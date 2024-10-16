@@ -48,7 +48,7 @@ import Login from "layouts/authentication/log-in";
 import ResetPassword from "layouts/authentication/forgot-password";
 // @mui icons
 import Icon from "@mui/material/Icon";
-
+import AddUser from "layouts/authentication/add-user";
 const routes = [
   {
     type: "collapse",
@@ -129,6 +129,14 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/forgot-password",
     component: <ResetPassword/>,
+  },
+  {
+    type: "collapse",
+    name: "AddUser",
+    key: "add-user",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/authentication/add-user",
+    component: <AddUser/>,
   },
 ];
 
