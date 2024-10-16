@@ -7,6 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import CloseIcon from "@mui/icons-material/Close"; // Import the Close icon
+import Switch from "@mui/material/Switch"; // Import Switch for Remember Me
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
@@ -33,6 +34,7 @@ function Login() {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false); // Add state for Remember Me switch
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const navigate = useNavigate(); // Initialize useNavigate for navigation
@@ -105,6 +107,25 @@ function Login() {
                 }}
               />
             </MDBox>
+
+            {/* Remember Me Switch */}
+            <MDBox display="flex" alignItems="center" mb={3}>
+              <Switch
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+              />
+              <MDTypography variant="button" fontWeight="regular" ml={1}>
+                Remember Me
+              </MDTypography>
+            </MDBox>
+
+            {/* Forgot Password Link */}
+            <Link to="/forgot-password" style={{ textDecoration: "none" }}>
+              <MDTypography variant="button" color="info" fontWeight="medium" textAlign="center">
+                Forgot Password?
+              </MDTypography>
+            </Link>
+
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth onClick={handleLogin}>
                 Login
