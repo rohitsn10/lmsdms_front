@@ -54,7 +54,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
-  const roles = ["Author", "Reviewer", "Approver", "Admin", "Doc Admin"];
+  const roles = ["Author", "Reviewer", "Approver", "vatsal", "Doc Admin"];
   const [open, setOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [password, setPassword] = useState("");
@@ -162,7 +162,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   <DialogTitle>Change Role</DialogTitle>
                   <DialogContent>
                     <FormControl fullWidth margin="normal">
-                      <InputLabel id="role-select-label">Select Role</InputLabel>
+                      <InputLabel id="role-select-label"
+                       sx={{ fontSize: "18px" }}>Select Role</InputLabel>
                       <Select
                         labelId="role-select-label"
                         value={selectedRole}
@@ -188,7 +189,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleSubmit} variant="contained">
+                    <Button onClick={handleSubmit} variant="contained"
+                     sx={{ backgroundColor: "primary.main", color: "white" }}>
                       Submit
                     </Button>
                   </DialogActions>
@@ -223,7 +225,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 variant="contained"
                 onClick={handleOpenMenu}
               >
-                <Icon sx={iconsStyle}>notifications</Icon>
+                {/* <Icon sx={iconsStyle}>notifications</Icon> */}
               </IconButton>
               {renderMenu()}
             </MDBox>
