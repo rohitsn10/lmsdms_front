@@ -168,6 +168,7 @@ const routes = [
     component: <AddApproval />,
   },
   {
+    type:"collapse",
     name: "ReviewDocument",
     key: "Review",
     icon: <Icon fontSize="small">assignment</Icon>,
