@@ -46,6 +46,7 @@ import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Login from "layouts/authentication/log-in";
 import ResetPassword from "layouts/authentication/forgot-password";
+import ReviewDocument from "layouts/authentication/Review";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import AddUser from "layouts/authentication/add-user";
@@ -138,6 +139,14 @@ const routes = [
     route: "/authentication/add-user",
     component: <AddUser/>,
   },
+  {
+    type: "collapse",
+    name: "ReviewDocument",
+    key: "Review",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/authentication/Review",
+    component: <ReviewDocument/>, 
+  }
 ];
 
 export default routes;

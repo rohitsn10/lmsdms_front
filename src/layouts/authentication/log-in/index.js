@@ -27,6 +27,7 @@ import {
   OutlinedInput,
   Button,
 } from "@mui/material";
+import forgotpassword from "../forgot-password/index.js";
 
 const roles = ["Author", "Reviewer", "Approver", "Admin", "Doc Admin"];
 
@@ -56,7 +57,9 @@ function Login() {
     setDialogOpen(false);
     navigate("/dashboard"); // Navigate to the dashboard on submit
   };
-
+  const handleForgotPassword = () => {
+   navigate("/forgotpassword")
+  };
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 400, mx: "auto" }}>
@@ -120,12 +123,11 @@ function Login() {
             </MDBox>
 
             {/* Forgot Password Link */}
-            <Link to="/forgot-password" style={{ textDecoration: "none" }}>
-              <MDTypography variant="button" color="info" fontWeight="medium" textAlign="center">
+            
+              <MDTypography variant="button" color="info" fontWeight="medium" textAlign="center"onClick={() => handleForgotPassword()}>
                 Forgot Password?
               </MDTypography>
-            </Link>
-
+    
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth onClick={handleLogin}>
                 Login
