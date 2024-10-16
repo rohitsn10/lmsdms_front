@@ -49,6 +49,10 @@ import ResetPassword from "layouts/authentication/forgot-password";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import AddUser from "layouts/authentication/add-user";
+import AddDepartment from "layouts/authentication/add-department";
+import AddDocument from "layouts/authentication/add-document";
+import AddApproval from "layouts/authentication/add-approval";
+
 const routes = [
   {
     type: "collapse",
@@ -138,6 +142,31 @@ const routes = [
     route: "/authentication/add-user",
     component: <AddUser/>,
   },
+  {
+    type: "collapse",
+    name: "AddDepartment",
+    key: "add-department",
+    icon: <Icon fontSize="small">notifications</Icon>,
+    route: "/add-department",
+    component: <AddDepartment />,
+  },
+  {
+    type: "collapse",
+    name: "AddDocument",
+    key: "add-document",
+    icon: <Icon fontSize="small">notifications</Icon>,
+    route: "/add-document",
+    component: <AddDocument />,
+  },
+  {
+    type: "collapse",
+    name: "AddApproval",
+    key: "add-approval",
+    icon: <Icon fontSize="small">notifications</Icon>,
+    route: "/add-approval",
+    component: <AddApproval />,
+  },
+  
 ];
 
 export default routes;
