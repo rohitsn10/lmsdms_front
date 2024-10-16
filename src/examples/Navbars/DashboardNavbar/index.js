@@ -1,24 +1,7 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState, useEffect } from "react";
 
-// react-router components
 import { useLocation, Link } from "react-router-dom";
 
-// prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
 
 // @material-ui core components
@@ -44,6 +27,18 @@ import {
   navbarIconButton,
   navbarMobileMenu,
 } from "examples/Navbars/DashboardNavbar/styles";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+} from "@mui/material";
 
 // Material Dashboard 2 React context
 import {
@@ -59,6 +54,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
+  const roles = ["Author", "Reviewer", "Approver", "Admin", "Doc Admin"];
+  const [open, setOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     // Setting the navbar type
@@ -68,21 +67,16 @@ function DashboardNavbar({ absolute, light, isMini }) {
       setNavbarType("static");
     }
 
-    // A function that sets the transparent state of the navbar.
+   
     function handleTransparentNavbar() {
       setTransparentNavbar(dispatch, (fixedNavbar && window.scrollY === 0) || !fixedNavbar);
     }
 
-    /** 
-     The event listener that's calling the handleTransparentNavbar function when 
-     scrolling the window.
-    */
     window.addEventListener("scroll", handleTransparentNavbar);
 
-    // Call the handleTransparentNavbar function to set the state with the initial value.
+    
     handleTransparentNavbar();
 
-    // Remove event listener on cleanup
     return () => window.removeEventListener("scroll", handleTransparentNavbar);
   }, [dispatch, fixedNavbar]);
 
@@ -90,6 +84,28 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleRoleChange = (event) => {
+    setSelectedRole(event.target.value);
+  };
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+  const handleSubmit = () => {
+    if (password && selectedRole) {
+      // Perform role change action (e.g., API call)
+      console.log("Role changed to:", selectedRole, "with password:", password);
+      handleClose(); // Close dialog after submission
+    } else {
+      // Handle validation (show an error if password or role is not selected)
+      console.log("Please select a role and enter your password.");
+    }
+  };
 
   // Render the notifications menu
   const renderMenu = () => (
@@ -109,7 +125,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
       <NotificationItem icon={<Icon>shopping_cart</Icon>} title="Payment successfully completed" />
     </Menu>
   );
-
   // Styles for the navbar icons
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {
@@ -139,11 +154,45 @@ function DashboardNavbar({ absolute, light, isMini }) {
               <MDInput label="Search here" />
             </MDBox>
             <MDBox color={light ? "white" : "inherit"}>
-              <Link to="/authentication/sign-in/basic">
-                <IconButton sx={navbarIconButton} size="small" disableRipple>
+          
+                <IconButton sx={navbarIconButton} size="small"disableRipple onClick={handleClickOpen}>
                   <Icon sx={iconsStyle}>account_circle</Icon>
                 </IconButton>
-              </Link>
+                <Dialog open={open} onClose={handleClose}>
+                  <DialogTitle>Change Role</DialogTitle>
+                  <DialogContent>
+                    <FormControl fullWidth margin="normal">
+                      <InputLabel id="role-select-label">Select Role</InputLabel>
+                      <Select
+                        labelId="role-select-label"
+                        value={selectedRole}
+                        onChange={handleRoleChange}
+                        label="Select Role"
+                      >
+                        {roles.map((role) => (
+                          <MenuItem key={role} value={role}>
+                            {role}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <TextField
+                      fullWidth
+                      margin="normal"
+                      label="Enter Password"
+                      type="password"
+                      value={password}
+                      onChange={handlePasswordChange}
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={handleSubmit} variant="contained">
+                      Submit
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               <IconButton
                 size="small"
                 disableRipple
