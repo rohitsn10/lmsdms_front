@@ -53,15 +53,17 @@ import AddUser from "layouts/authentication/add-user";
 import AddDepartment from "layouts/authentication/add-department";
 import AddDocument from "layouts/authentication/add-document";
 import AddApproval from "layouts/authentication/add-approval";
-
+import ReleaseDocument from "layouts/authentication/release-document";
+import PrintDocument from "layouts/authentication/print-document";
+import Watermark from "layouts/authentication/watermark";
 const routes = [
   {
     type: "collapse",
-    name: "Sign In",
-    key: "sign-in",
+    name: "PrintDocument",
+    key: "print-document",
     icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/sign-in",
-    component: <SignIn />,
+    route: "/authentication/print-document",
+    component: <PrintDocument />,
   },
   {
     type: "collapse",
@@ -73,11 +75,11 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Tables",
-    key: "tables",
+    name: "Watermark",
+    key: "watermark",
     icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
+    route: "/authentication/watermark",
+    component: <Watermark />,
   },
   {
     type: "collapse",
@@ -113,11 +115,11 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Sign Up",
-    key: "sign-up",
+    name: "ReleaseDocument",
+    key: "release-document",
     icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/sign-up",
-    component: <SignUp />,
+    route: "/authentication/release-document",
+    component: <ReleaseDocument />,
   },
   {
     type: "collapse",
