@@ -163,7 +163,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   <DialogContent>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="role-select-label"
-                       sx={{ fontSize: "18px" }}>Select Role</InputLabel>
+                      sx={{
+                        padding: "0.5rem",
+                      }}
+                      >
+                      Select Role
+                      </InputLabel>
                       <Select
                         labelId="role-select-label"
                         value={selectedRole}

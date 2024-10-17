@@ -162,7 +162,6 @@ material-dashboard-react
     │   ├── index.js
     │   └── routes.js
     ├── .eslintrc.json
-    ├── .prettierrc.json
     ├── CHANGELOG.md
     ├── ISSUE_TEMPLATE.md
     ├── jsconfig.json
