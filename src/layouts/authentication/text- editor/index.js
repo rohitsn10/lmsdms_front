@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Box, Button, Paper, Typography } from '@mui/material';
 import Editor from './Editor';
+import PropTypes from 'prop-types';
 
 const DocumentView = ({ addComment, comments }) => {
   const [selectedText, setSelectedText] = useState("");
@@ -125,6 +126,16 @@ const DocumentView = ({ addComment, comments }) => {
       )}
     </Box>
   );
+};
+
+DocumentView.propTypes = {
+  addComment: PropTypes.func.isRequired,
+  comments: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      text: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };
 
 export default DocumentView;
