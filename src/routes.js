@@ -47,7 +47,6 @@ import SignUp from "layouts/authentication/sign-up";
 import Login from "layouts/authentication/log-in";
 import ResetPassword from "layouts/authentication/forgot-password";
 import ReviewDocument from "layouts/authentication/Review";
-// @mui icons
 import Icon from "@mui/material/Icon";
 import AddUser from "layouts/authentication/add-user";
 import AddDepartment from "layouts/authentication/add-department";
@@ -56,6 +55,7 @@ import AddApproval from "layouts/authentication/add-approval";
 import ReleaseDocument from "layouts/authentication/release-document";
 import PrintDocument from "layouts/authentication/print-document";
 import Watermark from "layouts/authentication/watermark";
+import DocumentView from "layouts/authentication/text- editor";
 const routes = [
   {
     type: "collapse",
@@ -176,6 +176,14 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/Review",
     component: <ReviewDocument/>, 
+  },
+  {
+    type:"collapse",
+    name: "DocumentView",
+    key: "text-editor",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/authentication/text-editor",
+    component: <DocumentView/>, 
   }
 ];
 

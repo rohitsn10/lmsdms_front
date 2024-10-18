@@ -218,10 +218,7 @@ react                    16.13.1   →   17.0.2
 react-chartist            0.14.3   →   0.14.4
 react-dom                16.13.1   →   17.0.2
 react-scripts              3.4.1   →    4.0.3
-eslint-config-prettier    6.11.0   →    8.3.0
-eslint-plugin-prettier     3.1.3   →    3.4.0
 gulp-append-prepend        1.0.8   →    1.0.9
-prettier                   2.0.5   →    2.2.1
 typescript                 3.9.3   →    4.2.4
 ```
 
@@ -268,9 +265,7 @@ react-dom                16.9.0   →   16.13.1
 react-router-dom          5.0.1   →     5.2.0
 react-scripts             3.1.0   →     3.4.1
 react-swipeable-views    0.13.3   →    0.13.9
-eslint-config-prettier    6.0.0   →    6.11.0
-eslint-plugin-prettier    3.1.0   →     3.1.3
-prettier                 1.18.2   →     2.0.5
+eslint-config-    6.0.0   →    6.11.0
 @types/googlemaps        3.37.3   →    3.39.6
 ajv                      6.10.2   →    6.12.2
 typescript                3.5.3   →     3.9.3
@@ -315,7 +310,6 @@ _Warnings might appear while doing an npm install - they do not affect the UI or
 react                    16.8.6   →   16.9.0
 react-dom                16.8.6   →   16.9.0
 react-scripts             3.0.1   →    3.1.0
-eslint-config-prettier    4.3.0   →    6.0.0
 @types/googlemaps        3.36.4   →   3.37.3
 ajv                      6.10.0   →   6.10.2
 typescript                3.5.1   →    3.5.3
@@ -358,15 +352,12 @@ typescript                3.5.1   →    3.5.3
 @material-ui/icons         3.0.2   →    4.1.0
 chartist                  0.10.1   →   0.11.2
 history                    4.7.2   →    4.9.0
-prettier                  1.16.4   →   1.18.2
 prop-types                15.7.1   →   15.7.2
 react                     16.8.1   →   16.8.6
 react-dom                 16.8.1   →   16.8.6
 react-router-dom           4.3.1   →    5.0.1
 react-scripts              2.1.5   →    3.0.1
 react-swipeable-views     0.13.1   →   0.13.3
-eslint-config-prettier     4.0.0   →    4.3.0
-eslint-plugin-prettier     3.0.1   →    3.1.0
 @types/googlemaps        3.30.16   →   3.36.4
 ajv                        6.9.1   →   6.10.0
 ```
@@ -427,7 +418,6 @@ ajv                        6.9.1   →   6.10.0
 
 - `history4.7.2`
 - `prop-types@15.6.2`
-- `prettier@1.16.4`
 
 ### Updated dependencies
 
@@ -441,8 +431,7 @@ ajv                        6.9.1   →   6.10.0
 - `react-dom` _16.5.2_ → **16.8.1**
 - `react-scripts` _1.1.5_ → **2.1.5**
 - `react-swipeable-views` _0.12.17_ → **0.13.1**
-- `eslint-config-prettier` _3.0.1_ → **4.0.0**
-- `eslint-plugin-prettier` _2.6.2_ → **3.0.1**
+
 
 ## [1.5.0] 2018-09-21
 
@@ -473,9 +462,7 @@ ajv                        6.9.1   →   6.10.0
 - `react-dom` _16.4.1_ → **16.5.2**
 - `react-scripts` _1.1.4_ → **1.1.5**
 - `react-swipeable-views` _0.12.15_ → **0.12.17**
-- `eslint-config-prettier` _^2.9.0_ → **3.0.1**
 - `eslint-plugin-react` _^7.10.0_ → **7.11.1**
-- `prettier` _^1.13.7_ → **1.14.3**
 
 ## [1.4.1] 2018-08-10
 
