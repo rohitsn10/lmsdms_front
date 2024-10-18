@@ -2,7 +2,7 @@ import React, { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import ImageResize from 'quill-image-resize-module-react';
-
+import PropTypes from 'prop-types'; // Import PropTypes
 
 Quill.register('modules/imageResize', ImageResize);
 const VideoBlot = Quill.import('formats/video');
@@ -11,17 +11,17 @@ Quill.register(VideoBlot, true);
 
 const toolbarOptions = [
   [{ 'font': [] }],
-  [{'header':[1,2,3,4,5,6,false]}],
+  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
   [{ 'size': ['small', 'normal', 'large', 'huge'] }],
   ['bold', 'italic', 'underline', 'strike'],
   [{ 'color': [] }, { 'background': [] }],
   [{ 'list': 'ordered' }, { 'list': 'bullet' }],
   [{ 'align': [] }],
   ['link', 'image', 'video', 'blockquote', 'hr', 'formula'],
-  ['clean'], 
+  ['clean'],
   [{ 'indent': '-1' }, { 'indent': '+1' }],
   ['code-block'],
-  ['emoji'], 
+  ['emoji'],
 ];
 
 const Editor = forwardRef(
@@ -101,5 +101,18 @@ const Editor = forwardRef(
 );
 
 Editor.displayName = 'Editor';
+
+// Add PropTypes validation
+Editor.propTypes = {
+  readOnly: PropTypes.bool,
+  defaultValue: PropTypes.string,
+  onTextChange: PropTypes.func.isRequired,
+  onSelectionChange: PropTypes.func.isRequired,
+};
+
+Editor.defaultProps = {
+  readOnly: false,
+  defaultValue: '',
+};
 
 export default Editor;
