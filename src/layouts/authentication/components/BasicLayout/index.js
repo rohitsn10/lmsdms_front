@@ -8,7 +8,7 @@
 
 Coded by www.creative-tim.com
 
- =========================================================
+=========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
@@ -48,12 +48,7 @@ function BasicLayout({ image, children, showNavbarFooter = true }) {
         width="100%"
         minHeight="100vh"
         sx={{
-          backgroundImage: ({ functions: { linearGradient, rgba }, palette: { gradients } }) =>
-            image &&
-            `${linearGradient(
-              rgba(gradients.dark.main, 0.6),
-              rgba(gradients.dark.state, 0.6)
-            )}, url(${image})`,
+          backgroundImage: `url(${image})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -76,7 +71,7 @@ function BasicLayout({ image, children, showNavbarFooter = true }) {
 BasicLayout.propTypes = {
   image: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
-  showNavbarFooter: PropTypes.bool, // Add this line
+  showNavbarFooter: PropTypes.bool,
 };
 
 export default BasicLayout;
