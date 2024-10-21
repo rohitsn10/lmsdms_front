@@ -44,7 +44,6 @@ function AddUser() {
       joiningDate,
       jobPosition,
     });
-    // Navigate to a different page if needed
     navigate("/dashboard");
   };
 

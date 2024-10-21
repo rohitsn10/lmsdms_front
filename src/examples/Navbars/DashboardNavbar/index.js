@@ -67,14 +67,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
       setNavbarType("static");
     }
 
-   
     function handleTransparentNavbar() {
       setTransparentNavbar(dispatch, (fixedNavbar && window.scrollY === 0) || !fixedNavbar);
     }
 
     window.addEventListener("scroll", handleTransparentNavbar);
 
-    
     handleTransparentNavbar();
 
     return () => window.removeEventListener("scroll", handleTransparentNavbar);
@@ -107,7 +105,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
   };
 
-  // Render the notifications menu
   const renderMenu = () => (
     <Menu
       anchorEl={openMenu}
@@ -154,52 +151,60 @@ function DashboardNavbar({ absolute, light, isMini }) {
               <MDInput label="Search here" />
             </MDBox>
             <MDBox color={light ? "white" : "inherit"}>
-          
-                <IconButton sx={navbarIconButton} size="small"disableRipple onClick={handleClickOpen}>
-                  <Icon sx={iconsStyle}>account_circle</Icon>
-                </IconButton>
-                <Dialog open={open} onClose={handleClose}>
-                  <DialogTitle>Change Role</DialogTitle>
-                  <DialogContent>
-                    <FormControl fullWidth margin="normal">
-                      <InputLabel id="role-select-label"
+              <IconButton
+                sx={navbarIconButton}
+                size="small"
+                disableRipple
+                onClick={handleClickOpen}
+              >
+                <Icon sx={iconsStyle}>account_circle</Icon>
+              </IconButton>
+              <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Change Role</DialogTitle>
+                <DialogContent>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel
+                      id="role-select-label"
                       sx={{
                         padding: "0.5rem",
                       }}
-                      >
+                    >
                       Select Role
-                      </InputLabel>
-                      <Select
-                        labelId="role-select-label"
-                        value={selectedRole}
-                        onChange={handleRoleChange}
-                        label="Select Role"
-                      >
-                        {roles.map((role) => (
-                          <MenuItem key={role} value={role}>
-                            {role}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                    </InputLabel>
+                    <Select
+                      labelId="role-select-label"
+                      value={selectedRole}
+                      onChange={handleRoleChange}
+                      label="Select Role"
+                    >
+                      {roles.map((role) => (
+                        <MenuItem key={role} value={role}>
+                          {role}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
 
-                    <TextField
-                      fullWidth
-                      margin="normal"
-                      label="Enter Password"
-                      type="password"
-                      value={password}
-                      onChange={handlePasswordChange}
-                    />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleSubmit} variant="contained"
-                     sx={{ backgroundColor: "primary.main", color: "white" }}>
-                      Submit
-                    </Button>
-                  </DialogActions>
-                </Dialog>
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    label="Enter Password"
+                    type="password"
+                    value={password}
+                    onChange={handlePasswordChange}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleClose}>Cancel</Button>
+                  <Button
+                    onClick={handleSubmit}
+                    variant="contained"
+                    sx={{ backgroundColor: "primary.main", color: "white" }}
+                  >
+                    Submit
+                  </Button>
+                </DialogActions>
+              </Dialog>
               <IconButton
                 size="small"
                 disableRipple
@@ -220,19 +225,21 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 <Icon sx={iconsStyle}>settings</Icon>
               </IconButton>
-              <IconButton
-                size="small"
-                disableRipple
-                color="inherit"
-                sx={navbarIconButton}
-                aria-controls="notification-menu"
-                aria-haspopup="true"
-                variant="contained"
-                onClick={handleOpenMenu}
-              >
-                {/* <Icon sx={iconsStyle}>notifications</Icon> */}
-              </IconButton>
-              {renderMenu()}
+              <Link to="/document-view" style={{ textDecoration: "none", color: "inherit" }}>
+                {" "}
+                {/* Wrap IconButton in Link */}
+                <IconButton
+                  size="small"
+                  disableRipple
+                  color="inherit"
+                  sx={navbarIconButton}
+                  aria-controls="notification-menu"
+                  aria-haspopup="true"
+                  variant="contained"
+                >
+                  <Icon sx={iconsStyle}>notifications</Icon>
+                </IconButton>
+              </Link>
             </MDBox>
           </MDBox>
         )}
