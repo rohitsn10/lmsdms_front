@@ -151,14 +151,7 @@ const routes = [
     route: "/authentication/Review",
     component: <ReviewDocument/>, 
   },
-  {
-    type:"collapse",
-    name: "DocumentView",
-    key: "text-editor",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/text-editor",
-    component: <DocumentView/>, 
-  }
+  
 ];
 
 export default routes;

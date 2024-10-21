@@ -55,7 +55,7 @@ function Login() {
   const handleOk = () => {
     console.log("Selected Role:", selectedRole);
     setDialogOpen(false);
-    navigate("/dashboard"); // Navigate to the dashboard on submit
+    navigate("/dashboard"); 
   };
   const handleForgotPassword = () => {
    navigate("/forgotpassword")

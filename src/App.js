@@ -18,6 +18,7 @@ import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "co
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
 import Login from "./layouts/authentication/log-in/index.js";
+import DocumentView from "layouts/authentication/text- editor/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -34,7 +35,7 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-
+  const isTextEditor = pathname === "/document-view";  
   useMemo(() => {
     const cacheRtl = createCache({
       key: "rtl",
@@ -70,13 +71,12 @@ export default function App() {
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
 
-  // Set background image globally for all pages
   useEffect(() => {
     document.body.style.backgroundImage = "url('/dmsbg.png')";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundRepeat = "no-repeat";
     document.body.style.backgroundPosition = "center";
-  }, [pathname]);  // Apply background image on every route change
+  }, [pathname]); 
 
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
@@ -120,7 +120,7 @@ export default function App() {
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
         <CssBaseline />
         <div>
-          {layout === "dashboard" && (
+          {layout === "dashboard" && !isTextEditor && (
             <>
               <Sidenav
                 color={sidenavColor}
@@ -129,6 +129,7 @@ export default function App() {
                 routes={routes}
                 onMouseEnter={handleOnMouseEnter}
                 onMouseLeave={handleOnMouseLeave}
+                style={{ position: "fixed", zIndex: 2 }} // Fix position and set z-index
               />
               <Configurator />
               {configsButton}
@@ -138,6 +139,7 @@ export default function App() {
           <Routes>
             {getRoutes(routes)}
             <Route path="/login" element={<Login />} />
+            <Route path="/document-view" element={<DocumentView />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </div>
@@ -147,7 +149,7 @@ export default function App() {
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       <div>
-        {layout === "dashboard" && (
+        {layout === "dashboard" && !isTextEditor && (  // Conditional rendering of Sidebar
           <>
             <Sidenav
               color={sidenavColor}
@@ -156,6 +158,7 @@ export default function App() {
               routes={routes}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
+              style={{ position: "fixed", zIndex: 3 }} // Fix position and set z-index
             />
             <Configurator />
             {configsButton}
@@ -165,6 +168,7 @@ export default function App() {
         <Routes>
           {getRoutes(routes)}
           <Route path="/login" element={<Login />} />
+          <Route path="/document-view" element={<DocumentView />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
