@@ -36,6 +36,7 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
   const isTextEditor = pathname === "/document-view";  
+
   useMemo(() => {
     const cacheRtl = createCache({
       key: "rtl",
@@ -71,12 +72,17 @@ export default function App() {
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
 
+  // Set background image conditionally
   useEffect(() => {
-    document.body.style.backgroundImage = "url('/dmsbg.png')";
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundRepeat = "no-repeat";
-    document.body.style.backgroundPosition = "center";
-  }, [pathname]); 
+    if (!isTextEditor) {
+      document.body.style.backgroundImage = "url('/dmsbg.png')";
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundRepeat = "no-repeat";
+      document.body.style.backgroundPosition = "center";
+    } else {
+      document.body.style.backgroundImage = "none"; // Remove background image
+    }
+  }, [pathname, isTextEditor]); 
 
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
