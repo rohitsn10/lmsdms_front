@@ -65,16 +65,19 @@ function Login() {
       <Card sx={{ width: 400, mx: "auto" }}>
         <MDBox
           variant="gradient"
-          bgColor="info"
+
           borderRadius="lg"
           coloredShadow="info"
+          sx={{ backgroundColor: '#F5E0C3' }}
           mx={2}
           mt={-3}
           p={2}
           mb={1}
           textAlign="center"
+          
         >
-          <MDTypography variant="h3" fontWeight="medium" color="white" mt={1}>
+          <MDTypography variant="h3" fontWeight="medium"  mt={1}
+          >
             Login
           </MDTypography>
         </MDBox>
@@ -128,8 +131,9 @@ function Login() {
                 Forgot Password?
               </MDTypography>
     
-            <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth onClick={handleLogin}>
+            <MDBox mt={4} mb={1}
+            sx={{ backgroundColor: '#F5E0C3' }}>
+              <MDButton variant="gradient" color="info" sx={{ backgroundColor: '#F5E0C3' }}fullWidth onClick={handleLogin}>
                 Login
               </MDButton>
             </MDBox>

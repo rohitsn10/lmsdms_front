@@ -3,6 +3,8 @@ import { Box, Button, Paper, Typography } from '@mui/material';
 import Editor from './Editor';
 import PropTypes from 'prop-types';
 
+//src/layouts/authentication/text-editor/index.js
+
 const DocumentView = ({ addComment, comments }) => {
   const [selectedText, setSelectedText] = useState("");
   const [documentContent, setDocumentContent] = useState("");
@@ -103,166 +105,23 @@ const DocumentView = ({ addComment, comments }) => {
         >
           <Paper 
             elevation={3} 
-            sx={{ width: '210mm', height: '297mm', position: 'relative', padding: 2, overflowY: 'auto', backgroundColor:'white'}} // A4 size
+            sx={{ width: '190mm', height: '180mm', position: 'relative', padding: 2 }}
           >
-            <Typography variant="h6" onClick={closePopup} sx={{ position: 'absolute', top: 10, right: 10, cursor: 'pointer' }}>
+            <Typography 
+              variant="h6" 
+              onClick={closePopup} 
+              sx={{ position: 'absolute', top: 10, right: 10, cursor: 'pointer' }}
+            >
               &times;
             </Typography>
             <Box position="relative">
-              <Typography variant="h4" sx={{ marginBottom: 2 }}>Document Template</Typography>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">Title:</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">Number:</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">Version Supersedes:</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">Department:</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">1.0 PURPOSE:</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">2.0 SCOPE:</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">3.0 RESPONSIBILITY:</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">4.0 ACCOUNTABILITY:</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">5.0 ABBREVIATION:</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">6.0 DEFINITIONS (IF ANY):</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">7.0 PROCEDURE:</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">8.0 ANNEXURE (IF ANY):</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">9.0 FORMAT (IF ANY):</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">10.0 TEMPLATE (IF ANY):</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">11.0 ACRONYMS (IF ANY):</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">12.0 REFERENCES (IF ANY):</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
-              <Box component="div" sx={{ marginBottom: 2 }}>
-                <Typography variant="body1">13.0 REVISION HISTORY (IF ANY):</Typography>
-                <Editor
-                  ref={quillRef}
-                  readOnly={readOnly}
-                  defaultValue=""
-                  onTextChange={(content) => handleTextChange(content)}
-                />
-              </Box>
+              <Typography 
+                variant="h1" 
+                sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '100px', color: 'rgba(0, 0, 0, 0.1)', pointerEvents: 'none' }}
+              >
+                pending
+              </Typography>
+              <Box dangerouslySetInnerHTML={getHighlightedText(documentContent)} />
             </Box>
           </Paper>
         </Box>
@@ -273,7 +132,12 @@ const DocumentView = ({ addComment, comments }) => {
 
 DocumentView.propTypes = {
   addComment: PropTypes.func.isRequired,
-  comments: PropTypes.array.isRequired,
+  comments: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      text: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };
 
 export default DocumentView;
