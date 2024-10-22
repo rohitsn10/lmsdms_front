@@ -19,6 +19,10 @@ import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
 import Login from "./layouts/authentication/log-in/index.js";
 import DocumentView from "layouts/authentication/text- editor/index.js";
+import AddUser from "layouts/authentication/add-user";
+import AddDepartment from "layouts/authentication/add-department";
+import AddDocument from "layouts/authentication/add-document";
+import AddApproval from "layouts/authentication/add-approval";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -35,7 +39,7 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-  const isTextEditor = pathname === "/document-view";  
+  const isTextEditor = pathname === "/document-view";
 
   useMemo(() => {
     const cacheRtl = createCache({
@@ -63,8 +67,8 @@ export default function App() {
 
   useEffect(() => {
     document.body.setAttribute("dir", direction);
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
   }, [direction]);
 
   useEffect(() => {
@@ -82,7 +86,7 @@ export default function App() {
     } else {
       document.body.style.backgroundImage = "none"; // Remove background image
     }
-  }, [pathname, isTextEditor]); 
+  }, [pathname, isTextEditor]);
 
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
@@ -135,7 +139,7 @@ export default function App() {
                 routes={routes}
                 onMouseEnter={handleOnMouseEnter}
                 onMouseLeave={handleOnMouseLeave}
-                style={{ position: "fixed", zIndex: 2 }} // Fix position and set z-index
+                style={{ position: "fixed", zIndex: 2 }} 
               />
               <Configurator />
               {configsButton}
@@ -146,6 +150,10 @@ export default function App() {
             {getRoutes(routes)}
             <Route path="/login" element={<Login />} />
             <Route path="/document-view" element={<DocumentView />} />
+            <Route path="/add-user" element={<AddUser />} />
+            <Route path="/add-document" element={<AddDocument />} />
+            <Route path="/add-department" element={<AddDepartment />} />
+            <Route path="/add-approval" element={<AddApproval />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </div>
@@ -155,26 +163,31 @@ export default function App() {
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       <div>
-        {layout === "dashboard" && !isTextEditor && (  // Conditional rendering of Sidebar
-          <>
-            <Sidenav
-              color={sidenavColor}
-              brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-              brandName="Material Dashboard 2"
-              routes={routes}
-              onMouseEnter={handleOnMouseEnter}
-              onMouseLeave={handleOnMouseLeave}
-              style={{ position: "fixed", zIndex: 3 }} // Fix position and set z-index
-            />
-            <Configurator />
-            {configsButton}
-          </>
-        )}
+        {layout === "dashboard" &&
+          !isTextEditor && ( // Conditional rendering of Sidebar
+            <>
+              <Sidenav
+                color={sidenavColor}
+                brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
+                brandName="Bharat Parenterals"
+                routes={routes}
+                onMouseEnter={handleOnMouseEnter}
+                onMouseLeave={handleOnMouseLeave}
+                style={{ position: "fixed", zIndex: 3 }} 
+              />
+              <Configurator />
+              {configsButton}
+            </>
+          )}
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(routes)}
           <Route path="/login" element={<Login />} />
           <Route path="/document-view" element={<DocumentView />} />
+          <Route path="/add-user" element={<AddUser />} />
+          <Route path="/add-document" element={<AddDocument />} />
+          <Route path="/add-user" element={<AddDepartment />} />
+          <Route path="/add-user" element={<AddApproval />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
