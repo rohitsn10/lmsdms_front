@@ -182,12 +182,12 @@ export default function App() {
         <Routes>
           {getRoutes(routes)}
           <Route path="/login" element={<Login />} />
-          <Route path="/document-view" element={<DocumentView />} />
-          <Route path="/add-user" element={<AddUser />} />
-          <Route path="/add-document" element={<AddDocument />} />
-          <Route path="/add-user" element={<AddDepartment />} />
-          <Route path="/add-user" element={<AddApproval />} />
-          <Route path="*" element={<Navigate to="/login" />} />
+            <Route path="/document-view" element={<DocumentView />} />
+            <Route path="/add-user" element={<AddUser />} />
+            <Route path="/add-document" element={<AddDocument />} />
+            <Route path="/add-department" element={<AddDepartment />} />
+            <Route path="/add-approval" element={<AddApproval />} />
+            <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
     </ThemeProvider>
