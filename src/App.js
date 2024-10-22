@@ -39,7 +39,11 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
+<<<<<<< Updated upstream
   const isTextEditor = pathname === "/document-view";
+=======
+  const isDocEditor = pathname === "/DocEditor";  
+>>>>>>> Stashed changes
 
   useMemo(() => {
     const cacheRtl = createCache({
@@ -78,7 +82,7 @@ export default function App() {
 
   // Set background image conditionally
   useEffect(() => {
-    if (!isTextEditor) {
+    if (!isDocEditor) {
       document.body.style.backgroundImage = "url('/dmsbg.png')";
       document.body.style.backgroundSize = "cover";
       document.body.style.backgroundRepeat = "no-repeat";
@@ -86,7 +90,11 @@ export default function App() {
     } else {
       document.body.style.backgroundImage = "none"; // Remove background image
     }
+<<<<<<< Updated upstream
   }, [pathname, isTextEditor]);
+=======
+  }, [pathname, !isDocEditor]); 
+>>>>>>> Stashed changes
 
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
@@ -130,7 +138,7 @@ export default function App() {
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
         <CssBaseline />
         <div>
-          {layout === "dashboard" && !isTextEditor && (
+          {layout === "dashboard" && !isDocEditor && (
             <>
               <Sidenav
                 color={sidenavColor}
@@ -163,6 +171,7 @@ export default function App() {
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       <div>
+<<<<<<< Updated upstream
         {layout === "dashboard" &&
           !isTextEditor && ( // Conditional rendering of Sidebar
             <>
@@ -179,6 +188,23 @@ export default function App() {
               {configsButton}
             </>
           )}
+=======
+        {layout === "dashboard" && !isDocEditor && (  // Conditional rendering of Sidebar
+          <>
+            <Sidenav
+              color={sidenavColor}
+              brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
+              brandName="Material Dashboard 2"
+              routes={routes}
+              onMouseEnter={handleOnMouseEnter}
+              onMouseLeave={handleOnMouseLeave}
+              style={{ position: "fixed", zIndex: 3 }} // Fix position and set z-index
+            />
+            <Configurator />
+            {configsButton}
+          </>
+        )}
+>>>>>>> Stashed changes
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(routes)}

@@ -52,7 +52,17 @@ import ReleaseDocument from "layouts/authentication/release-document";
 import PrintDocument from "layouts/authentication/print-document";
 import Watermark from "layouts/authentication/watermark";
 import DocumentView from "layouts/authentication/text- editor";
+import DocEditor from "layouts/authentication/DocEditor";
+
 const routes = [
+  {
+    type: "collapse",
+    name: "DocEditor",
+    key: "DocEditor",
+    icon: <Icon fontSize="small">login</Icon>,
+    route: "/authentication/DocEditor",
+    component: <DocEditor />,
+  },
   {
     type: "collapse",
     name: "PrintDocument",

@@ -57,15 +57,16 @@ function Login() {
     setDialogOpen(false);
     navigate("/dashboard"); 
   };
+
   const handleForgotPassword = () => {
-   navigate("/forgotpassword")
+    navigate("/forgotpassword");
   };
+
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 400, mx: "auto" }}>
         <MDBox
           variant="gradient"
-
           borderRadius="lg"
           coloredShadow="info"
           sx={{ backgroundColor: '#F5E0C3' }}
@@ -74,10 +75,8 @@ function Login() {
           p={2}
           mb={1}
           textAlign="center"
-          
         >
-          <MDTypography variant="h3" fontWeight="medium"  mt={1}
-          >
+          <MDTypography variant="h3" fontWeight="medium" mt={1}>
             Login
           </MDTypography>
         </MDBox>
@@ -126,14 +125,37 @@ function Login() {
             </MDBox>
 
             {/* Forgot Password Link */}
-            
-              <MDTypography variant="button" color="info" fontWeight="medium" textAlign="center"onClick={() => handleForgotPassword()}>
-                Forgot Password?
-              </MDTypography>
-    
-            <MDBox mt={4} mb={1}
-            sx={{ backgroundColor: '#F5E0C3' }}>
-              <MDButton variant="gradient" color="info" sx={{ backgroundColor: '#F5E0C3' }}fullWidth onClick={handleLogin}>
+            <MDTypography
+              variant="button"
+              fontWeight="medium"
+              textAlign="center"
+              sx={{
+                color: '#00008B', // Dark blue color
+                cursor: 'pointer', // Add pointer to indicate it's clickable
+                "&:hover": {
+                  textDecoration: 'underline', // Optional: underline on hover
+                },
+              }}
+              onClick={handleForgotPassword}
+            >
+              Forgot Password?
+            </MDTypography>
+
+            <MDBox mt={4} mb={1} sx={{ backgroundColor: '#F5E0C3' }}>
+              <MDButton
+                variant="gradient"
+                // color="info"
+                sx={{
+                  backgroundColor: '#F5E0C3',
+                  color: '#000',
+                  "&:hover": {
+                    backgroundColor: '#E6D3B2', // Updated hover color
+                    color: '#000',
+                  },
+                }}
+                fullWidth
+                onClick={handleLogin}
+              >
                 Login
               </MDButton>
             </MDBox>
