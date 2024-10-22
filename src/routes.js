@@ -44,25 +44,19 @@ import ResetPassword from "layouts/authentication/forgot-password";
 import ReviewDocument from "layouts/authentication/Review";
 // @mui icons
 import Icon from "@mui/material/Icon";
-import AddUser from "layouts/authentication/add-user";
-import AddDepartment from "layouts/authentication/add-department";
-import AddDocument from "layouts/authentication/add-document";
-import AddApproval from "layouts/authentication/add-approval";
 import ReleaseDocument from "layouts/authentication/release-document";
 import PrintDocument from "layouts/authentication/print-document";
 import Watermark from "layouts/authentication/watermark";
-import DocumentView from "layouts/authentication/text- editor";
-import DocEditor from "layouts/authentication/DocEditor";
 
 const routes = [
-  {
-    type: "collapse",
-    name: "DocEditor",
-    key: "DocEditor",
-    icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/DocEditor",
-    component: <DocEditor />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "DocEditor",
+  //   key: "DocEditor",
+  //   icon: <Icon fontSize="small">login</Icon>,
+  //   route: "/authentication/DocEditor",
+  //   component: <DocEditor />,
+  // },
   {
     type: "collapse",
     name: "PrintDocument",

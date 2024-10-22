@@ -39,7 +39,7 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-  const isDocEditor = pathname === "/DocEditor";  
+  const isTextEditor = pathname === "/document-view";  
 
   useMemo(() => {
     const cacheRtl = createCache({
@@ -78,7 +78,7 @@ export default function App() {
 
   // Set background image conditionally
   useEffect(() => {
-    if (!isDocEditor) {
+    if (!isTextEditor) {
       document.body.style.backgroundImage = "url('/dmsbg.png')";
       document.body.style.backgroundSize = "cover";
       document.body.style.backgroundRepeat = "no-repeat";
@@ -86,7 +86,7 @@ export default function App() {
     } else {
       document.body.style.backgroundImage = "none"; // Remove background image
     }
-  }, [pathname, !isDocEditor]); 
+  }, [pathname, !isTextEditor]); 
 
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
@@ -130,7 +130,7 @@ export default function App() {
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
         <CssBaseline />
         <div>
-          {layout === "dashboard" && !isDocEditor && (
+          {layout === "dashboard" && !isTextEditor && (
             <>
               <Sidenav
                 color={sidenavColor}
@@ -163,7 +163,7 @@ export default function App() {
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       <div>
-        {layout === "dashboard" && !isDocEditor && (  // Conditional rendering of Sidebar
+        {layout === "dashboard" && !isTextEditor && (  // Conditional rendering of Sidebar
           <>
             <Sidenav
               color={sidenavColor}
