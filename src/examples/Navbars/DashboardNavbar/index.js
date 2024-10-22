@@ -105,23 +105,23 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
   };
 
-  const renderMenu = () => (
-    <Menu
-      anchorEl={openMenu}
-      anchorReference={null}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "left",
-      }}
-      open={Boolean(openMenu)}
-      onClose={handleCloseMenu}
-      sx={{ mt: 2 }}
-    >
-      <NotificationItem icon={<Icon>email</Icon>} title="Check new messages" />
-      <NotificationItem icon={<Icon>podcasts</Icon>} title="Manage Podcast sessions" />
-      <NotificationItem icon={<Icon>shopping_cart</Icon>} title="Payment successfully completed" />
-    </Menu>
-  );
+  // const renderMenu = () => (
+  //   <Menu
+  //     anchorEl={openMenu}
+  //     anchorReference={null}
+  //     anchorOrigin={{
+  //       vertical: "bottom",
+  //       horizontal: "left",
+  //     }}
+  //     open={Boolean(openMenu)}
+  //     onClose={handleCloseMenu}
+  //     sx={{ mt: 2 }}
+  //   >
+  //     <NotificationItem icon={<Icon>email</Icon>} title="Check new messages" />
+  //     <NotificationItem icon={<Icon>podcasts</Icon>} title="Manage Podcast sessions" />
+  //     <NotificationItem icon={<Icon>shopping_cart</Icon>} title="Payment successfully completed" />
+  //   </Menu>
+  // );
   // Styles for the navbar icons
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {

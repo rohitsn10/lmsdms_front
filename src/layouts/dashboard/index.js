@@ -26,6 +26,7 @@ import Footer from "examples/Footer";
 import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
 import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
+import { Link } from 'react-router-dom';
 
 // Data
 import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
@@ -34,6 +35,9 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 // Dashboard components
 import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
+import TopicIcon from '@mui/icons-material/Topic';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import ApartmentIcon from '@mui/icons-material/Apartment';
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
@@ -45,65 +49,74 @@ function Dashboard() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="dark"
-                icon="weekend"
-                title="Bookings"
-                count={281}
-                percentage={{
-                  color: "success",
-                  amount: "+55%",
-                  label: "than lask week",
-                }}
-              />
+              <Link to="/add-user">
+                <ComplexStatisticsCard
+                  color="primary"
+                  icon="person_add"
+                  title="Add user"
+                  count="91"
+                  percentage={{
+                    color: "success",
+                    amount: "",
+                    label: "Just updated",
+                  }}
+                />
+              </Link>
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                icon="leaderboard"
-                title="Today's Users"
-                count="2,300"
-                percentage={{
-                  color: "success",
-                  amount: "+3%",
-                  label: "than last month",
-                }}
-              />
+              <Link to="/add-document">
+                <ComplexStatisticsCard
+                  icon={<TopicIcon />}
+                  title="Add Document"
+                  count="2,300"
+                  percentage={{
+                    color: "success",
+                    // amount: "+3%",
+                    label: " Updated last month",
+                  }}
+                />
+              </Link>
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
+            <Link to="/add-department">
               <ComplexStatisticsCard
-                color="success"
-                icon="store"
-                title="Revenue"
-                count="34k"
-                percentage={{
-                  color: "success",
-                  amount: "+1%",
-                  label: "than yesterday",
-                }}
-              />
+                  color="success"
+                  icon={<ApartmentIcon/>}
+                  title="Add Department"
+                  count="47"
+                  percentage={{
+                    color: "success",
+                    amount: "",
+                    label: "Just updated",
+                  }}
+                />
+            </Link>
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="primary"
-                icon="person_add"
-                title="Followers"
-                count="+91"
-                percentage={{
-                  color: "success",
-                  amount: "",
-                  label: "Just updated",
-                }}
-              />
+              
+              <Link to="/add-approval">
+                <ComplexStatisticsCard
+                  color="dark"
+                  icon={<AssignmentTurnedInIcon/>}
+                  title="Approved"
+                  count="34"
+                  percentage={{
+                    color: "success",
+                    // amount: "+1%",
+                    label: "Updated yesterday",
+                  }}
+                />
+              </Link>
             </MDBox>
           </Grid>
         </Grid>
-        <MDBox mt={4.5}>
+        {/* <MDBox mt={4.5}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
@@ -143,7 +156,7 @@ function Dashboard() {
               </MDBox>
             </Grid>
           </Grid>
-        </MDBox>
+        </MDBox> */}
         <MDBox>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
