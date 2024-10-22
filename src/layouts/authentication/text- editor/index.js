@@ -72,7 +72,45 @@ const DocumentView = () => {
   }, [isLoaded, docContent]);
 
   const handlePrint = () => {
-    window.print();  // Trigger browser's print functionality
+    const content = quillRef.current.root.innerHTML; // Get the HTML content
+    const printWindow = window.open('', '_blank'); // Open a new window
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Document</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 0;
+              padding: 20px;
+              background-color: #fff;
+              width: 210mm; /* A4 width */
+              height: 297mm; /* A4 height */
+              overflow: hidden; /* Hide overflow */
+            }
+            /* Add any additional print styles here */
+          </style>
+        </head>
+        <body>
+          ${content} <!-- Insert the editor content here -->
+        </body>
+      </html>
+    `);
+    printWindow.document.close(); // Close the document for writing
+    printWindow.print(); // Trigger print
+    printWindow.close(); // Close the print window after printing
+  };
+
+  const handleSaveDraft = () => {
+    const content = quillRef.current.root.innerHTML; // Get the HTML content
+    // Add your save draft logic here (e.g., send to server or save locally)
+    console.log("Draft saved:", content);
+    alert('Draft saved!'); // Placeholder alert for demonstration
+  };
+
+  const handleView = () => {
+    // Add your view logic here (e.g., navigate to a different view or modal)
+    alert('Viewing the document!'); // Placeholder alert for demonstration
   };
 
   if (!isLoaded) {
@@ -80,11 +118,30 @@ const DocumentView = () => {
   }
 
   return (
-    <div>
-      <h2>Edit Document</h2>
-      {/* Quill editor container */}
-      <div id="editor-container" style={{ border: '1px solid black', padding: '10px', minHeight: '500px' }} />
-      <button onClick={handlePrint} style={{ marginTop: '20px' }}>Print Document</button>
+    <div style={{ fontFamily: 'Arial, sans-serif', padding: '20px', backgroundColor: '#f4f4f4', minHeight: '100vh' }}>
+      <header style={{ marginBottom: '20px', borderBottom: '2px solid #ccc', paddingBottom: '10px' }}>
+        <h1 style={{ margin: 0 }}>Document Title</h1>
+      </header>
+      {/* Quill editor container styled to mimic A4 paper */}
+      <div 
+        id="editor-container" 
+        style={{
+          width: '210mm', // A4 width in millimeters
+          height: '297mm', // A4 height in millimeters
+          border: '1px solid #ccc', 
+          backgroundColor: '#fff', 
+          padding: '20px', 
+          borderRadius: '5px', 
+          overflowY: 'auto', // Enable scrolling if content exceeds the page height
+          margin: '20px auto 0', // Added top margin for spacing
+          boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', // Add a subtle shadow
+        }} 
+      />
+      <footer style={{ marginTop: '20px', borderTop: '1px solid #ccc', paddingTop: '10px', display: 'flex', justifyContent: 'center' }}>
+        <button onClick={handleView} style={{ margin: '0 10px', padding: '10px 15px', fontSize: '16px' }}>View</button>
+        <button onClick={handleSaveDraft} style={{ margin: '0 10px', padding: '10px 15px', fontSize: '16px' }}>Save Draft</button>
+        <button onClick={handlePrint} style={{ margin: '0 10px', padding: '10px 15px', fontSize: '16px' }}>Print Document</button>
+      </footer>
     </div>
   );
 };
