@@ -39,11 +39,7 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-<<<<<<< Updated upstream
-  const isTextEditor = pathname === "/document-view";
-=======
   const isDocEditor = pathname === "/DocEditor";  
->>>>>>> Stashed changes
 
   useMemo(() => {
     const cacheRtl = createCache({
@@ -90,11 +86,7 @@ export default function App() {
     } else {
       document.body.style.backgroundImage = "none"; // Remove background image
     }
-<<<<<<< Updated upstream
-  }, [pathname, isTextEditor]);
-=======
   }, [pathname, !isDocEditor]); 
->>>>>>> Stashed changes
 
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
@@ -171,24 +163,6 @@ export default function App() {
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       <div>
-<<<<<<< Updated upstream
-        {layout === "dashboard" &&
-          !isTextEditor && ( // Conditional rendering of Sidebar
-            <>
-              <Sidenav
-                color={sidenavColor}
-                brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-                brandName="Bharat Parenterals"
-                routes={routes}
-                onMouseEnter={handleOnMouseEnter}
-                onMouseLeave={handleOnMouseLeave}
-                style={{ position: "fixed", zIndex: 3 }} 
-              />
-              <Configurator />
-              {configsButton}
-            </>
-          )}
-=======
         {layout === "dashboard" && !isDocEditor && (  // Conditional rendering of Sidebar
           <>
             <Sidenav
@@ -204,7 +178,6 @@ export default function App() {
             {configsButton}
           </>
         )}
->>>>>>> Stashed changes
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(routes)}
