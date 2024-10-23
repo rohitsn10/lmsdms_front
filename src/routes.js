@@ -107,14 +107,14 @@ const routes = [
     route: "/authentication/log-in",
     component: <Login/>,
   },
-  {
-    type: "collapse",
-    name: "ResetPassword",
-    key: "forgot-password",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/forgot-password",
-    component: <ResetPassword/>,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "ResetPassword",
+  //   key: "forgot-password",
+  //   icon: <Icon fontSize="small">assignment</Icon>,
+  //   route: "/authentication/forgot-password",
+  //   component: <ResetPassword/>,
+  // },
   // {
   //   type: "collapse",
   //   name: "AddUser",
