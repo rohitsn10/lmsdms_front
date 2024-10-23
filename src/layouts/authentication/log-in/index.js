@@ -14,6 +14,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import bplogo from "assets/images/logo-removebg-preview.png";
 import {
   Dialog,
   DialogActions,
@@ -26,6 +27,7 @@ import {
   MenuItem,
   OutlinedInput,
   Button,
+  Box,
 } from "@mui/material";
 import forgotpassword from "../forgot-password/index.js";
 
@@ -80,12 +82,21 @@ function Login() {
             textAlign: "center",
           }}
         >
-          
           <MDTypography variant="h3" fontWeight="medium" mt={1}>
+            <MDBox
+              component="img"
+              src={bplogo} // Replace with your logo's path
+              alt="Logo"
+              sx={{ height: "45px", width: "340px", display: "block", margin: "0 auto" }} // Adjust styling as needed
+            />
+          </MDTypography>
+        </MDBox>
+        <MDBox mt={1} display="flex" justifyContent="center" alignItems="center">
+          <MDTypography variant="h3" fontWeight="medium" textAlign="center">
             Login
           </MDTypography>
         </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
+        <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" sx={{ padding: 3 }}>
             <MDBox mb={3}>
               <MDInput
