@@ -23,14 +23,14 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
 // Authentication layout components
-import CoverLayout from "layouts/authentication/components/CoverLayout";
+import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 // Images
 import bgImage from "assets/images/bg-reset-cover.jpeg";
 
 function Cover() {
   return (
-    <CoverLayout coverHeight="50vh" image={bgImage}>
+    <BasicLayout coverHeight="50vh" image={bgImage}>
       <Card>
         <MDBox
         borderRadius="lg"
@@ -65,7 +65,7 @@ function Cover() {
           </MDBox>
         </MDBox>
       </Card>
-    </CoverLayout>
+    </BasicLayout>
   );
 }
 
