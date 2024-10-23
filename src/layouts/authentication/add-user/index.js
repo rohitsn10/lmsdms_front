@@ -1,6 +1,5 @@
-// Import necessary components
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate } from "react-router-dom"; 
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -9,10 +8,10 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/material";
-import linearGradient from "assets/theme/functions/linearGradient";
+import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
 
 const roles = ["Author", "Purchase", "Reviewer", "Approver", "Doc_Admin"];
-const departments = ["HR", "Finance", "IT", "Sales"]; // Example department options
+const departments = ["HR", "Finance", "IT", "Sales"]; 
 
 function AddUser() {
   const [firstName, setFirstName] = useState("");
@@ -23,26 +22,16 @@ function AddUser() {
   const [department, setDepartment] = useState("");
   const [joiningDate, setJoiningDate] = useState("");
   const [jobPosition, setJobPosition] = useState("");
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false); // State for dialog visibility
 
-  const navigate = useNavigate(); // Initialize useNavigate for navigation
+  const navigate = useNavigate(); 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("User Details Submitted:", {
-      firstName,
-      lastName,
-      employeeId,
-      email,
-      userRole,
-      department,
-      joiningDate,
-      jobPosition,
-    });
-    navigate("/dashboard");
+    // Open the E-signature dialog on form submission
+    setOpenSignatureDialog(true);
   };
 
-  // Function to clear all input fields
   const handleClear = () => {
     setFirstName("");
     setLastName("");
@@ -54,15 +43,20 @@ function AddUser() {
     setJobPosition("");
   };
 
+  const handleCloseSignatureDialog = () => {
+    setOpenSignatureDialog(false);
+    navigate("/dashboard"); // Navigate to the dashboard when dialog is closed
+  };
+
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
-      <Card sx={{ width: 600, mx: "auto",mt:10,mb:10}}>
+      <Card sx={{ width: 600, mx: "auto", mt: 10, mb: 10 }}>
         <MDBox
            borderRadius="lg"
            sx={{
-            background: "linear-gradient(212deg, #d5b282, #f5e0c3)", // Custom color gradient
+            background: "linear-gradient(212deg, #d5b282, #f5e0c3)",
             borderRadius: "lg",
-            boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)", // Custom colored shadow
+            boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)",
             mx: 2,
             mt: -3,
             p: 2,
@@ -70,8 +64,7 @@ function AddUser() {
             textAlign: "center",
           }}
         >
-          <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}
-           >
+          <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
             Add User
           </MDTypography>
         </MDBox>
@@ -79,7 +72,7 @@ function AddUser() {
           <MDButton
             variant="outlined"
             color="error"
-            size="small" // Set the button size to small
+            size="small"
             onClick={handleClear}
             sx={{ marginRight: '20px' }}
           >
@@ -87,7 +80,7 @@ function AddUser() {
           </MDButton>
         </MDBox>
 
-        <MDBox  pb={3} px={3}>
+        <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <MDBox mb={3}>
               <MDInput
@@ -136,11 +129,11 @@ function AddUser() {
                   input={<OutlinedInput label="User Role" />}
                   sx={{
                     minWidth: 200,
-                    height: "3rem", // Adjust the height here
+                    height: "3rem",
                     ".MuiSelect-select": {
-                      padding: "0.45rem", // Adjust padding for the select input text
+                      padding: "0.45rem",
                     },
-                  }} // Ensure dropdown has a minimum width
+                  }}
                 >
                   {roles.map((role) => (
                     <MenuItem key={role} value={role}>
@@ -161,11 +154,11 @@ function AddUser() {
                   input={<OutlinedInput label="Department" />}
                   sx={{
                     minWidth: 200,
-                    height: "3rem", // Adjust the height here
+                    height: "3rem",
                     ".MuiSelect-select": {
-                      padding: "0.75rem", // Adjust padding for the select input text
+                      padding: "0.75rem",
                     },
-                  }} // Ensure dropdown has a minimum width
+                  }}
                 >
                   {departments.map((dept) => (
                     <MenuItem key={dept} value={dept}>
@@ -178,7 +171,6 @@ function AddUser() {
             <MDBox mb={3}>
               <MDInput
                 type="date"
-                // label="Joining Date"
                 fullWidth
                 value={joiningDate}
                 onChange={(e) => setJoiningDate(e.target.value)}
@@ -201,6 +193,7 @@ function AddUser() {
           </MDBox>
         </MDBox>
       </Card>
+      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
     </BasicLayout>
   );
 }
