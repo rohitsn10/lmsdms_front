@@ -33,15 +33,17 @@ function Cover() {
     <CoverLayout coverHeight="50vh" image={bgImage}>
       <Card>
         <MDBox
-          variant="gradient"
-          bgColor="info"
-          borderRadius="lg"
-          coloredShadow="success"
-          mx={2}
-          mt={-3}
-          py={2}
-          mb={1}
-          textAlign="center"
+        borderRadius="lg"
+          sx={{
+            background: "linear-gradient(212deg, #d5b282, #f5e0c3)", // Custom color gradient
+            borderRadius: "lg",
+            boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)", // Custom colored shadow
+            mx: 2,
+            mt: -3,
+            p: 2,
+            mb: 1,
+            textAlign: "center",
+          }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="white" mt={1}>
             Reset Password

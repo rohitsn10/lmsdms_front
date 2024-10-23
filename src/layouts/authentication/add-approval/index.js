@@ -56,17 +56,19 @@ function AddApproval() {
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto" }}>
         <MDBox
-          variant="gradient"
-          bgColor="info"
           borderRadius="lg"
-          coloredShadow="info"
-          mx={2}
-          mt={-3}
-          p={2}
-          mb={1}
-          textAlign="center"
+          sx={{
+            background: "linear-gradient(212deg, #d5b282, #f5e0c3)", // Custom color gradient
+            borderRadius: "lg",
+            boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)", // Custom colored shadow
+            mx: 2,
+            mt: -3,
+            p: 2,
+            mb: 1,
+            textAlign: "center",
+          }}
         >
-          <MDTypography variant="h3" fontWeight="medium" color="white" mt={1}>
+          <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
             Add Approval
           </MDTypography>
         </MDBox>
@@ -93,7 +95,12 @@ function AddApproval() {
                   value={approvalStatus}
                   onChange={(e) => setApprovalStatus(e.target.value)}
                   input={<OutlinedInput label="Approval Status" />}
-                  sx={{ minWidth: 200 }}
+                  sx={{ minWidth: 200 ,
+                    height: "3rem", // Adjust the height here
+                    ".MuiSelect-select": {
+                      padding: "0.45rem", // Adjust padding for the select input text
+                    },
+                  }}
                 >
                   <MenuItem value="Approved">Approved</MenuItem>
                   <MenuItem value="Sent Back">Sent Back</MenuItem>
@@ -112,7 +119,12 @@ function AddApproval() {
                     value={sentBackTo}
                     onChange={(e) => setSentBackTo(e.target.value)}
                     input={<OutlinedInput label="Sent Back To" />}
-                    sx={{ minWidth: 200 }}
+                    sx={{ minWidth: 200 ,
+                      height: "3rem", // Adjust the height here
+                      ".MuiSelect-select": {
+                        padding: "0.45rem", // Adjust padding for the select input text
+                      },
+                    }}
                   >
                     {sentBackRoles.map((role) => (
                       <MenuItem key={role} value={role}>

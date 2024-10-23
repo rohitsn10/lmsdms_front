@@ -76,23 +76,38 @@ function AddDocument() {
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
-      <Card sx={{ width: 600, mx: "auto" }}>
+      <Card sx={{ width: 600, mx: "auto" ,marginTop:10,marginBottom:10}}>
         <MDBox
-          variant="gradient"
-          bgColor="info"
-          borderRadius="lg"
-          coloredShadow="info"
-          mx={2}
-          mt={-3}
-          p={2}
-          mb={1}
-          textAlign="center"
+           borderRadius="lg"
+           sx={{
+            background: "linear-gradient(212deg, #d5b282, #f5e0c3)", // Custom color gradient
+            borderRadius: "lg",
+            boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)", // Custom colored shadow
+            mx: 2,
+            mt: -3,
+            p: 2,
+            mb: 1,
+            textAlign: "center",
+          }}
         >
-          <MDTypography variant="h3" fontWeight="medium" color="white" mt={1}>
+          <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}
+          >
             Add Document
           </MDTypography>
+          
         </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
+        <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
+          <MDButton
+            variant="outlined"
+            color="error"
+            size="small" // Set the button size to small
+            onClick={handleClear}
+            sx={{ marginRight: '20px' }}
+          >
+            Clear
+          </MDButton>
+        </MDBox>
+        <MDBox  pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <MDBox mb={3}>
               <MDInput
@@ -112,7 +127,10 @@ function AddDocument() {
                   value={type}
                   onChange={(e) => setType(e.target.value)}
                   input={<OutlinedInput label="Type" />}
-                  sx={{ minWidth: 200 }} // Ensure dropdown has a minimum width
+                  sx={{ minWidth: 200, height: "3rem", // Adjust the height here
+                    ".MuiSelect-select": {
+                      padding: "0.45rem", // Adjust padding for the select input text
+                    }, }} // Ensure dropdown has a minimum width
                 >
                   {documentTypes.map((docType) => (
                     <MenuItem key={docType} value={docType}>
@@ -159,7 +177,12 @@ function AddDocument() {
                   value={operations}
                   onChange={(e) => setOperations(e.target.value)}
                   input={<OutlinedInput label="Operations" />}
-                  sx={{ minWidth: 200 }} // Ensure dropdown has a minimum width
+                  sx={{ minWidth: 200,
+                    height: "3rem", // Adjust the height here
+                    ".MuiSelect-select": {
+                      padding: "0.45rem", // Adjust padding for the select input text
+                    },
+                   }} // Ensure dropdown has a minimum width
                 >
                   <MenuItem value="Create Document - Online">Create Document - Online</MenuItem>
                 </Select>
@@ -174,7 +197,12 @@ function AddDocument() {
                   value={workflow}
                   onChange={(e) => setWorkflow(e.target.value)}
                   input={<OutlinedInput label="Workflow" />}
-                  sx={{ minWidth: 200 }} // Ensure dropdown has a minimum width
+                  sx={{ minWidth: 200,
+                    height: "3rem", // Adjust the height here
+                    ".MuiSelect-select": {
+                      padding: "0.45rem", // Adjust padding for the select input text
+                    },
+                   }} // Ensure dropdown has a minimum width
                 >
                   {workflows.map((wf) => (
                     <MenuItem key={wf} value={wf}>
@@ -193,7 +221,12 @@ function AddDocument() {
                   value={parentDocument}
                   onChange={(e) => setParentDocument(e.target.value)}
                   input={<OutlinedInput label="Parent Document" />}
-                  sx={{ minWidth: 200 }} // Ensure dropdown has a minimum width
+                  sx={{ minWidth: 200,
+                    height: "3rem", // Adjust the height here
+                    ".MuiSelect-select": {
+                      padding: "0.45rem", // Adjust padding for the select input text
+                    },
+                   }} // Ensure dropdown has a minimum width
                 >
                   <MenuItem value="">None</MenuItem>
                   {/* Populate this dropdown with existing documents */}
@@ -244,18 +277,6 @@ function AddDocument() {
                 value={createdAt}
                 disabled
               />
-            </MDBox>
-
-            <MDBox mt={2} mb={1} display="flex" justifyContent="space-between">
-              <MDButton
-                variant="outlined"
-                color="error"
-                size="small" // Set the button size to small
-                onClick={handleClear}
-                sx={{ alignSelf: 'flex-end' }} // Align button to the right
-              >
-                Clear
-              </MDButton>
             </MDBox>
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">

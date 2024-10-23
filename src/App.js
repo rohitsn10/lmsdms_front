@@ -17,6 +17,7 @@ import routes from "routes";
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
+import Brandlogo from "assets/images/bp-logo.png"
 import Login from "./layouts/authentication/log-in/index.js";
 import DocumentView from "layouts/authentication/text- editor/index.js";
 import AddUser from "layouts/authentication/add-user";
@@ -134,7 +135,7 @@ export default function App() {
             <>
               <Sidenav
                 color={sidenavColor}
-                brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
+                brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
                 brandName="Material"
                 routes={routes}
                 onMouseEnter={handleOnMouseEnter}
@@ -142,7 +143,7 @@ export default function App() {
                 style={{ position: "fixed", zIndex: 2 }} 
               />
               <Configurator />
-              {configsButton}
+              {/* {configsButton} */}
             </>
           )}
           {layout === "vr" && <Configurator />}
@@ -167,15 +168,15 @@ export default function App() {
           <>
             <Sidenav
               color={sidenavColor}
-              brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-              brandName="Material Dashboard 2"
+              brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
+              brandName="Bharat parenterals"
               routes={routes}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
               style={{ position: "fixed", zIndex: 3 }} // Fix position and set z-index
             />
             <Configurator />
-            {configsButton}
+            {/* {configsButton} */}
           </>
         )}
         {layout === "vr" && <Configurator />}

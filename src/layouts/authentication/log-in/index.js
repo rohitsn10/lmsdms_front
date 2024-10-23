@@ -55,7 +55,7 @@ function Login() {
   const handleOk = () => {
     console.log("Selected Role:", selectedRole);
     setDialogOpen(false);
-    navigate("/dashboard"); 
+    navigate("/dashboard");
   };
 
   const handleForgotPassword = () => {
@@ -69,13 +69,18 @@ function Login() {
           variant="gradient"
           borderRadius="lg"
           coloredShadow="info"
-          sx={{ backgroundColor: '#F5E0C3' }}
-          mx={2}
-          mt={-3}
-          p={2}
-          mb={1}
-          textAlign="center"
+          sx={{
+            background: "linear-gradient(212deg, #d5b282, #f5e0c3)", // Custom color gradient
+            borderRadius: "lg",
+            boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)", // Custom colored shadow
+            mx: 2,
+            mt: -3,
+            p: 2,
+            mb: 1,
+            textAlign: "center",
+          }}
         >
+          
           <MDTypography variant="h3" fontWeight="medium" mt={1}>
             Login
           </MDTypography>
@@ -101,10 +106,7 @@ function Login() {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                      >
+                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -115,10 +117,7 @@ function Login() {
 
             {/* Remember Me Switch */}
             <MDBox display="flex" alignItems="center" mb={3}>
-              <Switch
-                checked={rememberMe}
-                onChange={() => setRememberMe(!rememberMe)}
-              />
+              <Switch checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
               <MDTypography variant="button" fontWeight="regular" ml={1}>
                 Remember Me
               </MDTypography>
@@ -130,10 +129,10 @@ function Login() {
               fontWeight="medium"
               textAlign="center"
               sx={{
-                color: '#00008B', // Dark blue color
-                cursor: 'pointer', // Add pointer to indicate it's clickable
+                color: "#00008B", // Dark blue color
+                cursor: "pointer", // Add pointer to indicate it's clickable
                 "&:hover": {
-                  textDecoration: 'underline', // Optional: underline on hover
+                  textDecoration: "underline", // Optional: underline on hover
                 },
               }}
               onClick={handleForgotPassword}
@@ -141,16 +140,15 @@ function Login() {
               Forgot Password?
             </MDTypography>
 
-            <MDBox mt={4} mb={1} sx={{ backgroundColor: '#F5E0C3' }}>
+            <MDBox mt={4} mb={1} sx={{ backgroundColor: "#F5E0C3" }}>
               <MDButton
                 variant="gradient"
-                // color="info"
                 sx={{
-                  backgroundColor: '#F5E0C3',
-                  color: '#000',
+                  backgroundColor: "#F5E0C3",
+                  color: "#000",
                   "&:hover": {
-                    backgroundColor: '#E6D3B2', // Updated hover color
-                    color: '#000',
+                    backgroundColor: "#E6D3B2", // Updated hover color
+                    color: "#000",
                   },
                 }}
                 fullWidth
@@ -177,22 +175,24 @@ function Login() {
           },
         }}
       >
-        <DialogTitle
+        <MDTypography
+          variant="h3" // Adjust the variant for the desired font size
           sx={{
-            backgroundColor: "#4a4a4a", // Darker gray color for the title
-            color: "#ffffff", // White text for better contrast
+            backgroundColor: "#F5E0C3", // Darker gray color for the title
+            color: "#344767", // Text color for contrast
             padding: "16px 24px",
-            fontSize: "1.5rem", // Larger font size for a stylish look
+            fontSize: "1.5rem", // Font size for a stylish look
             display: "flex", // Align close button to the right
             justifyContent: "space-between",
             alignItems: "center",
           }}
         >
           Select Role
-          <IconButton onClick={handleCloseDialog} sx={{ color: "#fff" }}>
+          <IconButton onClick={handleCloseDialog} sx={{ color: "#344767" }}>
             <CloseIcon />
           </IconButton>
-        </DialogTitle>
+        </MDTypography>
+
         <DialogContent sx={{ padding: "24px" }}>
           <Typography variant="body1" sx={{ marginBottom: "8px" }}>
             User Id: {userId}
@@ -236,7 +236,7 @@ function Login() {
             onClick={handleOk}
             variant="contained"
             sx={{
-              backgroundColor: "#6d4c41", // Earthy color for the button
+              backgroundColor: "##F5E0C3", // Earthy color for the button
               color: "#fff",
               "&:hover": { backgroundColor: "#5d4037" }, // Darker shade on hover
             }}
