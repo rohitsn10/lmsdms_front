@@ -65,7 +65,7 @@ function ReviewDocument() {
          sx={{
           background: "linear-gradient(212deg, #d5b282, #f5e0c3)", // Custom color gradient
           borderRadius: "lg",
-          boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)", // Custom colored shadow
+          // boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)", // Custom colored shadow
           mx: 2,
           mt: -3,
           p: 2,
@@ -174,7 +174,7 @@ function ReviewDocument() {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth type="submit">
+              <MDButton variant="gradient" color="submit" fullWidth type="submit">
                 Submit
               </MDButton>
             </MDBox>

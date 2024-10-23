@@ -74,7 +74,7 @@ function ResetPassword() {
               </MDTypography>
             )}
             <MDBox mt={6} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth onClick={handleSubmit}>
+              <MDButton variant="gradient" color="submit" fullWidth onClick={handleSubmit}>
                 Submit
               </MDButton>
             </MDBox>

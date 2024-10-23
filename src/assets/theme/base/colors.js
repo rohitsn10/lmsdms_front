@@ -106,10 +106,13 @@ const colors = {
       main: "#747b8a",
       state: "#495361",
     },
-
+    submit: {
+      main: "#2F1B14",
+      state: "#2F1B14"
+    },
     info: {
-      main: "#49a3f1",
-      state: "#1A73E8",
+      main: "#f5e0c3",
+      state: "#f5e0c3",
     },
 
     success: {
@@ -212,15 +215,18 @@ const colors = {
     },
 
     info: {
-      background: "#aecef7",
-      text: "#095bc6",
+      background: "#f5e0c3",
+      text: "#344767",
     },
 
     success: {
       background: "#bce2be",
       text: "#339537",
     },
-
+    submit: {
+      background: "#2F1B14",
+      text: "#000000"
+    },
     warning: {
       background: "#ffd59f",
       text: "#c87000",
@@ -245,7 +251,7 @@ const colors = {
   coloredShadows: {
     primary: "#e91e62",
     secondary: "#110e0e",
-    info: "#00bbd4",
+    info: "#344767",
     success: "#4caf4f",
     warning: "#ff9900",
     error: "#f44336",
