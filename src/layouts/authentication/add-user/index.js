@@ -186,7 +186,7 @@ function AddUser() {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth type="submit">
+              <MDButton variant="gradient" color="submit" fullWidth type="submit">
                 Submit
               </MDButton>
             </MDBox>
