@@ -29,7 +29,6 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import forgotpassword from "../forgot-password/index.js";
 
 const roles = ["Author", "Reviewer", "Approver", "Admin", "Doc Admin"];
 
@@ -155,11 +154,11 @@ function Login() {
               <MDButton
                 variant="gradient"
                 sx={{
-                  backgroundColor: "#F5E0C3",
-                  color: "#000",
+                  backgroundColor: "#2F1B14",
+                  color: "#fff",
                   "&:hover": {
-                    backgroundColor: "#E6D3B2", // Updated hover color
-                    color: "#000",
+                    backgroundColor: "#2F1B14", // Updated hover color
+                    color: "#fff",
                   },
                 }}
                 fullWidth
@@ -247,9 +246,9 @@ function Login() {
             onClick={handleOk}
             variant="contained"
             sx={{
-              backgroundColor: "##F5E0C3", // Earthy color for the button
+              backgroundColor: "#2F1B14", // Earthy color for the button
               color: "#fff",
-              "&:hover": { backgroundColor: "#5d4037" }, // Darker shade on hover
+              "&:hover": { backgroundColor: "#2F1B14" }, // Darker shade on hover
             }}
           >
             Submit

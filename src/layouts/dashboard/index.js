@@ -65,10 +65,12 @@ function Dashboard() {
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
+            <MDBox mb={1.5}
+            >
               <Link to="/add-document">
                 <ComplexStatisticsCard
                   icon={<TopicIcon />}
+                  color="warning"
                   title="Add Document"
                   count="2,300"
                   percentage={{
