@@ -3,8 +3,6 @@ import { useState } from "react";
 // @mui material components
 import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import { Typography, Box, Button } from "@mui/material";
 
@@ -123,7 +121,6 @@ const mockData = () => ({
 
 function Listing() {
   const { columns, rows } = mockData();
-  const [menu, setMenu] = useState(null);
   const [filters, setFilters] = useState({
     title: "",
     doc_no: "",
@@ -133,33 +130,9 @@ function Listing() {
     workflow: "",
   });
 
-  const openMenu = ({ currentTarget }) => setMenu(currentTarget);
-  const closeMenu = () => setMenu(null);
-
   const handleFilterChange = (e, column) => {
     setFilters({ ...filters, [column]: e.target.value });
   };
-
-  const renderMenu = (
-    <Menu
-      id="simple-menu"
-      anchorEl={menu}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "left",
-      }}
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={Boolean(menu)}
-      onClose={closeMenu}
-    >
-      <MenuItem onClick={closeMenu}>Action</MenuItem>
-      <MenuItem onClick={closeMenu}>Another action</MenuItem>
-      <MenuItem onClick={closeMenu}>Something else</MenuItem>
-    </Menu>
-  );
 
   // Apply filters
   const filteredRows = rows.filter((row) =>
@@ -205,12 +178,6 @@ function Listing() {
             </Button>
           </MDBox>
         </MDBox>
-        <MDBox color="text" px={2}>
-          <Icon sx={{ cursor: "pointer", fontWeight: "bold" }} fontSize="small" onClick={openMenu}>
-            more_vert
-          </Icon>
-        </MDBox>
-        {renderMenu}
       </MDBox>
 
       {/* Filters */}

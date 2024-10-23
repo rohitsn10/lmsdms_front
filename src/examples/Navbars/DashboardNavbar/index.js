@@ -159,70 +159,71 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 <Icon sx={iconsStyle}>account_circle</Icon>
               </IconButton>
-              <Dialog
-                open={open}
-                onClose={handleClose}
-                fullWidth
-                maxWidth="md" // Sets max width to medium
-                sx={{
-                  "& .MuiDialog-paper": {
-                    width: "30vw", // 50% of the viewport width
-                    height: "50vh", // 50% of the viewport height
-                  },
-                }}
-              >
-                <DialogTitle>Change Role</DialogTitle>
-                <DialogContent>
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel
-                      id="role-select-label"
-                      sx={{
-                        padding: "0.5rem",
-                        height: "3rem",
-                      }}
-                    >
-                      Select Role
-                    </InputLabel>
-                    <Select
-                      labelId="role-select-label"
-                      value={selectedRole}
-                      onChange={handleRoleChange}
-                      label="Select Role"
-                      sx={{
-                        height: '3rem', // Adjust the height here
-                        '.MuiSelect-select': {
-                          padding: '0.75rem', // Adjust padding for the select input text
-                        }
-                      }}
-                    >
-                      {roles.map((role) => (
-                        <MenuItem key={role} value={role}>
-                          {role}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+              
+<Dialog
+  open={open}
+  onClose={handleClose}
+  fullWidth
+  maxWidth="md"
+  sx={{
+    "& .MuiDialog-paper": {
+      width: "30vw", // 50% of the viewport width
+      height: "50vh", // 50% of the viewport height
+    },
+  }}
+>
+  <DialogTitle sx={{ textAlign: 'center' }}>Change Role</DialogTitle> {/* Centered title */}
+  <DialogContent>
+    <FormControl fullWidth margin="normal">
+      <InputLabel
+        id="role-select-label"
+        sx={{
+          padding: "0.5rem",
+          height: "3rem",
+        }}
+      >
+        Select Role
+      </InputLabel>
+      <Select
+        labelId="role-select-label"
+        value={selectedRole}
+        onChange={handleRoleChange}
+        label="Select Role"
+        sx={{
+          height: '3rem', // Adjust the height here
+          '.MuiSelect-select': {
+            padding: '0.75rem', // Adjust padding for the select input text
+          }
+        }}
+      >
+        {roles.map((role) => (
+          <MenuItem key={role} value={role}>
+            {role}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
 
-                  <TextField
-                    fullWidth
-                    margin="normal"
-                    label="Enter Password"
-                    type="password"
-                    value={password}
-                    onChange={handlePasswordChange}
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleClose}>Cancel</Button>
-                  <Button
-                    onClick={handleSubmit}
-                    variant="contained"
-                    sx={{ backgroundColor: "primary.main", color: "white" }}
-                  >
-                    Submit
-                  </Button>
-                </DialogActions>
-              </Dialog>
+    <TextField
+      fullWidth
+      margin="normal"
+      label="Enter Password"
+      type="password"
+      value={password}
+      onChange={handlePasswordChange}
+    />
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleClose}>Cancel</Button>
+    <Button
+      onClick={handleSubmit}
+      variant="contained"
+      sx={{ backgroundColor: "primary.main", color: "white" }} // White text color
+    >
+      Submit
+    </Button>
+  </DialogActions>
+</Dialog>
 
               <IconButton
                 size="small"
