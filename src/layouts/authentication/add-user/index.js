@@ -8,13 +8,8 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import {
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  OutlinedInput,
-} from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/material";
+import linearGradient from "assets/theme/functions/linearGradient";
 
 const roles = ["Author", "Purchase", "Reviewer", "Approver", "Doc_Admin"];
 const departments = ["HR", "Finance", "IT", "Sales"]; // Example department options
@@ -61,23 +56,38 @@ function AddUser() {
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
-      <Card sx={{ width: 600, mx: "auto" }}>
+      <Card sx={{ width: 600, mx: "auto",mt:10,mb:10}}>
         <MDBox
-          variant="gradient"
-          bgColor="info"
-          borderRadius="lg"
-          coloredShadow="info"
-          mx={2}
-          mt={-3}
-          p={2}
-          mb={1}
-          textAlign="center"
+           borderRadius="lg"
+           sx={{
+            background: "linear-gradient(212deg, #d5b282, #f5e0c3)", // Custom color gradient
+            borderRadius: "lg",
+            boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)", // Custom colored shadow
+            mx: 2,
+            mt: -3,
+            p: 2,
+            mb: 1,
+            textAlign: "center",
+          }}
         >
-          <MDTypography variant="h3" fontWeight="medium" color="white" mt={1}>
+          <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}
+           >
             Add User
           </MDTypography>
         </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
+        <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
+          <MDButton
+            variant="outlined"
+            color="error"
+            size="small" // Set the button size to small
+            onClick={handleClear}
+            sx={{ marginRight: '20px' }}
+          >
+            Clear
+          </MDButton>
+        </MDBox>
+
+        <MDBox  pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <MDBox mb={3}>
               <MDInput
@@ -124,7 +134,13 @@ function AddUser() {
                   value={userRole}
                   onChange={(e) => setUserRole(e.target.value)}
                   input={<OutlinedInput label="User Role" />}
-                  sx={{ minWidth: 200 }} // Ensure dropdown has a minimum width
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem", // Adjust the height here
+                    ".MuiSelect-select": {
+                      padding: "0.45rem", // Adjust padding for the select input text
+                    },
+                  }} // Ensure dropdown has a minimum width
                 >
                   {roles.map((role) => (
                     <MenuItem key={role} value={role}>
@@ -143,7 +159,13 @@ function AddUser() {
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
                   input={<OutlinedInput label="Department" />}
-                  sx={{ minWidth: 200 }} // Ensure dropdown has a minimum width
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem", // Adjust the height here
+                    ".MuiSelect-select": {
+                      padding: "0.75rem", // Adjust padding for the select input text
+                    },
+                  }} // Ensure dropdown has a minimum width
                 >
                   {departments.map((dept) => (
                     <MenuItem key={dept} value={dept}>
@@ -156,7 +178,7 @@ function AddUser() {
             <MDBox mb={3}>
               <MDInput
                 type="date"
-                label="Joining Date"
+                // label="Joining Date"
                 fullWidth
                 value={joiningDate}
                 onChange={(e) => setJoiningDate(e.target.value)}
@@ -170,18 +192,6 @@ function AddUser() {
                 value={jobPosition}
                 onChange={(e) => setJobPosition(e.target.value)}
               />
-            </MDBox>
-
-            <MDBox mt={2} mb={1} display="flex" justifyContent="space-between">
-              <MDButton
-                variant="outlined"
-                color="error"
-                size="small" // Set the button size to small
-                onClick={handleClear}
-                sx={{ alignSelf: 'flex-end' }} // Align button to the right
-              >
-                Clear
-              </MDButton>
             </MDBox>
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
