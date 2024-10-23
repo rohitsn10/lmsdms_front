@@ -24,6 +24,7 @@ import AddUser from "layouts/authentication/add-user";
 import AddDepartment from "layouts/authentication/add-department";
 import AddDocument from "layouts/authentication/add-document";
 import AddApproval from "layouts/authentication/add-approval";
+import ResetPassword from "layouts/authentication/forgot-password/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -155,6 +156,7 @@ export default function App() {
             <Route path="/add-document" element={<AddDocument />} />
             <Route path="/add-department" element={<AddDepartment />} />
             <Route path="/add-approval" element={<AddApproval />} />
+            <Route path="/forgotpassword" element={<ResetPassword />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </div>
@@ -188,6 +190,7 @@ export default function App() {
             <Route path="/add-document" element={<AddDocument />} />
             <Route path="/add-department" element={<AddDepartment />} />
             <Route path="/add-approval" element={<AddApproval />} />
+            <Route path="/forgotpassword" element={<ResetPassword />} />
             <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>

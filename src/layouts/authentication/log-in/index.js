@@ -87,7 +87,7 @@ function Login() {
               component="img"
               src={bplogo} // Replace with your logo's path
               alt="Logo"
-              sx={{ height: "45px", width: "340px", display: "block", margin: "0 auto" }} // Adjust styling as needed
+              sx={{ height: "28px", width: "250px", display: "block", margin: "0 auto" }} // Adjust styling as needed
             />
           </MDTypography>
         </MDBox>
