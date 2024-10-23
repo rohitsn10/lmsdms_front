@@ -57,21 +57,34 @@ function Watermark() {
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto" }}>
         <MDBox
-          variant="gradient"
-          bgColor="info"
-          borderRadius="lg"
-          coloredShadow="info"
-          mx={2}
-          mt={-3}
-          p={2}
-          mb={1}
-          textAlign="center"
+        borderRadius="lg"
+          sx={{
+            background: "linear-gradient(212deg, #d5b282, #f5e0c3)", // Custom color gradient
+            borderRadius: "lg",
+            boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)", // Custom colored shadow
+            mx: 2,
+            mt: -3,
+            p: 2,
+            mb: 1,
+            textAlign: "center",
+          }}
         >
-          <MDTypography variant="h3" fontWeight="medium" color="white" mt={1}>
+          <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
             Watermark Document
           </MDTypography>
         </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
+        <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
+          <MDButton
+            variant="outlined"
+            color="error"
+            size="small" // Set the button size to small
+            onClick={handleClear}
+            sx={{ marginRight: '20px' }}
+          >
+            Clear
+          </MDButton>
+        </MDBox>
+        <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
@@ -82,7 +95,12 @@ function Watermark() {
                   value={document}
                   onChange={(e) => setDocument(e.target.value)}
                   input={<OutlinedInput label="Document" />}
-                  sx={{ minWidth: 200 }}
+                  sx={{ minWidth: 200,
+                    height: "3rem", // Adjust the height here
+                    ".MuiSelect-select": {
+                      padding: "0.45rem", // Adjust padding for the select input text
+                    },
+                   }}
                 >
                   {documents.map((doc) => (
                     <MenuItem key={doc} value={doc}>
@@ -112,7 +130,12 @@ function Watermark() {
                   value={stageStatus}
                   onChange={handleStageStatusChange}
                   input={<OutlinedInput label="Stage Status" />}
-                  sx={{ minWidth: 200 }}
+                  sx={{ minWidth: 200,
+                    height: "3rem", // Adjust the height here
+                    ".MuiSelect-select": {
+                      padding: "0.45rem", // Adjust padding for the select input text
+                    },
+                   }}
                 >
                   {statuses.map((status) => (
                     <MenuItem key={status} value={status}>
@@ -131,18 +154,6 @@ function Watermark() {
                 value={createdAt}
                 disabled // Auto-filled with the current date
               />
-            </MDBox>
-
-            <MDBox mt={2} mb={1} display="flex" justifyContent="space-between">
-              <MDButton
-                variant="outlined"
-                color="error"
-                size="small"
-                onClick={handleClear}
-                sx={{ alignSelf: 'flex-end' }}
-              >
-                Clear
-              </MDButton>
             </MDBox>
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
