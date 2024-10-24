@@ -22,7 +22,7 @@ const ESignatureDialog = ({ open, handleClose }) => {
       <DialogTitle sx={{ textAlign: 'center' }}>E-Signature</DialogTitle>
       <DialogContent>
         <TextField
-          label="Enter Password"
+          placeholder="Enter Password" // Use placeholder instead of label
           type={showPassword ? 'text' : 'password'}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -34,8 +34,14 @@ const ESignatureDialog = ({ open, handleClose }) => {
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             ),
+            sx: { paddingRight: '8px' } // Ensures visibility of end adornment without cutting
           }}
-          sx={{ marginBottom: 2 }}
+          sx={{
+            marginBottom: 2,
+            '& .MuiInputBase-input': {
+              padding: '12px', // Adjusts padding for input text
+            },
+          }}
         />
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center' }}>
