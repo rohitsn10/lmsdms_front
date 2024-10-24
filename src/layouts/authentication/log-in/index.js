@@ -175,35 +175,20 @@ function Login() {
       <Dialog
         open={dialogOpen}
         onClose={handleCloseDialog}
-        PaperProps={{
-          sx: {
-            minWidth: "600px", // Adjust width for a larger dialog
-            maxWidth: "700px",
-            borderRadius: "20px", // Smooth rounded corners
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)", // Classy shadow
-            backgroundColor: "#fafafa", // Light background for a classy feel
+        fullWidth
+        maxWidth="md" // Match the width of the first dialog
+        sx={{
+          "& .MuiDialog-paper": {
+            width: "40vw", // Match 30% viewport width
+            height: "45vh", // Match 42% viewport height
+            borderRadius: "10px", // Keep smooth rounded corners
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)", // Subtle shadow for clean look
+            backgroundColor: "#fff", // Light background
           },
         }}
       >
-        <MDTypography
-          variant="h3" // Adjust the variant for the desired font size
-          sx={{
-            backgroundColor: "#F5E0C3", // Darker gray color for the title
-            color: "#344767", // Text color for contrast
-            padding: "16px 24px",
-            fontSize: "1.5rem", // Font size for a stylish look
-            display: "flex", // Align close button to the right
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          Select Role
-          <IconButton onClick={handleCloseDialog} sx={{ color: "#344767" }}>
-            <CloseIcon />
-          </IconButton>
-        </MDTypography>
-
-        <DialogContent sx={{ padding: "24px" }}>
+        <DialogTitle sx={{ textAlign: "center" }}>Select Role</DialogTitle> {/* Center the title */}
+        <DialogContent sx={{ padding: "16px 24px" }}>
           <Typography variant="body1" sx={{ marginBottom: "8px" }}>
             User Id: {userId}
           </Typography>
@@ -212,7 +197,9 @@ function Login() {
           </Typography>
 
           <FormControl fullWidth margin="dense">
-            <InputLabel id="select-role-label">Select Role</InputLabel>
+            <InputLabel id="select-role-label" sx={{ height: "2.5rem" }}>
+              Select Role
+            </InputLabel>
             <Select
               labelId="select-role-label"
               id="select-role"
@@ -220,11 +207,14 @@ function Login() {
               onChange={handleRoleChange}
               input={<OutlinedInput label="Select Role" />}
               sx={{
-                minWidth: "450px", // Increased width for the select box
-                padding: "12px", // Added padding for the input
-                borderRadius: "10px", // Rounded corners
-                backgroundColor: "#fff", // White background for clean look
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)", // Soft shadow for input
+                height: "3rem", // Match height from the first dialog
+                ".MuiSelect-select": {
+                  padding: "0.75rem", // Adjust padding for a cleaner look
+                },
+                minWidth: "450px", // Match the width from the first dialog
+                borderRadius: "10px", // Keep smooth corners
+                backgroundColor: "#fff", // Clean white background
+                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)", // Soft shadow
               }}
             >
               {roles.map((role) => (
@@ -243,12 +233,23 @@ function Login() {
           }}
         >
           <Button
+            onClick={handleCloseDialog} // Close the dialog when cancel is clicked
+            variant="outlined"
+            sx={{
+              color: "primary.main",
+              borderColor: "primary.main", // Match the color of the border
+              "&:hover": { backgroundColor: "primary.dark",color:"#fff"}, // Light background on hover
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
             onClick={handleOk}
             variant="contained"
             sx={{
-              backgroundColor: "#2F1B14", // Earthy color for the button
+              backgroundColor: "primary.main", // Primary color
               color: "#fff",
-              "&:hover": { backgroundColor: "#2F1B14" }, // Darker shade on hover
+              "&:hover": { backgroundColor: "primary.dark" }, // Darker shade on hover
             }}
           >
             Submit
