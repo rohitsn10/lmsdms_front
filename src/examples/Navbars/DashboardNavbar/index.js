@@ -153,6 +153,14 @@ function DashboardNavbar({ absolute, light, isMini }) {
               <MDInput label="Search here" />
             </MDBox>
             <MDBox color={light ? "white" : "inherit"}>
+            <Button
+              variant="contained"
+              component={RouterLink}
+              to="/roles-permission"
+              sx={{ mr: 2, backgroundColor: "primary.main", color: "#fff" }}
+            >
+              Roles
+            </Button>
               <IconButton
                 sx={navbarIconButton}
                 size="small"
@@ -293,9 +301,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
   </MenuItem>
   <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/Review">
     Review Document
-  </MenuItem>
-  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/roles-permissions">
-    Roles and Permissions
   </MenuItem>
   <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/watermark">
     Watermark

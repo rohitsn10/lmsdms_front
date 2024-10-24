@@ -31,6 +31,7 @@ import ReviewDocument from "layouts/authentication/Review";
 import ReleaseDocument from "layouts/authentication/release-document";
 import PrintDocument from "layouts/authentication/print-document";
 import Watermark from "layouts/authentication/watermark";
+import RolesPermissionsPopup from "layouts/authentication/roles-permission";
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -167,6 +168,7 @@ export default function App() {
             <Route path="/release-document" element={<ReleaseDocument />} />
             <Route path="/Review" element={<ReviewDocument />} />
             <Route path="/watermark" element={<Watermark />} />
+            <Route path="/roles-permission" element={<RolesPermissionsPopup />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </div>
@@ -206,6 +208,7 @@ export default function App() {
             <Route path="/release-document" element={<ReleaseDocument />} />
             <Route path="/Review" element={<ReviewDocument />} />
             <Route path="/watermark" element={<Watermark />} />
+            <Route path="/roles-permission" element={<RolesPermissionsPopup />} />
             <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
