@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { Link as RouterLink } from "react-router-dom";
 
 // @material-ui core components
 import AppBar from "@mui/material/AppBar";
@@ -280,26 +281,29 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 <Icon sx={iconsStyle}>settings</Icon>
               </IconButton>
               <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleCloseSettings}
-              >
-                <MenuItem onClick={() => handleMenuItemClick("Release Document")}>
-                  Release Document
-                </MenuItem>
-                <MenuItem onClick={() => handleMenuItemClick("Print Document")}>
-                  Print Document
-                </MenuItem>
-                <MenuItem onClick={() => handleMenuItemClick("Review Document")}>
-                  Review Document
-                </MenuItem>
-                <MenuItem onClick={() => handleMenuItemClick("Roles and Permissions")}>
-                  Roles and Permissions
-                </MenuItem>
-                <MenuItem onClick={() => handleMenuItemClick("Logout")}>
-                  Logout
-                </MenuItem>
-              </Menu>
+  anchorEl={anchorEl}
+  open={Boolean(anchorEl)}
+  onClose={handleCloseSettings}
+>
+  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/release-document">
+    Release Document
+  </MenuItem>
+  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/print-document">
+    Print Document
+  </MenuItem>
+  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/Review">
+    Review Document
+  </MenuItem>
+  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/roles-permissions">
+    Roles and Permissions
+  </MenuItem>
+  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/watermark">
+    Watermark
+  </MenuItem>
+  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/logout">
+    Logout
+  </MenuItem>
+</Menu>
               <Link to="/document-view" style={{ textDecoration: "none", color: "inherit" }}>
                 <IconButton
                   size="small"

@@ -27,7 +27,10 @@ import AddApproval from "layouts/authentication/add-approval";
 import ResetPassword from "layouts/authentication/forgot-password/index.js";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
 
-
+import ReviewDocument from "layouts/authentication/Review";
+import ReleaseDocument from "layouts/authentication/release-document";
+import PrintDocument from "layouts/authentication/print-document";
+import Watermark from "layouts/authentication/watermark";
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -160,6 +163,10 @@ export default function App() {
             <Route path="/add-approval" element={<AddApproval />} />
             <Route path="/forgotpassword" element={<ResetPassword />} />
             <Route path="/ESignatureDialog" element={<ESignatureDialog />} />
+            <Route path="/print-document" element={<PrintDocument />} />
+            <Route path="/release-document" element={<ReleaseDocument />} />
+            <Route path="/Review" element={<ReviewDocument />} />
+            <Route path="/watermark" element={<Watermark />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </div>
@@ -195,6 +202,10 @@ export default function App() {
             <Route path="/add-approval" element={<AddApproval />} />
             <Route path="/forgotpassword" element={<ResetPassword />} />
             <Route path="/e-sign" element={<ESignatureDialog />} />
+            <Route path="/print-document" element={<PrintDocument />} />
+            <Route path="/release-document" element={<ReleaseDocument />} />
+            <Route path="/Review" element={<ReviewDocument />} />
+            <Route path="/watermark" element={<Watermark />} />
             <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
