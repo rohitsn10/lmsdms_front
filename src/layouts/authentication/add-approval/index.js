@@ -72,7 +72,18 @@ function AddApproval() {
             Add Approval
           </MDTypography>
         </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
+        <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
+          <MDButton
+            variant="outlined"
+            color="error"
+            size="small" // Set the button size to small
+            onClick={handleClear}
+            sx={{ marginRight: '20px' }}
+          >
+            Clear
+          </MDButton>
+        </MDBox>
+        <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             {/* Approver (Auto-filled) */}
             <MDBox mb={3}>
@@ -145,19 +156,6 @@ function AddApproval() {
                 value={approvedAt}
                 disabled
               />
-            </MDBox>
-
-            {/* Clear and Submit buttons */}
-            <MDBox mt={2} mb={1} display="flex" justifyContent="space-between">
-              <MDButton
-                variant="outlined"
-                color="error"
-                size="small"
-                onClick={handleClear}
-                sx={{ alignSelf: 'flex-end' }}
-              >
-                Clear
-              </MDButton>
             </MDBox>
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit">

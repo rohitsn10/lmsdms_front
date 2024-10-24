@@ -8,8 +8,10 @@ import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
 import Icon from "@mui/material/Icon";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import InputAdornment from "@mui/material/InputAdornment";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -82,6 +84,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
+  const [showPassword, setShowPassword] = useState(false);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -105,24 +108,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
   };
 
-  // const renderMenu = () => (
-  //   <Menu
-  //     anchorEl={openMenu}
-  //     anchorReference={null}
-  //     anchorOrigin={{
-  //       vertical: "bottom",
-  //       horizontal: "left",
-  //     }}
-  //     open={Boolean(openMenu)}
-  //     onClose={handleCloseMenu}
-  //     sx={{ mt: 2 }}
-  //   >
-  //     <NotificationItem icon={<Icon>email</Icon>} title="Check new messages" />
-  //     <NotificationItem icon={<Icon>podcasts</Icon>} title="Manage Podcast sessions" />
-  //     <NotificationItem icon={<Icon>shopping_cart</Icon>} title="Payment successfully completed" />
-  //   </Menu>
-  // );
-  // Styles for the navbar icons
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {
       let colorValue = light || darkMode ? white.main : dark.main;
@@ -159,71 +144,95 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 <Icon sx={iconsStyle}>account_circle</Icon>
               </IconButton>
-              
-<Dialog
-  open={open}
-  onClose={handleClose}
-  fullWidth
-  maxWidth="md"
-  sx={{
-    "& .MuiDialog-paper": {
-      width: "30vw", // 50% of the viewport width
-      height: "50vh", // 50% of the viewport height
-    },
-  }}
->
-  <DialogTitle sx={{ textAlign: 'center' }}>Change Role</DialogTitle> {/* Centered title */}
-  <DialogContent>
-    <FormControl fullWidth margin="normal">
-      <InputLabel
-        id="role-select-label"
-        sx={{
-          padding: "0.5rem",
-          height: "3rem",
-        }}
-      >
-        Select Role
-      </InputLabel>
-      <Select
-        labelId="role-select-label"
-        value={selectedRole}
-        onChange={handleRoleChange}
-        label="Select Role"
-        sx={{
-          height: '3rem', // Adjust the height here
-          '.MuiSelect-select': {
-            padding: '0.75rem', // Adjust padding for the select input text
-          }
-        }}
-      >
-        {roles.map((role) => (
-          <MenuItem key={role} value={role}>
-            {role}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
 
-    <TextField
-      fullWidth
-      margin="normal"
-      label="Enter Password"
-      type="password"
-      value={password}
-      onChange={handlePasswordChange}
-    />
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={handleClose}>Cancel</Button>
-    <Button
-      onClick={handleSubmit}
-      variant="contained"
-      sx={{ backgroundColor: "primary.main", color: "white" }} // White text color
-    >
-      Submit
-    </Button>
-  </DialogActions>
-</Dialog>
+              <Dialog
+                open={open}
+                onClose={handleClose}
+                fullWidth
+                maxWidth="md"
+                sx={{
+                  "& .MuiDialog-paper": {
+                    width: "30vw", // 50% of the viewport width
+                    height: "42vh", // 50% of the viewport height
+                  },
+                }}
+              >
+                <DialogTitle sx={{ textAlign: "center" }}>Change Role</DialogTitle>{" "}
+                {/* Centered title */}
+                <DialogContent>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel
+                      id="role-select-label"
+                      sx={{
+                        height: "2.5rem",
+                      }}
+                    >
+                      Select Role
+                    </InputLabel>
+                    <Select
+                      labelId="role-select-label"
+                      value={selectedRole}
+                      onChange={handleRoleChange}
+                      label="Select Role"
+                      sx={{
+                        height: "3rem", // Adjust the height here
+                        ".MuiSelect-select": {
+                          padding: "0.75rem", // Adjust padding for the select input text
+                        },
+                      }}
+                    >
+                      {roles.map((role) => (
+                        <MenuItem key={role} value={role}>
+                          {role}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <MDBox mb={3}>
+                    <MDInput
+                      type={showPassword ? "text" : "password"}
+                      label="Password"
+                      fullWidth
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </MDBox>
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={handleClose} // Close the dialog when cancel is clicked
+                    variant="outlined"
+                    sx={{
+                      color: "primary.main",
+                      borderColor: "primary.main", // Match the color of the border
+                      "&:hover": { backgroundColor: "primary.dark", color: "#fff" }, // Light background on hover
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSubmit}
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "primary.main", // Primary color
+                      color: "#fff",
+                      "&:hover": { backgroundColor: "primary.dark" }, // Darker shade on hover
+                    }}
+                  >
+                    Submit
+                  </Button>
+                </DialogActions>
+              </Dialog>
 
               <IconButton
                 size="small"
