@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-
 import { useLocation, Link } from "react-router-dom";
-
 import PropTypes from "prop-types";
 
 // @material-ui core components
@@ -12,6 +10,8 @@ import Icon from "@mui/material/Icon";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import InputAdornment from "@mui/material/InputAdornment";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -36,7 +36,6 @@ import {
   DialogActions,
   Button,
   TextField,
-  MenuItem,
   FormControl,
   InputLabel,
   Select,
@@ -60,6 +59,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [open, setOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [password, setPassword] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null); // State for settings dropdown
 
   useEffect(() => {
     // Setting the navbar type
@@ -119,6 +119,22 @@ function DashboardNavbar({ absolute, light, isMini }) {
       return colorValue;
     },
   });
+
+  // Function to open the dropdown menu
+  const handleSettingsClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  // Function to close the dropdown menu
+  const handleCloseSettings = () => {
+    setAnchorEl(null);
+  };
+
+  // Handle menu item click (customize as needed)
+  const handleMenuItemClick = (item) => {
+    console.log("Clicked:", item);
+    handleCloseSettings(); // Close the menu after clicking an item
+  };
 
   return (
     <AppBar
@@ -254,9 +270,37 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 <Icon sx={iconsStyle}>settings</Icon>
               </IconButton>
+              <IconButton
+                size="small"
+                disableRipple
+                color="inherit"
+                sx={navbarIconButton}
+                onClick={handleSettingsClick}
+              >
+                <Icon sx={iconsStyle}>settings</Icon>
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleCloseSettings}
+              >
+                <MenuItem onClick={() => handleMenuItemClick("Release Document")}>
+                  Release Document
+                </MenuItem>
+                <MenuItem onClick={() => handleMenuItemClick("Print Document")}>
+                  Print Document
+                </MenuItem>
+                <MenuItem onClick={() => handleMenuItemClick("Review Document")}>
+                  Review Document
+                </MenuItem>
+                <MenuItem onClick={() => handleMenuItemClick("Roles and Permissions")}>
+                  Roles and Permissions
+                </MenuItem>
+                <MenuItem onClick={() => handleMenuItemClick("Logout")}>
+                  Logout
+                </MenuItem>
+              </Menu>
               <Link to="/document-view" style={{ textDecoration: "none", color: "inherit" }}>
-                {" "}
-                {/* Wrap IconButton in Link */}
                 <IconButton
                   size="small"
                   disableRipple
@@ -277,14 +321,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
   );
 }
 
-// Setting default values for the props of DashboardNavbar
-DashboardNavbar.defaultProps = {
-  absolute: false,
-  light: false,
-  isMini: false,
-};
-
-// Typechecking props for the DashboardNavbar
 DashboardNavbar.propTypes = {
   absolute: PropTypes.bool,
   light: PropTypes.bool,

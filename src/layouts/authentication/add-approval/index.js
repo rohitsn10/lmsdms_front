@@ -14,8 +14,9 @@ import {
   MenuItem,
   OutlinedInput,
 } from "@mui/material";
+import ESignatureDialog from "layouts/authentication/ESignatureDialog"; // Ensure correct import
 
-// Example roles for Sent Back To dropdown
+
 const sentBackRoles = ["Author", "Reviewer"];
 
 function AddApproval() {
@@ -23,33 +24,30 @@ function AddApproval() {
   const [approvalStatus, setApprovalStatus] = useState("");
   const [sentBackTo, setSentBackTo] = useState("");
   const [approvedAt, setApprovedAt] = useState("");
+  const [esignatureDialogOpen, setEsignatureDialogOpen] = useState(false); // State for E-Signature dialog
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Auto-fill approver and approvedAt based on user role and current date
     const currentUserRole = "Approver"; // Replace with dynamic role fetching logic
-    const currentDate = new Date().toISOString().split("T")[0]; // Format date as YYYY-MM-DD
+    const currentDate = new Date().toISOString().split("T")[0];
     setApprover(currentUserRole);
     setApprovedAt(currentDate);
   }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Approval Details Submitted:", {
-      approver,
-      approvalStatus,
-      sentBackTo,
-      approvedAt,
-    });
-    // Navigate or perform any action post submission
-    navigate("/dashboard");
+    setEsignatureDialogOpen(true); // Open the E-Signature dialog on submit
   };
 
-  // Function to clear input fields
   const handleClear = () => {
     setApprovalStatus("");
     setSentBackTo("");
+  };
+
+  const handleCloseEsignatureDialog = () => {
+    setEsignatureDialogOpen(false);
+    navigate("/dashboard"); // Navigate after closing the dialog
   };
 
   return (
@@ -58,9 +56,8 @@ function AddApproval() {
         <MDBox
           borderRadius="lg"
           sx={{
-            background: "linear-gradient(212deg, #d5b282, #f5e0c3)", // Custom color gradient
+            background: "linear-gradient(212deg, #d5b282, #f5e0c3)",
             borderRadius: "lg",
-            // boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)", // Custom colored shadow
             mx: 2,
             mt: -3,
             p: 2,
@@ -76,7 +73,7 @@ function AddApproval() {
           <MDButton
             variant="outlined"
             color="error"
-            size="small" // Set the button size to small
+            size="small"
             onClick={handleClear}
             sx={{ marginRight: '20px' }}
           >
@@ -85,7 +82,6 @@ function AddApproval() {
         </MDBox>
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
-            {/* Approver (Auto-filled) */}
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -106,12 +102,7 @@ function AddApproval() {
                   value={approvalStatus}
                   onChange={(e) => setApprovalStatus(e.target.value)}
                   input={<OutlinedInput label="Approval Status" />}
-                  sx={{ minWidth: 200 ,
-                    height: "3rem", // Adjust the height here
-                    ".MuiSelect-select": {
-                      padding: "0.45rem", // Adjust padding for the select input text
-                    },
-                  }}
+                  sx={{ minWidth: 200, height: "3rem", ".MuiSelect-select": { padding: "0.45rem" }}}
                 >
                   <MenuItem value="Approved">Approved</MenuItem>
                   <MenuItem value="Sent Back">Sent Back</MenuItem>
@@ -130,12 +121,7 @@ function AddApproval() {
                     value={sentBackTo}
                     onChange={(e) => setSentBackTo(e.target.value)}
                     input={<OutlinedInput label="Sent Back To" />}
-                    sx={{ minWidth: 200 ,
-                      height: "3rem", // Adjust the height here
-                      ".MuiSelect-select": {
-                        padding: "0.45rem", // Adjust padding for the select input text
-                      },
-                    }}
+                    sx={{ minWidth: 200, height: "3rem", ".MuiSelect-select": { padding: "0.45rem" }}}
                   >
                     {sentBackRoles.map((role) => (
                       <MenuItem key={role} value={role}>
@@ -165,6 +151,12 @@ function AddApproval() {
           </MDBox>
         </MDBox>
       </Card>
+
+      {/* E-Signature Dialog */}
+      <ESignatureDialog
+        open={esignatureDialogOpen}
+        handleClose={handleCloseEsignatureDialog}
+      />
     </BasicLayout>
   );
 }
