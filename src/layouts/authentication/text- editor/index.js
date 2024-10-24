@@ -196,25 +196,34 @@ const DocumentView = () => {
 
       {/* Comment Drawer */}
       <Drawer anchor="right" open={openDrawer} onClose={() => setOpenDrawer(false)}>
-        <Box sx={{ width: 300, padding: 2 }}>
-          <IconButton onClick={() => setOpenDrawer(false)} sx={{ position: 'absolute', right: 10, top: 10 }}>
-            <CloseIcon />
-          </IconButton>
-          <Typography variant="h6">Add Comment</Typography>
-          <TextField
-            value={currentComment}
-            onChange={(e) => setCurrentComment(e.target.value)}
-            rows={4}
-            multiline
-            fullWidth
-            variant="outlined"
-            margin="normal"
-          />
-          <Button variant="contained" onClick={handleSaveComment} sx={{ marginTop: 2 }}>
-            Save Comment
-          </Button>
-        </Box>
-      </Drawer>
+  <Box sx={{ width: 250, padding: 2, position: 'relative', height: '100%' }}>
+    <IconButton onClick={() => setOpenDrawer(false)} sx={{ position: 'absolute', right: 10, top: 10 }}>
+      <CloseIcon />
+    </IconButton>
+    <Typography variant="h6">Add Comment</Typography>
+    <TextField
+      value={currentComment}
+      onChange={(e) => setCurrentComment(e.target.value)}
+      rows={4}
+      multiline
+      fullWidth
+      variant="outlined"
+      margin="normal"
+    />
+   <Button
+      variant="contained"
+      onClick={handleSaveComment}
+      sx={{ position: 'absolute', bottom: 16, left: 16, right: 16 }}
+      style={{
+        backgroundColor: "#E53471",
+        color: "white",
+      }}
+    >
+      Save Comment
+    </Button>
+  </Box>
+</Drawer>
+
 
       {/* Footer with Action Buttons */}
       <Box sx={{ marginTop: 2, display: "flex", justifyContent: "center" }}>
