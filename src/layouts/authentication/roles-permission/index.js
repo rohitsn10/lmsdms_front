@@ -111,7 +111,10 @@ function RolesPermissionsPopup({ open, handleCloseRolesPopup, handleSubmitRolesP
           <Button
             variant="contained"
             style={{ backgroundColor: "#E53471", color: "white" }}
-            onClick={handleSubmitRolesPopup}
+            onClick={() => {
+              handleEsignOpen();  
+              handleSubmitRolesPopup && handleSubmitRolesPopup(); 
+            }}
           >
             Submit
           </Button>
