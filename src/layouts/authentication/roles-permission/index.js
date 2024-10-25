@@ -13,9 +13,9 @@ import {
   Button,
   TextField,
 } from "@mui/material";
+import PropTypes from 'prop-types';
 
-function RolesPermissionsPopup() {
-  const [open, setOpen] = useState(false);
+function RolesPermissionsPopup({ open, handleCloseRolesPopup, handleSubmitRolesPopup }) {
   const [esignOpen, setEsignOpen] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -40,11 +40,6 @@ function RolesPermissionsPopup() {
     }, {})
   );
 
-  const handleClickOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const handleEsignOpen = () => setEsignOpen(true);
-  const handleEsignClose = () => setEsignOpen(false);
-
   const handleCheckboxChange = (role, permission) => {
     setCheckedState((prevState) => ({
       ...prevState,
@@ -55,10 +50,8 @@ function RolesPermissionsPopup() {
     }));
   };
 
-  const handleSubmit = () => {
-    setOpen(false);
-    handleEsignOpen();
-  };
+  const handleEsignOpen = () => setEsignOpen(true);
+  const handleEsignClose = () => setEsignOpen(false);
 
   const handleEsignSubmit = () => {
     console.log("E-signature password:", password);
@@ -66,18 +59,16 @@ function RolesPermissionsPopup() {
     setEsignOpen(false);
   };
 
+  RolesPermissionsPopup.propTypes = {
+    open: PropTypes.bool.isRequired,
+    handleCloseRolesPopup: PropTypes.func.isRequired,
+    handleSubmitRolesPopup: PropTypes.func, // Assuming this is an optional prop
+  };
+  
   return (
     <div>
-      <Button
-        variant="outlined"
-        color="primary"
-        onClick={handleClickOpen}
-      >
-        Open Roles and Permissions Popup
-      </Button>
-
       {/* Main Popup for Roles and Permissions */}
-      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+      <Dialog open={open} onClose={handleCloseRolesPopup} maxWidth="md" fullWidth>
         <DialogTitle style={{ textAlign: "center" }}>Roles and Permissions</DialogTitle>
         <DialogContent>
           <Table style={{ tableLayout: "fixed", width: "100%" }}>
@@ -114,19 +105,13 @@ function RolesPermissionsPopup() {
           </Table>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={handleClose}
-            style={{ color: "black" }}
-          >
+          <Button onClick={handleCloseRolesPopup} style={{ color: "black" }}>
             Cancel
           </Button>
           <Button
             variant="contained"
-            style={{
-              backgroundColor: "#E53471",
-              color: "white",
-            }}
-            onClick={handleSubmit}
+            style={{ backgroundColor: "#E53471", color: "white" }}
+            onClick={handleSubmitRolesPopup}
           >
             Submit
           </Button>
@@ -135,7 +120,7 @@ function RolesPermissionsPopup() {
 
       {/* E-signature Popup */}
       <Dialog open={esignOpen} onClose={handleEsignClose} maxWidth="sm" fullWidth>
-        <DialogTitle style={{ textAlign: "center" }}>E-signature </DialogTitle>
+        <DialogTitle style={{ textAlign: "center" }}>E-signature</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -148,18 +133,12 @@ function RolesPermissionsPopup() {
           />
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={handleEsignClose}
-            style={{ color: "black" }}
-          >
+          <Button onClick={handleEsignClose} style={{ color: "black" }}>
             Cancel
           </Button>
           <Button
             variant="contained"
-            style={{
-              backgroundColor: "#303f9f",
-              color: "white",
-            }}
+            style={{ backgroundColor: "#303f9f", color: "white" }}
             onClick={handleEsignSubmit}
           >
             Submit

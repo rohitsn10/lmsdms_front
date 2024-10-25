@@ -20,7 +20,7 @@ import MDInput from "components/MDInput";
 
 // Material Dashboard 2 React example components
 import Breadcrumbs from "examples/Breadcrumbs";
-import NotificationItem from "examples/Items/NotificationItem";
+import RolesPermissionsPopup from "layouts/authentication/roles-permission";
 
 // Custom styles for DashboardNavbar
 import {
@@ -85,6 +85,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
+  const [openRolesPopup, setOpenRolesPopup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const handleClickOpen = () => {
     setOpen(true);
@@ -134,9 +135,16 @@ function DashboardNavbar({ absolute, light, isMini }) {
   // Handle menu item click (customize as needed)
   const handleMenuItemClick = (item) => {
     console.log("Clicked:", item);
-    handleCloseSettings(); // Close the menu after clicking an item
+    handleCloseSettings();
   };
 
+  const handleOpenRolesPopup = () => setOpenRolesPopup(true);
+  const handleCloseRolesPopup = () => setOpenRolesPopup(false);
+
+  const handleSubmitRolesPopup = () => {
+    console.log("Roles and Permissions Submitted");
+    setOpenRolesPopup(false);
+  };
   return (
     <AppBar
       position={absolute ? "absolute" : navbarType}
@@ -153,14 +161,16 @@ function DashboardNavbar({ absolute, light, isMini }) {
               <MDInput label="Search here" />
             </MDBox>
             <MDBox color={light ? "white" : "inherit"}>
-            <Button
-              variant="contained"
-              component={RouterLink}
-              to="/roles-permission"
-              sx={{ mr: 2, backgroundColor: "primary.main", color: "#fff" }}
-            >
-              Roles
-            </Button>
+              <Button
+                variant="contained"
+                component={RouterLink}
+                onClick={handleOpenRolesPopup} 
+                sx={{  backgroundColor: "primary.main", color: "#fff" }}
+              >
+                Roles
+              </Button>
+              <RolesPermissionsPopup open={openRolesPopup} handleCloseRolesPopup={handleCloseRolesPopup} />
+
               <IconButton
                 sx={navbarIconButton}
                 size="small"
@@ -288,27 +298,27 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 <Icon sx={iconsStyle}>settings</Icon>
               </IconButton>
-              <Menu
-  anchorEl={anchorEl}
-  open={Boolean(anchorEl)}
-  onClose={handleCloseSettings}
->
-  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/release-document">
-    Release Document
-  </MenuItem>
-  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/print-document">
-    Print Document
-  </MenuItem>
-  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/Review">
-    Review Document
-  </MenuItem>
-  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/watermark">
-    Watermark
-  </MenuItem>
-  <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/logout">
-    Logout
-  </MenuItem>
-</Menu>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseSettings}>
+                <MenuItem
+                  onClick={handleCloseSettings}
+                  component={RouterLink}
+                  to="/release-document"
+                >
+                  Release Document
+                </MenuItem>
+                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/print-document">
+                  Print Document
+                </MenuItem>
+                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/Review">
+                  Review Document
+                </MenuItem>
+                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/watermark">
+                  Watermark
+                </MenuItem>
+                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/logout">
+                  Logout
+                </MenuItem>
+              </Menu>
               <Link to="/document-view" style={{ textDecoration: "none", color: "inherit" }}>
                 <IconButton
                   size="small"
