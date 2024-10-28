@@ -29,20 +29,33 @@ import {
   Button,
   Box,
 } from "@mui/material";
+import { login } from '../../../api/auth/auth'; 
+
+
 
 const roles = ["Author", "Reviewer", "Approver", "Admin", "Doc Admin"];
 
 function Login() {
-  const [userId, setUserId] = useState("");
-  const [password, setPassword] = useState("");
+  const [userId, setUserId] = useState(""); 
+  const [password, setPassword] = useState(""); 
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false); // Add state for Remember Me switch
+  const [rememberMe, setRememberMe] = useState(false); 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate for navigation
+  const navigate = useNavigate(); 
 
-  const handleLogin = () => {
-    setDialogOpen(true);
+  const handleLogin = async () => {
+    try {
+      const response = await login({ username: userId, password });
+      if (response.data) {
+        
+        console.log("Login successful:", response.data);
+        setDialogOpen(true); 
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      
+    }
   };
 
   const handleCloseDialog = () => {
@@ -84,9 +97,9 @@ function Login() {
           <MDTypography variant="h3" fontWeight="medium" mt={1}>
             <MDBox
               component="img"
-              src={bplogo} // Replace with your logo's path
+              src={bplogo} 
               alt="Logo"
-              sx={{ height: "28px", width: "250px", display: "block", margin: "0 auto" }} // Adjust styling as needed
+              sx={{ height: "28px", width: "250px", display: "block", margin: "0 auto" }} 
             />
           </MDTypography>
         </MDBox>
@@ -162,7 +175,7 @@ function Login() {
                   },
                 }}
                 fullWidth
-                onClick={handleLogin}
+                onClick={handleLogin} // Trigger the API call on button click
               >
                 Login
               </MDButton>
@@ -238,21 +251,20 @@ function Login() {
             sx={{
               color: "primary.main",
               borderColor: "primary.main", // Match the color of the border
-              "&:hover": { backgroundColor: "primary.dark",color:"#fff"}, // Light background on hover
+              "&:hover": { backgroundColor: "primary.dark", color: "#fff" }, // Add hover effect
             }}
           >
             Cancel
           </Button>
           <Button
-            onClick={handleOk}
+            onClick={handleOk} // Handle the role selection
             variant="contained"
             sx={{
-              backgroundColor: "primary.main", // Primary color
-              color: "#fff",
-              "&:hover": { backgroundColor: "primary.dark" }, // Darker shade on hover
+              backgroundColor: "primary.main",
+              "&:hover": { backgroundColor: "primary.dark" }, // Add hover effect
             }}
           >
-            Submit
+            Ok
           </Button>
         </DialogActions>
       </Dialog>
