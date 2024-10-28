@@ -67,7 +67,7 @@ function AddDocument() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/dashboard"); // Navigate to the dashboard when dialog is closed
+    navigate("/document-view"); // Navigate to the dashboard when dialog is closed
   };
 
   return (
@@ -302,7 +302,7 @@ function AddDocument() {
         {/* E-Signature Dialog */}
         <ESignatureDialog
           open={openSignatureDialog}
-          onClose={handleCloseSignatureDialog}
+          handleClose={handleCloseSignatureDialog}
         />
       </Card>
     </BasicLayout>

@@ -37,17 +37,8 @@ Coded by www.creative-tim.com
 
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
-import Profile from "layouts/profile";
-import Login from "layouts/authentication/log-in";
-import ResetPassword from "layouts/authentication/forgot-password";
-import ReviewDocument from "layouts/authentication/Review";
-// @mui icons
 import Icon from "@mui/material/Icon";
-import ReleaseDocument from "layouts/authentication/release-document";
-import PrintDocument from "layouts/authentication/print-document";
-import Watermark from "layouts/authentication/watermark";
-
+import LMSDashboard from "layouts/authentication/lms-dashboard";
 const routes = [
   // {
   //   type: "collapse",
@@ -72,6 +63,14 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+  },
+  {
+    type: "collapse",
+    name: "lmsDashboard",
+    key: "lms-dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/lms-dashboard",
+    component: <LMSDashboard />,
   },
   // {
   //   type: "collapse",
@@ -147,14 +146,8 @@ const routes = [
   //   route: "/add-approval",
   //   component: <AddApproval />,
   // },
-  // {
-  //   type:"collapse",
-  //   name: "ReviewDocument",
-  //   key: "Review",
-  //   icon: <Icon fontSize="small">assignment</Icon>,
-  //   route: "/authentication/Review",
-  //   component: <ReviewDocument/>, 
-  // },
+
+  
   
 ];
 
