@@ -40,31 +40,34 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(false); 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
-  const [error, setError] = useState(""); // For displaying error messages
+  const [error, setError] = useState(""); 
   const navigate = useNavigate(); 
 
   const handleLogin = async () => {
-    // Basic validation for empty fields
+    
     if (!userId || !password) {
       setError("Both User ID and Password are required.");
       return;
     }
-
+  
     try {
       const response = await login({ username: userId, password });
-      if (response.data) {
+      if (response && response.data) { 
         console.log("Login successful:", response.data);
-        setDialogOpen(true); // Open role selection dialog only if login is successful
-        setError(""); // Clear any previous errors
+        setDialogOpen(true); 
+        setError("");
       } else {
-        setError("Incorrect User ID or Password."); // Show error if login fails
+        setError("Incorrect User ID or Password."); 
+        setDialogOpen(false); 
       }
     } catch (error) {
       console.error("Login failed:", error);
-      setError("Incorrect User ID or Password."); // Show error if login fails
+      setError("Incorrect User ID or Password."); 
+      setDialogOpen(false); 
     }
   };
-
+  
+  
   const handleCloseDialog = () => {
     setDialogOpen(false);
   };
