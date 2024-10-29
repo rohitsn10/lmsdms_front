@@ -21,13 +21,19 @@ import App from "App";
 // Material Dashboard 2 React Context Provider
 import { MaterialUIControllerProvider } from "context";
 
+// Import Redux Provider and your store
+import { Provider } from 'react-redux';
+import store from './store'; // Adjust the path to your Redux store
+
 const container = document.getElementById("app");
 const root = createRoot(container);
 
 root.render(
-  <BrowserRouter>
-    <MaterialUIControllerProvider>
-      <App />
-    </MaterialUIControllerProvider>
-  </BrowserRouter>
+  <Provider store={store}>  {/* Wrap your app with Provider */}
+    <BrowserRouter>
+      <MaterialUIControllerProvider>
+        <App />
+      </MaterialUIControllerProvider>
+    </BrowserRouter>
+  </Provider>
 );
