@@ -109,7 +109,7 @@ material-dashboard-react
     │   ├── favicon.png
     │   ├── index.html
     │   ├── manifest.json
-    │   └── robots.txt
+    │   └── robots.txt  
     ├── src
     │   ├── assets
     │   │   ├── images

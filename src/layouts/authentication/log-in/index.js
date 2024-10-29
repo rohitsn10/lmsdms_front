@@ -1,13 +1,12 @@
 // Import necessary components
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { Link, useNavigate } from "react-router-dom"; 
 import Card from "@mui/material/Card";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import CloseIcon from "@mui/icons-material/Close"; // Import the Close icon
-import Switch from "@mui/material/Switch"; // Import Switch for Remember Me
+import Switch from "@mui/material/Switch"; 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
@@ -84,9 +83,9 @@ function Login() {
           borderRadius="lg"
           coloredShadow="#344767"
           sx={{
-            background: "linear-gradient(212deg, #d5b282, #f5e0c3)", // Custom color gradient
+            background: "linear-gradient(212deg, #d5b282, #f5e0c3)", 
             borderRadius: "lg",
-            boxShadow: "#344767", // Custom colored shadow
+            boxShadow: "#344767", 
             mx: 2,
             mt: -3,
             p: 2,
@@ -152,10 +151,10 @@ function Login() {
               fontWeight="medium"
               textAlign="center"
               sx={{
-                color: "#00008B", // Dark blue color
-                cursor: "pointer", // Add pointer to indicate it's clickable
+                color: "#00008B", 
+                cursor: "pointer", 
                 "&:hover": {
-                  textDecoration: "underline", // Optional: underline on hover
+                  textDecoration: "underline", 
                 },
               }}
               onClick={handleForgotPassword}

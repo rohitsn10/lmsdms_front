@@ -12,6 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/creativetimofficial/material-dashboard-react.git"
   },
+  "proxy": "https://a0a3-2409-40c1-10b7-edd8-6dd5-e2f8-1f7e-be05.ngrok-free.app",
   "dependencies": {
     "@emotion/cache": "11.10.8",
     "@emotion/react": "11.10.8",

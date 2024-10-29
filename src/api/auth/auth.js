@@ -2,11 +2,12 @@
 import apiService from '../../services/apiService';
 
 export const login = (loginData) => {
-  return apiService.post('/login', {
-    username: loginData.username,
-    password: loginData.password,
-  });
-};
+    return apiService.post('/user_profile/login', {
+      username: loginData.username,
+      password: loginData.password,
+    });
+  };
+  
 
 export const authenticateToken = (token) => {
   return apiService.post('/get_user_from_token', {}, {
@@ -18,5 +19,5 @@ export const authenticateToken = (token) => {
 
 export const logout = (navigate) => {
   sessionStorage.clear(); 
-  navigate('/login'); // Redirect to login page
+  navigate('/login'); 
 };
