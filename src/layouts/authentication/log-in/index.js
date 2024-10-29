@@ -27,10 +27,9 @@ import {
   OutlinedInput,
   Button,
   Box,
+  Alert,
 } from "@mui/material";
 import { login } from '../../../api/auth/auth'; 
-
-
 
 const roles = ["Author", "Reviewer", "Approver", "Admin", "Doc Admin"];
 
@@ -41,19 +40,28 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(false); 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
+  const [error, setError] = useState(""); // For displaying error messages
   const navigate = useNavigate(); 
 
   const handleLogin = async () => {
+    // Basic validation for empty fields
+    if (!userId || !password) {
+      setError("Both User ID and Password are required.");
+      return;
+    }
+
     try {
       const response = await login({ username: userId, password });
       if (response.data) {
-        
         console.log("Login successful:", response.data);
-        setDialogOpen(true); 
+        setDialogOpen(true); // Open role selection dialog only if login is successful
+        setError(""); // Clear any previous errors
+      } else {
+        setError("Incorrect User ID or Password."); // Show error if login fails
       }
     } catch (error) {
       console.error("Login failed:", error);
-      
+      setError("Incorrect User ID or Password."); // Show error if login fails
     }
   };
 
@@ -109,6 +117,11 @@ function Login() {
         </MDBox>
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" sx={{ padding: 3 }}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -169,12 +182,12 @@ function Login() {
                   backgroundColor: "#2F1B14",
                   color: "#fff",
                   "&:hover": {
-                    backgroundColor: "#2F1B14", // Updated hover color
+                    backgroundColor: "#2F1B14", 
                     color: "#fff",
                   },
                 }}
                 fullWidth
-                onClick={handleLogin} // Trigger the API call on button click
+                onClick={handleLogin} 
               >
                 Login
               </MDButton>
@@ -188,18 +201,18 @@ function Login() {
         open={dialogOpen}
         onClose={handleCloseDialog}
         fullWidth
-        maxWidth="md" // Match the width of the first dialog
+        maxWidth="md"
         sx={{
           "& .MuiDialog-paper": {
-            width: "40vw", // Match 30% viewport width
-            height: "45vh", // Match 42% viewport height
-            borderRadius: "10px", // Keep smooth rounded corners
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)", // Subtle shadow for clean look
-            backgroundColor: "#fff", // Light background
+            width: "40vw", 
+            height: "45vh", 
+            borderRadius: "10px", 
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)", 
+            backgroundColor: "#fff", 
           },
         }}
       >
-        <DialogTitle sx={{ textAlign: "center" }}>Select Role</DialogTitle> {/* Center the title */}
+        <DialogTitle sx={{ textAlign: "center" }}>Select Role</DialogTitle>
         <DialogContent sx={{ padding: "16px 24px" }}>
           <Typography variant="body1" sx={{ marginBottom: "8px" }}>
             User Id: {userId}
@@ -219,14 +232,14 @@ function Login() {
               onChange={handleRoleChange}
               input={<OutlinedInput label="Select Role" />}
               sx={{
-                height: "3rem", // Match height from the first dialog
+                height: "3rem", 
                 ".MuiSelect-select": {
-                  padding: "0.75rem", // Adjust padding for a cleaner look
+                  padding: "0.75rem", 
                 },
-                minWidth: "450px", // Match the width from the first dialog
-                borderRadius: "10px", // Keep smooth corners
-                backgroundColor: "#fff", // Clean white background
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)", // Soft shadow
+                minWidth: "450px", 
+                borderRadius: "10px", 
+                backgroundColor: "#fff", 
+                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)", 
               }}
             >
               {roles.map((role) => (
@@ -245,25 +258,26 @@ function Login() {
           }}
         >
           <Button
-            onClick={handleCloseDialog} // Close the dialog when cancel is clicked
+            onClick={handleCloseDialog}
             variant="outlined"
             sx={{
               color: "primary.main",
-              borderColor: "primary.main", // Match the color of the border
-              "&:hover": { backgroundColor: "primary.dark", color: "#fff" }, // Add hover effect
+              borderColor: "primary.main", 
+              "&:hover": { backgroundColor: "primary.dark", color: "#fff" },
             }}
           >
             Cancel
           </Button>
           <Button
-            onClick={handleOk} // Handle the role selection
+            onClick={handleOk}
             variant="contained"
             sx={{
               backgroundColor: "primary.main",
-              "&:hover": { backgroundColor: "primary.dark" }, // Add hover effect
+              "&:hover": { backgroundColor: "primary.dark" },
             }}
+            disabled={!selectedRole} 
           >
-            Ok
+            OK
           </Button>
         </DialogActions>
       </Dialog>
