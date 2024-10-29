@@ -9,6 +9,7 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/material";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
+import { useCreateUserMutation } from 'api/auth/userApi'; // Import your API hook
 
 const roles = ["Author", "Purchase", "Reviewer", "Approver", "Doc_Admin"];
 const departments = ["HR", "Finance", "IT", "Sales"]; 
@@ -22,14 +23,37 @@ function AddUser() {
   const [department, setDepartment] = useState("");
   const [joiningDate, setJoiningDate] = useState("");
   const [jobPosition, setJobPosition] = useState("");
-  const [openSignatureDialog, setOpenSignatureDialog] = useState(false); // State for dialog visibility
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
   const navigate = useNavigate(); 
+  const [createUser, { isLoading, isError, isSuccess }] = useCreateUserMutation(); // Create user mutation
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Open the E-signature dialog on form submission
     setOpenSignatureDialog(true);
+    
+    // Prepare the user data for submission
+    const userData = {
+      first_name: firstName,
+      last_name: lastName,
+      employee_id: employeeId,
+      email: email,
+      user_role: userRole,
+      department: department,
+      joining_date: joiningDate,
+      job_position: jobPosition,
+    };
+
+    try {
+      // Call the API to create the user
+      await createUser(userData).unwrap();
+      // Navigate to the dashboard on success
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Failed to create user:", error);
+      // Handle error (show message, etc.)
+    }
   };
 
   const handleClear = () => {
@@ -45,7 +69,6 @@ function AddUser() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/dashboard"); // Navigate to the dashboard when dialog is closed
   };
 
   return (
@@ -56,7 +79,6 @@ function AddUser() {
            sx={{
             background: "linear-gradient(212deg, #d5b282, #f5e0c3)",
             borderRadius: "lg",
-            // boxShadow: "0 4px 20px 0 rgba(213, 178, 130, 0.5)",
             mx: 2,
             mt: -3,
             p: 2,
@@ -186,8 +208,8 @@ function AddUser() {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit">
-                Submit
+              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
+                {isLoading ? "Submitting..." : "Submit"}
               </MDButton>
             </MDBox>
           </MDBox>
