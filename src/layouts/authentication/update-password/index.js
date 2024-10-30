@@ -1,7 +1,10 @@
-// UpdatePassword.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
@@ -17,6 +20,9 @@ function UpdatePassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
@@ -59,6 +65,12 @@ function UpdatePassword() {
     navigate("/dashboard");
   };
 
+  const toggleVisibility = (field) => {
+    if (field === "old") setShowOldPassword((prev) => !prev);
+    else if (field === "new") setShowNewPassword((prev) => !prev);
+    else setShowConfirmPassword((prev) => !prev);
+  };
+
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto" }}>
@@ -99,29 +111,56 @@ function UpdatePassword() {
             )}
             <MDBox mb={3}>
               <MDInput
-                type="password"
+                type={showOldPassword ? "text" : "password"}
                 label="Old Password"
                 fullWidth
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => toggleVisibility("old")}>
+                        {showOldPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </MDBox>
             <MDBox mb={3}>
               <MDInput
-                type="password"
+                type={showNewPassword ? "text" : "password"}
                 label="New Password"
                 fullWidth
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => toggleVisibility("new")}>
+                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </MDBox>
             <MDBox mb={3}>
               <MDInput
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 label="Confirm Password"
                 fullWidth
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => toggleVisibility("confirm")}>
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
