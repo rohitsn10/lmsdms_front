@@ -315,6 +315,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/watermark">
                   Watermark
                 </MenuItem>
+                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/update-password">
+                  Update Password
+                </MenuItem>
                 <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/logout">
                   Logout
                 </MenuItem>
