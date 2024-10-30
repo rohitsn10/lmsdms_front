@@ -46,7 +46,6 @@ function AddUser() {
     };
 
     try {
-      // Call the API to create the user
       await createUser(userData).unwrap();
       // Navigate to the dashboard on success
       navigate("/dashboard");
