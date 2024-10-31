@@ -5,7 +5,7 @@ import config from 'constants/config';
 export const userApi = createApi({
     reducerPath: 'userApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: config.BACKEND_API_URL, // Access BACKEND_API_URL from the config
+        baseUrl: config.BACKEND_API_URL, 
         prepareHeaders: (headers) => {
             const token = sessionStorage.getItem('token');
             if (token) {

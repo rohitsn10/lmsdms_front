@@ -5,7 +5,7 @@ import config from 'constants/config';
 export const documentApi = createApi({
     reducerPath: 'documentApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: config.BACKEND_API_URL, // Access BACKEND_API_URL from the config
+        baseUrl: config.BACKEND_API_URL, 
         prepareHeaders: (headers) => {
             const token = sessionStorage.getItem('token');
             if (token) {
@@ -18,7 +18,7 @@ export const documentApi = createApi({
     endpoints: (builder) => ({
         createDocument: builder.mutation({
             query: (body) => ({
-                url: 'dms_module/CreateDocument', // Adjust the endpoint as necessary
+                url: 'dms_module/CreateDocument', 
                 method: 'POST',
                 body,
             }),
