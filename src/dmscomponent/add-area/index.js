@@ -9,7 +9,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog"; // Ensure correct import
+import ESignatureDialog from "layouts/authentication/ESignatureDialog"; 
 
 function AddArea() {
   const [areaName, setAreaName] = useState("");
@@ -21,7 +21,7 @@ function AddArea() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setOpenSignatureDialog(true); // Open dialog on form submission
+    setOpenSignatureDialog(true); 
     console.log("Area Details Submitted:", { areaName, departmentName, description });
   };
 
