@@ -4,7 +4,11 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-import { useRequestForgotPasswordOtpMutation, useVerifyForgotPasswordOtpMutation } from 'api/auth/forgotpassApi';
+import {
+  useRequestForgotPasswordOtpMutation,
+  useVerifyForgotPasswordOtpMutation,
+  useResetPasswordMutation, // Ensure you have a reset password mutation
+} from "api/auth/forgotpassApi";
 
 function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -18,6 +22,7 @@ function ResetPassword() {
 
   const [requestForgotPasswordOtp] = useRequestForgotPasswordOtpMutation();
   const [verifyForgotPasswordOtp] = useVerifyForgotPasswordOtpMutation();
+  const [resetPassword] = useResetPasswordMutation(); // Reset password mutation
 
   // Step 1: Handle Email Submit to request OTP
   const handleEmailSubmit = async () => {
@@ -60,41 +65,39 @@ function ResetPassword() {
     }
   };
 
-  // Step 2: Handle OTP Verification and move to password reset step
-  const handleOtpSubmit = async () => {
+  // Step 2: Handle OTP verification and Password Reset
+  const handleVerifyAndResetPassword = async () => {
     if (otp.join("").length === 6) {
       try {
         const response = await verifyForgotPasswordOtp({ email, otp: otp.join("") }).unwrap();
+
         if (response.status) {
-          setMessage("OTP verified successfully. Please set your new password.");
-          setStep(3); // Move to "Set New Password" card
+          // OTP verified, now check for password reset
+          if (password && confirm_password && password === confirm_password) {
+            // Reset password
+            const resetResponse = await resetPassword({
+              email,
+              password,
+            }).unwrap(); // Ensure only email and password are passed
+
+            if (resetResponse.status) {
+              setMessage("Password reset successfully.");
+              // Optionally, navigate to login or show success message
+            } else {
+              setMessage(resetResponse.message || "Password reset failed. Please try again.");
+            }
+          } else {
+            setMessage("Passwords do not match. Please ensure both fields are filled.");
+          }
+        } else {
+          setMessage(response.message || "OTP verification failed. Please try again.");
         }
       } catch (error) {
-        setMessage(error.data?.message || "Error verifying OTP");
+        console.error("Error during verification or resetting password:", error);
+        setMessage(error.data?.message || "Error processing your request");
       }
     } else {
       setMessage("Invalid OTP. Please enter a 6-digit OTP.");
-    }
-  };
-
-  // Step 3: Final Password Reset Submission
-  const handlePasswordResetSubmit = async () => {
-    if (password && confirm_password && password === confirm_password) {
-      try {
-        const response = await verifyForgotPasswordOtp({
-          email,
-          otp: otp.join(""),
-          password,
-          confirm_password,
-        }).unwrap();
-        if (response.status) {
-          setMessage("Password reset successfully.");
-        }
-      } catch (error) {
-        setMessage(error.data?.message || "Error resetting password");
-      }
-    } else {
-      setMessage("Passwords do not match. Please ensure both fields are filled.");
     }
   };
 
@@ -112,14 +115,12 @@ function ResetPassword() {
         textAlign="center"
       >
         <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-          {step === 1 ? "Forgot Password?" : step === 2 ? "Enter OTP" : "Set New Password"}
+          {step === 1 ? "Forgot Password?" : "Verify OTP & Set New Password"}
         </MDTypography>
         <MDTypography display="block" variant="button" color="#344767" my={1}>
           {step === 1
             ? "Enter your email below."
-            : step === 2
-            ? "Enter the 6-digit OTP sent to your email."
-            : "Enter your new password."}
+            : "Enter the 6-digit OTP sent to your email and your new password."}
         </MDTypography>
       </MDBox>
       <MDBox pt={4} pb={3} px={3}>
@@ -136,26 +137,40 @@ function ResetPassword() {
             </MDBox>
           )}
           {step === 2 && (
-            <MDBox mb={4} display="flex" justifyContent="space-between">
-              {otp.map((digit, index) => (
-                <MDInput
-                  key={index}
-                  type="text"
-                  label=""
-                  inputProps={{
-                    maxLength: 1,
-                    style: { width: "30px", height: "30px", textAlign: "center", marginRight: "8px" },
-                    onPaste: handleOtpPaste,
-                  }}
-                  value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  ref={(ref) => (inputRefs.current[index] = ref)}
-                />
-              ))}
-            </MDBox>
-          )}
-          {step === 3 && (
             <>
+              <MDBox mb={4} textAlign="center">
+                <MDInput
+                  type="text"
+                  label="Email"
+                  value={email}
+                  fullWidth
+                  InputProps={{
+                    readOnly: true, // Make the input read-only
+                  }}
+                />
+              </MDBox>
+              <MDBox mb={4} display="flex" justifyContent="space-between">
+                {otp.map((digit, index) => (
+                  <MDInput
+                    key={index}
+                    type="text"
+                    label=""
+                    inputProps={{
+                      maxLength: 1,
+                      style: {
+                        width: "30px",
+                        height: "30px",
+                        textAlign: "center",
+                        marginRight: "8px",
+                      },
+                      onPaste: handleOtpPaste,
+                    }}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    ref={(ref) => (inputRefs.current[index] = ref)}
+                  />
+                ))}
+              </MDBox>
               <MDBox mb={4}>
                 <MDInput
                   type="password"
@@ -188,13 +203,8 @@ function ResetPassword() {
               </MDButton>
             )}
             {step === 2 && (
-              <MDButton variant="gradient" color="submit" fullWidth onClick={handleOtpSubmit}>
-                Verify OTP
-              </MDButton>
-            )}
-            {step === 3 && (
-              <MDButton variant="gradient" color="submit" fullWidth onClick={handlePasswordResetSubmit}>
-                Reset Password
+              <MDButton variant="gradient" color="submit" fullWidth onClick={handleVerifyAndResetPassword}>
+                Verify OTP & Reset Password
               </MDButton>
             )}
           </MDBox>
