@@ -34,6 +34,28 @@ import Watermark from "layouts/authentication/watermark";
 import RolesPermissionsPopup from "layouts/authentication/roles-permission";
 
 import UpdatePassword from "layouts/authentication/update-password";
+
+
+
+//Lms components
+
+import AddArea from "dmscomponent/add-area/index.js";
+import AddDepartments from "dmscomponent/add-departments/index.js";
+import AddPlant from "dmscomponent/add-plant/index.js";
+import AddJobRole from "dmscomponent/add-jobrole/index.js";
+import AddTrainingType from "dmscomponent/training-type/index.js";
+import AddInductionTraining from "dmscomponent/induction-training/index.js";
+import AddTraining from "dmscomponent/add-training/index.js";
+import AddMaterial from "dmscomponent/add-material/index.js";
+import AddQuestion from "dmscomponent/add-question/index.js";
+import CreateQuiz from "dmscomponent/add-quiz/index.js";
+import TrainingMapping from "dmscomponent/training-mappping/index.js";
+import ClassroomTraining from "dmscomponent/classroom-training/index.js";
+import TrainingMatrix from "dmscomponent/training-matrix/index.js";
+import TrainingProgressReport from "dmscomponent/training-progressreport/index.js";
+import ExamResultsReport from "dmscomponent/exam-result/index.js";
+
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -173,6 +195,25 @@ export default function App() {
             <Route path="/roles-permission" element={<RolesPermissionsPopup />} />
             <Route path="/update-password" element={<UpdatePassword />} />
 
+
+            {/* Lms components */}
+            <Route path="/add-area" element={<AddArea />} />
+            <Route path="/add-departments" element={<AddDepartments />} />
+            <Route path="/add-plant" element={<AddPlant />} />
+            <Route path="/add-jobrole" element={<AddJobRole />} />
+            <Route path="/training-type" element={<AddTrainingType />} />
+            <Route path="/induction-training" element={<AddInductionTraining />} />
+            <Route path="/add-training" element={<AddTraining />} />
+            <Route path="/add-material" element={<AddMaterial />} />
+            <Route path="/add-question" element={<AddQuestion />} />
+            <Route path="/add-quiz" element={<CreateQuiz />} />
+            <Route path="/training-mapping" element={<TrainingMapping />} />
+            <Route path="/classroom-training" element={<ClassroomTraining />} />
+            <Route path="/training-matrix" element={<TrainingMatrix />} />
+            <Route path="/training-progressreport" element={<TrainingProgressReport />} />
+            <Route path="/exam-result" element={<ExamResultsReport />} />
+            
+
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </div>
@@ -215,6 +256,25 @@ export default function App() {
             <Route path="/roles-permission" element={<RolesPermissionsPopup />} />
             <Route path="/update-password" element={<UpdatePassword />} />
             <Route path="*" element={<Navigate to="/login" />} />
+
+
+             {/* Lms components */}
+             <Route path="/add-area" element={<AddArea />} />
+            <Route path="/add-departments" element={<AddDepartments />} />
+            <Route path="/add-plant" element={<AddPlant />} />
+            <Route path="/add-jobrole" element={<AddJobRole />} />
+            <Route path="/training-type" element={<AddTrainingType />} />
+            <Route path="/induction-training" element={<AddInductionTraining />} />
+            <Route path="/add-training" element={<AddTraining />} />
+            <Route path="/add-material" element={<AddMaterial />} />
+            <Route path="/add-question" element={<AddQuestion />} />
+            <Route path="/add-quiz" element={<CreateQuiz />} />
+            <Route path="/training-mapping" element={<TrainingMapping />} />
+            <Route path="/classroom-training" element={<ClassroomTraining />} />
+            <Route path="/training-matrix" element={<TrainingMatrix />} />
+            <Route path="/exam-result" element={<ExamResultsReport />} />
+            <Route path="/training-progressreport" element={<TrainingProgressReport />} />
+
         </Routes>
       </div>
     </ThemeProvider>
