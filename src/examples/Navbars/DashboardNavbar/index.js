@@ -321,6 +321,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/logout">
                   Logout
                 </MenuItem>
+                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/add-workflow">
+                 Add Workflow
+                </MenuItem>
               </Menu>
               <Link to="/document-view" style={{ textDecoration: "none", color: "inherit" }}>
                 <IconButton
