@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCreateDocumentMutation, useFetchDocumentTypesQuery } from 'api/auth/documentApi'; 
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -18,11 +19,10 @@ import {
   FormControlLabel,
   FormLabel,
 } from "@mui/material";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js"; // Import the E-Signature dialog
+import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
 
-const documentTypes = ["Policy", "SOP", "Guideline"]; // Example types
-const workflows = ["Initial", "Review", "Approved", "Released"]; // Workflow options
-const templates = ["Template 1", "Template 2", "Template 3"]; // Example templates
+const workflows = ["Initial", "Review", "Approved", "Released"];
+const templates = ["Template 1", "Template 2", "Template 3"];
 
 function AddDocument() {
   const [title, setTitle] = useState("");
@@ -33,24 +33,36 @@ function AddDocument() {
   const [operations, setOperations] = useState("");
   const [workflow, setWorkflow] = useState("");
   const [parentDocument, setParentDocument] = useState("");
-  const [trainingRequired, setTrainingRequired] = useState("No"); // Default value
-  const [version, setVersion] = useState("");
-  const [template, setTemplate] = useState(""); // New state for template selection
-  const [openSignatureDialog, setOpenSignatureDialog] = useState(false); // State for dialog visibility
+  const [trainingRequired, setTrainingRequired] = useState("No");
+  const [template, setTemplate] = useState("");
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
-  // Simulated auto-filled fields
-  const createdBy = "John Doe"; // Replace with the logged-in user's name
-  const createdAt = new Date().toLocaleDateString(); // Auto-fill the current date
+  const navigate = useNavigate();
+  const [createDocument] = useCreateDocumentMutation(); // Initialize mutation hook
+  const { data: documentTypesData } = useFetchDocumentTypesQuery(); // Fetch document types
 
-  const navigate = useNavigate(); // Initialize useNavigate for navigation
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Open the E-signature dialog on form submission
-    setOpenSignatureDialog(true);
+    try {
+      const documentData = {
+        title,
+        type,
+        documentNumber,
+        description,
+        revisionTime,
+        operations,
+        workflow,
+        parentDocument,
+        trainingRequired,
+        template,
+      };
+      await createDocument(documentData).unwrap(); // Execute the mutation
+      setOpenSignatureDialog(true); // Open the E-signature dialog
+    } catch (error) {
+      console.error("Error creating document:", error);
+    }
   };
 
-  // Function to clear all input fields
   const handleClear = () => {
     setTitle("");
     setType("");
@@ -61,13 +73,12 @@ function AddDocument() {
     setWorkflow("");
     setParentDocument("");
     setTrainingRequired("No");
-    setVersion("");
-    setTemplate(""); // Clear template selection
+    setTemplate("");
   };
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/document-view"); // Navigate to the dashboard when dialog is closed
+    navigate("/document-view");
   };
 
   return (
@@ -76,7 +87,7 @@ function AddDocument() {
         <MDBox
           borderRadius="lg"
           sx={{
-            background: "linear-gradient(212deg, #d5b282, #f5e0c3)", // Custom color gradient
+            background: "linear-gradient(212deg, #d5b282, #f5e0c3)",
             borderRadius: "lg",
             mx: 2,
             mt: -3,
@@ -85,12 +96,7 @@ function AddDocument() {
             textAlign: "center",
           }}
         >
-          <MDTypography
-            variant="h3"
-            fontWeight="medium"
-            color="#344767"
-            mt={1}
-          >
+          <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
             Add Document
           </MDTypography>
         </MDBox>
@@ -98,7 +104,7 @@ function AddDocument() {
           <MDButton
             variant="outlined"
             color="error"
-            size="small" // Set the button size to small
+            size="small"
             onClick={handleClear}
             sx={{ marginRight: "20px" }}
           >
@@ -107,7 +113,6 @@ function AddDocument() {
         </MDBox>
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
-            {/* Title field */}
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -118,7 +123,6 @@ function AddDocument() {
               />
             </MDBox>
 
-            {/* Type field */}
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-type-label">Type</InputLabel>
@@ -130,7 +134,7 @@ function AddDocument() {
                   input={<OutlinedInput label="Type" />}
                   sx={{ minWidth: 200, height: "3rem", ".MuiSelect-select": { padding: "0.45rem" } }}
                 >
-                  {documentTypes.map((docType) => (
+                  {documentTypesData?.map((docType) => (
                     <MenuItem key={docType} value={docType}>
                       {docType}
                     </MenuItem>
@@ -139,7 +143,6 @@ function AddDocument() {
               </FormControl>
             </MDBox>
 
-            {/* Document Number field */}
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -150,7 +153,6 @@ function AddDocument() {
               />
             </MDBox>
 
-            {/* Description field */}
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -161,7 +163,6 @@ function AddDocument() {
               />
             </MDBox>
 
-            {/* Revision Time field */}
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -172,7 +173,6 @@ function AddDocument() {
               />
             </MDBox>
 
-            {/* Operations field */}
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -183,7 +183,6 @@ function AddDocument() {
               />
             </MDBox>
 
-            {/* Workflow field */}
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-workflow-label">Workflow</InputLabel>
@@ -204,7 +203,6 @@ function AddDocument() {
               </FormControl>
             </MDBox>
 
-            {/* Parent Document field */}
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -215,7 +213,6 @@ function AddDocument() {
               />
             </MDBox>
 
-            {/* Select Template dropdown */}
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-template-label">Select Template</InputLabel>
@@ -236,7 +233,6 @@ function AddDocument() {
               </FormControl>
             </MDBox>
 
-            {/* Training Required radio buttons */}
             <MDBox mb={3} display="flex" alignItems="center">
               <FormLabel component="legend" style={{ fontSize: '0.875rem', color: 'black', marginRight: '16px' }}>
                 Training Required
@@ -259,47 +255,14 @@ function AddDocument() {
               </RadioGroup>
             </MDBox>
 
-            {/* Version field */}
-            <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Version"
-                value={version}
-                onChange={(e) => setVersion(e.target.value)}
-                fullWidth
-              />
-            </MDBox>
-
-            {/* Created By and Created At fields (auto-filled) */}
-            <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Created By"
-                value={createdBy}
-                fullWidth
-                disabled // Disable editing for auto-filled fields
-              />
-            </MDBox>
-            <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Created At"
-                value={createdAt}
-                fullWidth
-                disabled // Disable editing for auto-filled fields
-              />
-            </MDBox>
-
-            {/* Submit button */}
             <MDBox mt={4}>
-            <MDButton variant="gradient" color="submit" fullWidth type="submit">
+              <MDButton variant="gradient" color="submit" fullWidth type="submit">
                 Submit
               </MDButton>
             </MDBox>
           </MDBox>
         </MDBox>
 
-        {/* E-Signature Dialog */}
         <ESignatureDialog
           open={openSignatureDialog}
           handleClose={handleCloseSignatureDialog}

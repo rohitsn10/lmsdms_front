@@ -5,7 +5,7 @@ import config from 'constants/config';
 export const documentApi = createApi({
     reducerPath: 'documentApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: config.BACKEND_API_URL, 
+        baseUrl: config.BACKEND_API_URL,
         prepareHeaders: (headers) => {
             const token = sessionStorage.getItem('token');
             if (token) {
@@ -17,13 +17,35 @@ export const documentApi = createApi({
     }),
     endpoints: (builder) => ({
         createDocument: builder.mutation({
-            query: (body) => ({
-                url: 'dms_module/CreateDocument', 
+            query: (documentData) => ({
+                url: 'dms_module/CreateDocument',
                 method: 'POST',
-                body,
+                body: documentData,
             }),
+            transformResponse: (response) => response.data,
+        }),
+        
+        createDocumentType: builder.mutation({
+            query: (documentTypeData) => ({
+                url: 'dms_module/create_get_document_type',
+                method: 'POST',
+                body: documentTypeData,
+            }),
+            transformResponse: (response) => response.data,
+        }),
+
+        fetchDocumentTypes: builder.query({
+            query: () => ({
+                url: 'dms_module/create_get_document_type',
+                method: 'GET',
+            }),
+            transformResponse: (response) => response.data,
         }),
     }),
 });
 
-export const { useCreateDocumentMutation } = documentApi;
+export const { 
+    useCreateDocumentMutation, 
+    useCreateDocumentTypeMutation, 
+    useFetchDocumentTypesQuery 
+} = documentApi;

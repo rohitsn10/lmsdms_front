@@ -1,5 +1,5 @@
-// Import necessary components
-import { useState } from "react";
+// Login.js
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import Card from "@mui/material/Card";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -29,9 +29,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { login } from '../../../api/auth/auth'; 
-
-const roles = ["Author", "Reviewer", "Approver", "Admin", "Doc Admin"];
+import { login, getUserGroups } from '../../../api/auth/auth';
 
 function Login() {
   const [userId, setUserId] = useState(""); 
@@ -40,11 +38,11 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(false); 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
+  const [roles, setRoles] = useState([]);
   const [error, setError] = useState(""); 
   const navigate = useNavigate(); 
 
   const handleLogin = async () => {
-    
     if (!userId || !password) {
       setError("Both User ID and Password are required.");
       return;
@@ -54,20 +52,49 @@ function Login() {
       const response = await login({ username: userId, password });
       if (response && response.data) { 
         console.log("Login successful:", response.data);
-        setDialogOpen(true); 
+        const token = response.data.token;
+        await fetchRoles(token);
+        setDialogOpen(true);
         setError("");
       } else {
-        setError("Incorrect User ID or Password."); 
-        setDialogOpen(false); 
+        setError("Incorrect User ID or Password.");
+        setDialogOpen(false);
       }
     } catch (error) {
       console.error("Login failed:", error);
-      setError("Incorrect User ID or Password."); 
-      setDialogOpen(false); 
+      setError("Incorrect User ID or Password.");
+      setDialogOpen(false);
     }
   };
   
+  const fetchRoles = async (token) => {
+    try {
+        const response = await getUserGroups(token);
+        console.log("User groups response:", response); 
+
+        
+        if (response && response.status === 200 && response.data) {
   
+            if (response.data.data && Array.isArray(response.data.data)) {
+                setRoles(response.data.data); 
+            } else {
+                console.error("Unexpected response structure:", response.data);
+                setRoles([]);
+                setError("No roles available or invalid response structure.");
+            }
+        } else {
+            console.error("Server responded with an error:", response);
+            setError("Unable to fetch user groups. Please check your connection or try again later.");
+        }
+    } catch (error) {
+        console.error("Failed to fetch user groups:", error);
+        setRoles([]);
+        setError("Failed to fetch user groups. Please try again later.");
+    }
+};
+
+  
+
   const handleCloseDialog = () => {
     setDialogOpen(false);
   };
@@ -153,7 +180,6 @@ function Login() {
               />
             </MDBox>
 
-            {/* Remember Me Switch */}
             <MDBox display="flex" alignItems="center" mb={3}>
               <Switch checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
               <MDTypography variant="button" fontWeight="regular" ml={1}>
@@ -161,7 +187,6 @@ function Login() {
               </MDTypography>
             </MDBox>
 
-            {/* Forgot Password Link */}
             <MDTypography
               variant="button"
               fontWeight="medium"
@@ -199,7 +224,6 @@ function Login() {
         </MDBox>
       </Card>
 
-      {/* Role Selection Popup */}
       <Dialog
         open={dialogOpen}
         onClose={handleCloseDialog}
@@ -242,46 +266,29 @@ function Login() {
                 minWidth: "450px", 
                 borderRadius: "10px", 
                 backgroundColor: "#fff", 
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)", 
+                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", 
               }}
             >
-              {roles.map((role) => (
-                <MenuItem key={role} value={role}>
-                  {role}
-                </MenuItem>
-              ))}
+              {roles.length > 0 ? (
+                roles.map((role) => (
+                  <MenuItem key={role.id} value={role.name}>
+                    {role.name} 
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No roles available</MenuItem>
+              )}
             </Select>
           </FormControl>
         </DialogContent>
-        <DialogActions
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "16px 24px",
-          }}
-        >
-          <Button
-            onClick={handleCloseDialog}
-            variant="outlined"
-            sx={{
-              color: "primary.main",
-              borderColor: "primary.main", 
-              "&:hover": { backgroundColor: "primary.dark", color: "#fff" },
-            }}
-          >
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="secondary">
             Cancel
           </Button>
-          <Button
-            onClick={handleOk}
-            variant="contained"
-            sx={{
-              backgroundColor: "primary.main",
-              "&:hover": { backgroundColor: "primary.dark" },
-            }}
-            disabled={!selectedRole} 
-          >
+          <Button onClick={handleOk} color="primary" >
             OK
           </Button>
+          {/* disabled={!selectedRole} */}
         </DialogActions>
       </Dialog>
     </BasicLayout>

@@ -1,20 +1,34 @@
 // ESignatureDialog.js
 import React, { useState } from 'react';
-import PropTypes from 'prop-types'; // Import PropTypes
+import PropTypes from 'prop-types';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useSubmitESignatureMutation } from 'api/auth/esignatureApi'; // Import the new mutation hook
 
 const ESignatureDialog = ({ open, handleClose }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null); // State to handle error messages
+
+  const [submitESignature, { isLoading }] = useSubmitESignatureMutation(); // Destructure the mutation
 
   const handleToggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = () => {
-    console.log("E-Signature submitted with password:", password);
-    handleClose(); // Close the dialog after submission
+  const handleSubmit = async () => {
+    try {
+      setError(null); // Reset any previous error
+      const response = await submitESignature(password).unwrap(); // Use unwrap to get the response
+      if (response.status) {
+        console.log(response.message); // Handle success (e.g., show a success message)
+        handleClose(); // Close the dialog after successful submission
+      } else {
+        setError("Submission failed, please try again."); // Handle error response
+      }
+    } catch (error) {
+      setError("An error occurred while submitting the signature."); // Set error message on catch
+    }
   };
 
   return (
@@ -22,7 +36,7 @@ const ESignatureDialog = ({ open, handleClose }) => {
       <DialogTitle sx={{ textAlign: 'center' }}>E-Signature</DialogTitle>
       <DialogContent>
         <TextField
-          placeholder="Enter Password" // Use placeholder instead of label
+          placeholder="Enter Password"
           type={showPassword ? 'text' : 'password'}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -34,15 +48,16 @@ const ESignatureDialog = ({ open, handleClose }) => {
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             ),
-            sx: { paddingRight: '8px' } // Ensures visibility of end adornment without cutting
+            sx: { paddingRight: '8px' }
           }}
           sx={{
             marginBottom: 2,
             '& .MuiInputBase-input': {
-              padding: '12px', // Adjusts padding for input text
+              padding: '12px',
             },
           }}
         />
+        {error && <Typography color="error" variant="body2">{error}</Typography>} {/* Error message display */}
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center' }}>
         <Typography 
@@ -55,6 +70,7 @@ const ESignatureDialog = ({ open, handleClose }) => {
         <Button 
           onClick={handleSubmit} 
           variant="contained" 
+          disabled={isLoading} // Disable button while loading
           sx={{ 
             backgroundColor: '#3f51b5', 
             color: '#fff', 

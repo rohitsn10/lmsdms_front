@@ -24,15 +24,14 @@ function AddUser() {
   const [joiningDate, setJoiningDate] = useState("");
   const [jobPosition, setJobPosition] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // New state to manage submission status
 
   const navigate = useNavigate(); 
-  const [createUser, { isLoading, isError, isSuccess }] = useCreateUserMutation(); // Create user mutation
+  const [createUser, { isLoading }] = useCreateUserMutation(); // Create user mutation
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Open the E-signature dialog on form submission
-    setOpenSignatureDialog(true);
-    
+    setIsSubmitting(true); // Set submitting state to true
     // Prepare the user data for submission
     const userData = {
       first_name: firstName,
@@ -47,11 +46,12 @@ function AddUser() {
 
     try {
       await createUser(userData).unwrap();
-      // Navigate to the dashboard on success
-      navigate("/dashboard");
+      
+      setOpenSignatureDialog(true);
     } catch (error) {
       console.error("Failed to create user:", error);
-      // Handle error (show message, etc.)
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -68,6 +68,7 @@ function AddUser() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
+    navigate("/dashboard");
   };
 
   return (
@@ -207,8 +208,8 @@ function AddUser() {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
-                {isLoading ? "Submitting..." : "Submit"}
+              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading || isSubmitting}>
+                {isLoading || isSubmitting ? "Submitting..." : "Submit"}
               </MDButton>
             </MDBox>
           </MDBox>
