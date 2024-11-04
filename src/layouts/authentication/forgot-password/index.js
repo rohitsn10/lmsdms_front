@@ -7,7 +7,6 @@ import MDButton from "components/MDButton";
 import {
   useRequestForgotPasswordOtpMutation,
   useVerifyForgotPasswordOtpMutation,
-  useResetPasswordMutation, // Ensure you have a reset password mutation
 } from "api/auth/forgotpassApi";
 
 function ResetPassword() {
@@ -22,7 +21,6 @@ function ResetPassword() {
 
   const [requestForgotPasswordOtp] = useRequestForgotPasswordOtpMutation();
   const [verifyForgotPasswordOtp] = useVerifyForgotPasswordOtpMutation();
-  const [resetPassword] = useResetPasswordMutation(); // Reset password mutation
 
   // Step 1: Handle Email Submit to request OTP
   const handleEmailSubmit = async () => {
@@ -74,11 +72,13 @@ function ResetPassword() {
         if (response.status) {
           // OTP verified, now check for password reset
           if (password && confirm_password && password === confirm_password) {
-            // Reset password
+            // Assuming we have an API endpoint specifically for resetting the password
             const resetResponse = await resetPassword({
               email,
+              otp: otp.join(""),
               password,
-            }).unwrap(); // Ensure only email and password are passed
+              confirm_password,
+            }).unwrap();
 
             if (resetResponse.status) {
               setMessage("Password reset successfully.");

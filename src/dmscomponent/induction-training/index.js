@@ -89,13 +89,21 @@ function AddInductionTraining() {
                 onChange={(e) => setInductionTitle(e.target.value)}
               />
             </MDBox>
-            <MDBox mb={3}>
+            <MDBox mb={3}
+            >
               <TextField
                 select
                 label="Department Name"
                 fullWidth
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
+                sx={{
+                  height: "40px", // Set desired height here
+                  "& .MuiInputBase-root": {
+                    minHeight: "2.4265em",
+                    height: "100%", // Ensures the inner select aligns with the specified height
+                  },
+                }}
               >
                 <MenuItem value="HR">HR</MenuItem>
                 <MenuItem value="IT">IT</MenuItem>
@@ -108,6 +116,7 @@ function AddInductionTraining() {
                 type="file"
                 label="Upload Document (PPT)"
                 fullWidth
+                InputLabelProps={{ shrink: true }}
                 inputProps={{ accept: ".ppt, .pptx" }}
                 onChange={handleFileChange}
               />

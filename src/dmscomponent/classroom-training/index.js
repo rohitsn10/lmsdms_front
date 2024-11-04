@@ -13,6 +13,7 @@ import MDTypography from "components/MDTypography";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import DeleteIcon from "@mui/icons-material/Delete";
+import MDButton from "components/MDButton";
 
 function ClassroomTraining() {
   const [trainingType, setTrainingType] = useState("");
@@ -81,6 +82,13 @@ function ClassroomTraining() {
                   fullWidth
                   value={trainingType}
                   onChange={(e) => setTrainingType(e.target.value)}
+                  sx={{
+                    height: "40px", // Set desired height here
+                    "& .MuiInputBase-root": {
+                      minHeight: "2.4265em",
+                      height: "100%", // Ensures the inner select aligns with the specified height
+                    },
+                  }}
                 >
                   <MenuItem value="With Assessment">With Assessment</MenuItem>
                   <MenuItem value="Without Assessment">Without Assessment</MenuItem>
@@ -114,6 +122,13 @@ function ClassroomTraining() {
                   fullWidth
                   value={selectedDepartment}
                   onChange={(e) => setSelectedDepartment(e.target.value)}
+                  sx={{
+                    height: "40px", // Set desired height here
+                    "& .MuiInputBase-root": {
+                      minHeight: "2.4265em",
+                      height: "100%", // Ensures the inner select aligns with the specified height
+                    },
+                  }}
                 >
                   <MenuItem value="Department 1">Department 1</MenuItem>
                   <MenuItem value="Department 2">Department 2</MenuItem>
@@ -127,6 +142,13 @@ function ClassroomTraining() {
                   fullWidth
                   value={selectedEmployee}
                   onChange={(e) => setSelectedEmployee(e.target.value)}
+                  sx={{
+                    height: "40px", // Set desired height here
+                    "& .MuiInputBase-root": {
+                      minHeight: "2.4265em",
+                      height: "100%", // Ensures the inner select aligns with the specified height
+                    },
+                  }}
                 >
                   <MenuItem value="Employee 1">Employee 1</MenuItem>
                   <MenuItem value="Employee 2">Employee 2</MenuItem>
@@ -148,6 +170,13 @@ function ClassroomTraining() {
                   fullWidth
                   value={selectedSOP}
                   onChange={(e) => setSelectedSOP(e.target.value)}
+                  sx={{
+                    height: "40px", // Set desired height here
+                    "& .MuiInputBase-root": {
+                      minHeight: "2.4265em",
+                      height: "100%", // Ensures the inner select aligns with the specified height
+                    },
+                  }}
                 >
                   <MenuItem value="SOP 1">SOP 1</MenuItem>
                   <MenuItem value="SOP 2">SOP 2</MenuItem>
@@ -159,6 +188,7 @@ function ClassroomTraining() {
                   type="date"
                   label="Start Date"
                   fullWidth
+                  InputLabelProps={{ shrink: true }}
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
@@ -169,6 +199,7 @@ function ClassroomTraining() {
                   type="time"
                   label="Start Time"
                   fullWidth
+                  InputLabelProps={{ shrink: true }}
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
                 />
@@ -179,6 +210,7 @@ function ClassroomTraining() {
                   type="time"
                   label="End Time"
                   fullWidth
+                  InputLabelProps={{ shrink: true }}
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
                 />
@@ -200,9 +232,9 @@ function ClassroomTraining() {
             </Grid>
 
             <MDBox mt={2} mb={1}>
-              <Button variant="contained" color="primary" fullWidth type="submit">
+              <MDButton variant="gradient" color="submit" fullWidth type="submit">
                 Create Classroom Training
-              </Button>
+              </MDButton>
             </MDBox>
           </MDBox>
         </MDBox>

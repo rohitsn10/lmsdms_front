@@ -157,22 +157,26 @@ function AddMaterial() {
                 fullWidth
                 value={sectionStatus}
                 onChange={(e) => setSectionStatus(e.target.value)}
+                sx={{
+                  height: "40px", // Set desired height here
+                  "& .MuiInputBase-root": {
+                    minHeight: "2.4265em",
+                    height: "100%", // Ensures the inner select aligns with the specified height
+                  },
+                }}
               >
                 <MenuItem value="Active">Active</MenuItem>
                 <MenuItem value="Inactive">Inactive</MenuItem>
               </TextField>
             </MDBox>
             <MDBox mb={3}>
-              <MDButton variant="gradient" color="success" fullWidth onClick={handleAddSection}>
+              <MDButton variant="gradient" color="success"  onClick={handleAddSection}>
                 Add Section
               </MDButton>
             </MDBox>
           </MDBox>
 
           <MDBox>
-            <MDTypography variant="h5" fontWeight="medium" color="#344767">
-              Sections
-            </MDTypography>
             {sections.map((section, sectionIndex) => (
               <MDBox key={sectionIndex} sx={{ mb: 3, border: '1px solid #ccc', padding: 2 }}>
                 <MDTypography variant="h6" fontWeight="medium">{section.name}</MDTypography>
@@ -198,6 +202,13 @@ function AddMaterial() {
                     fullWidth
                     value={fileType}
                     onChange={(e) => setFileType(e.target.value)}
+                    sx={{
+                      height: "40px", // Set desired height here
+                      "& .MuiInputBase-root": {
+                        minHeight: "2.4265em",
+                        height: "100%", // Ensures the inner select aligns with the specified height
+                      },
+                    }}
                   >
                     <MenuItem value="PDF">PDF</MenuItem>
                     <MenuItem value="Image">Image</MenuItem>
@@ -229,10 +240,11 @@ function AddMaterial() {
                     type="file"
                     label="Select File"
                     fullWidth
+                    InputLabelProps={{ shrink: true }}
                     onChange={(e) => handleFileChange(sectionIndex, e)}
                   />
                 </MDBox>
-                <MDButton variant="gradient" color="info" onClick={() => handleAddFile(sectionIndex)}>
+                <MDButton variant="gradient" color="submit" onClick={() => handleAddFile(sectionIndex)}>
                   Add File
                 </MDButton>
               </MDBox>

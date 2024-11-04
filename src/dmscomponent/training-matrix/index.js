@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import MDButton from "components/MDButton";
 
 function TrainingMatrix() {
   const [readMaterialDuration, setReadMaterialDuration] = useState("");
@@ -77,6 +78,13 @@ function TrainingMatrix() {
             value={selectedSOP}
             onChange={(e) => setSelectedSOP(e.target.value)}
             required
+            sx={{
+              height: "40px", // Set desired height here
+              "& .MuiInputBase-root": {
+                minHeight: "2.4265em",
+                height: "100%", // Ensures the inner select aligns with the specified height
+              },
+            }}
           >
             <MenuItem value="SOP 1">SOP 1</MenuItem>
             <MenuItem value="SOP 2">SOP 2</MenuItem>
@@ -96,15 +104,14 @@ function TrainingMatrix() {
           </Grid>
 
           <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="primary"
+            <MDButton
+              variant="gradient" color="submit"
               fullWidth
               onClick={handleExamStart}
               disabled={evaluationStatus === "Completed"}
             >
               Start Exam
-            </Button>
+            </MDButton>
           </Grid>
 
           <Grid item xs={12}>

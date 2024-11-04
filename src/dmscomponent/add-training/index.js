@@ -163,6 +163,7 @@ function AddTraining() {
                 type="file"
                 label="Upload Documents"
                 fullWidth
+                InputLabelProps={{ shrink: true }}
                 inputProps={{ multiple: true }}
                 onChange={handleFileChange}
               />

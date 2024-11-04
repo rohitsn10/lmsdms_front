@@ -85,6 +85,13 @@ function TrainingMapping() {
                 fullWidth
                 value={selectedTraining}
                 onChange={(e) => setSelectedTraining(e.target.value)}
+                sx={{
+                  height: "40px", // Set desired height here
+                  "& .MuiInputBase-root": {
+                    minHeight: "2.4265em",
+                    height: "100%", // Ensures the inner select aligns with the specified height
+                  },
+                }}
               >
                 <MenuItem value="Training 1">Training 1</MenuItem>
                 <MenuItem value="Training 2">Training 2</MenuItem>
@@ -99,6 +106,13 @@ function TrainingMapping() {
                 fullWidth
                 value={selectedPlant}
                 onChange={(e) => setSelectedPlant(e.target.value)}
+                sx={{
+                  height: "40px", // Set desired height here
+                  "& .MuiInputBase-root": {
+                    minHeight: "2.4265em",
+                    height: "100%", // Ensures the inner select aligns with the specified height
+                  },
+                }}
               >
                 <MenuItem value="Plant A">Plant A</MenuItem>
                 <MenuItem value="Plant B">Plant B</MenuItem>
@@ -112,6 +126,13 @@ function TrainingMapping() {
                 fullWidth
                 value={selectedDepartment}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
+                sx={{
+                  height: "40px", // Set desired height here
+                  "& .MuiInputBase-root": {
+                    minHeight: "2.4265em",
+                    height: "100%", // Ensures the inner select aligns with the specified height
+                  },
+                }}
               >
                 <MenuItem value="Department 1">Department 1</MenuItem>
                 <MenuItem value="Department 2">Department 2</MenuItem>
@@ -125,6 +146,13 @@ function TrainingMapping() {
                 fullWidth
                 value={selectedArea}
                 onChange={(e) => setSelectedArea(e.target.value)}
+                sx={{
+                  height: "40px", // Set desired height here
+                  "& .MuiInputBase-root": {
+                    minHeight: "2.4265em",
+                    height: "100%", // Ensures the inner select aligns with the specified height
+                  },
+                }}
               >
                 <MenuItem value="Area 1">Area 1</MenuItem>
                 <MenuItem value="Area 2">Area 2</MenuItem>
@@ -156,9 +184,9 @@ function TrainingMapping() {
                 value={selectedTraining}
                 onChange={(e) => setSelectedTraining(e.target.value)}
               />
-              <Button variant="contained" onClick={handleAddJobRole}>
+              <MDButton variant="gradient" color="submit" onClick={handleAddJobRole}>
                 Add
-              </Button>
+              </MDButton>
             </MDBox>
 
             <MDBox mb={3}>
@@ -167,6 +195,7 @@ function TrainingMapping() {
                 label="Bulk Upload Job Roles"
                 fullWidth
                 inputProps={{ accept: ".csv,.xlsx" }}
+                InputLabelProps={{ shrink: true }}
                 onChange={handleBulkUpload}
               />
             </MDBox>
