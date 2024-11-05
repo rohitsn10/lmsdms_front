@@ -1,4 +1,3 @@
-// AddWorkflow.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
@@ -8,19 +7,31 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog"; // Ensure correct import
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
+import { useCreateWorkflowMutation } from "api/auth/workflowApi"; // Import the mutation
 
 function AddWorkflow() {
   const [workflowName, setWorkflowName] = useState("");
   const [workflowDescription, setWorkflowDescription] = useState("");
-  const [openSignatureDialog, setOpenSignatureDialog] = useState(false); // State for dialog visibility
-
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+  const [createWorkflow, { isLoading }] = useCreateWorkflowMutation(); // Hook to call the mutation
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setOpenSignatureDialog(true); // Open dialog on form submission
-    console.log("Workflow Details Submitted:", { workflowName, workflowDescription });
+    try {
+      const response = await createWorkflow({
+        workflow_name: workflowName,
+        workflow_description: workflowDescription,
+      }).unwrap();
+
+      if (response.status) {
+        console.log("API Response:", response.message);
+        setOpenSignatureDialog(true);
+      }
+    } catch (error) {
+      console.error("Error creating workflow:", error);
+    }
   };
 
   const handleClear = () => {
@@ -29,8 +40,8 @@ function AddWorkflow() {
   };
 
   const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false); // Close the dialog
-    navigate("/dashboard"); // Navigate after closing
+    setOpenSignatureDialog(false);
+    navigate("/dashboard");
   };
 
   return (
@@ -86,8 +97,8 @@ function AddWorkflow() {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit">
-                Submit
+              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
+                {isLoading ? "Submitting..." : "Submit"}
               </MDButton>
             </MDBox>
           </MDBox>
@@ -95,10 +106,7 @@ function AddWorkflow() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog
-        open={openSignatureDialog}
-        handleClose={handleCloseSignatureDialog}
-      />
+      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
     </BasicLayout>
   );
 }

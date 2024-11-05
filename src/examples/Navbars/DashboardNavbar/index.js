@@ -148,7 +148,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   return (
     <AppBar
       position={absolute ? "absolute" : navbarType}
-      color="inherit"
+      color={light ? "default" : "inherit"} // Use "default" for light mode
       sx={(theme) => navbar(theme, { transparentNavbar, absolute, light, darkMode })}
     >
       <Toolbar sx={(theme) => navbarContainer(theme)}>
@@ -157,189 +157,175 @@ function DashboardNavbar({ absolute, light, isMini }) {
         </MDBox>
         {isMini ? null : (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
-            <MDBox pr={1}>
-              <MDInput label="Search here" />
-            </MDBox>
-            <MDBox color={light ? "white" : "inherit"}>
-              <Button
-                variant="contained"
-                component={RouterLink}
-                onClick={handleOpenRolesPopup} 
-                sx={{  backgroundColor: "primary.main", color: "#fff" }}
-              >
-                Roles
-              </Button>
-              <RolesPermissionsPopup open={openRolesPopup} handleCloseRolesPopup={handleCloseRolesPopup} />
-
-              <IconButton
-                sx={navbarIconButton}
-                size="small"
-                disableRipple
-                onClick={handleClickOpen}
-              >
-                <Icon sx={iconsStyle}>account_circle</Icon>
-              </IconButton>
-
-              <Dialog
-                open={open}
-                onClose={handleClose}
-                fullWidth
-                maxWidth="md"
-                sx={{
-                  "& .MuiDialog-paper": {
-                    width: "30vw", // 50% of the viewport width
-                    height: "42vh", // 50% of the viewport height
-                  },
-                }}
-              >
-                <DialogTitle sx={{ textAlign: "center" }}>Change Role</DialogTitle>{" "}
-                {/* Centered title */}
-                <DialogContent>
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel
-                      id="role-select-label"
-                      sx={{
-                        height: "2.5rem",
-                      }}
-                    >
-                      Select Role
-                    </InputLabel>
-                    <Select
-                      labelId="role-select-label"
-                      value={selectedRole}
-                      onChange={handleRoleChange}
-                      label="Select Role"
-                      sx={{
-                        height: "3rem", // Adjust the height here
-                        ".MuiSelect-select": {
-                          padding: "0.75rem", // Adjust padding for the select input text
-                        },
-                      }}
-                    >
-                      {roles.map((role) => (
-                        <MenuItem key={role} value={role}>
-                          {role}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  <MDBox mb={3}>
-                    <MDInput
-                      type={showPassword ? "text" : "password"}
-                      label="Password"
-                      fullWidth
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                              {showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </MDBox>
-                </DialogContent>
-                <DialogActions>
-                  <Button
-                    onClick={handleClose} // Close the dialog when cancel is clicked
-                    variant="outlined"
-                    sx={{
-                      color: "primary.main",
-                      borderColor: "primary.main", // Match the color of the border
-                      "&:hover": { backgroundColor: "primary.dark", color: "#fff" }, // Light background on hover
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSubmit}
-                    variant="contained"
-                    sx={{
-                      backgroundColor: "primary.main", // Primary color
-                      color: "#fff",
-                      "&:hover": { backgroundColor: "primary.dark" }, // Darker shade on hover
-                    }}
-                  >
-                    Submit
-                  </Button>
-                </DialogActions>
-              </Dialog>
-
-              <IconButton
-                size="small"
-                disableRipple
-                color="inherit"
-                sx={navbarMobileMenu}
-                onClick={handleMiniSidenav}
-              >
-                <Icon sx={iconsStyle} fontSize="medium">
-                  {miniSidenav ? "menu_open" : "menu"}
-                </Icon>
-              </IconButton>
-              {/* <IconButton
-                size="small"
-                disableRipple
-                color="inherit"
-                sx={navbarIconButton}
-                onClick={handleConfiguratorOpen}
-              >
-                <Icon sx={iconsStyle}>settings</Icon>
-              </IconButton> */}
-              <IconButton
-                size="small"
-                disableRipple
-                color="inherit"
-                sx={navbarIconButton}
-                onClick={handleSettingsClick}
-              >
-                <Icon sx={iconsStyle}>settings</Icon>
-              </IconButton>
-              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseSettings}>
-                <MenuItem
-                  onClick={handleCloseSettings}
-                  component={RouterLink}
-                  to="/release-document"
-                >
-                  Release Document
-                </MenuItem>
-                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/print-document">
-                  Print Document
-                </MenuItem>
-                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/Review">
-                  Review Document
-                </MenuItem>
-                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/watermark">
-                  Watermark
-                </MenuItem>
-                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/update-password">
-                  Update Password
-                </MenuItem>
-                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/logout">
-                  Logout
-                </MenuItem>
-                <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/add-workflow">
-                 Add Workflow
-                </MenuItem>
-              </Menu>
-              <Link to="/document-view" style={{ textDecoration: "none", color: "inherit" }}>
-                <IconButton
-                  size="small"
-                  disableRipple
-                  color="inherit"
-                  sx={navbarIconButton}
-                  aria-controls="notification-menu"
-                  aria-haspopup="true"
-                  variant="contained"
-                >
-                  <Icon sx={iconsStyle}>notifications</Icon>
-                </IconButton>
-              </Link>
-            </MDBox>
+          <MDBox pr={1}>
+            <MDInput label="Search here" />
           </MDBox>
+          <MDBox color={light ? "white" : "inherit"} display="flex" alignItems="center">
+            <Button
+              variant="contained"
+              component={RouterLink}
+              onClick={handleOpenRolesPopup} 
+              sx={{ backgroundColor: "primary.main", color: "#fff", mr: 2 }}
+            >
+              Roles
+            </Button>
+            <RolesPermissionsPopup open={openRolesPopup} handleCloseRolesPopup={handleCloseRolesPopup} />
+        
+            <IconButton
+              sx={navbarIconButton}
+              size="small"
+              disableRipple
+              onClick={handleClickOpen}
+            >
+              <Icon sx={iconsStyle}>account_circle</Icon>
+            </IconButton>
+        
+            <Dialog
+              open={open}
+              onClose={handleClose}
+              fullWidth
+              maxWidth="md"
+              sx={{
+                "& .MuiDialog-paper": {
+                  width: "30vw",
+                  height: "42vh",
+                },
+              }}
+            >
+              <DialogTitle sx={{ textAlign: "center" }}>Change Role</DialogTitle>
+              <DialogContent>
+                <FormControl fullWidth margin="normal">
+                  <InputLabel
+                    id="role-select-label"
+                    sx={{ height: "2.5rem" }}
+                  >
+                    Select Role
+                  </InputLabel>
+                  <Select
+                    labelId="role-select-label"
+                    value={selectedRole}
+                    onChange={handleRoleChange}
+                    label="Select Role"
+                    sx={{
+                      height: "3rem",
+                      ".MuiSelect-select": {
+                        padding: "0.75rem",
+                      },
+                    }}
+                  >
+                    {roles.map((role) => (
+                      <MenuItem key={role} value={role}>
+                        {role}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+        
+                <MDBox mb={3}>
+                  <MDInput
+                    type={showPassword ? "text" : "password"}
+                    label="Password"
+                    fullWidth
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </MDBox>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  onClick={handleClose}
+                  variant="outlined"
+                  sx={{
+                    color: "primary.main",
+                    borderColor: "primary.main",
+                    "&:hover": { backgroundColor: "primary.dark", color: "#fff" },
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "#fff",
+                    "&:hover": { backgroundColor: "primary.dark" },
+                  }}
+                >
+                  Submit
+                </Button>
+              </DialogActions>
+            </Dialog>
+        
+            <IconButton
+              size="small"
+              disableRipple
+              color="inherit"
+              sx={navbarMobileMenu}
+              onClick={handleMiniSidenav}
+            >
+              <Icon sx={iconsStyle} fontSize="medium">
+                {miniSidenav ? "menu_open" : "menu"}
+              </Icon>
+            </IconButton>
+        
+            <IconButton
+              size="small"
+              disableRipple
+              color="inherit"
+              sx={navbarIconButton}
+              onClick={handleSettingsClick}
+            >
+              <Icon sx={iconsStyle}>settings</Icon>
+            </IconButton>
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseSettings}>
+              <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/release-document">
+                Release Document
+              </MenuItem>
+              <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/print-document">
+                Print Document
+              </MenuItem>
+              <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/Review">
+                Review Document
+              </MenuItem>
+              <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/watermark">
+                Watermark
+              </MenuItem>
+              <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/update-password">
+                Update Password
+              </MenuItem>
+              <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/add-workflow">
+                Add Workflow
+              </MenuItem>
+              <MenuItem onClick={handleCloseSettings} component={RouterLink} to="/logout">
+                Logout
+              </MenuItem>
+            </Menu>
+            <Link to="/document-view" style={{ textDecoration: "none", color: "inherit" }}>
+              <IconButton
+                size="small"
+                disableRipple
+                color="inherit"
+                sx={navbarIconButton}
+                aria-controls="notification-menu"
+                aria-haspopup="true"
+                variant="contained"
+              >
+                <Icon sx={iconsStyle}>notifications</Icon>
+              </IconButton>
+            </Link>
+          </MDBox>
+        </MDBox>
+        
         )}
       </Toolbar>
     </AppBar>

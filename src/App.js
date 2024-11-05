@@ -54,7 +54,7 @@ import ClassroomTraining from "dmscomponent/classroom-training/index.js";
 import TrainingMatrix from "dmscomponent/training-matrix/index.js";
 import TrainingProgressReport from "dmscomponent/training-progressreport/index.js";
 import ExamResultsReport from "dmscomponent/exam-result/index.js";
-
+import AddWorkflow from "layouts/authentication/add-workflow/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -194,7 +194,7 @@ export default function App() {
             <Route path="/watermark" element={<Watermark />} />
             <Route path="/roles-permission" element={<RolesPermissionsPopup />} />
             <Route path="/update-password" element={<UpdatePassword />} />
-
+            <Route path="/add-workflow" element={<AddWorkflow />} />
 
             {/* Lms components */}
             <Route path="/add-area" element={<AddArea />} />
@@ -212,7 +212,7 @@ export default function App() {
             <Route path="/training-matrix" element={<TrainingMatrix />} />
             <Route path="/training-progressreport" element={<TrainingProgressReport />} />
             <Route path="/exam-result" element={<ExamResultsReport />} />
-            
+           
 
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
@@ -256,7 +256,7 @@ export default function App() {
             <Route path="/roles-permission" element={<RolesPermissionsPopup />} />
             <Route path="/update-password" element={<UpdatePassword />} />
             <Route path="*" element={<Navigate to="/login" />} />
-
+            <Route path="/add-workflow" element={<AddWorkflow />} />
 
              {/* Lms components */}
              <Route path="/add-area" element={<AddArea />} />

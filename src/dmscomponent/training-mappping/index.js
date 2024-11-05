@@ -10,6 +10,7 @@ import {
   Button,
 } from "@mui/material";
 import MDBox from "components/MDBox";
+import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
