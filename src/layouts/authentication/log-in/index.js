@@ -41,6 +41,7 @@ function Login() {
   const [roles, setRoles] = useState([]);
   const [error, setError] = useState(""); 
   const navigate = useNavigate(); 
+  const [firstName, setFirstName] = useState("");
 
   const handleLogin = async () => {
     if (!userId || !password) {
@@ -50,12 +51,21 @@ function Login() {
   
     try {
       const response = await login({ username: userId, password });
-      if (response && response.data) { 
-        console.log("Login successful:", response.data);
-        const token = response.data.token;
-        await fetchRoles(token);
-        setDialogOpen(true);
-        setError("");
+  
+      if (response && response.data && response.data.message === "Login successfully") {
+        const token = response.data.data?.token;
+        const userFirstName = response.data.data?.first_name; // Extract first name
+  
+        // Ensure token and first name exist before proceeding
+        if (token && userFirstName) {
+          sessionStorage.setItem("token", token); // Store token
+          setFirstName(userFirstName); // Store first name in state
+          await fetchRoles(token); // Fetch roles with the token
+          setDialogOpen(true); // Open role selection dialog
+          setError(""); // Clear error if login is successful
+        } else {
+          setError("Login successful, but missing required information.");
+        }
       } else {
         setError("Incorrect User ID or Password.");
         setDialogOpen(false);
@@ -66,6 +76,7 @@ function Login() {
       setDialogOpen(false);
     }
   };
+  
   
   const fetchRoles = async (token) => {
     try {
@@ -245,7 +256,7 @@ function Login() {
             User Id: {userId}
           </Typography>
           <Typography variant="body1" sx={{ marginBottom: "24px" }}>
-            User Name: Vasu Patel
+            User Name: {firstName || "N/A"}
           </Typography>
 
           <FormControl fullWidth margin="dense">

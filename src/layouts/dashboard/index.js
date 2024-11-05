@@ -39,6 +39,7 @@ import TopicIcon from '@mui/icons-material/Topic';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 
+
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
 
@@ -53,7 +54,7 @@ function Dashboard() {
                 <ComplexStatisticsCard
                   color="primary"
                   icon="person_add"
-                  title="Add user"
+                  title="User"
                   count="91"
                   percentage={{
                     color: "success",
@@ -71,7 +72,7 @@ function Dashboard() {
                 <ComplexStatisticsCard
                   icon={<TopicIcon />}
                   color="warning"
-                  title="Add Document"
+                  title="Document"
                   count="2,300"
                   percentage={{
                     color: "success",
@@ -88,7 +89,7 @@ function Dashboard() {
               <ComplexStatisticsCard
                   color="success"
                   icon={<ApartmentIcon/>}
-                  title="Add Department"
+                  title="Department"
                   count="47"
                   percentage={{
                     color: "success",
@@ -99,7 +100,7 @@ function Dashboard() {
             </Link>
             </MDBox>
           </Grid>
-          <Grid item xs={12} md={6} lg={3}>
+          {/* <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               
               <Link to="/add-approval">
@@ -107,6 +108,24 @@ function Dashboard() {
                   color="dark"
                   icon={<AssignmentTurnedInIcon/>}
                   title="Approved"
+                  count="34"
+                  percentage={{
+                    color: "success",
+                    // amount: "+1%",
+                    label: "Updated yesterday",
+                  }}
+                />
+              </Link>
+            </MDBox>
+          </Grid> */}
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              
+              <Link to="/add-workflow">
+                <ComplexStatisticsCard
+                  color="dark"
+                  icon={<AssignmentTurnedInIcon/>}
+                  title="WorkFlow"
                   count="34"
                   percentage={{
                     color: "success",
@@ -159,7 +178,7 @@ function Dashboard() {
             </Grid>
           </Grid>
         </MDBox> */}
-        <MDBox>
+        {/* <MDBox>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
               <Projects />
@@ -168,9 +187,9 @@ function Dashboard() {
               <OrdersOverview />
             </Grid>
           </Grid>
-        </MDBox>
+        </MDBox> */}
       </MDBox>
-      <Footer />
+      {/* <Footer /> */}
     </DashboardLayout>
   );
 }
