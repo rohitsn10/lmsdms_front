@@ -37,8 +37,15 @@ Coded by www.creative-tim.com
 
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
+import AddUser from "layouts/authentication/add-user";
+import AddDepartment from "layouts/authentication/add-department";
+import AddDocument from "layouts/authentication/add-document";
 import Icon from "@mui/material/Icon";
 import LMSDashboard from "layouts/authentication/lms-dashboard";
+import TopicIcon from '@mui/icons-material/Topic';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+
 const routes = [
   // {
   //   type: "collapse",
@@ -114,30 +121,30 @@ const routes = [
   //   route: "/authentication/forgot-password",
   //   component: <ResetPassword/>,
   // },
-  // {
-  //   type: "collapse",
-  //   name: "AddUser",
-  //   key: "add-user",
-  //   icon: <Icon fontSize="small">assignment</Icon>,
-  //   route: "/authentication/add-user",
-  //   component: <AddUser/>,
-  // },
-  // {
-  //   type: "collapse",
-  //   name: "AddDepartment",
-  //   key: "add-department",
-  //   icon: <Icon fontSize="small">notifications</Icon>,
-  //   route: "/add-department",
-  //   component: <AddDepartment />,
-  // },
-  // {
-  //   type: "collapse",
-  //   name: "AddDocument",
-  //   key: "add-document",
-  //   icon: <Icon fontSize="small">notifications</Icon>,
-  //   route: "/add-document",
-  //   component: <AddDocument />,
-  // },
+  {
+    type: "collapse",
+    name: "User",
+    key: "add-user",
+    icon:<PersonAddIcon/>,
+    route: "/authentication/add-user",
+    component: <AddUser/>,
+  },
+  {
+    type: "collapse",
+    name: "Department",
+    key: "add-department",
+    icon: <ApartmentIcon/>,
+    route: "/add-department",
+    component: <AddDepartment />,
+  },
+  {
+    type: "collapse",
+    name: "Document",
+    key: "add-document",
+    icon:<TopicIcon/>,
+    route: "/add-document",
+    component: <AddDocument />,
+  },
   // {
   //   type: "collapse",
   //   name: "AddApproval",

@@ -1,11 +1,5 @@
 import apiService from '../../services/apiService';
 
-// export const login = (loginData) => {
-//   return apiService.post('/user_profile/login', {
-//     username: loginData.username,
-//     password: loginData.password,
-//   });
-// };
 export const login = async (loginData) => {
   try {
     const response = await apiService.post('/user_profile/login', {
