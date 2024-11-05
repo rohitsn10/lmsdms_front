@@ -131,6 +131,13 @@ function CreateQuiz() {
                 fullWidth
                 value={quizType}
                 onChange={(e) => setQuizType(e.target.value)}
+                sx={{
+                  height: "40px", // Set desired height here
+                  "& .MuiInputBase-root": {
+                    minHeight: "2.4265em",
+                    height: "100%", // Ensures the inner select aligns with the specified height
+                  },
+                }}
               >
                 <MenuItem value="Auto">Auto</MenuItem>
                 <MenuItem value="Manual">Manual</MenuItem>

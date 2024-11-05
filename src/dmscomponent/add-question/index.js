@@ -121,6 +121,13 @@ function AddQuestion() {
                 fullWidth
                 value={questionType}
                 onChange={(e) => setQuestionType(e.target.value)}
+                sx={{
+                  height: "40px", // Set desired height here
+                  "& .MuiInputBase-root": {
+                    minHeight: "2.4265em",
+                    height: "100%", // Ensures the inner select aligns with the specified height
+                  },
+                }}
               >
                 <MenuItem value="Fill in the blank">Fill in the blank</MenuItem>
                 <MenuItem value="MCQ">MCQ</MenuItem>
@@ -184,6 +191,13 @@ function AddQuestion() {
                 fullWidth
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
+                sx={{
+                  height: "40px", // Set desired height here
+                  "& .MuiInputBase-root": {
+                    minHeight: "2.4265em",
+                    height: "100%", // Ensures the inner select aligns with the specified height
+                  },
+                }}
               >
                 <MenuItem value="Active">Active</MenuItem>
                 <MenuItem value="Inactive">Inactive</MenuItem>
