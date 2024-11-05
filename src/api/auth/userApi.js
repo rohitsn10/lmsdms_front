@@ -1,11 +1,10 @@
-// src/api/userApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import config from 'constants/config';
 
 export const userApi = createApi({
     reducerPath: 'userApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: config.BACKEND_API_URL, 
+        baseUrl: config.BACKEND_API_URL,
         prepareHeaders: (headers) => {
             const token = sessionStorage.getItem('token');
             if (token) {
@@ -23,7 +22,10 @@ export const userApi = createApi({
                 body,
             }),
         }),
+        userList: builder.query({
+            query: () => 'user_profile/user_list',
+        }),
     }),
 });
 
-export const { useCreateUserMutation } = userApi;
+export const { useCreateUserMutation, useUserListQuery } = userApi;

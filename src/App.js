@@ -57,6 +57,7 @@ import ExamResultsReport from "dmscomponent/exam-result/index.js";
 import AddWorkflow from "layouts/authentication/add-workflow/index.js";
 import UsersListing from "layouts/authentication/user-listing/index.js";
 import DocumentListing from "layouts/authentication/document-listing/index.js";
+import WorkflowListing from "layouts/authentication/workflow-listing/index.js";
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -198,6 +199,7 @@ export default function App() {
             <Route path="/add-workflow" element={<AddWorkflow />} />
             <Route path="/user-listing" element={<UsersListing />} />
             <Route path="/document-listing" element={<DocumentListing />} />
+            <Route path="/workflow-listing" element={<WorkflowListing />} />
 
             {/* Lms components */}
             <Route path="/add-area" element={<AddArea />} />
@@ -226,8 +228,8 @@ export default function App() {
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       <div>
-      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && (
-  <>
+      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" && (
+            <>
             <Sidenav
               color={sidenavColor}
               brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
@@ -262,6 +264,7 @@ export default function App() {
             <Route path="/add-workflow" element={<AddWorkflow />} />
             <Route path="/user-listing" element={<UsersListing />} />
             <Route path="/document-listing" element={<DocumentListing />} />
+            <Route path="/workflow-listing" element={<WorkflowListing />} />
 
              {/* Lms components */}
              <Route path="/add-area" element={<AddArea />} />

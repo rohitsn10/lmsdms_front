@@ -1,13 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useFetchDocumentsQuery } from 'api/auth/documentApi'; // Import the new hook
+import { useFetchDocumentsQuery } from 'api/auth/documentApi';
 import Card from "@mui/material/Card";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
+import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import MDBox from "components/MDBox";
@@ -18,8 +13,6 @@ import MDButton from "components/MDButton";
 const DocumentListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
-  // Use the fetchDocumentsQuery hook
   const { data, isLoading, isError } = useFetchDocumentsQuery();
 
   const handleSearch = (event) => {
@@ -35,6 +28,30 @@ const DocumentListing = () => {
     doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     doc.document_number.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
+
+  const columns = [
+    { field: 'id', headerName: 'Sr. No.', width: 90, headerAlign: 'center' },
+    { field: 'document_title', headerName: 'Title', width: 250, headerAlign: 'center' },
+    { field: 'document_type_name', headerName: 'Type', width: 200, headerAlign: 'center' },
+    { field: 'document_number', headerName: 'Document No.', width: 200, headerAlign: 'center' },
+    { field: 'formatted_created_at', headerName: 'Created Date', width: 150, headerAlign: 'center' },
+    {
+      field: 'actions',
+      headerName: 'Action',
+      width: 100,
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <IconButton
+          color="primary"
+          onClick={() => navigate(`/edit_document/${params.row.id}`)}
+        >
+          <EditIcon />
+        </IconButton>
+      ),
+      sortable: false,
+      filterable: false,
+    },
+  ];
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching documents.</div>;
@@ -58,116 +75,31 @@ const DocumentListing = () => {
             Add Document
           </MDButton>
         </MDBox>
-        <TableContainer sx={{ width: '100%', mx: 'auto' }}>
-          <Table sx={{ borderCollapse: 'collapse', width: '100%' }}>
-            <TableHead>
-              <TableRow>
-                <TableCell 
-                  sx={{ 
-                    fontWeight: 'bold', 
-                    border: '1px solid #ddd', 
-                    textAlign: 'center', 
-                    width: '10%', 
-                    padding: '8px 16px', 
-                    verticalAlign: 'middle',
-                    display: 'table-cell'
-                  }}
-                >
-                  Sr. No.
-                </TableCell>
-                <TableCell 
-                  sx={{ 
-                    fontWeight: 'bold', 
-                    border: '1px solid #ddd', 
-                    textAlign: 'center', 
-                    width: '25%', 
-                    padding: '8px 16px', 
-                    verticalAlign: 'middle',
-                    display: 'table-cell'
-                  }}
-                >
-                  Title
-                </TableCell>
-                <TableCell 
-                  sx={{ 
-                    fontWeight: 'bold', 
-                    border: '1px solid #ddd', 
-                    textAlign: 'center', 
-                    width: '20%', 
-                    padding: '8px 16px', 
-                    verticalAlign: 'middle',
-                    display: 'table-cell'
-                  }}
-                >
-                  Type
-                </TableCell>
-                <TableCell 
-                  sx={{ 
-                    fontWeight: 'bold', 
-                    border: '1px solid #ddd', 
-                    textAlign: 'center', 
-                    width: '20%', 
-                    padding: '8px 16px', 
-                    verticalAlign: 'middle',
-                    display: 'table-cell'
-                  }}
-                >
-                  Document No.
-                </TableCell>
-                <TableCell 
-                  sx={{ 
-                    fontWeight: 'bold', 
-                    border: '1px solid #ddd', 
-                    textAlign: 'center', 
-                    width: '10%', 
-                    padding: '8px 16px', 
-                    verticalAlign: 'middle',
-                    display: 'table-cell'
-                  }}
-                >
-                  Created Date
-                </TableCell>
-                <TableCell 
-                  sx={{ 
-                    border: '1px solid #ddd', 
-                    textAlign: 'center', 
-                    width: '10%', 
-                    padding: '8px 16px', 
-                    verticalAlign: 'middle',
-                    display: 'table-cell'
-                  }}
-                >
-                  Action
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredData.map((doc, index) => (
-                <TableRow 
-                  key={doc.id} 
-                  sx={{ 
-                    '&:hover': { backgroundColor: '#f5f5f5' },
-                    border: '1px solid #ddd' 
-                  }}
-                >
-                  <TableCell sx={{ border: '1px solid #ddd', textAlign: 'center', padding: '8px 16px', display: 'table-cell' }}>{index + 1}</TableCell>
-                  <TableCell sx={{ border: '1px solid #ddd', textAlign: 'center', padding: '8px 16px', display: 'table-cell' }}>{doc.document_title}</TableCell>
-                  <TableCell sx={{ border: '1px solid #ddd', textAlign: 'center', padding: '8px 16px', display: 'table-cell' }}>{doc.document_type_name}</TableCell>
-                  <TableCell sx={{ border: '1px solid #ddd', textAlign: 'center', padding: '8px 16px', display: 'table-cell' }}>{doc.document_number}</TableCell>
-                  <TableCell sx={{ border: '1px solid #ddd', textAlign: 'center', padding: '8px 16px', display: 'table-cell' }}>{doc.formatted_created_at}</TableCell>
-                  <TableCell sx={{ border: '1px solid #ddd', textAlign: 'center', padding: '8px 16px', display: 'table-cell' }}>
-                    <IconButton
-                      color="primary"
-                      onClick={() => navigate(`/edit_document/${doc.id}`)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <MDBox display="flex" justifyContent="center" p={2}>
+          <div style={{ height: 500, width: '100%' }}>
+            <DataGrid
+              rows={filteredData}
+              columns={columns}
+              pageSize={10}
+              rowsPerPageOptions={[10, 25, 50]}
+              sx={{
+                '& .MuiDataGrid-columnHeaders': {
+                  backgroundColor: '#f5f5f5',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  justifyContent: 'center',
+                },
+                '& .MuiDataGrid-cell': {
+                  textAlign: 'center',
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  textAlign: 'center',
+                  width: '100%',
+                },
+              }}
+            />
+          </div>
+        </MDBox>
       </Card>
     </MDBox>
   );

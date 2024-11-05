@@ -23,7 +23,17 @@ export const workflowApi = createApi({
                 body,
             }),
         }),
+        fetchWorkflows: builder.query({
+            query: () => 'dms_module/create_get_workflow', // Adjusted for GET request
+            transformResponse: (response) => {
+                // Assuming the response structure you provided
+                if (response.status) {
+                    return response.data; // Return the data array directly
+                }
+                throw new Error(response.message || 'Failed to fetch workflows'); // Handle errors
+            },
+        }),
     }),
 });
 
-export const { useCreateWorkflowMutation } = workflowApi;
+export const { useCreateWorkflowMutation, useFetchWorkflowsQuery } = workflowApi;
