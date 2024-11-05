@@ -41,11 +41,18 @@ export const documentApi = createApi({
             }),
             transformResponse: (response) => response.data,
         }),
+
+       
+        fetchDocuments: builder.query({
+            query: () => 'dms_module/view_document',
+            transformResponse: (response) => response.data,
+        }),
     }),
 });
 
 export const { 
     useCreateDocumentMutation, 
     useCreateDocumentTypeMutation, 
-    useFetchDocumentTypesQuery 
+    useFetchDocumentTypesQuery,
+    useFetchDocumentsQuery, 
 } = documentApi;
