@@ -48,6 +48,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import DocumentListing from "layouts/authentication/document-listing";
 import UsersListing from "layouts/authentication/user-listing";
 import WorkflowListing from "layouts/authentication/workflow-listing";
+import StatusListing from "layouts/authentication/status-handle";
 
 const routes = [
   // {
@@ -164,6 +165,15 @@ const routes = [
   //   route: "/add-approval",
   //   component: <AddApproval />,
   // },
+   
+  {
+    type: "collapse",
+    name: "Status",
+    key: "status-list",
+    icon: <Icon fontSize="small">notifications</Icon>,
+    route: "/status-list",
+    component: <StatusListing />,
+  },
 
   
   

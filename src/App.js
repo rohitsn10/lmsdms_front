@@ -17,7 +17,7 @@ import routes from "routes";
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
-import Brandlogo from "assets/images/bp-logo.png"
+import Brandlogo from "assets/images/bp-logo.png";
 import Login from "./layouts/authentication/log-in/index.js";
 import DocumentView from "layouts/authentication/text- editor/index.js";
 import AddUser from "layouts/authentication/add-user";
@@ -34,8 +34,6 @@ import Watermark from "layouts/authentication/watermark";
 import RolesPermissionsPopup from "layouts/authentication/roles-permission";
 
 import UpdatePassword from "layouts/authentication/update-password";
-
-
 
 //Lms components
 
@@ -58,6 +56,7 @@ import AddWorkflow from "layouts/authentication/add-workflow/index.js";
 import UsersListing from "layouts/authentication/user-listing/index.js";
 import DocumentListing from "layouts/authentication/document-listing/index.js";
 import WorkflowListing from "layouts/authentication/workflow-listing/index.js";
+import StatusListing from "layouts/authentication/status-handle/index.js";
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -73,7 +72,7 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-  const isTextEditor = pathname === "/document-view";  
+  const isTextEditor = pathname === "/document-view";
 
   useMemo(() => {
     const cacheRtl = createCache({
@@ -120,7 +119,7 @@ export default function App() {
     } else {
       document.body.style.backgroundImage = "none"; // Remove background image
     }
-  }, [pathname, !isTextEditor]); 
+  }, [pathname, !isTextEditor]);
 
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
@@ -173,7 +172,7 @@ export default function App() {
                 routes={routes}
                 onMouseEnter={handleOnMouseEnter}
                 onMouseLeave={handleOnMouseLeave}
-                style={{ position: "fixed", zIndex: 2 }} 
+                style={{ position: "fixed", zIndex: 2 }}
               />
               <Configurator />
               {/* {configsButton} */}
@@ -200,6 +199,7 @@ export default function App() {
             <Route path="/user-listing" element={<UsersListing />} />
             <Route path="/document-listing" element={<DocumentListing />} />
             <Route path="/workflow-listing" element={<WorkflowListing />} />
+            <Route path="/status-list" element={<StatusListing />} />
 
             {/* Lms components */}
             <Route path="/add-area" element={<AddArea />} />
@@ -217,7 +217,6 @@ export default function App() {
             <Route path="/training-matrix" element={<TrainingMatrix />} />
             <Route path="/training-progressreport" element={<TrainingProgressReport />} />
             <Route path="/exam-result" element={<ExamResultsReport />} />
-           
 
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
@@ -228,61 +227,66 @@ export default function App() {
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       <div>
-      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" && (
+        {layout === "dashboard" &&
+          !isTextEditor &&
+          pathname !== "/user-listing" &&
+          pathname !== "/document-listing" &&
+          pathname !== "/status-list" &&
+          pathname !== "/workflow-listing" && (
             <>
-            <Sidenav
-              color={sidenavColor}
-              brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
-              brandName="Bharat parenterals"
-              routes={routes}
-              onMouseEnter={handleOnMouseEnter}
-              onMouseLeave={handleOnMouseLeave}
-              style={{ position: "fixed", zIndex: 3 }} // Fix position and set z-index
-            />
-            <Configurator />
-            {/* {configsButton} */}
-          </>
-        )}
+              <Sidenav
+                color={sidenavColor}
+                brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
+                brandName="Bharat parenterals"
+                routes={routes}
+                onMouseEnter={handleOnMouseEnter}
+                onMouseLeave={handleOnMouseLeave}
+                style={{ position: "fixed", zIndex: 3 }} // Fix position and set z-index
+              />
+              <Configurator />
+              {/* {configsButton} */}
+            </>
+          )}
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(routes)}
           <Route path="/login" element={<Login />} />
-            <Route path="/document-view" element={<DocumentView />} />
-            <Route path="/add-user" element={<AddUser />} />
-            <Route path="/add-document" element={<AddDocument />} />
-            <Route path="/add-department" element={<AddDepartment />} />
-            <Route path="/add-approval" element={<AddApproval />} />
-            <Route path="/forgotpassword" element={<ResetPassword />} />
-            <Route path="/e-sign" element={<ESignatureDialog />} />
-            <Route path="/print-document" element={<PrintDocument />} />
-            <Route path="/release-document" element={<ReleaseDocument />} />
-            <Route path="/Review" element={<ReviewDocument />} />
-            <Route path="/watermark" element={<Watermark />} />
-            <Route path="/roles-permission" element={<RolesPermissionsPopup />} />
-            <Route path="/update-password" element={<UpdatePassword />} />
-            <Route path="*" element={<Navigate to="/login" />} />
-            <Route path="/add-workflow" element={<AddWorkflow />} />
-            <Route path="/user-listing" element={<UsersListing />} />
-            <Route path="/document-listing" element={<DocumentListing />} />
-            <Route path="/workflow-listing" element={<WorkflowListing />} />
+          <Route path="/document-view" element={<DocumentView />} />
+          <Route path="/add-user" element={<AddUser />} />
+          <Route path="/add-document" element={<AddDocument />} />
+          <Route path="/add-department" element={<AddDepartment />} />
+          <Route path="/add-approval" element={<AddApproval />} />
+          <Route path="/forgotpassword" element={<ResetPassword />} />
+          <Route path="/e-sign" element={<ESignatureDialog />} />
+          <Route path="/print-document" element={<PrintDocument />} />
+          <Route path="/release-document" element={<ReleaseDocument />} />
+          <Route path="/Review" element={<ReviewDocument />} />
+          <Route path="/watermark" element={<Watermark />} />
+          <Route path="/roles-permission" element={<RolesPermissionsPopup />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
+          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="/add-workflow" element={<AddWorkflow />} />
+          <Route path="/user-listing" element={<UsersListing />} />
+          <Route path="/document-listing" element={<DocumentListing />} />
+          <Route path="/workflow-listing" element={<WorkflowListing />} />
+          <Route path="/status-list" element={<StatusListing />} />
 
-             {/* Lms components */}
-             <Route path="/add-area" element={<AddArea />} />
-            <Route path="/add-departments" element={<AddDepartments />} />
-            <Route path="/add-plant" element={<AddPlant />} />
-            <Route path="/add-jobrole" element={<AddJobRole />} />
-            <Route path="/training-type" element={<AddTrainingType />} />
-            <Route path="/induction-training" element={<AddInductionTraining />} />
-            <Route path="/add-training" element={<AddTraining />} />
-            <Route path="/add-material" element={<AddMaterial />} />
-            <Route path="/add-question" element={<AddQuestion />} />
-            <Route path="/add-quiz" element={<CreateQuiz />} />
-            <Route path="/training-mapping" element={<TrainingMapping />} />
-            <Route path="/classroom-training" element={<ClassroomTraining />} />
-            <Route path="/training-matrix" element={<TrainingMatrix />} />
-            <Route path="/exam-result" element={<ExamResultsReport />} />
-            <Route path="/training-progressreport" element={<TrainingProgressReport />} />
-
+          {/* Lms components */}
+          <Route path="/add-area" element={<AddArea />} />
+          <Route path="/add-departments" element={<AddDepartments />} />
+          <Route path="/add-plant" element={<AddPlant />} />
+          <Route path="/add-jobrole" element={<AddJobRole />} />
+          <Route path="/training-type" element={<AddTrainingType />} />
+          <Route path="/induction-training" element={<AddInductionTraining />} />
+          <Route path="/add-training" element={<AddTraining />} />
+          <Route path="/add-material" element={<AddMaterial />} />
+          <Route path="/add-question" element={<AddQuestion />} />
+          <Route path="/add-quiz" element={<CreateQuiz />} />
+          <Route path="/training-mapping" element={<TrainingMapping />} />
+          <Route path="/classroom-training" element={<ClassroomTraining />} />
+          <Route path="/training-matrix" element={<TrainingMatrix />} />
+          <Route path="/exam-result" element={<ExamResultsReport />} />
+          <Route path="/training-progressreport" element={<TrainingProgressReport />} />
         </Routes>
       </div>
     </ThemeProvider>
