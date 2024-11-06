@@ -24,6 +24,11 @@ function ResetPassword() {
 
   // Step 1: Handle Email Submit to request OTP
   const handleEmailSubmit = async () => {
+    console.log("Submitting email:", email); // Debugging log
+    if (!email) {
+      setMessage("Please enter a valid email address.");
+      return;
+    }
     try {
       const response = await requestForgotPasswordOtp(email).unwrap();
       if (response.status) {
@@ -34,6 +39,7 @@ function ResetPassword() {
       setMessage(error.data?.message || "Error sending OTP");
     }
   };
+  
 
   // Handle OTP input changes
   const handleOtpChange = (index, value) => {
