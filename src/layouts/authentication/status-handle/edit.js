@@ -4,16 +4,17 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import MDInput from 'components/MDInput';
+import PropTypes from "prop-types";
 import MDButton from 'components/MDButton';
-import { useUpdateStatusMutation } from 'api/auth/statusApi';  // Import the update status mutation
+import { useUpdateStatusMutation } from 'api/auth/statusApi';
 
 const UpdateStatusDialog = ({ open, handleClose, statusId, statusText }) => {
-  const [status, setStatus] = useState(statusText);  // Local state for status input
+  const [status, setStatus] = useState(statusText);
 
-  const [updateStatus] = useUpdateStatusMutation();  // Hook to call the update status API
+  const [updateStatus] = useUpdateStatusMutation();
 
   useEffect(() => {
-    setStatus(statusText);  // Update the status input when the dialog opens
+    setStatus(statusText);
   }, [statusText]);
 
   const handleUpdate = async () => {
@@ -21,7 +22,7 @@ const UpdateStatusDialog = ({ open, handleClose, statusId, statusText }) => {
       try {
         const response = await updateStatus({ id: statusId, status }).unwrap();
         if (response.status) {
-          handleClose();  // Close dialog after successful update
+          handleClose();
         } else {
           console.error('Error updating status:', response.message || 'Unknown error');
         }
@@ -52,6 +53,14 @@ const UpdateStatusDialog = ({ open, handleClose, statusId, statusText }) => {
       </DialogActions>
     </Dialog>
   );
+};
+
+// Define PropTypes for the component
+UpdateStatusDialog.propTypes = {
+  open: PropTypes.bool.isRequired,           // Boolean to indicate if dialog is open
+  handleClose: PropTypes.func.isRequired,    // Function to close the dialog
+  statusId: PropTypes.string.isRequired,     // String identifier for the status
+  statusText: PropTypes.string.isRequired    // Initial status text for the input
 };
 
 export default UpdateStatusDialog;

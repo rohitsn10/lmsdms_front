@@ -1,4 +1,3 @@
-// src/api/workflowApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import config from 'constants/config';
 
@@ -24,16 +23,22 @@ export const workflowApi = createApi({
             }),
         }),
         fetchWorkflows: builder.query({
-            query: () => 'dms_module/create_get_workflow', // Adjusted for GET request
+            query: () => 'dms_module/create_get_workflow',
             transformResponse: (response) => {
-                // Assuming the response structure you provided
                 if (response.status) {
-                    return response.data; // Return the data array directly
+                    return response.data;
                 }
-                throw new Error(response.message || 'Failed to fetch workflows'); // Handle errors
+                throw new Error(response.message || 'Failed to fetch workflows');
             },
+        }),
+        updateWorkflow: builder.mutation({
+            query: ({ workflow_id, workflow_name, workflow_description }) => ({
+                url: `dms_module/update_delete_workflow/${workflow_id}`,
+                method: 'PUT',
+                body: { workflow_name, workflow_description },
+            }),
         }),
     }),
 });
 
-export const { useCreateWorkflowMutation, useFetchWorkflowsQuery } = workflowApi;
+export const { useCreateWorkflowMutation, useFetchWorkflowsQuery, useUpdateWorkflowMutation } = workflowApi;

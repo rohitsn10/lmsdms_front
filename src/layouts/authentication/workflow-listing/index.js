@@ -30,8 +30,8 @@ const WorkflowListing = () => {
         setSearchTerm(event.target.value);
     };
 
-    const handleAddWorkflow = () => {
-        navigate("/add-workflow");
+    const handleEditWorkflow = (workflow) => {
+        navigate("/update-workflow", { state: { workflow } });
     };
 
     const filteredData = formattedData.filter(
@@ -50,8 +50,8 @@ const WorkflowListing = () => {
             headerName: "Action",
             flex: 0.5,
             headerAlign: 'center',
-            renderCell: () => (
-                <IconButton color="primary" onClick={handleAddWorkflow}>
+            renderCell: (params) => (
+                <IconButton color="primary" onClick={() => handleEditWorkflow(params.row)}>
                     <EditIcon />
                 </IconButton>
             ),
@@ -73,7 +73,7 @@ const WorkflowListing = () => {
                     <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
                         Workflow Listing
                     </MDTypography>
-                    <MDButton variant="contained" color="primary" onClick={handleAddWorkflow} sx={{ ml: 2 }}>
+                    <MDButton variant="contained" color="primary" onClick={() => navigate("/add-workflow")} sx={{ ml: 2 }}>
                         Add Workflow
                     </MDButton>
                 </MDBox>
