@@ -59,6 +59,7 @@ import WorkflowListing from "layouts/authentication/workflow-listing/index.js";
 import StatusListing from "layouts/authentication/status-handle/index.js";
 import DocumentTypesListing from "layouts/authentication/document-typelisting/index.js";
 import AddDocumentType from "layouts/add-documenttype/index.js";
+import UpdateWorkflow from "layouts/authentication/add-workflow/updateworkflow.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -205,6 +206,8 @@ export default function App() {
             <Route path="/status-list" element={<StatusListing />} />
             <Route path="/document-typelisting" element={<DocumentTypesListing />} />
             <Route path="/add-documenttype" element={<AddDocumentType />} />
+            <Route path="/update-workflow" element={<UpdateWorkflow />} />
+
 
             {/* Lms components */}
             <Route path="/add-area" element={<AddArea />} />
@@ -232,7 +235,9 @@ export default function App() {
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       <div>
+
       {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && pathname !== "/status-list" && (
+
             <>
               <Sidenav
                 color={sidenavColor}
@@ -271,7 +276,9 @@ export default function App() {
           <Route path="/workflow-listing" element={<WorkflowListing />} />
           <Route path="/status-list" element={<StatusListing />} />
           <Route path="/document-typelisting" element={<DocumentTypesListing />} />
-            <Route path="/add-documenttype" element={<AddDocumentType />} />
+          <Route path="/add-documenttype" element={<AddDocumentType />} />
+          <Route path="/update-workflow" element={<UpdateWorkflow />} />
+
 
           {/* Lms components */}
           <Route path="/add-area" element={<AddArea />} />
