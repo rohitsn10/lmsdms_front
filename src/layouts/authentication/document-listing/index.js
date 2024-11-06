@@ -20,7 +20,7 @@ const DocumentListing = () => {
   };
 
   const handleAddDocument = () => {
-    navigate("/add_update_document");
+    navigate("/add-document");
   };
 
   const filteredData = data?.data?.filter((doc) =>
@@ -30,20 +30,20 @@ const DocumentListing = () => {
   ) || [];
 
   const columns = [
-    { field: 'id', headerName: 'Sr. No.', width: 90, headerAlign: 'center' },
-    { field: 'document_title', headerName: 'Title', width: 250, headerAlign: 'center' },
-    { field: 'document_type_name', headerName: 'Type', width: 200, headerAlign: 'center' },
-    { field: 'document_number', headerName: 'Document No.', width: 200, headerAlign: 'center' },
-    { field: 'formatted_created_at', headerName: 'Created Date', width: 150, headerAlign: 'center' },
+    { field: 'id', headerName: 'Sr. No.', flex: 0.5, headerAlign: 'center' },
+    { field: 'document_title', headerName: 'Title', flex: 1, headerAlign: 'center' },
+    { field: 'document_type_name', headerName: 'Type', flex: 1, headerAlign: 'center' },
+    { field: 'document_number', headerName: 'Document No.', flex: 1, headerAlign: 'center' },
+    { field: 'formatted_created_at', headerName: 'Created Date', flex: 0.75, headerAlign: 'center' },
     {
       field: 'actions',
       headerName: 'Action',
-      width: 100,
+      flex: 0.5,
       headerAlign: 'center',
       renderCell: (params) => (
         <IconButton
           color="primary"
-          onClick={() => navigate(`/edit_document/${params.row.id}`)}
+          onClick={() => navigate("/add-document")}
         >
           <EditIcon />
         </IconButton>
@@ -52,6 +52,7 @@ const DocumentListing = () => {
       filterable: false,
     },
   ];
+  
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching documents.</div>;

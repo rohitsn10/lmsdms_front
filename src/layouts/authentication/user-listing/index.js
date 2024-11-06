@@ -34,7 +34,7 @@ const UsersListing = () => {
   };
 
   const handleAddUser = () => {
-    navigate("/add_update_user");
+    navigate("/add-user");
   };
 
   const filteredData = formattedData.filter(
@@ -45,19 +45,18 @@ const UsersListing = () => {
   );
 
   const columns = [
-    { field: "serial_number", headerName: "Sr. No.", width: 100, headerAlign: 'center' },
-    { field: "email", headerName: "Email", width: 200, headerAlign: 'center' },
-    { field: "full_name", headerName: "Full Name", width: 200, headerAlign: 'center' },
-    { field: "username", headerName: "Username", width: 150, headerAlign: 'center' },
-    // Assuming 'created_at' is not in the response. You may want to adjust based on your actual data.
-    { field: "created_at", headerName: "Date", width: 150, headerAlign: 'center' },
+    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: 'center' },
+    { field: "email", headerName: "Email", flex: 1, headerAlign: 'center' },
+    { field: "full_name", headerName: "Full Name", flex: 1, headerAlign: 'center' },
+    { field: "username", headerName: "Username", flex: 0.75, headerAlign: 'center' },
+    { field: "created_at", headerName: "Date", flex: 0.75, headerAlign: 'center' },
     {
       field: "action",
       headerName: "Action",
-      width: 100,
+      flex: 0.5,
       headerAlign: 'center',
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => navigate(`/edit_user/${params.row.id}`)}>
+        <IconButton color="primary" onClick={() => navigate("/add-user")}>
           <EditIcon />
         </IconButton>
       ),

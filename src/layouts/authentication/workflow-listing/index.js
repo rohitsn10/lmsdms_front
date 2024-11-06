@@ -15,16 +15,15 @@ const WorkflowListing = () => {
     const navigate = useNavigate();
     const { data: workflows = [], isLoading, error } = useFetchWorkflowsQuery();
 
-    // Handle loading state
     if (isLoading) return <div>Loading workflows...</div>;
     if (error) return <div>Error loading workflows: {error.message}</div>;
 
     const formattedData = workflows.map((item, index) => ({
         id: item.id,
         serial_number: index + 1,
-        workflow_name: item.workflow_name || "N/A", // Handle potential null values
+        workflow_name: item.workflow_name || "N/A",
         workflow_description: item.workflow_description || "N/A",
-        created_at: new Date(item.created_at).toLocaleDateString(), // Adjust if necessary
+        created_at: new Date(item.created_at).toLocaleDateString(),
     }));
 
     const handleSearch = (event) => {
@@ -32,7 +31,7 @@ const WorkflowListing = () => {
     };
 
     const handleAddWorkflow = () => {
-        navigate("/add_update_workflow");
+        navigate("/add-workflow");
     };
 
     const filteredData = formattedData.filter(
@@ -42,23 +41,23 @@ const WorkflowListing = () => {
     );
 
     const columns = [
-        { field: "serial_number", headerName: "Sr. No.", width: 100, headerAlign: 'center' },
-        { field: "workflow_name", headerName: "Workflow Name", width: 200, headerAlign: 'center' },
-        { field: "workflow_description", headerName: "Workflow Description", width: 300, headerAlign: 'center' },
-        { field: "created_at", headerName: "Created At", width: 150, headerAlign: 'center' },
+        { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: 'center' },
+        { field: "workflow_name", headerName: "Workflow Name", flex: 1, headerAlign: 'center' },
+        { field: "workflow_description", headerName: "Workflow Description", flex: 1.5, headerAlign: 'center' },
+        { field: "created_at", headerName: "Created At", flex: 0.75, headerAlign: 'center' },
         {
             field: "action",
             headerName: "Action",
-            width: 100,
+            flex: 0.5,
             headerAlign: 'center',
-            renderCell: (params) => (
-                <IconButton color="primary" onClick={() => navigate(`/edit_workflow/${params.row.id}`)}>
+            renderCell: () => (
+                <IconButton color="primary" onClick={handleAddWorkflow}>
                     <EditIcon />
                 </IconButton>
             ),
         },
     ];
-
+    
     return (
         <MDBox p={3}>
             <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3 }}>

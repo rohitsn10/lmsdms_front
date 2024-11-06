@@ -25,9 +25,13 @@ function AddWorkflow() {
         workflow_description: workflowDescription,
       }).unwrap();
 
+      console.log("API Response:", response); // Log the response to check if status is true
+
+      // Verify if response has a truthy status
       if (response.status) {
-        console.log("API Response:", response.message);
-        setOpenSignatureDialog(true);
+        setOpenSignatureDialog(true); // Opens the signature dialog
+      } else {
+        console.error("Workflow creation failed:", response.message);
       }
     } catch (error) {
       console.error("Error creating workflow:", error);

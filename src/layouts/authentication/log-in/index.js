@@ -296,10 +296,10 @@ function Login() {
           <Button onClick={handleCloseDialog} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleOk} color="primary" >
+          <Button onClick={handleOk} color="primary"  disabled={!selectedRole}>
             OK
           </Button>
-          {/* disabled={!selectedRole} */}
+         
         </DialogActions>
       </Dialog>
     </BasicLayout>
