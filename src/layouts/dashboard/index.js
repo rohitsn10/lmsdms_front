@@ -50,7 +50,7 @@ function Dashboard() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <Link to="/add-user">
+              <Link to="/user-listing">
                 <ComplexStatisticsCard
                   color="primary"
                   icon="person_add"
@@ -68,7 +68,7 @@ function Dashboard() {
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}
             >
-              <Link to="/add-document">
+              <Link to="/document-listing">
                 <ComplexStatisticsCard
                   icon={<TopicIcon />}
                   color="warning"
@@ -121,7 +121,7 @@ function Dashboard() {
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               
-              <Link to="/add-workflow">
+              <Link to="/workflow-listing">
                 <ComplexStatisticsCard
                   color="dark"
                   icon={<AssignmentTurnedInIcon/>}

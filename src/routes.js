@@ -45,6 +45,9 @@ import LMSDashboard from "layouts/authentication/lms-dashboard";
 import TopicIcon from '@mui/icons-material/Topic';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import DocumentListing from "layouts/authentication/document-listing";
+import UsersListing from "layouts/authentication/user-listing";
+import WorkflowListing from "layouts/authentication/workflow-listing";
 
 const routes = [
   // {
@@ -124,10 +127,10 @@ const routes = [
   {
     type: "collapse",
     name: "User",
-    key: "add-user",
+    key: "user-listing",
     icon:<PersonAddIcon/>,
-    route: "/authentication/add-user",
-    component: <AddUser/>,
+    route: "/user-listing",
+    component: <UsersListing/>,
   },
   {
     type: "collapse",
@@ -140,10 +143,18 @@ const routes = [
   {
     type: "collapse",
     name: "Document",
-    key: "add-document",
+    key: "document-listing",
     icon:<TopicIcon/>,
-    route: "/add-document",
-    component: <AddDocument />,
+    route: "/document-listing",
+    component: <DocumentListing />,
+  },
+  {
+    type: "collapse",
+    name: "Workflow",
+    key: "workflow-listing",
+    icon:<TopicIcon/>,
+    route: "/workflow-listing",
+    component: <WorkflowListing/>,
   },
   // {
   //   type: "collapse",
