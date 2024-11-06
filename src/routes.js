@@ -48,6 +48,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import DocumentListing from "layouts/authentication/document-listing";
 import UsersListing from "layouts/authentication/user-listing";
 import WorkflowListing from "layouts/authentication/workflow-listing";
+import DocumentTypesListing from "layouts/authentication/document-typelisting";
 
 const routes = [
   // {
@@ -164,7 +165,14 @@ const routes = [
   //   route: "/add-approval",
   //   component: <AddApproval />,
   // },
-
+  {
+    type: "collapse",
+    name: "Document Type",
+    key: "document-typelisting",
+    icon:<TopicIcon/>,
+    route: "/document-typelisting",
+    component: <DocumentTypesListing/>,
+  },
   
   
 ];

@@ -58,6 +58,9 @@ import AddWorkflow from "layouts/authentication/add-workflow/index.js";
 import UsersListing from "layouts/authentication/user-listing/index.js";
 import DocumentListing from "layouts/authentication/document-listing/index.js";
 import WorkflowListing from "layouts/authentication/workflow-listing/index.js";
+import DocumentTypesListing from "layouts/authentication/document-typelisting/index.js";
+import AddDocumentType from "layouts/add-documenttype/index.js";
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -200,6 +203,8 @@ export default function App() {
             <Route path="/user-listing" element={<UsersListing />} />
             <Route path="/document-listing" element={<DocumentListing />} />
             <Route path="/workflow-listing" element={<WorkflowListing />} />
+            <Route path="/document-typelisting" element={<DocumentTypesListing />} />
+            <Route path="/add-documenttype" element={<AddDocumentType />} />
 
             {/* Lms components */}
             <Route path="/add-area" element={<AddArea />} />
@@ -228,7 +233,7 @@ export default function App() {
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       <div>
-      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" && (
+      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && (
             <>
             <Sidenav
               color={sidenavColor}
@@ -265,6 +270,8 @@ export default function App() {
             <Route path="/user-listing" element={<UsersListing />} />
             <Route path="/document-listing" element={<DocumentListing />} />
             <Route path="/workflow-listing" element={<WorkflowListing />} />
+            <Route path="/document-typelisting" element={<DocumentTypesListing />} />
+            <Route path="/add-documenttype" element={<AddDocumentType />} />
 
              {/* Lms components */}
              <Route path="/add-area" element={<AddArea />} />

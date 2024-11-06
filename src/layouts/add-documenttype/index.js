@@ -7,45 +7,42 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useCreateWorkflowMutation } from "api/auth/workflowApi"; 
-
-function AddWorkflow() {
-  const [workflowName, setWorkflowName] = useState("");
-  const [workflowDescription, setWorkflowDescription] = useState("");
-  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const [createWorkflow, { isLoading }] = useCreateWorkflowMutation(); 
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";  
+import { useCreateDocumentTypeMutation } from 'api/auth/documentApi'; 
+function AddDocumentType() {
+  const [documentTypeName, setDocumentTypeName] = useState("");
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);  
+  const [createDocumentType, { isLoading }] = useCreateDocumentTypeMutation(); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await createWorkflow({
-        workflow_name: workflowName,
-        workflow_description: workflowDescription,
+      const response = await createDocumentType({
+        document_name: documentTypeName,
+        token: sessionStorage.getItem("token"), 
       }).unwrap();
 
-      console.log("API Response:", response);
+      console.log("API Response:", response); 
 
     
       if (response.status) {
         setOpenSignatureDialog(true); 
       } else {
-        console.error("Workflow creation failed:", response.message);
+        console.error("Document type creation failed:", response.message);
       }
     } catch (error) {
-      console.error("Error creating workflow:", error);
+      console.error("Error creating document type:", error);
     }
   };
 
   const handleClear = () => {
-    setWorkflowName("");
-    setWorkflowDescription("");
+    setDocumentTypeName("");
   };
 
   const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/dashboard");
+    setOpenSignatureDialog(false);  // Close the dialog
+    navigate("/document-typelisting");  // Redirect to document types listing page
   };
 
   return (
@@ -64,7 +61,7 @@ function AddWorkflow() {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Add Workflow
+            Add Document Type
           </MDTypography>
         </MDBox>
         <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
@@ -84,20 +81,10 @@ function AddWorkflow() {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Workflow Name"
+                label="Document Type Name"
                 fullWidth
-                value={workflowName}
-                onChange={(e) => setWorkflowName(e.target.value)}
-              />
-            </MDBox>
-            <MDBox mb={3}>
-              <MDInput
-                label="Workflow Description"
-                multiline
-                rows={4}
-                fullWidth
-                value={workflowDescription}
-                onChange={(e) => setWorkflowDescription(e.target.value)}
+                value={documentTypeName}
+                onChange={(e) => setDocumentTypeName(e.target.value)}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
@@ -115,4 +102,4 @@ function AddWorkflow() {
   );
 }
 
-export default AddWorkflow;
+export default AddDocumentType;
