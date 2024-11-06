@@ -235,7 +235,9 @@ export default function App() {
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       <div>
-      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && (
+
+      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && pathname !== "/status-list" && (
+
             <>
               <Sidenav
                 color={sidenavColor}
@@ -276,6 +278,7 @@ export default function App() {
           <Route path="/document-typelisting" element={<DocumentTypesListing />} />
           <Route path="/add-documenttype" element={<AddDocumentType />} />
           <Route path="/update-workflow" element={<UpdateWorkflow />} />
+
 
           {/* Lms components */}
           <Route path="/add-area" element={<AddArea />} />
