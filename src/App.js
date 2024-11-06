@@ -57,6 +57,9 @@ import UsersListing from "layouts/authentication/user-listing/index.js";
 import DocumentListing from "layouts/authentication/document-listing/index.js";
 import WorkflowListing from "layouts/authentication/workflow-listing/index.js";
 import StatusListing from "layouts/authentication/status-handle/index.js";
+import DocumentTypesListing from "layouts/authentication/document-typelisting/index.js";
+import AddDocumentType from "layouts/add-documenttype/index.js";
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -200,6 +203,8 @@ export default function App() {
             <Route path="/document-listing" element={<DocumentListing />} />
             <Route path="/workflow-listing" element={<WorkflowListing />} />
             <Route path="/status-list" element={<StatusListing />} />
+            <Route path="/document-typelisting" element={<DocumentTypesListing />} />
+            <Route path="/add-documenttype" element={<AddDocumentType />} />
 
             {/* Lms components */}
             <Route path="/add-area" element={<AddArea />} />
@@ -233,6 +238,7 @@ export default function App() {
           pathname !== "/document-listing" &&
           pathname !== "/status-list" &&
           pathname !== "/workflow-listing" && (
+      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && (
             <>
               <Sidenav
                 color={sidenavColor}
@@ -270,6 +276,43 @@ export default function App() {
           <Route path="/document-listing" element={<DocumentListing />} />
           <Route path="/workflow-listing" element={<WorkflowListing />} />
           <Route path="/status-list" element={<StatusListing />} />
+            <Route path="/document-view" element={<DocumentView />} />
+            <Route path="/add-user" element={<AddUser />} />
+            <Route path="/add-document" element={<AddDocument />} />
+            <Route path="/add-department" element={<AddDepartment />} />
+            <Route path="/add-approval" element={<AddApproval />} />
+            <Route path="/forgotpassword" element={<ResetPassword />} />
+            <Route path="/e-sign" element={<ESignatureDialog />} />
+            <Route path="/print-document" element={<PrintDocument />} />
+            <Route path="/release-document" element={<ReleaseDocument />} />
+            <Route path="/Review" element={<ReviewDocument />} />
+            <Route path="/watermark" element={<Watermark />} />
+            <Route path="/roles-permission" element={<RolesPermissionsPopup />} />
+            <Route path="/update-password" element={<UpdatePassword />} />
+            <Route path="*" element={<Navigate to="/login" />} />
+            <Route path="/add-workflow" element={<AddWorkflow />} />
+            <Route path="/user-listing" element={<UsersListing />} />
+            <Route path="/document-listing" element={<DocumentListing />} />
+            <Route path="/workflow-listing" element={<WorkflowListing />} />
+            <Route path="/document-typelisting" element={<DocumentTypesListing />} />
+            <Route path="/add-documenttype" element={<AddDocumentType />} />
+
+             {/* Lms components */}
+             <Route path="/add-area" element={<AddArea />} />
+            <Route path="/add-departments" element={<AddDepartments />} />
+            <Route path="/add-plant" element={<AddPlant />} />
+            <Route path="/add-jobrole" element={<AddJobRole />} />
+            <Route path="/training-type" element={<AddTrainingType />} />
+            <Route path="/induction-training" element={<AddInductionTraining />} />
+            <Route path="/add-training" element={<AddTraining />} />
+            <Route path="/add-material" element={<AddMaterial />} />
+            <Route path="/add-question" element={<AddQuestion />} />
+            <Route path="/add-quiz" element={<CreateQuiz />} />
+            <Route path="/training-mapping" element={<TrainingMapping />} />
+            <Route path="/classroom-training" element={<ClassroomTraining />} />
+            <Route path="/training-matrix" element={<TrainingMatrix />} />
+            <Route path="/exam-result" element={<ExamResultsReport />} />
+            <Route path="/training-progressreport" element={<TrainingProgressReport />} />
 
           {/* Lms components */}
           <Route path="/add-area" element={<AddArea />} />

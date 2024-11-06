@@ -49,6 +49,7 @@ import DocumentListing from "layouts/authentication/document-listing";
 import UsersListing from "layouts/authentication/user-listing";
 import WorkflowListing from "layouts/authentication/workflow-listing";
 import StatusListing from "layouts/authentication/status-handle";
+import DocumentTypesListing from "layouts/authentication/document-typelisting";
 
 const routes = [
   // {
@@ -175,6 +176,14 @@ const routes = [
     component: <StatusListing />,
   },
 
+  {
+    type: "collapse",
+    name: "Document Type",
+    key: "document-typelisting",
+    icon:<TopicIcon/>,
+    route: "/document-typelisting",
+    component: <DocumentTypesListing/>,
+  },
   
   
 ];
