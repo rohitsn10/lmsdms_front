@@ -28,7 +28,7 @@ function AddTemplate() {
     formData.append("token", sessionStorage.getItem("token"));
 
     try {
-      // Choose whether to create or update the template
+      
       const response = await (isUpdating ? updateTemplate(formData) : createTemplate(formData)).unwrap();
 
       if (response.status) {
