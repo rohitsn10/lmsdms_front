@@ -11,14 +11,13 @@ export const documentApi = createApi({
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
-      // No need to set Content-Type here; it will automatically be set to 'multipart/form-data' by the browser when uploading files
       return headers;
     },
   }),
   endpoints: (builder) => ({
     createDocument: builder.mutation({
       query: (documentData) => ({
-        url: "dms_module/CreateDocument",
+        url: "dms_module/create_document",
         method: "POST",
         body: documentData,
       }),
@@ -50,10 +49,9 @@ export const documentApi = createApi({
     // Modified createTemplate mutation to handle file uploads
     createTemplate: builder.mutation({
       query: (templateData) => {
-        // Create a FormData object to handle file upload
         const formData = new FormData();
         formData.append("template_name", templateData.template_name);
-        formData.append("template_doc", templateData.template_doc); // Assuming template_doc is the file object
+        formData.append("template_doc", templateData.template_doc);
 
         return {
           url: "dms_module/CreateTemplate",
@@ -79,6 +77,6 @@ export const {
   useCreateDocumentTypeMutation,
   useFetchDocumentTypesQuery,
   useFetchDocumentsQuery,
-  useCreateTemplateMutation, // Export the updated mutation hook
+  useCreateTemplateMutation,
   useViewTemplateQuery,
 } = documentApi;
