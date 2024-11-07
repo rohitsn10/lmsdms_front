@@ -1,47 +1,22 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// @mui material components
-import Grid from "@mui/material/Grid";
-
-// Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-
-// Material Dashboard 2 React example components
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
-import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
-import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
-import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-import { Link } from 'react-router-dom';
-
-// Data
-import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
-import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
-
-// Dashboard components
-import Projects from "layouts/dashboard/components/Projects";
-import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
+import React from 'react';
+import { Grid } from '@mui/material';
+import { useGetDashboardCountsQuery } from 'api/auth/dashboardApi'; // Make sure to import the API hook
+import MDBox from 'components/MDBox';
+import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatisticsCard';
+import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
+import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
+import Footer from 'examples/Footer';
 import TopicIcon from '@mui/icons-material/Topic';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import ApartmentIcon from '@mui/icons-material/Apartment';
-
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { Link } from 'react-router-dom';
 
 function Dashboard() {
-  const { sales, tasks } = reportsLineChartData;
+  const { data, error, isLoading } = useGetDashboardCountsQuery(); // Fetch the dashboard counts
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading dashboard data</div>;
 
   return (
     <DashboardLayout>
@@ -53,12 +28,11 @@ function Dashboard() {
               <Link to="/user-listing">
                 <ComplexStatisticsCard
                   color="primary"
-                  icon="person_add"
+                  icon={<PersonAddIcon />}
                   title="User"
-                  count="91"
+                  count={data.user_count} // Dynamic count from API response
                   percentage={{
                     color: "success",
-                    amount: "",
                     label: "Just updated",
                   }}
                 />
@@ -66,18 +40,16 @@ function Dashboard() {
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}
-            >
+            <MDBox mb={1.5}>
               <Link to="/document-listing">
                 <ComplexStatisticsCard
                   icon={<TopicIcon />}
                   color="warning"
                   title="Document"
-                  count="2,300"
+                  count={data.document_count} // Dynamic count from API response
                   percentage={{
                     color: "success",
-                    // amount: "+3%",
-                    label: " Updated last month",
+                    label: "Updated last month",
                   }}
                 />
               </Link>
@@ -85,51 +57,30 @@ function Dashboard() {
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-            <Link to="/department-listing">
-              <ComplexStatisticsCard
+              <Link to="/department-listing">
+                <ComplexStatisticsCard
                   color="success"
-                  icon={<ApartmentIcon/>}
+                  icon={<ApartmentIcon />}
                   title="Department"
-                  count="47"
+                  count={data.department_count} // Dynamic count from API response
                   percentage={{
                     color: "success",
-                    amount: "",
                     label: "Just updated",
                   }}
                 />
-            </Link>
-            </MDBox>
-          </Grid>
-          {/* <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              
-              <Link to="/add-approval">
-                <ComplexStatisticsCard
-                  color="dark"
-                  icon={<AssignmentTurnedInIcon/>}
-                  title="Approved"
-                  count="34"
-                  percentage={{
-                    color: "success",
-                    // amount: "+1%",
-                    label: "Updated yesterday",
-                  }}
-                />
               </Link>
             </MDBox>
-          </Grid> */}
+          </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              
               <Link to="/workflow-listing">
                 <ComplexStatisticsCard
                   color="dark"
-                  icon={<AssignmentTurnedInIcon/>}
+                  icon={<AssignmentTurnedInIcon />}
                   title="WorkFlow"
-                  count="34"
+                  count={data.workflow_count} // Dynamic count from API response
                   percentage={{
                     color: "success",
-                    // amount: "+1%",
                     label: "Updated yesterday",
                   }}
                 />
@@ -137,57 +88,6 @@ function Dashboard() {
             </MDBox>
           </Grid>
         </Grid>
-        {/* <MDBox mt={4.5}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsBarChart
-                  color="info"
-                  title="website views"
-                  description="Last Campaign Performance"
-                  date="campaign sent 2 days ago"
-                  chart={reportsBarChartData}
-                />
-              </MDBox>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="success"
-                  title="daily sales"
-                  description={
-                    <>
-                      (<strong>+15%</strong>) increase in today sales.
-                    </>
-                  }
-                  date="updated 4 min ago"
-                  chart={sales}
-                />
-              </MDBox>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="dark"
-                  title="completed tasks"
-                  description="Last Campaign Performance"
-                  date="just updated"
-                  chart={tasks}
-                />
-              </MDBox>
-            </Grid>
-          </Grid>
-        </MDBox> */}
-        {/* <MDBox>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={8}>
-              <Projects />
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <OrdersOverview />
-            </Grid>
-          </Grid>
-        </MDBox> */}
       </MDBox>
       {/* <Footer /> */}
     </DashboardLayout>
