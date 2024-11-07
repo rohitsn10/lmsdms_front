@@ -45,7 +45,7 @@ const TemplateListing = () => {
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => navigate(`/edit-template/${params.id}`)}>
+        <IconButton color="primary" onClick={() => navigate(`/add-template/${params.id}`)}>
           <EditIcon />
         </IconButton>
       ),

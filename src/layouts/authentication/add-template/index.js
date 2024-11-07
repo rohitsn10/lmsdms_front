@@ -8,7 +8,7 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useCreateTemplateMutation, useUpdateTemplateMutation } from "api/auth/documentApi";
+import { useCreateTemplateMutation, useEditTemplateMutation } from "api/auth/documentApi";
 
 function AddTemplate() {
   const [templateName, setTemplateName] = useState("");
@@ -17,7 +17,7 @@ function AddTemplate() {
   const navigate = useNavigate();
 
   const [createTemplate, { isLoading: isCreating }] = useCreateTemplateMutation();
-  const [updateTemplate, { isLoading: isUpdating }] = useUpdateTemplateMutation();
+  const [updateTemplate, { isLoading: isUpdating }] = useEditTemplateMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,7 +28,7 @@ function AddTemplate() {
     formData.append("token", sessionStorage.getItem("token"));
 
     try {
-      // Choose whether to create or update the template
+      
       const response = await (isUpdating ? updateTemplate(formData) : createTemplate(formData)).unwrap();
 
       if (response.status) {
