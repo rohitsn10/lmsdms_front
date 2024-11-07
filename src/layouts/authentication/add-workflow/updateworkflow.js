@@ -20,7 +20,7 @@ const UpdateWorkflow = () => {
         e.preventDefault();
         try {
             const response = await updateWorkflow({
-                workflow_id: state.workflow.id,   // Pass the dynamic workflow_id
+                workflow_id: state.workflow.id,   
                 workflow_name: workflowName,
                 workflow_description: workflowDescription,
             }).unwrap();

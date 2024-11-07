@@ -8,36 +8,36 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useCreateTemplateMutation } from "api/auth/documentApi";
+import { useCreateTemplateMutation, useUpdateTemplateMutation } from "api/auth/documentApi";
 
 function AddTemplate() {
   const [templateName, setTemplateName] = useState("");
   const [templateFile, setTemplateFile] = useState(null);
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const navigate = useNavigate();
-  
-  // Use the createTemplate mutation
-  const [createTemplate, { isLoading }] = useCreateTemplateMutation();
+
+  const [createTemplate, { isLoading: isCreating }] = useCreateTemplateMutation();
+  const [updateTemplate, { isLoading: isUpdating }] = useUpdateTemplateMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     const formData = new FormData();
     formData.append("template_name", templateName);
     formData.append("template_file", templateFile);
     formData.append("token", sessionStorage.getItem("token"));
 
     try {
-      // Call createTemplate mutation with formData
-      const response = await createTemplate(formData).unwrap();
+      // Choose whether to create or update the template
+      const response = await (isUpdating ? updateTemplate(formData) : createTemplate(formData)).unwrap();
 
       if (response.status) {
         setOpenSignatureDialog(true);
       } else {
-        console.error("Template creation failed:", response.message);
+        console.error("Template action failed:", response.message);
       }
     } catch (error) {
-      console.error("Error creating template:", error);
+      console.error("Error in template action:", error);
     }
   };
 
@@ -71,7 +71,7 @@ function AddTemplate() {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Add Template
+            Add or Update Template
           </MDTypography>
         </MDBox>
         <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
@@ -108,8 +108,8 @@ function AddTemplate() {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
-                {isLoading ? "Submitting..." : "Submit"}
+              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isCreating || isUpdating}>
+                {isCreating || isUpdating ? "Processing..." : "Submit"}
               </MDButton>
             </MDBox>
           </MDBox>

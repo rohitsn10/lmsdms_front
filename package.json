@@ -24,6 +24,7 @@
     "axios": "^1.7.7",
     "chart.js": "4.3.0",
     "chroma-js": "2.4.2",
+    "dayjs": "^1.11.13",
     "docxtemplater": "^3.51.1",
     "jszip": "^3.10.1",
     "mammoth": "^1.8.0",
