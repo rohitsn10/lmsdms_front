@@ -50,6 +50,7 @@ import UsersListing from "layouts/authentication/user-listing";
 import WorkflowListing from "layouts/authentication/workflow-listing";
 import StatusListing from "layouts/authentication/status-handle";
 import DocumentTypesListing from "layouts/authentication/document-typelisting";
+import TemplateListing from "layouts/authentication/template-listing";
 
 const routes = [
   // {
@@ -183,6 +184,14 @@ const routes = [
     icon:<TopicIcon/>,
     route: "/document-typelisting",
     component: <DocumentTypesListing/>,
+  },
+  {
+    type: "collapse",
+    name: "Template",
+    key: "template-listing",
+    icon:<TopicIcon/>,
+    route: "/template-listing",
+    component: <TemplateListing/>,
   },
   
   

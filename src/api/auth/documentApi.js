@@ -46,6 +46,25 @@ export const documentApi = createApi({
             query: () => 'dms_module/view_document',
             transformResponse: (response) => response.data,
         }),
+
+        // New createTemplate mutation for adding a template
+        createTemplate: builder.mutation({
+            query: (templateData) => ({
+                url: 'dms_module/CreateTemplate',
+                method: 'POST',
+                body: templateData,
+            }),
+            transformResponse: (response) => response.data,
+        }),
+        // Add this query at the bottom of the endpoints in documentApi
+viewTemplate: builder.query({
+    query: () => ({
+        url: 'dms_module/ViewTemplate',
+        method: 'GET',
+    }),
+    transformResponse: (response) => response.data,
+}),
+
     }),
 });
 
@@ -54,4 +73,5 @@ export const {
     useCreateDocumentTypeMutation, 
     useFetchDocumentTypesQuery,
     useFetchDocumentsQuery, 
+    useCreateTemplateMutation, // Export the new mutation hook
 } = documentApi;

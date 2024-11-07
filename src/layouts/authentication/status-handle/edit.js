@@ -37,10 +37,10 @@ const UpdateStatusDialog = ({ open, handleClose, statusId, statusText }) => {
       <DialogTitle>Update Status</DialogTitle>
       <DialogContent>
         <MDInput
-          label="Status"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
           fullWidth
+
         />
       </DialogContent>
       <DialogActions>
@@ -57,10 +57,10 @@ const UpdateStatusDialog = ({ open, handleClose, statusId, statusText }) => {
 
 // Define PropTypes for the component
 UpdateStatusDialog.propTypes = {
-  open: PropTypes.bool.isRequired,           // Boolean to indicate if dialog is open
-  handleClose: PropTypes.func.isRequired,    // Function to close the dialog
-  statusId: PropTypes.string.isRequired,     // String identifier for the status
-  statusText: PropTypes.string.isRequired    // Initial status text for the input
+  open: PropTypes.bool.isRequired,           
+  handleClose: PropTypes.func.isRequired,    
+  statusId: PropTypes.string.isRequired,   
+  statusText: PropTypes.string.isRequired   
 };
 
 
