@@ -8,19 +8,29 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog"; // Ensure correct import
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
+import { useCreateDepartmentMutation } from "api/auth/departmentApi";
 
 function AddDepartment() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [openSignatureDialog, setOpenSignatureDialog] = useState(false); // State for dialog visibility
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
   const navigate = useNavigate();
+  const [createDepartment, { isLoading }] = useCreateDepartmentMutation();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setOpenSignatureDialog(true); // Open dialog on form submission
-    console.log("Department Details Submitted:", { name, description });
+    try {
+      const response = await createDepartment({
+        department_name: name,
+        department_description: description,
+      }).unwrap();
+      console.log("API Response:", response);
+      setOpenSignatureDialog(true);
+    } catch (error) {
+      console.error("Failed to create department:", error.message);
+    }
   };
 
   const handleClear = () => {
@@ -29,8 +39,8 @@ function AddDepartment() {
   };
 
   const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false); // Close the dialog
-    navigate("/dashboard"); // Navigate after closing
+    setOpenSignatureDialog(false);
+    navigate("/dashboard");
   };
 
   return (
@@ -53,17 +63,16 @@ function AddDepartment() {
           </MDTypography>
         </MDBox>
         <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
-  <MDButton
-    variant="outlined"
-    color="error"
-    size="small" // Set the button size to small
-    onClick={handleClear}
-    sx={{ marginLeft: '10px', marginRight: '10px' }} // Adjust marginLeft to move it left
-  >
-    Clear
-  </MDButton>
-</MDBox>
-
+          <MDButton
+            variant="outlined"
+            color="error"
+            size="small"
+            onClick={handleClear}
+            sx={{ marginLeft: '10px', marginRight: '10px' }}
+          >
+            Clear
+          </MDButton>
+        </MDBox>
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <MDBox mb={3}>
@@ -86,8 +95,8 @@ function AddDepartment() {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit">
-                Submit
+              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
+                {isLoading ? "Submitting..." : "Submit"}
               </MDButton>
             </MDBox>
           </MDBox>
@@ -95,10 +104,7 @@ function AddDepartment() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog
-        open={openSignatureDialog}
-        handleClose={handleCloseSignatureDialog} // Make sure prop name matches
-      />
+      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
     </BasicLayout>
   );
 }

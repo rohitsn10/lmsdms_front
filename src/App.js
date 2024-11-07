@@ -62,7 +62,8 @@ import AddDocumentType from "layouts/add-documenttype/index.js";
 import UpdateWorkflow from "layouts/authentication/add-workflow/updateworkflow.js";
 import TemplateListing from "layouts/authentication/template-listing/index.js";
 import AddTemplate from "layouts/authentication/add-template/index.js";
-
+import DepartmentListing from "layouts/authentication/department-listing/index.js";
+import UpdateDepartment from "layouts/authentication/add-department/updatedepartment.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -212,7 +213,8 @@ export default function App() {
             <Route path="/update-workflow" element={<UpdateWorkflow />} />
             <Route path="/template-listing" element={<TemplateListing />} />
             <Route path="/add-template" element={<AddTemplate />} />
-              
+            <Route path="/department-listing" element={<DepartmentListing />} />
+            <Route path="/update-department" element={<UpdateDepartment />} />
 
 
             {/* Lms components */}
@@ -242,7 +244,7 @@ export default function App() {
       <CssBaseline />
       <div>
 
-      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && pathname !== "/status-list" && pathname !== "/template-listing" &&(
+      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && pathname !== "/status-list" && pathname !== "/template-listing" && pathname !== "/department-listing" &&(
 
             <>
               <Sidenav
@@ -286,7 +288,8 @@ export default function App() {
           <Route path="/update-workflow" element={<UpdateWorkflow />} />
           <Route path="/template-listing" element={<TemplateListing />} />
           <Route path="/add-template" element={<AddTemplate />} />
-
+          <Route path="/department-listing" element={<DepartmentListing />} />
+          <Route path="/update-department" element={<UpdateDepartment />} />
 
           {/* Lms components */}
           <Route path="/add-area" element={<AddArea />} />
