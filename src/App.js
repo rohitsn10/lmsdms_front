@@ -60,6 +60,9 @@ import StatusListing from "layouts/authentication/status-handle/index.js";
 import DocumentTypesListing from "layouts/authentication/document-typelisting/index.js";
 import AddDocumentType from "layouts/add-documenttype/index.js";
 import UpdateWorkflow from "layouts/authentication/add-workflow/updateworkflow.js";
+import TemplateListing from "layouts/authentication/template-listing/index.js";
+import AddTemplate from "layouts/authentication/add-template/index.js";
+
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -207,6 +210,9 @@ export default function App() {
             <Route path="/document-typelisting" element={<DocumentTypesListing />} />
             <Route path="/add-documenttype" element={<AddDocumentType />} />
             <Route path="/update-workflow" element={<UpdateWorkflow />} />
+            <Route path="/template-listing" element={<TemplateListing />} />
+            <Route path="/add-template" element={<AddTemplate />} />
+              
 
 
             {/* Lms components */}
@@ -236,7 +242,7 @@ export default function App() {
       <CssBaseline />
       <div>
 
-      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && pathname !== "/status-list" && (
+      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && pathname !== "/status-list" && pathname !== "/template-listing" &&(
 
             <>
               <Sidenav
@@ -278,6 +284,8 @@ export default function App() {
           <Route path="/document-typelisting" element={<DocumentTypesListing />} />
           <Route path="/add-documenttype" element={<AddDocumentType />} />
           <Route path="/update-workflow" element={<UpdateWorkflow />} />
+          <Route path="/template-listing" element={<TemplateListing />} />
+          <Route path="/add-template" element={<AddTemplate />} />
 
 
           {/* Lms components */}
