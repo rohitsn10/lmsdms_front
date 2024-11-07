@@ -9,7 +9,6 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { useViewTemplateQuery } from "api/auth/documentApi";
-import dayjs from "dayjs"; // Optional: Import for date formatting
 
 const TemplateListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,7 +31,7 @@ const TemplateListing = () => {
     .map((item, index) => ({
       ...item,
       serial_number: index + 1,
-      created_at: dayjs(item.created_at).format("YYYY-MM-DD"), // Optional formatting
+      created_at: new Date(item.created_at).toLocaleDateString("en-GB"), // Format date as DD/MM/YYYY
     }));
 
   const columns = [
