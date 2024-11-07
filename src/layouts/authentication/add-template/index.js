@@ -43,13 +43,13 @@ function AddTemplate() {
         setSubmissionError(response.message || "Template creation failed. Please try again.");
       }
     } catch (error) {
-  if (error.data) {
-    setSubmissionError(`Backend error: ${error.data.message}`);
-  } else {
-    setSubmissionError("An error occurred while creating the template. Please try again.");
-  }
-  console.error("Error creating template:", error);
-}
+      if (error.data) {
+        setSubmissionError(`Backend error: ${error.data.message}`);
+      } else {
+        setSubmissionError("An error occurred while creating the template. Please try again.");
+      }
+      console.error("Error creating template:", error);
+    }
   };
 
   const handleClear = () => {
