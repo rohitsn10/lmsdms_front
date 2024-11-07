@@ -14,7 +14,6 @@ function AddTemplate() {
   const [templateName, setTemplateName] = useState("");
   const [templateFile, setTemplateFile] = useState(null);
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const [submissionError, setSubmissionError] = useState(null);
   const navigate = useNavigate();
   
   // Use the createTemplate mutation
@@ -22,32 +21,22 @@ function AddTemplate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmissionError(null); // Clear any previous error
 
     const formData = new FormData();
     formData.append("template_name", templateName);
     formData.append("template_file", templateFile);
-
-    // Log FormData entries to verify structure
-    for (const pair of formData.entries()) {
-      console.log(`${pair[0]}: ${pair[1]}`);
-    }
+    formData.append("token", sessionStorage.getItem("token"));
 
     try {
       // Call createTemplate mutation with formData
       const response = await createTemplate(formData).unwrap();
 
       if (response.status) {
-        setOpenSignatureDialog(true); // Open dialog on success
+        setOpenSignatureDialog(true);
       } else {
-        setSubmissionError(response.message || "Template creation failed. Please try again.");
+        console.error("Template creation failed:", response.message);
       }
     } catch (error) {
-      if (error.data) {
-        setSubmissionError(`Backend error: ${error.data.message}`);
-      } else {
-        setSubmissionError("An error occurred while creating the template. Please try again.");
-      }
       console.error("Error creating template:", error);
     }
   };
@@ -55,7 +44,6 @@ function AddTemplate() {
   const handleClear = () => {
     setTemplateName("");
     setTemplateFile(null);
-    setSubmissionError(null); // Clear error message on reset
   };
 
   const handleCloseSignatureDialog = () => {
@@ -119,14 +107,6 @@ function AddTemplate() {
                 inputProps={{ accept: ".pdf,.docx,.txt" }}
               />
             </MDBox>
-            
-            {/* Display error message if submission fails */}
-            {submissionError && (
-              <MDTypography variant="body2" color="error" mb={2}>
-                {submissionError}
-              </MDTypography>
-            )}
-
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
                 {isLoading ? "Submitting..." : "Submit"}
