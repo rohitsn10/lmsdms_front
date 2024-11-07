@@ -18,7 +18,7 @@ export const documentApi = createApi({
     endpoints: (builder) => ({
         createDocument: builder.mutation({
             query: (documentData) => ({
-                url: 'dms_module/CreateDocument',
+                url: 'dms_module/create_document',
                 method: 'POST',
                 body: documentData,
             }),
