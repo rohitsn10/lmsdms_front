@@ -20,6 +20,7 @@ export const documentApi = createApi({
         url: "dms_module/create_document",
         method: "POST",
         body: documentData,
+        
       }),
       transformResponse: (response) => response.data,
     }),
@@ -49,16 +50,13 @@ export const documentApi = createApi({
     // Modified createTemplate mutation to handle file uploads
     createTemplate: builder.mutation({
       query: (templateData) => {
-        const formData = new FormData();
-        formData.append("template_name", templateData.template_name);
-        formData.append("template_doc", templateData.template_doc);
-
         return {
           url: "dms_module/CreateTemplate",
           method: "POST",
-          body: formData,
+          body: templateData,
         };
       },
+      
       transformResponse: (response) => response.data,
     }),
 

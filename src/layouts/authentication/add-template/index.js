@@ -5,7 +5,6 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
@@ -34,20 +33,23 @@ function AddTemplate() {
 
     try {
       // Send the token in the headers
-      const response = await (isUpdating
-        ? updateTemplate(formData, {
-            headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
-          })
-        : createTemplate(formData, {
-            headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
-          })
-      ).unwrap();
+      // const response = await (isUpdating
+      //   ? updateTemplate(formData, {
+      //       headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
+      //     })
+      //   : createTemplate(formData)
+      // ).unwrap();
 
-      if (response && response.status) {
-        setOpenSignatureDialog(true);
-      } else {
-        console.error("Template action failed:", response.message || "No message provided");
-      }
+      const response = await createTemplate(formData).unwrap(); //yaha pe sirf formdata jana chahiye only
+
+      console.log("RESPONSE", response);
+
+      // if (response && response.status) {
+      //   setOpenSignatureDialog(true);
+      // } else {
+      //   console.log(response)
+      //   console.error("Template action failed:", response.message || "No message provided");
+      // }
     } catch (error) {
       console.error("Error in template action:", error);
     }
