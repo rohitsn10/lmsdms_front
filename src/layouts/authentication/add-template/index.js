@@ -99,7 +99,6 @@ function AddTemplate() {
             Clear
           </MDButton>
         </MDBox>
-
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <MDBox mb={3}>

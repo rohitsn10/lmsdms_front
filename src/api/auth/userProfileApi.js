@@ -17,11 +17,20 @@ export const userProfileApi = createApi({
     }),
     endpoints: (builder) => ({
         resetPassword: builder.mutation({
-            query: ({ oldPassword, password, confirmPassword }) => ({
+            query: ({ oldPassword }) => ({
                 url: 'user_profile/reset_password',
                 method: 'PUT',
                 body: {
                     old_password: oldPassword,
+                },
+            }),
+        }),
+        otpResetPassword: builder.mutation({
+            query: ({ otp, password, confirmPassword }) => ({
+                url: 'user_profile/Otp_ResetPassword',
+                method: 'PUT',
+                body: {
+                    otp,
                     password,
                     confirm_password: confirmPassword,
                 },
@@ -30,4 +39,4 @@ export const userProfileApi = createApi({
     }),
 });
 
-export const { useResetPasswordMutation } = userProfileApi;
+export const { useResetPasswordMutation, useOtpResetPasswordMutation } = userProfileApi;

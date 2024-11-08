@@ -216,7 +216,6 @@ export default function App() {
             <Route path="/department-listing" element={<DepartmentListing />} />
             <Route path="/update-department" element={<UpdateDepartment />} />
 
-
             {/* Lms components */}
             <Route path="/add-area" element={<AddArea />} />
             <Route path="/add-departments" element={<AddDepartments />} />
