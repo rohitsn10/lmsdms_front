@@ -219,6 +219,8 @@ function AddDocument() {
                   sx={{ minWidth: 200, height: "3rem", ".MuiSelect-select": { padding: "0.45rem" } }}
                 >
                   {templateData?.map((templateItem) => (
+
+
                     <MenuItem key={templateItem.id} value={templateItem.template_name}>
                       {templateItem.template_name}
                     </MenuItem>
