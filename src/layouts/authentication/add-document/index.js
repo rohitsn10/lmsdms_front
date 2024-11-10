@@ -122,7 +122,6 @@ function AddDocument() {
                 fullWidth
               />
             </MDBox>
-
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-type-label">Type</InputLabel>
@@ -142,7 +141,6 @@ function AddDocument() {
                 </Select>
               </FormControl>
             </MDBox>
-
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -210,16 +208,6 @@ function AddDocument() {
             </MDBox>
 
             <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Parent Document"
-                value={parentDocument}
-                onChange={(e) => setParentDocument(e.target.value)}
-                fullWidth
-              />
-            </MDBox>
-
-            <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-template-label">Select Template</InputLabel>
                 <Select
@@ -231,12 +219,21 @@ function AddDocument() {
                   sx={{ minWidth: 200, height: "3rem", ".MuiSelect-select": { padding: "0.45rem" } }}
                 >
                   {templateData?.map((templateItem) => (
-                    <MenuItem key={templateItem.id} value={templateItem.name}>
-                      {templateItem.name}
+                    <MenuItem key={templateItem.id} value={templateItem.template_name}>
+                      {templateItem.template_name}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
+            </MDBox>
+            <MDBox mb={3}>
+              <MDInput
+                type="text"
+                label="Parent Document"
+                value={parentDocument}
+                onChange={(e) => setParentDocument(e.target.value)}
+                fullWidth
+              />
             </MDBox>
 
             <MDBox mb={3} display="flex" alignItems="center">
