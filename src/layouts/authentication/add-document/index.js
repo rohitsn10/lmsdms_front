@@ -232,7 +232,7 @@ function AddDocument() {
                 >
                   {templateData?.map((templateItem) => (
                     <MenuItem key={templateItem.id} value={templateItem.name}>
-                      {templateItem.name}
+                      {templateItem.template_name}
                     </MenuItem>
                   ))}
                 </Select>
