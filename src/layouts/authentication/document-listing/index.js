@@ -15,6 +15,9 @@ const DocumentListing = () => {
   const navigate = useNavigate();
   const { data, isLoading, isError } = useFetchDocumentsQuery();
 
+  // Log API response for debugging
+  console.log("Fetched Data:", data);
+
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -23,7 +26,7 @@ const DocumentListing = () => {
     navigate("/add-document");
   };
 
-  const filteredData = data?.data?.filter((doc) =>
+  const filteredData = data?.filter((doc) =>
     doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     doc.document_number.toLowerCase().includes(searchTerm.toLowerCase())
@@ -52,7 +55,6 @@ const DocumentListing = () => {
       filterable: false,
     },
   ];
-  
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching documents.</div>;
@@ -79,7 +81,7 @@ const DocumentListing = () => {
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: '100%' }}>
             <DataGrid
-              rows={filteredData}
+              rows={filteredData || []}
               columns={columns}
               pageSize={10}
               rowsPerPageOptions={[10, 25, 50]}

@@ -95,5 +95,5 @@ export const {
   useFetchDocumentsQuery,
   useCreateTemplateMutation,
   useViewTemplateQuery,
-  useEditTemplateMutation, // Export the new editTemplate mutation
+  useEditTemplateMutation, 
 } = documentApi;
