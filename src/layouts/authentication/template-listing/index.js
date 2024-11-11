@@ -14,7 +14,7 @@ const TemplateListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // Fetch templates data using useViewTemplateQuery
+  // Fetch templates data
   const { data, error, isLoading } = useViewTemplateQuery();
 
   const handleAddTemplate = () => {
@@ -31,6 +31,7 @@ const TemplateListing = () => {
     .map((item, index) => ({
       ...item,
       serial_number: index + 1,
+      created_at: new Date(item.created_at).toLocaleDateString("en-GB"), // Format date as DD/MM/YYYY
     }));
 
   const columns = [
@@ -43,7 +44,7 @@ const TemplateListing = () => {
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => navigate(`/edit-template/${params.id}`)}>
+        <IconButton color="primary" onClick={() => navigate(`/add-template/${params.id}`)}>
           <EditIcon />
         </IconButton>
       ),
@@ -70,10 +71,8 @@ const TemplateListing = () => {
           </MDButton>
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
-          {isLoading ? (
-            <MDTypography>Loading...</MDTypography>
-          ) : error ? (
-            <MDTypography>Error fetching templates</MDTypography>
+          {error ? (
+            <MDTypography color="error">Error fetching templates</MDTypography>
           ) : (
             <div style={{ height: 500, width: "100%" }}>
               <DataGrid
@@ -82,12 +81,11 @@ const TemplateListing = () => {
                 pageSize={5}
                 rowsPerPageOptions={[5, 10, 20]}
                 disableSelectionOnClick
+                loading={isLoading}
                 sx={{
                   border: "1px solid #ddd",
                   borderRadius: "4px",
                   "& .MuiDataGrid-columnHeaders": {
-                    display: "flex",
-                    justifyContent: "center",
                     backgroundColor: "#f5f5f5",
                     fontWeight: "bold",
                   },
@@ -96,6 +94,11 @@ const TemplateListing = () => {
                   },
                 }}
               />
+              {!isLoading && filteredData.length === 0 && (
+                <MDTypography align="center" color="textSecondary">
+                  No templates found
+                </MDTypography>
+              )}
             </div>
           )}
         </MDBox>

@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCreateDocumentMutation, useFetchDocumentTypesQuery } from 'api/auth/documentApi'; 
+import { useCreateDocumentMutation, useFetchDocumentTypesQuery, useViewTemplateQuery } from 'api/auth/documentApi'; 
+import { useFetchWorkflowsQuery } from 'api/auth/workflowApi';  
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -21,8 +22,7 @@ import {
 } from "@mui/material";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
 
-const workflows = ["Initial", "Review", "Approved", "Released"];
-const templates = ["Template 1", "Template 2", "Template 3"];
+
 
 function AddDocument() {
   const [title, setTitle] = useState("");
@@ -38,26 +38,26 @@ function AddDocument() {
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
   const navigate = useNavigate();
-  const [createDocument] = useCreateDocumentMutation(); // Initialize mutation hook
-  const { data: documentTypesData } = useFetchDocumentTypesQuery(); // Fetch document types
+  const [createDocument] = useCreateDocumentMutation();
+  const { data: documentTypesData } = useFetchDocumentTypesQuery();
+  const { data: templateData } = useViewTemplateQuery();
+  const { data: workflowsData, error: workflowsError, isLoading: workflowsLoading } = useFetchWorkflowsQuery();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const documentData = {
-        title,
-        type,
-        documentNumber,
-        description,
-        revisionTime,
-        operations,
-        workflow,
-        parentDocument,
-        trainingRequired,
-        template,
+        document_title: title,
+        document_number: documentNumber,
+        document_type: type,
+        document_description: description,
+        revision_time: revisionTime,
+        document_operation: operations,
+        select_template: template,
+        workflow: workflow,
       };
-      await createDocument(documentData).unwrap(); // Execute the mutation
-      setOpenSignatureDialog(true); // Open the E-signature dialog
+      await createDocument(documentData).unwrap();
+      setOpenSignatureDialog(true);
     } catch (error) {
       console.error("Error creating document:", error);
     }
@@ -122,7 +122,6 @@ function AddDocument() {
                 fullWidth
               />
             </MDBox>
-
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-type-label">Type</InputLabel>
@@ -135,14 +134,13 @@ function AddDocument() {
                   sx={{ minWidth: 200, height: "3rem", ".MuiSelect-select": { padding: "0.45rem" } }}
                 >
                   {documentTypesData?.map((docType) => (
-                    <MenuItem key={docType} value={docType}>
-                      {docType}
+                    <MenuItem key={docType.id} value={docType.document_name}>
+                      {docType.document_name}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </MDBox>
-
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -184,7 +182,7 @@ function AddDocument() {
             </MDBox>
 
             <MDBox mb={3}>
-              <FormControl fullWidth margin="dense">
+             <FormControl fullWidth margin="dense">
                 <InputLabel id="select-workflow-label">Workflow</InputLabel>
                 <Select
                   labelId="select-workflow-label"
@@ -194,23 +192,19 @@ function AddDocument() {
                   input={<OutlinedInput label="Workflow" />}
                   sx={{ minWidth: 200, height: "3rem", ".MuiSelect-select": { padding: "0.45rem" } }}
                 >
-                  {workflows.map((flow) => (
-                    <MenuItem key={flow} value={flow}>
-                      {flow}
-                    </MenuItem>
-                  ))}
+                  {workflowsLoading ? (
+                    <MenuItem disabled>Loading...</MenuItem>
+                  ) : workflowsError ? (
+                    <MenuItem disabled>Error loading workflows</MenuItem>
+                  ) : (
+                    workflowsData?.map((flow) => (
+                      <MenuItem key={flow.id} value={flow.workflow_name}>
+                        {flow.workflow_name}
+                      </MenuItem>
+                    ))
+                  )}
                 </Select>
               </FormControl>
-            </MDBox>
-
-            <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Parent Document"
-                value={parentDocument}
-                onChange={(e) => setParentDocument(e.target.value)}
-                fullWidth
-              />
             </MDBox>
 
             <MDBox mb={3}>
@@ -224,13 +218,24 @@ function AddDocument() {
                   input={<OutlinedInput label="Select Template" />}
                   sx={{ minWidth: 200, height: "3rem", ".MuiSelect-select": { padding: "0.45rem" } }}
                 >
-                  {templates.map((template) => (
-                    <MenuItem key={template} value={template}>
-                      {template}
+                  {templateData?.map((templateItem) => (
+
+
+                    <MenuItem key={templateItem.id} value={templateItem.template_name}>
+                      {templateItem.template_name}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
+            </MDBox>
+            <MDBox mb={3}>
+              <MDInput
+                type="text"
+                label="Parent Document"
+                value={parentDocument}
+                onChange={(e) => setParentDocument(e.target.value)}
+                fullWidth
+              />
             </MDBox>
 
             <MDBox mb={3} display="flex" alignItems="center">

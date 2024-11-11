@@ -7,39 +7,39 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import { useUpdateWorkflowMutation } from 'api/auth/workflowApi';
+import { useUpdateDeleteDepartmentMutation } from "api/auth/departmentApi";  
 
-const UpdateWorkflow = () => {
+const UpdateDepartment = () => {
     const { state } = useLocation();
     const navigate = useNavigate();
-    const [workflowName, setWorkflowName] = useState(state?.workflow.workflow_name || "");
-    const [workflowDescription, setWorkflowDescription] = useState(state?.workflow.workflow_description || "");
-    const [updateWorkflow, { isLoading }] = useUpdateWorkflowMutation();
+    const [departmentName, setDepartmentName] = useState(state?.department.department_name || "");
+    const [departmentDescription, setDepartmentDescription] = useState(state?.department.department_description || "");
+    const [updateDeleteDepartment, { isLoading }] = useUpdateDeleteDepartmentMutation(); // Updated hook
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await updateWorkflow({
-                workflow_id: state.workflow.id,   
-                workflow_name: workflowName,
-                workflow_description: workflowDescription,
+            const response = await updateDeleteDepartment({
+                department_id: state.department.id,   // Pass the dynamic department_id
+                department_name: departmentName,
+                department_description: departmentDescription,
             }).unwrap();
 
             console.log("API Response:", response);
 
             if (response.status) {
-                navigate("/workflow-listing");
+                navigate("/department-listing");
             } else {
-                console.error("Workflow update failed:", response.message);
+                console.error("Department update failed:", response.message);
             }
         } catch (error) {
-            console.error("Error updating workflow:", error.message || error);
+            console.error("Error updating department:", error.message || error);
         }
     };
 
     const handleClear = () => {
-        setWorkflowName("");
-        setWorkflowDescription("");
+        setDepartmentName("");
+        setDepartmentDescription("");
     };
 
     return (
@@ -58,7 +58,7 @@ const UpdateWorkflow = () => {
                     }}
                 >
                     <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-                        Update Workflow
+                        Update Department
                     </MDTypography>
                 </MDBox>
 
@@ -79,20 +79,20 @@ const UpdateWorkflow = () => {
                         <MDBox mb={3}>
                             <MDInput
                                 type="text"
-                                label="Workflow Name"
+                                label="Department Name"
                                 fullWidth
-                                value={workflowName}
-                                onChange={(e) => setWorkflowName(e.target.value)}
+                                value={departmentName}
+                                onChange={(e) => setDepartmentName(e.target.value)}
                             />
                         </MDBox>
                         <MDBox mb={3}>
                             <MDInput
-                                label="Workflow Description"
+                                label="Department Description"
                                 multiline
                                 rows={4}
                                 fullWidth
-                                value={workflowDescription}
-                                onChange={(e) => setWorkflowDescription(e.target.value)}
+                                value={departmentDescription}
+                                onChange={(e) => setDepartmentDescription(e.target.value)}
                             />
                         </MDBox>
                         <MDBox mt={2} mb={1}>
@@ -107,4 +107,4 @@ const UpdateWorkflow = () => {
     );
 };
 
-export default UpdateWorkflow;
+export default UpdateDepartment;

@@ -48,8 +48,11 @@ const DocumentView = () => {
 
   // Load the document when the component mounts
   useEffect(() => {
-    fetch("/SOP template.docx")
-      .then((response) => response.blob())
+    fetch('/SOP_template.docx').then((response) => {
+      console.log("RESPONSE", response)
+      return response.blob();
+  })
+      
       .then((blob) => {
         const reader = new FileReader();
         reader.onload = async (e) => {

@@ -310,19 +310,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 Logout
               </MenuItem>
             </Menu>
-            <Link to="/document-view" style={{ textDecoration: "none", color: "inherit" }}>
-              <IconButton
-                size="small"
-                disableRipple
-                color="inherit"
-                sx={navbarIconButton}
-                aria-controls="notification-menu"
-                aria-haspopup="true"
-                variant="contained"
-              >
-                <Icon sx={iconsStyle}>notifications</Icon>
-              </IconButton>
-            </Link>
           </MDBox>
         </MDBox>
         

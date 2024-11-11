@@ -52,6 +52,7 @@ import StatusListing from "layouts/authentication/status-handle";
 import DocumentTypesListing from "layouts/authentication/document-typelisting";
 import TemplateListing from "layouts/authentication/template-listing";
 import InventoryListing from "layouts/authentication/inventory-handle";
+import DepartmentListing from "layouts/authentication/department-listing";
 
 const routes = [
   // {
@@ -139,10 +140,10 @@ const routes = [
   {
     type: "collapse",
     name: "Department",
-    key: "add-department",
+    key: "department-listing",
     icon: <ApartmentIcon/>,
-    route: "/add-department",
-    component: <AddDepartment />,
+    route: "/department-listing",
+    component: <DepartmentListing />,
   },
   {
     type: "collapse",

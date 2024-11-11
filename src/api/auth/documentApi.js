@@ -20,6 +20,7 @@ export const documentApi = createApi({
         url: "dms_module/create_document",
         method: "POST",
         body: documentData,
+        
       }),
       transformResponse: (response) => response.data,
     }),
@@ -56,9 +57,10 @@ export const documentApi = createApi({
         return {
           url: "dms_module/CreateTemplate",
           method: "POST",
-          body: formData,
+          body: templateData,
         };
       },
+      
       transformResponse: (response) => response.data,
     }),
 
@@ -68,6 +70,26 @@ export const documentApi = createApi({
         method: "GET",
       }),
       transformResponse: (response) => response.data,
+
+    }),
+
+    // New editTemplate mutation to edit a template
+    editTemplate: builder.mutation({
+      query: ({ templateId, templateData }) => {
+        const formData = new FormData();
+        formData.append("template_name", templateData.template_name);
+        if (templateData.template_doc) {
+          formData.append("template_doc", templateData.template_doc);
+        }
+
+        return {
+          url: `dms_module/EditTemplate/${templateId}`,
+          method: "PUT",
+          body: formData,
+        };
+      },
+      transformResponse: (response) => response.data,
+
     }),
   }),
 });
@@ -79,4 +101,7 @@ export const {
   useFetchDocumentsQuery,
   useCreateTemplateMutation,
   useViewTemplateQuery,
+  useEditTemplateMutation, 
 } = documentApi;
+  
+
