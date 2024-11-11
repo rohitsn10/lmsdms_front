@@ -6,12 +6,12 @@ import DialogTitle from '@mui/material/DialogTitle';
 import MDInput from 'components/MDInput';
 import PropTypes from "prop-types";
 import MDButton from 'components/MDButton';
-import { useUpdateinventoryMutation } from 'api/auth/inventoryApi';
+import { useUpdateInventoryMutation} from 'api/auth/inventoryApi';
 
 const UpdateinventoryDialog = ({ open, handleClose, inventoryId, inventoryName }) => {
   const [inventory_name, setinventory] = useState(inventoryName);
 
-  const [updateinventory] = useUpdateinventoryMutation();
+  const [updateinventory] = useUpdateInventoryMutation();
 
   useEffect(() => {
     setinventory(inventoryName);

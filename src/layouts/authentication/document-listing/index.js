@@ -14,10 +14,6 @@ const DocumentListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { data, isLoading, isError } = useFetchDocumentsQuery();
-
-  // Log API response for debugging
-  console.log("Fetched Data:", data);
-
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -32,12 +28,47 @@ const DocumentListing = () => {
     doc.document_number.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
+  const rows = filteredData?.map((doc, index) => ({
+    ...doc,
+    index, // Add index to each row
+  }));
+  
   const columns = [
-    { field: 'id', headerName: 'Sr. No.', flex: 0.5, headerAlign: 'center' },
-    { field: 'document_title', headerName: 'Title', flex: 1, headerAlign: 'center' },
-    { field: 'document_type_name', headerName: 'Type', flex: 1, headerAlign: 'center' },
-    { field: 'document_number', headerName: 'Document No.', flex: 1, headerAlign: 'center' },
-    { field: 'formatted_created_at', headerName: 'Created Date', flex: 0.75, headerAlign: 'center' },
+    {
+      field: 'index',
+      headerName: 'Sr. No.',
+      flex: 0.5,
+      headerAlign: 'center',
+      renderCell: (params) => {
+        return <span>{params.row.index + 1}</span>;
+      },
+      sortable: false,
+      filterable: false,
+    },
+    { 
+      field: 'document_title', 
+      headerName: 'Title', 
+      flex: 1, 
+      headerAlign: 'center' 
+    },
+    { 
+      field: 'document_type_name', 
+      headerName: 'Type', 
+      flex: 1, 
+      headerAlign: 'center' 
+    },
+    { 
+      field: 'document_number', 
+      headerName: 'Document No.', 
+      flex: 1, 
+      headerAlign: 'center' 
+    },
+    { 
+      field: 'formatted_created_at', 
+      headerName: 'Created Date', 
+      flex: 0.75, 
+      headerAlign: 'center' 
+    },
     {
       field: 'actions',
       headerName: 'Action',
@@ -81,7 +112,7 @@ const DocumentListing = () => {
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: '100%' }}>
             <DataGrid
-              rows={filteredData || []}
+               rows={rows || []}
               columns={columns}
               pageSize={10}
               rowsPerPageOptions={[10, 25, 50]}

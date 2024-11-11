@@ -1,25 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useCreateinventoryMutation } from "api/auth/inventoryApi"; // Assuming the inventoryApi is placed in services folder
-import { Dialog, DialogActions, DialogContent, DialogTitle, FormControl, TextField, Button } from "@mui/material";
+import { useCreateInventoryMutation } from "api/auth/inventoryApi"; // Adjust this import path if needed
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  TextField,
+  Button,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
 
 function AddinventoryDialog({ open, handleClose }) {
-  const [inventory_name, setinventory] = useState("");
-  const [createinventory, { isLoading, isSuccess, isError, error }] = useCreateinventoryMutation();
+  const [inventory_name, setInventoryName] = useState("");
+  const [createinventory, { isLoading, isSuccess, isError, error }] = useCreateInventoryMutation();
 
-  const handleinventoryChange = (event) => {
-    setinventory(event.target.value);
+  // Handle success and error effects
+  useEffect(() => {
+    if (isSuccess) {
+      handleClose();
+      setInventoryName(""); // Clear input on success
+    }
+  }, [isSuccess, handleClose]);
+
+  const handleInventoryChange = (event) => {
+    setInventoryName(event.target.value);
   };
 
   const handleSubmit = async () => {
     if (inventory_name) {
       try {
-        // Call the API to create a new inventory
-        await createinventory(inventory_name).unwrap();
-        handleClose(); // Close dialog after successful submission
+        // Send inventory name wrapped in an object as required by the backend
+        await createinventory({ name: inventory_name }).unwrap();
       } catch (err) {
         console.error("Failed to create inventory:", err);
-        // Handle errors, e.g., show a toast notification or an error message
+        // Optionally, display a toast or alert for error feedback
       }
     }
   };
@@ -28,12 +45,17 @@ function AddinventoryDialog({ open, handleClose }) {
     <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
       <DialogTitle>Add Inventory</DialogTitle>
       <DialogContent>
+        {isError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error?.data?.message || "Failed to create inventory. Please try again."}
+          </Alert>
+        )}
         <FormControl fullWidth margin="dense">
           <TextField
-            label="inventory"
+            label="Inventory"
             variant="outlined"
             value={inventory_name}
-            onChange={handleinventoryChange}
+            onChange={handleInventoryChange}
             fullWidth
             sx={{ minWidth: 200, height: "3rem" }}
           />
@@ -44,7 +66,7 @@ function AddinventoryDialog({ open, handleClose }) {
           Cancel
         </Button>
         <Button onClick={handleSubmit} color="primary" disabled={isLoading}>
-          {isLoading ? "Submitting..." : "Submit"}
+          {isLoading ? <CircularProgress size={24} /> : "Submit"}
         </Button>
       </DialogActions>
     </Dialog>

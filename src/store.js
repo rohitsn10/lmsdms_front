@@ -5,7 +5,7 @@ import { workflowApi } from "./api/auth/workflowApi";
 import { forgotPassApi } from "api/auth/forgotpassApi";
 import { statusApi } from "api/auth/statusApi";
 import { inventoryApi } from "api/auth/inventoryApi";
-
+import { texteditorApi } from "api/auth/texteditorApi";
 import { departmentApi } from "api/auth/departmentApi"; 
 import { dashboardApi } from "api/auth/dashboardApi";
 
@@ -19,6 +19,7 @@ const store = configureStore({
     [inventoryApi.reducerPath]: inventoryApi.reducer,
     [departmentApi.reducerPath]: departmentApi.reducer, 
     [dashboardApi.reducerPath]: dashboardApi.reducer,
+    [texteditorApi.reducerPath]: texteditorApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -29,7 +30,8 @@ const store = configureStore({
       statusApi.middleware,
       inventoryApi.middleware,
       departmentApi.middleware,
-      dashboardApi.middleware 
+      dashboardApi.middleware,
+      texteditorApi.middleware,
     ),
 });
 

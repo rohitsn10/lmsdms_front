@@ -11,7 +11,7 @@ import MDInput from 'components/MDInput';
 import MDButton from 'components/MDButton';
 import AddinventoryDialog from './inventory';
 import UpdateinventoryDialog from './edit'; // Import the update inventory dialog
-import { useViewinventoryQuery, useDeleteinventoryMutation } from 'api/auth/inventoryApi';
+import { useViewInventoryQuery, useDeleteInventoryMutation } from 'api/auth/inventoryApi';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -28,7 +28,7 @@ const InventoryListing = () => {
   const [inventoryName, setinventoryName] = useState('');
   const navigate = useNavigate();
 
-  const { data, isLoading, isError, refetch } = useViewinventoryQuery();
+  const { data, isLoading, isError, refetch } = useViewInventoryQuery();
 
   React.useEffect(() => {
     if (data) {
@@ -46,7 +46,7 @@ const InventoryListing = () => {
     setEditDialogOpen(true);
   };
 
-  const [deleteInventory] = useDeleteinventoryMutation();
+  const [deleteInventory] = useDeleteInventoryMutation();
 
   const handleDelete = async () => {
     if (inventoryToDelete) {

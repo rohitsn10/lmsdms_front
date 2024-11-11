@@ -78,8 +78,9 @@ function AddDocument() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/document-view");
+    navigate("/document-view", { state: { templateId: templateItem.id } }); 
   };
+  
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
@@ -134,7 +135,7 @@ function AddDocument() {
                   sx={{ minWidth: 200, height: "3rem", ".MuiSelect-select": { padding: "0.45rem" } }}
                 >
                   {documentTypesData?.map((docType) => (
-                    <MenuItem key={docType.id} value={docType.document_name}>
+                    <MenuItem key={docType.id} value={docType.id}>
                       {docType.document_name}
                     </MenuItem>
                   ))}
@@ -198,7 +199,7 @@ function AddDocument() {
                     <MenuItem disabled>Error loading workflows</MenuItem>
                   ) : (
                     workflowsData?.map((flow) => (
-                      <MenuItem key={flow.id} value={flow.workflow_name}>
+                      <MenuItem key={flow.id} value={flow.id}>
                         {flow.workflow_name}
                       </MenuItem>
                     ))
@@ -221,7 +222,7 @@ function AddDocument() {
                   {templateData?.map((templateItem) => (
 
 
-                    <MenuItem key={templateItem.id} value={templateItem.template_name}>
+                    <MenuItem key={templateItem.id} value={templateItem.id}>
                       {templateItem.template_name}
                     </MenuItem>
                   ))}

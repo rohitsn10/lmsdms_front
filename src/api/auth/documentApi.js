@@ -9,7 +9,7 @@ export const documentApi = createApi({
     prepareHeaders: (headers) => {
       const token = sessionStorage.getItem("token");
       if (token) {
-        headers.set("Authorization", 'Bearer ${token}');
+        headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
     },
@@ -50,10 +50,6 @@ export const documentApi = createApi({
     // Modified createTemplate mutation to handle file uploads
     createTemplate: builder.mutation({
       query: (templateData) => {
-        const formData = new FormData();
-        formData.append("template_name", templateData.template_name);
-        formData.append("template_doc", templateData.template_doc);
-
         return {
           url: "dms_module/CreateTemplate",
           method: "POST",
@@ -70,7 +66,6 @@ export const documentApi = createApi({
         method: "GET",
       }),
       transformResponse: (response) => response.data,
-
     }),
 
     // New editTemplate mutation to edit a template
@@ -89,7 +84,6 @@ export const documentApi = createApi({
         };
       },
       transformResponse: (response) => response.data,
-
     }),
   }),
 });
@@ -103,5 +97,3 @@ export const {
   useViewTemplateQuery,
   useEditTemplateMutation, 
 } = documentApi;
-  
-
