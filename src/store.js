@@ -4,6 +4,8 @@ import { documentApi } from "./api/auth/documentApi";
 import { workflowApi } from "./api/auth/workflowApi";
 import { forgotPassApi } from "api/auth/forgotpassApi";
 import { statusApi } from "api/auth/statusApi";
+import { inventoryApi } from "api/auth/inventoryApi";
+
 
 const store = configureStore({
   reducer: {
@@ -12,6 +14,7 @@ const store = configureStore({
     [workflowApi.reducerPath]: workflowApi.reducer,
     [forgotPassApi.reducerPath]: forgotPassApi.reducer,
     [statusApi.reducerPath]: statusApi.reducer,
+    [inventoryApi.reducerPath]: inventoryApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -19,7 +22,8 @@ const store = configureStore({
       documentApi.middleware,
       workflowApi.middleware,
       forgotPassApi.middleware,
-      statusApi.middleware
+      statusApi.middleware,
+      inventoryApi.middleware
     ),
 });
 

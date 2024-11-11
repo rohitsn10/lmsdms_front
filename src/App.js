@@ -32,6 +32,7 @@ import ReleaseDocument from "layouts/authentication/release-document";
 import PrintDocument from "layouts/authentication/print-document";
 import Watermark from "layouts/authentication/watermark";
 import RolesPermissionsPopup from "layouts/authentication/roles-permission";
+import InventoryListing from "layouts/authentication/inventory-handle";
 
 import UpdatePassword from "layouts/authentication/update-password";
 
@@ -212,7 +213,7 @@ export default function App() {
             <Route path="/update-workflow" element={<UpdateWorkflow />} />
             <Route path="/template-listing" element={<TemplateListing />} />
             <Route path="/add-template" element={<AddTemplate />} />
-              
+            <Route path="/inventory-list" element={<InventoryListing/>}/>              
 
 
             {/* Lms components */}
@@ -286,6 +287,7 @@ export default function App() {
           <Route path="/update-workflow" element={<UpdateWorkflow />} />
           <Route path="/template-listing" element={<TemplateListing />} />
           <Route path="/add-template" element={<AddTemplate />} />
+          <Route path="/inventory-list" element={<InventoryListing/>}/>  
 
 
           {/* Lms components */}
