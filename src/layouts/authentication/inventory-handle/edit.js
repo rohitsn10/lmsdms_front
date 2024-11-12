@@ -60,8 +60,7 @@ UpdateinventoryDialog.propTypes = {
   open: PropTypes.bool.isRequired,           
   handleClose: PropTypes.func.isRequired,    
   inventoryId: PropTypes.string.isRequired,   
-  inventoryName: PropTypes.string.isRequired   
+  inventoryName: PropTypes.string.isRequired,
 };
-
 
 export default UpdateinventoryDialog;

@@ -32,14 +32,14 @@ function AddinventoryDialog({ open, handleClose }) {
   const handleSubmit = async () => {
     if (inventory_name) {
       try {
-        // Send inventory name wrapped in an object as required by the backend
-        await createinventory({ name: inventory_name }).unwrap();
+        // Send the inventory name with the expected key
+        await createinventory({ inventory_name }).unwrap(); 
       } catch (err) {
         console.error("Failed to create inventory:", err);
-        // Optionally, display a toast or alert for error feedback
       }
     }
   };
+  
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>

@@ -22,8 +22,6 @@ import {
 } from "@mui/material";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
 
-
-
 function AddDocument() {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("");
@@ -78,10 +76,9 @@ function AddDocument() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/document-view", { state: { templateId: templateItem.id } }); 
+    navigate("/document-view", { state: { templateId: template } });
   };
   
-
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto", marginTop: 10, marginBottom: 10 }}>
@@ -207,7 +204,6 @@ function AddDocument() {
                 </Select>
               </FormControl>
             </MDBox>
-
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-template-label">Select Template</InputLabel>
@@ -220,8 +216,6 @@ function AddDocument() {
                   sx={{ minWidth: 200, height: "3rem", ".MuiSelect-select": { padding: "0.45rem" } }}
                 >
                   {templateData?.map((templateItem) => (
-
-
                     <MenuItem key={templateItem.id} value={templateItem.id}>
                       {templateItem.template_name}
                     </MenuItem>

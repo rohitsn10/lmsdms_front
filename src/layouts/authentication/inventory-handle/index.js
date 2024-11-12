@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import { DataGrid } from '@mui/x-data-grid';
@@ -10,7 +10,7 @@ import MDTypography from 'components/MDTypography';
 import MDInput from 'components/MDInput';
 import MDButton from 'components/MDButton';
 import AddinventoryDialog from './inventory';
-import UpdateinventoryDialog from './edit'; // Import the update inventory dialog
+import UpdateinventoryDialog from './edit';
 import { useViewInventoryQuery, useDeleteInventoryMutation } from 'api/auth/inventoryApi';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -22,15 +22,15 @@ const InventoryListing = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
   const [inventories, setInventories] = useState([]);
-  const [inventoryToDelete, setinventoryToDelete] = useState(null);
+  const [inventoryToDelete, setInventoryToDelete] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [inventoryId, setinventoryId] = useState(null);
-  const [inventoryName, setinventoryName] = useState('');
+  const [inventoryId, setInventoryId] = useState(null);
+  const [inventoryName, setInventoryName] = useState('');
   const navigate = useNavigate();
 
   const { data, isLoading, isError, refetch } = useViewInventoryQuery();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (data) {
       setInventories(data);
     }
@@ -41,8 +41,8 @@ const InventoryListing = () => {
   };
 
   const handleUpdate = (id, inventory_name) => {
-    setinventoryId(id);
-    setinventoryName(inventory_name);
+    setInventoryId(id);
+    setInventoryName(inventory_name);
     setEditDialogOpen(true);
   };
 
@@ -53,8 +53,11 @@ const InventoryListing = () => {
       try {
         const response = await deleteInventory(inventoryToDelete).unwrap();
         if (response.status) {
-          setInventories((prevInventories) => prevInventories.filter((inventory_name) => inventory.id !== inventoryToDelete));
+          setInventories((prevInventories) =>
+            prevInventories.filter((inventory) => inventory.id !== inventoryToDelete)
+          );
           setConfirmationDialogOpen(false);
+          setInventoryToDelete(null);
         } else {
           console.error('Error deleting inventory:', response.message || 'Unknown error');
         }
@@ -96,7 +99,7 @@ const InventoryListing = () => {
       headerAlign: 'center',
       renderCell: (params) => (
         <div>
-          <IconButton color="primary" onClick={() => handleUpdate(params.id, params.row.name)}>
+          <IconButton color="primary" onClick={() => handleUpdate(params.id, params.row.inventory_name)}>
             <EditIcon />
           </IconButton>
           <IconButton color="error" onClick={() => handleDeleteClick(params.id)}>
