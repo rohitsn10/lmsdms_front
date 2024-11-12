@@ -65,6 +65,8 @@ import TemplateListing from "layouts/authentication/template-listing/index.js";
 import AddTemplate from "layouts/authentication/add-template/index.js";
 import DepartmentListing from "layouts/authentication/department-listing/index.js";
 import UpdateDepartment from "layouts/authentication/add-department/updatedepartment.js";
+import RolesPermissionsListing from "layouts/authentication/roles-listing/index.js";
+import PermissionsTable from "layouts/authentication/add-permissions/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -215,9 +217,10 @@ export default function App() {
             <Route path="/template-listing" element={<TemplateListing />} />
             <Route path="/add-template" element={<AddTemplate />} />
             <Route path="/inventory-list" element={<InventoryListing/>}/>              
-
+            <Route path="/roles-listing" element={<RolesPermissionsListing />} />
             <Route path="/department-listing" element={<DepartmentListing />} />
             <Route path="/update-department" element={<UpdateDepartment />} />
+            <Route path="/add-permissions" element={<PermissionsTable/>} />
 
             {/* Lms components */}
             <Route path="/add-area" element={<AddArea />} />
@@ -246,7 +249,7 @@ export default function App() {
       <CssBaseline />
       <div>
 
-      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && pathname !== "/status-list" && pathname !== "/template-listing" && pathname !== "/department-listing" && pathname !== "/inventory-list"&&(
+      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && pathname !== "/status-list" && pathname !== "/template-listing" && pathname !== "/department-listing" && pathname !== "/inventory-list"&& pathname !== "/roles-listing" && pathname !== "/add-permissions" && (
 
             <>
               <Sidenav
@@ -291,9 +294,10 @@ export default function App() {
           <Route path="/template-listing" element={<TemplateListing />} />
           <Route path="/add-template" element={<AddTemplate />} />
           <Route path="/inventory-list" element={<InventoryListing/>}/>  
-
+          <Route path="/roles-listing" element={<RolesPermissionsListing />} />
           <Route path="/department-listing" element={<DepartmentListing />} />
           <Route path="/update-department" element={<UpdateDepartment />} />
+          <Route path="/add-permissions" element={<PermissionsTable/>} />
 
           {/* Lms components */}
           <Route path="/add-area" element={<AddArea />} />

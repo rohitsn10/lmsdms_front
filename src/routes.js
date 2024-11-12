@@ -53,6 +53,7 @@ import DocumentTypesListing from "layouts/authentication/document-typelisting";
 import TemplateListing from "layouts/authentication/template-listing";
 import InventoryListing from "layouts/authentication/inventory-handle";
 import DepartmentListing from "layouts/authentication/department-listing";
+import RolesPermissionsListing from "layouts/authentication/roles-listing";
 
 const routes = [
   // {
@@ -204,6 +205,15 @@ const routes = [
     icon:<TopicIcon/>,
     route: "/inventory-list",
     component: <InventoryListing />,
+  },
+
+  {
+    type: "collapse",
+    name: "Roles",
+    key: "roles-listing",
+    icon: <ApartmentIcon/>,
+    route: "/roles-listing",
+    component: <RolesPermissionsListing />,
   },
   
 ];

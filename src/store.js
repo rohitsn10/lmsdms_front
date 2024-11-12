@@ -8,6 +8,8 @@ import { inventoryApi } from "api/auth/inventoryApi";
 import { texteditorApi } from "api/auth/texteditorApi";
 import { departmentApi } from "api/auth/departmentApi"; 
 import { dashboardApi } from "api/auth/dashboardApi";
+import { esignatureApi } from "api/auth/esignatureApi";
+import { permissionApi } from "api/auth/permissionApi";
 
 const store = configureStore({
   reducer: {
@@ -20,6 +22,8 @@ const store = configureStore({
     [departmentApi.reducerPath]: departmentApi.reducer, 
     [dashboardApi.reducerPath]: dashboardApi.reducer,
     [texteditorApi.reducerPath]: texteditorApi.reducer,
+    [esignatureApi.reducerPath]:esignatureApi.reducer,
+    [permissionApi.reducerPath]:permissionApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -32,6 +36,8 @@ const store = configureStore({
       departmentApi.middleware,
       dashboardApi.middleware,
       texteditorApi.middleware,
+      esignatureApi.middleware,
+      permissionApi.middleware,
     ),
 });
 
