@@ -3,6 +3,7 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import ImageResize from "quill-image-resize-module-react";
 import Mammoth from "mammoth";
+import { useParams } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -15,7 +16,6 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useLocation } from "react-router-dom";
 import { useGetTemplateQuery } from "api/auth/texteditorApi";
 
 // Register the ImageResize module
@@ -41,22 +41,23 @@ const DocumentView = () => {
   const [docContent, setDocContent] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const quillRef = useRef(null);
-  
+  const { id } = useParams();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [currentComment, setCurrentComment] = useState("");
   const [selectedRange, setSelectedRange] = useState(null);
   const [comments, setComments] = useState([]);
-  const location = useLocation();
-  const { templateId } = location.state || {}; 
+ 
   
   
   // Fetch template from the API
-  const { data, error, isLoading } = useGetTemplateOnIdQuery(templateId);
-  console.log("Template ID passed:", templateId);
-
+  const { data, error, isLoading } = useGetTemplateQuery(id);
+  console.log("data",data)
   useEffect(() => {
     if (data) {
-      const arrayBuffer = data; 
+      // When the template data is loaded
+      const arrayBuffer = data; // Assuming 'data' contains the binary content of the document (docx)
+
+      // Convert the docx file to HTML using Mammoth
       Mammoth.convertToHtml({ arrayBuffer }).then((result) => {
         setDocContent(result.value);
         setIsLoaded(true);
@@ -65,7 +66,7 @@ const DocumentView = () => {
         setIsLoaded(true);
       });
     }
-  }, [data]); 
+  }, [data]); // Re-run when 'data' changes
 
   useEffect(() => {
     if (isLoaded && !quillRef.current) {

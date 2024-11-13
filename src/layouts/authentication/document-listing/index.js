@@ -5,22 +5,28 @@ import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
+import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 
 const DocumentListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { data, isLoading, isError } = useFetchDocumentsQuery();
+  
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
   const handleAddDocument = () => {
     navigate("/add-document");
+  };
+  const handleClick = (id) => {
+    
+    navigate(`/document-view/${id}`);
+    console.log('Document id passed',id)
   };
 
   const filteredData = data?.filter((doc) =>
@@ -85,8 +91,8 @@ const DocumentListing = () => {
           </IconButton>
           
           <IconButton
-            color="secondary"
-            onClick={() => navigate("/document-view")}
+            color="inherit"
+            onClick={() => handleClick(params.row.id)}
           >
             <EditCalendarIcon />
           </IconButton>
@@ -95,7 +101,6 @@ const DocumentListing = () => {
       sortable: false,
       filterable: false,
     },
-    
   ];
 
   if (isLoading) return <div>Loading...</div>;
@@ -123,7 +128,7 @@ const DocumentListing = () => {
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: '100%' }}>
             <DataGrid
-               rows={rows || []}
+              rows={rows || []}
               columns={columns}
               pageSize={10}
               rowsPerPageOptions={[10, 25, 50]}

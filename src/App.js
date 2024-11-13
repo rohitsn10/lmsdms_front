@@ -191,9 +191,9 @@ export default function App() {
           )}
           {layout === "vr" && <Configurator />}
           <Routes>
-            {getRoutes(routes)}
+            {/* {getRoutes(routes)}
             <Route path="/login" element={<Login />} />
-            <Route path="/document-view" element={<DocumentView />} />
+            <Route path="/document-view/:id" element={<DocumentView />} />
             <Route path="/add-user" element={<AddUser />} />
             <Route path="/add-document" element={<AddDocument />} />
             <Route path="/add-department" element={<AddDepartment />} />
@@ -220,10 +220,10 @@ export default function App() {
             <Route path="/roles-listing" element={<RolesPermissionsListing />} />
             <Route path="/department-listing" element={<DepartmentListing />} />
             <Route path="/update-department" element={<UpdateDepartment />} />
-            <Route path="/add-permissions" element={<PermissionsTable/>} />
+            <Route path="/add-permissions" element={<PermissionsTable/>} /> */}
 
             {/* Lms components */}
-            <Route path="/add-area" element={<AddArea />} />
+            {/* <Route path="/add-area" element={<AddArea />} />
             <Route path="/add-departments" element={<AddDepartments />} />
             <Route path="/add-plant" element={<AddPlant />} />
             <Route path="/add-jobrole" element={<AddJobRole />} />
@@ -237,7 +237,7 @@ export default function App() {
             <Route path="/classroom-training" element={<ClassroomTraining />} />
             <Route path="/training-matrix" element={<TrainingMatrix />} />
             <Route path="/training-progressreport" element={<TrainingProgressReport />} />
-            <Route path="/exam-result" element={<ExamResultsReport />} />
+            <Route path="/exam-result" element={<ExamResultsReport />} /> */}
 
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
@@ -249,7 +249,7 @@ export default function App() {
       <CssBaseline />
       <div>
 
-      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && pathname !== "/status-list" && pathname !== "/template-listing" && pathname !== "/department-listing" && pathname !== "/inventory-list"&& pathname !== "/roles-listing" && pathname !== "/add-permissions" && (
+      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && pathname !== "/status-list" && pathname !== "/template-listing" && pathname !== "/department-listing" && pathname !== "/inventory-list"&& pathname !== "/roles-listing" && pathname !== "/add-permissions" && !/^\/document-view\/\d+$/.test(pathname) &&(
 
             <>
               <Sidenav
@@ -259,7 +259,7 @@ export default function App() {
                 routes={routes}
                 onMouseEnter={handleOnMouseEnter}
                 onMouseLeave={handleOnMouseLeave}
-                style={{ position: "fixed", zIndex: 3 }} // Fix position and set z-index
+                style={{ position: "fixed", zIndex: 3 }}
               />
               <Configurator />
               {/* {configsButton} */}
@@ -269,7 +269,7 @@ export default function App() {
         <Routes>
           {getRoutes(routes)}
           <Route path="/login" element={<Login />} />
-          <Route path="/document-view" element={<DocumentView />} />
+           <Route path="/document-view/:id" element={<DocumentView />} />
           <Route path="/add-user" element={<AddUser />} />
           <Route path="/add-document" element={<AddDocument />} />
           <Route path="/add-department" element={<AddDepartment />} />
@@ -282,7 +282,6 @@ export default function App() {
           <Route path="/watermark" element={<Watermark />} />
           <Route path="/roles-permission" element={<RolesPermissionsPopup />} />
           <Route path="/update-password" element={<UpdatePassword />} />
-          <Route path="*" element={<Navigate to="/login" />} />
           <Route path="/add-workflow" element={<AddWorkflow />} />
           <Route path="/user-listing" element={<UsersListing />} />
           <Route path="/document-listing" element={<DocumentListing />} />
@@ -315,6 +314,8 @@ export default function App() {
           <Route path="/training-matrix" element={<TrainingMatrix />} />
           <Route path="/exam-result" element={<ExamResultsReport />} />
           <Route path="/training-progressreport" element={<TrainingProgressReport />} />
+
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
     </ThemeProvider>

@@ -22,6 +22,8 @@ import {
 } from "@mui/material";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
 
+
+
 function AddDocument() {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("");
@@ -76,9 +78,8 @@ function AddDocument() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/document-view", { state: { templateId: template }});
+    navigate("/document-listing");
   };
-  
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto", marginTop: 10, marginBottom: 10 }}>

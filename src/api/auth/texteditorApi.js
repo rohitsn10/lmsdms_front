@@ -16,10 +16,10 @@ export const texteditorApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    // Fetch template by template ID
-    getTemplateOnId: builder.query({
-      query: (template_id) => ({
-        url: `dms_module/GetTemplateOnId/${template_id}`, // Use dynamic template_id
+    // Fetch template by document ID
+    getTemplate: builder.query({
+      query: (document_id) => ({
+        url: `dms_module/GetTemplate/${document_id}`, // Use dynamic document_id
         method: 'GET',
       }),
       transformResponse: (response) => response.data, // Extract data from response
@@ -27,4 +27,4 @@ export const texteditorApi = createApi({
   }),
 });
 
-export const { useGetTemplateOnIdQuery } = texteditorApi;
+export const { useGetTemplateQuery } = texteditorApi;
