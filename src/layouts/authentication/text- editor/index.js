@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useLocation } from "react-router-dom";
-import { useGetTemplateOnIdQuery } from "api/auth/texteditorApi";
+import { useGetTemplateQuery } from "api/auth/texteditorApi";
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -55,26 +55,17 @@ const DocumentView = () => {
   console.log("Template ID passed:", templateId);
 
   useEffect(() => {
-    if (data && data.document_url) {
-      // Fetch the document as an array buffer
-      fetch(data.document_url)
-        .then(response => response.arrayBuffer())
-        .then(arrayBuffer => {
-          // Convert DOCX to HTML
-          Mammoth.convertToHtml({ arrayBuffer }).then((result) => {
-            setDocContent(result.value);
-            setIsLoaded(true);
-          }).catch((err) => {
-            console.error("Error converting DOCX to HTML:", err);
-            setIsLoaded(true);
-          });
-        })
-        .catch(err => {
-          console.error("Error fetching the document:", err);
-          setIsLoaded(true);
-        });
+    if (data) {
+      const arrayBuffer = data; 
+      Mammoth.convertToHtml({ arrayBuffer }).then((result) => {
+        setDocContent(result.value);
+        setIsLoaded(true);
+      }).catch((err) => {
+        console.error("Error converting DOCX to HTML:", err);
+        setIsLoaded(true);
+      });
     }
-  }, [data]);
+  }, [data]); 
 
   useEffect(() => {
     if (isLoaded && !quillRef.current) {
@@ -190,13 +181,13 @@ const DocumentView = () => {
 
   return (
     <Box sx={{ fontFamily: "Arial, sans-serif", padding: 2, backgroundColor: "#f4f4f4", minHeight: "100vh" }}>
-      {/* <AppBar position="static">
+      <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Document Title
           </Typography>
         </Toolbar>
-      </AppBar> */}
+      </AppBar>
       <Paper
         id="editor-container"
         sx={{

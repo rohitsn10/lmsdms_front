@@ -9,6 +9,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
+import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 
 const DocumentListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -75,16 +76,26 @@ const DocumentListing = () => {
       flex: 0.5,
       headerAlign: 'center',
       renderCell: (params) => (
-        <IconButton
-          color="primary"
-          onClick={() => navigate("/add-document")}
-        >
-          <EditIcon />
-        </IconButton>
+        <MDBox display="flex" gap={1}>
+          <IconButton
+            color="primary"
+            onClick={() => navigate("/add-document")}
+          >
+            <EditIcon />
+          </IconButton>
+          
+          <IconButton
+            color="secondary"
+            onClick={() => navigate("/document-view")}
+          >
+            <EditCalendarIcon />
+          </IconButton>
+        </MDBox>
       ),
       sortable: false,
       filterable: false,
     },
+    
   ];
 
   if (isLoading) return <div>Loading...</div>;

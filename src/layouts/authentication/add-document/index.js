@@ -76,7 +76,7 @@ function AddDocument() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/document-view", { state: { templateId: template } });
+    navigate("/document-view", { state: { templateId: template }});
   };
   
   return (
