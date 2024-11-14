@@ -24,7 +24,6 @@ export const documentApi = createApi({
       }),
       transformResponse: (response) => response.data,
     }),
-
     createDocumentType: builder.mutation({
       query: (documentTypeData) => ({
         url: "dms_module/create_get_document_type",
@@ -96,4 +95,6 @@ export const {
   useCreateTemplateMutation,
   useViewTemplateQuery,
   useEditTemplateMutation, 
+  
+  
 } = documentApi;

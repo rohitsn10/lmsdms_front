@@ -3,6 +3,8 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import ImageResize from "quill-image-resize-module-react";
 import Mammoth from "mammoth";
+import { Document, Packer, Paragraph, TextRun } from "docx";
+import { saveAs } from "file-saver";
 import { useParams } from 'react-router-dom';
 import {
   Box,
@@ -17,7 +19,6 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { useGetTemplateQuery, useCreateDocumentMutation } from "api/auth/texteditorApi";
 
 // Register the ImageResize module
@@ -50,7 +51,8 @@ const DocumentView = () => {
   const [comments, setComments] = useState([]);
   const [openDialog, setOpenDialog] = useState(false); // Dialog state
   const [createDocument, { isSuccess, isError }] = useCreateDocumentMutation(); // API mutation
-
+  
+  
   // Fetch template from the API
   const { data, error, isLoading } = useGetTemplateQuery(id);
   console.log("data", data);
@@ -96,7 +98,6 @@ const DocumentView = () => {
       comments.forEach(({ range }) => {
         quill.formatText(range.index, range.length, { background: "yellow" });
       });
-
       const commentButton = document.querySelector(".ql-comment");
       if (commentButton) {
         commentButton.innerHTML = "💬";
@@ -104,12 +105,39 @@ const DocumentView = () => {
     }
   }, [isLoaded, docContent, comments]);
 
+ 
+  // Save the document as DOCX
+const handleSaveAsDocx = async () => {
+  const quill = quillRef.current;
+  const htmlContent = quill.root.innerHTML;
+
+  // Convert HTML content to plain text, splitting it into lines for paragraphs
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, 'text/html');
+  const plainText = doc.body.innerText.split("\n");
+
+  // Create a Document object with each line as a separate paragraph
+  const docxDocument = new Document({
+    sections: [
+      {
+        children: plainText.map(line => new Paragraph(line)),
+      },
+    ],
+  });
+
+  // Generate the document as a blob and save it
+  Packer.toBlob(docxDocument).then((blob) => {
+    saveAs(blob, "document.docx");
+  });
+};
+
   // Handle Ctrl+S to open save dialog
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
         setOpenDialog(true);
+        
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -142,6 +170,7 @@ const DocumentView = () => {
     const documentData = { document_id: id, document_data: content };
     await createDocument(documentData);
     setOpenDialog(false);
+    handleSaveAsDocx();
   };
 
   if (isLoading) {

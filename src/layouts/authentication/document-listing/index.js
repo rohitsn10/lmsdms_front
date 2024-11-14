@@ -29,6 +29,15 @@ const DocumentListing = () => {
     console.log('Document id passed',id)
   };
 
+  const handleEditClick = (id) => {
+    
+    navigate(`/edit-document/${id}`);
+    console.log('Edit-Document id passed',id)
+  };
+
+
+
+
   const filteredData = data?.filter((doc) =>
     doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -85,7 +94,7 @@ const DocumentListing = () => {
         <MDBox display="flex" gap={1}>
           <IconButton
             color="primary"
-            onClick={() => navigate("/add-document")}
+            onClick={() => handleEditClick(params.row.id)}
           >
             <EditIcon />
           </IconButton>

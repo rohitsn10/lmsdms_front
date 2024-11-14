@@ -1,11 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  useCreateDocumentMutation,
-  useFetchDocumentTypesQuery,
-  useViewTemplateQuery,
-} from "api/auth/documentApi";
-import { useFetchWorkflowsQuery } from "api/auth/workflowApi";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -25,48 +19,52 @@ import {
   FormLabel,
 } from "@mui/material";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
+import { useFetchDocumentDetailsQuery } from "api/auth/editDocumentApi";
+import { useFetchDocumentTypesQuery } from "api/auth/documentApi";
+import { useFetchWorkflowsQuery } from "api/auth/workflowApi"; // Adjust import according to your file structure
 
-function AddDocument() {
+function EditDocument() {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("");
   const [documentNumber, setDocumentNumber] = useState("");
   const [description, setDescription] = useState("");
   const [revisionTime, setRevisionTime] = useState("");
+  const [operations, setOperations] = useState("");
   const [workflow, setWorkflow] = useState("");
-  const [parentDocument, setParentDocument] = useState("");
   const [trainingRequired, setTrainingRequired] = useState("No");
-  const [template, setTemplate] = useState("");
+  const [templateFile, setTemplateFile] = useState(null);
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const [operations, setOperations] = useState('Create online');
-
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [createDocument] = useCreateDocumentMutation();
-  const { data: documentTypesData } = useFetchDocumentTypesQuery();
-  const { data: templateData } = useViewTemplateQuery();
+
+  // Fetch document details using API
+  const { data: documentDetails, isLoading: documentDetailsLoading } =
+    useFetchDocumentDetailsQuery(id);
+
+  // Fetch dropdown data using API
+  const { data: documentTypesData, isLoading: documentTypesLoading } = useFetchDocumentTypesQuery();
   const {
     data: workflowsData,
-    error: workflowsError,
     isLoading: workflowsLoading,
+    error: workflowsError,
   } = useFetchWorkflowsQuery();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const documentData = {
-        document_title: title,
-        document_number: documentNumber,
-        document_type: type,
-        document_description: description,
-        revision_time: revisionTime,
-        document_operation: operations,
-        select_template: template,
-        workflow: workflow,
-      };
-      await createDocument(documentData).unwrap();
-      setOpenSignatureDialog(true);
-    } catch (error) {
-      console.error("Error creating document:", error);
+  useEffect(() => {
+    if (documentDetails) {
+      setTitle(documentDetails.document_title || ""); // Ensure this maps correctly
+      setType(documentDetails.document_type || ""); // Map to document_type
+      setDocumentNumber(documentDetails.document_number || ""); // Map to document_number
+      setDescription(documentDetails.document_description || ""); // Map to document_description
+      setRevisionTime(documentDetails.revision_time || ""); // Map to revision_time
+      setOperations(documentDetails.document_operation || ""); // Map to document_operation
+      setWorkflow(documentDetails.workflow || ""); // Map to workflow
+      setTrainingRequired(documentDetails.trainingRequired || "No"); // If it's part of the response
     }
+  }, [documentDetails]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setOpenSignatureDialog(true);
   };
 
   const handleClear = () => {
@@ -77,16 +75,19 @@ function AddDocument() {
     setRevisionTime("");
     setOperations("");
     setWorkflow("");
-    setParentDocument("");
     setTrainingRequired("No");
-    setTemplate("");
+    setTemplateFile(null);
+  };
+
+  const handleFileChange = (e) => {
+    setTemplateFile(e.target.files[0]);
   };
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
     navigate("/document-listing");
-    console.log("template id: ", template);
   };
+
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto", marginTop: 10, marginBottom: 10 }}>
@@ -103,7 +104,7 @@ function AddDocument() {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Add Document
+            Edit Document
           </MDTypography>
         </MDBox>
         <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
@@ -142,12 +143,17 @@ function AddDocument() {
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
+                  disabled={documentTypesLoading} // Disable while loading
                 >
-                  {documentTypesData?.map((docType) => (
-                    <MenuItem key={docType.id} value={docType.id}>
-                      {docType.document_name}
-                    </MenuItem>
-                  ))}
+                  {documentTypesLoading ? (
+                    <MenuItem disabled>Loading...</MenuItem>
+                  ) : (
+                    documentTypesData?.map((docType) => (
+                      <MenuItem key={docType.id} value={docType.id}>
+                        {docType.document_name}
+                      </MenuItem>
+                    ))
+                  )}
                 </Select>
               </FormControl>
             </MDBox>
@@ -160,7 +166,6 @@ function AddDocument() {
                 fullWidth
               />
             </MDBox>
-
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -170,7 +175,6 @@ function AddDocument() {
                 fullWidth
               />
             </MDBox>
-
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -180,7 +184,6 @@ function AddDocument() {
                 fullWidth
               />
             </MDBox>
-
             <MDBox mb={3} display="flex" alignItems="center">
               <FormLabel
                 component="legend"
@@ -189,14 +192,25 @@ function AddDocument() {
                 Operations
               </FormLabel>
               <RadioGroup row value={operations} onChange={(e) => setOperations(e.target.value)}>
-                <FormControlLabel value="Create online" control={<Radio />} label="Create online" />
                 <FormControlLabel
-                  value="Upload files"
-                  control={<Radio />}
-                  label="Upload files"
-                  disabled // Disable the "Upload files" option
+                  value="Create online"
+                  control={<Radio disabled />}
+                  label="Create online"
                 />
+                <FormControlLabel value="Upload files" control={<Radio />} label="Upload files" />
               </RadioGroup>
+            </MDBox>
+
+            {/* Upload Template File */}
+            <MDBox mb={3}>
+              <MDInput
+                type="file"
+                label="Upload Template File"
+                fullWidth
+                onChange={handleFileChange}
+                InputLabelProps={{ shrink: true }}
+                inputProps={{ accept: ".pdf,.docx,.txt" }}
+              />
             </MDBox>
 
             <MDBox mb={3}>
@@ -213,11 +227,10 @@ function AddDocument() {
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
+                  disabled={workflowsLoading} // Disable while loading
                 >
                   {workflowsLoading ? (
                     <MenuItem disabled>Loading...</MenuItem>
-                  ) : workflowsError ? (
-                    <MenuItem disabled>Error loading workflows</MenuItem>
                   ) : (
                     workflowsData?.map((flow) => (
                       <MenuItem key={flow.id} value={flow.id}>
@@ -228,58 +241,20 @@ function AddDocument() {
                 </Select>
               </FormControl>
             </MDBox>
-            <MDBox mb={3}>
-              <FormControl fullWidth margin="dense">
-                <InputLabel id="select-template-label">Select Template</InputLabel>
-                <Select
-                  labelId="select-template-label"
-                  id="select-template"
-                  value={template}
-                  onChange={(e) => setTemplate(e.target.value)}
-                  input={<OutlinedInput label="Select Template" />}
-                  sx={{
-                    minWidth: 200,
-                    height: "3rem",
-                    ".MuiSelect-select": { padding: "0.45rem" },
-                  }}
-                >
-                  {templateData?.map((templateItem) => (
-                    <MenuItem key={templateItem.id} value={templateItem.id}>
-                      {templateItem.template_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </MDBox>
-            <MDBox mb={3} display="flex" alignItems="center">
-              <FormLabel
-                component="legend"
-                style={{ fontSize: "0.875rem", color: "black", marginRight: "16px" }}
-              >
-                Training Required
-              </FormLabel>
-              <RadioGroup
-                row
-                value={trainingRequired}
-                onChange={(e) => setTrainingRequired(e.target.value)}
-              >
-                <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel value="No" control={<Radio />} label="No" />
-              </RadioGroup>
-            </MDBox>
 
             <MDBox mt={4}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit">
-                Submit
+                Update
               </MDButton>
             </MDBox>
           </MDBox>
         </MDBox>
-
-        <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
       </Card>
+
+      {/* Signature Dialog */}
+      <ESignatureDialog open={openSignatureDialog} onClose={handleCloseSignatureDialog} />
     </BasicLayout>
   );
 }
 
-export default AddDocument;
+export default EditDocument;

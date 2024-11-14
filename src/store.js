@@ -10,6 +10,7 @@ import { departmentApi } from "api/auth/departmentApi";
 import { dashboardApi } from "api/auth/dashboardApi";
 import { esignatureApi } from "api/auth/esignatureApi";
 import { permissionApi } from "api/auth/permissionApi";
+import { editDocumentApi } from "api/auth/editDocumentApi";
 
 const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ const store = configureStore({
     [texteditorApi.reducerPath]: texteditorApi.reducer,
     [esignatureApi.reducerPath]:esignatureApi.reducer,
     [permissionApi.reducerPath]:permissionApi.reducer,
+    [editDocumentApi.reducerPath]: editDocumentApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -38,6 +40,7 @@ const store = configureStore({
       texteditorApi.middleware,
       esignatureApi.middleware,
       permissionApi.middleware,
+      editDocumentApi.middleware,
     ),
 });
 

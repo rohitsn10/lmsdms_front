@@ -32,24 +32,8 @@ function AddTemplate() {
     }
 
     try {
-      // Send the token in the headers
-      // const response = await (isUpdating
-      //   ? updateTemplate(formData, {
-      //       headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
-      //     })
-      //   : createTemplate(formData)
-      // ).unwrap();
-
       const response = await createTemplate(formData).unwrap(); //yaha pe sirf formdata jana chahiye only
-
       console.log("RESPONSE", response);
-
-      // if (response && response.status) {
-      //   setOpenSignatureDialog(true);
-      // } else {
-      //   console.log(response)
-      //   console.error("Template action failed:", response.message || "No message provided");
-      // }
     } catch (error) {
       console.error("Error in template action:", error);
     }

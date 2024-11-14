@@ -67,6 +67,7 @@ import DepartmentListing from "layouts/authentication/department-listing/index.j
 import UpdateDepartment from "layouts/authentication/add-department/updatedepartment.js";
 import RolesPermissionsListing from "layouts/authentication/roles-listing/index.js";
 import PermissionsTable from "layouts/authentication/add-permissions/index.js";
+import EditDocument from "layouts/authentication/edit-document/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -272,6 +273,7 @@ export default function App() {
            <Route path="/document-view/:id" element={<DocumentView />} />
           <Route path="/add-user" element={<AddUser />} />
           <Route path="/add-document" element={<AddDocument />} />
+          <Route path="/edit-document/:id" element={<EditDocument />} />
           <Route path="/add-department" element={<AddDepartment />} />
           <Route path="/add-approval" element={<AddApproval />} />
           <Route path="/forgotpassword" element={<ResetPassword />} />
