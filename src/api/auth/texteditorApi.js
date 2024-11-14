@@ -16,15 +16,22 @@ export const texteditorApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    // Fetch template by document ID
     getTemplate: builder.query({
       query: (document_id) => ({
-        url: `dms_module/GetTemplate/${document_id}`, // Use dynamic document_id
+        url: `dms_module/GetTemplate/${document_id}`,
         method: 'GET',
       }),
-      transformResponse: (response) => response.data, // Extract data from response
+      transformResponse: (response) => response.data,
+    }),
+    createDocument: builder.mutation({
+      query: ({ document_id, document_data }) => ({
+        url: `dms_module/create_document_details`,
+        method: 'POST',
+        body: { document_id, document_data },
+      }),
+      transformResponse: (response) => response.data,
     }),
   }),
 });
 
-export const { useGetTemplateQuery } = texteditorApi;
+export const { useGetTemplateQuery, useCreateDocumentMutation } = texteditorApi;

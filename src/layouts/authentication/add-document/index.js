@@ -79,6 +79,7 @@ function AddDocument() {
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
     navigate("/document-listing");
+    console.log("template id: ",template)
   };
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
@@ -170,15 +171,28 @@ function AddDocument() {
               />
             </MDBox>
 
-            <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Operations"
-                value={operations}
-                onChange={(e) => setOperations(e.target.value)}
-                fullWidth
-              />
-            </MDBox>
+            <MDBox mb={3} display="flex" alignItems="center">
+  <FormLabel component="legend" style={{ fontSize: '0.875rem', color: 'black', marginRight: '16px' }}>
+    Operations
+  </FormLabel>
+  <RadioGroup
+    row
+    value={operations}
+    onChange={(e) => setOperations(e.target.value)}
+  >
+    <FormControlLabel
+      value="Create online"
+      control={<Radio />}
+      label="Create online"
+    />
+    <FormControlLabel
+      value="Upload files"
+      control={<Radio />}
+      label="Upload files"
+    />
+  </RadioGroup>
+</MDBox>
+
 
             <MDBox mb={3}>
              <FormControl fullWidth margin="dense">
@@ -219,21 +233,12 @@ function AddDocument() {
                   {templateData?.map((templateItem) => (
                     <MenuItem key={templateItem.id} value={templateItem.id}>
                       {templateItem.template_name}
+                      
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </MDBox>
-            <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Parent Document"
-                value={parentDocument}
-                onChange={(e) => setParentDocument(e.target.value)}
-                fullWidth
-              />
-            </MDBox>
-
             <MDBox mb={3} display="flex" alignItems="center">
               <FormLabel component="legend" style={{ fontSize: '0.875rem', color: 'black', marginRight: '16px' }}>
                 Training Required

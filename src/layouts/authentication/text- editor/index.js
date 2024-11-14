@@ -11,12 +11,14 @@ import {
   TextField,
   Typography,
   Paper,
-  AppBar,
-  Toolbar,
-  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useGetTemplateQuery } from "api/auth/texteditorApi";
+import { useGetTemplateQuery, useCreateDocumentMutation } from "api/auth/texteditorApi";
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -46,27 +48,32 @@ const DocumentView = () => {
   const [currentComment, setCurrentComment] = useState("");
   const [selectedRange, setSelectedRange] = useState(null);
   const [comments, setComments] = useState([]);
- 
-  
-  
+  const [openDialog, setOpenDialog] = useState(false); // Dialog state
+  const [createDocument, { isSuccess, isError }] = useCreateDocumentMutation(); // API mutation
+
   // Fetch template from the API
   const { data, error, isLoading } = useGetTemplateQuery(id);
-  console.log("data",data)
-  useEffect(() => {
-    if (data) {
-      // When the template data is loaded
-      const arrayBuffer = data; // Assuming 'data' contains the binary content of the document (docx)
+  console.log("data", data);
+  console.log("document Id: ", id);
 
-      // Convert the docx file to HTML using Mammoth
-      Mammoth.convertToHtml({ arrayBuffer }).then((result) => {
-        setDocContent(result.value);
-        setIsLoaded(true);
-      }).catch((err) => {
-        console.error("Error converting DOCX to HTML:", err);
-        setIsLoaded(true);
-      });
-    }
-  }, [data]); // Re-run when 'data' changes
+  useEffect(() => {
+    const fetchDocxFile = async () => {
+      if (data?.template_url) {
+        try {
+          const response = await fetch(data.template_url);
+          const arrayBuffer = await response.arrayBuffer();
+          const result = await Mammoth.convertToHtml({ arrayBuffer });
+          setDocContent(result.value);
+          setIsLoaded(true);
+        } catch (err) {
+          console.error("Error converting DOCX to HTML:", err);
+          setIsLoaded(true);
+        }
+      }
+    };
+
+    fetchDocxFile();
+  }, [data]);
 
   useEffect(() => {
     if (isLoaded && !quillRef.current) {
@@ -86,24 +93,10 @@ const DocumentView = () => {
       quillRef.current = quill;
       quill.clipboard.dangerouslyPasteHTML(docContent);
 
-      // Apply existing comments
       comments.forEach(({ range }) => {
         quill.formatText(range.index, range.length, { background: "yellow" });
       });
 
-      // Add event listener for video embedding
-      const videoButton = document.querySelector(".ql-video");
-      if (videoButton) {
-        videoButton.addEventListener("click", () => {
-          const videoUrl = prompt("Enter video URL");
-          if (videoUrl) {
-            const range = quill.getSelection();
-            quill.insertEmbed(range.index, "video", videoUrl);
-          }
-        });
-      }
-
-      // Customize the comment button icon
       const commentButton = document.querySelector(".ql-comment");
       if (commentButton) {
         commentButton.innerHTML = "💬";
@@ -111,10 +104,21 @@ const DocumentView = () => {
     }
   }, [isLoaded, docContent, comments]);
 
+  // Handle Ctrl+S to open save dialog
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        setOpenDialog(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const handleAddComment = () => {
     const quill = quillRef.current;
     const range = quill.getSelection();
-
     if (range) {
       setSelectedRange(range);
       setOpenDrawer(true);
@@ -125,7 +129,6 @@ const DocumentView = () => {
 
   const handleSaveComment = () => {
     if (currentComment.trim() === "") return;
-
     const quill = quillRef.current;
     quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
     setComments([...comments, { range: selectedRange, comment: currentComment }]);
@@ -133,62 +136,23 @@ const DocumentView = () => {
     setOpenDrawer(false);
   };
 
-  const handlePrint = () => {
+  // Save the document API call
+  const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
-    const printWindow = window.open("", "_blank");
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Print Document</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              margin: 0;
-              padding: 20px;
-              background-color: #fff;
-              width: 210mm; /* A4 width */
-              height: 297mm; /* A4 height */
-              overflow: hidden; /* Hide overflow */
-            }
-          </style>
-        </head>
-        <body>
-          ${content} <!-- Insert the editor content here -->
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-    printWindow.close();
-  };
-
-  const handleSaveDraft = () => {
-    const content = quillRef.current.root.innerHTML;
-    console.log("Draft saved:", content);
-    alert("Draft saved!");
-  };
-
-  const handleView = () => {
-    alert("Viewing the document!");
+    const documentData = { document_id: id, document_data: content };
+    await createDocument(documentData);
+    setOpenDialog(false);
   };
 
   if (isLoading) {
-    return <Box padding={2}>Loading document...</Box>; // Show loading indicator
+    return <Box padding={2}>Loading document...</Box>;
   }
-
   if (error) {
     return <Box padding={2}>Error loading document</Box>;
   }
 
   return (
     <Box sx={{ fontFamily: "Arial, sans-serif", padding: 2, backgroundColor: "#f4f4f4", minHeight: "100vh" }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Document Title
-          </Typography>
-        </Toolbar>
-      </AppBar>
       <Paper
         id="editor-container"
         sx={{
@@ -207,9 +171,6 @@ const DocumentView = () => {
       {/* Comment Drawer */}
       <Drawer anchor="right" open={openDrawer} onClose={() => setOpenDrawer(false)}>
         <Box sx={{ width: 250, padding: 2, position: 'relative', height: '100%' }}>
-          <IconButton onClick={() => setOpenDrawer(false)} sx={{ position: 'absolute', right: 10, top: 10 }}>
-            <CloseIcon />
-          </IconButton>
           <Typography variant="h6">Add Comment</Typography>
           <TextField
             value={currentComment}
@@ -224,28 +185,28 @@ const DocumentView = () => {
             variant="contained"
             onClick={handleSaveComment}
             sx={{ position: 'absolute', bottom: 16, left: 16, right: 16 }}
-            style={{
-              backgroundColor: "#E53471",
-              color: "white",
-            }}
+            style={{ backgroundColor: "#E53471", color: "white" }}
           >
             Save Comment
           </Button>
         </Box>
       </Drawer>
 
-      {/* Footer with Action Buttons */}
-      <Box sx={{ marginTop: 2, display: "flex", justifyContent: "center" }}>
-        <Button variant="contained" onClick={handleView} sx={{ margin: 1 }}>
-          View
-        </Button>
-        <Button variant="contained" onClick={handleSaveDraft} sx={{ margin: 1 }}>
-          Save Draft
-        </Button>
-        <Button variant="contained" onClick={handlePrint} sx={{ margin: 1 }}>
-          Print Document
-        </Button>
-      </Box>
+      {/* Save Confirmation Dialog */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Save Document</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Do you want to save this document?</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmSave} color="primary" variant="contained">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
