@@ -3,15 +3,14 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import ImageResize from "quill-image-resize-module-react";
 import Mammoth from "mammoth";
-import { Document, Packer, Paragraph, TextRun } from "docx";
-import { saveAs } from "file-saver";
-import { useParams } from 'react-router-dom';
+import { Document, Packer, Paragraph } from "docx";
+import { saveAs } from "file-saver";
+import { useParams } from "react-router-dom";
+import ReactDOM from "react-dom";
+import CommentBankIcon from "@mui/icons-material/CommentBank";
 import {
   Box,
   Button,
-  Drawer,
-  TextField,
-  Typography,
   Paper,
   Dialog,
   DialogActions,
@@ -20,6 +19,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useGetTemplateQuery, useCreateDocumentMutation } from "api/auth/texteditorApi";
+import CommentDrawer from "./Comments/CommentDialog";
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -49,11 +49,9 @@ const DocumentView = () => {
   const [currentComment, setCurrentComment] = useState("");
   const [selectedRange, setSelectedRange] = useState(null);
   const [comments, setComments] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false); // Dialog state
-  const [createDocument, { isSuccess, isError }] = useCreateDocumentMutation(); // API mutation
-  
-  
-  // Fetch template from the API
+  const [openDialog, setOpenDialog] = useState(false);
+  const [createDocument, { isSuccess, isError }] = useCreateDocumentMutation();
+
   const { data, error, isLoading } = useGetTemplateQuery(id);
   console.log("data", data);
   console.log("document Id: ", id);
@@ -91,53 +89,57 @@ const DocumentView = () => {
           imageResize: {},
         },
       });
-
+  
       quillRef.current = quill;
       quill.clipboard.dangerouslyPasteHTML(docContent);
-
+  
       comments.forEach(({ range }) => {
         quill.formatText(range.index, range.length, { background: "yellow" });
       });
+  
       const commentButton = document.querySelector(".ql-comment");
       if (commentButton) {
-        commentButton.innerHTML = "💬";
+        // Clear existing content
+        commentButton.innerHTML = "";
+  
+        // Create an instance of the CommentBankIcon
+        const commentIcon = document.createElement("span");
+        ReactDOM.render(<CommentBankIcon fontSize="small" />, commentIcon);
+  
+        // Append the rendered icon to the button
+        commentButton.appendChild(commentIcon);
       }
     }
   }, [isLoaded, docContent, comments]);
+  
 
- 
   // Save the document as DOCX
-const handleSaveAsDocx = async () => {
-  const quill = quillRef.current;
-  const htmlContent = quill.root.innerHTML;
+  const handleSaveAsDocx = async () => {
+    const quill = quillRef.current;
+    const htmlContent = quill.root.innerHTML;
 
-  // Convert HTML content to plain text, splitting it into lines for paragraphs
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlContent, 'text/html');
-  const plainText = doc.body.innerText.split("\n");
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, "text/html");
+    const plainText = doc.body.innerText.split("\n");
 
-  // Create a Document object with each line as a separate paragraph
-  const docxDocument = new Document({
-    sections: [
-      {
-        children: plainText.map(line => new Paragraph(line)),
-      },
-    ],
-  });
+    const docxDocument = new Document({
+      sections: [
+        {
+          children: plainText.map((line) => new Paragraph(line)),
+        },
+      ],
+    });
 
-  // Generate the document as a blob and save it
-  Packer.toBlob(docxDocument).then((blob) => {
-    saveAs(blob, "document.docx");
-  });
-};
+    Packer.toBlob(docxDocument).then((blob) => {
+      saveAs(blob, "document.docx");
+    });
+  };
 
-  // Handle Ctrl+S to open save dialog
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
         setOpenDialog(true);
-        
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -159,18 +161,25 @@ const handleSaveAsDocx = async () => {
     if (currentComment.trim() === "") return;
     const quill = quillRef.current;
     quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
-    setComments([...comments, { range: selectedRange, comment: currentComment }]);
+    setComments([...comments, { id: Date.now(), range: selectedRange, comment: currentComment }]);
     setCurrentComment("");
     setOpenDrawer(false);
   };
 
-  // Save the document API call
   const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
     const documentData = { document_id: id, document_data: content };
     await createDocument(documentData);
     setOpenDialog(false);
     handleSaveAsDocx();
+  };
+
+  const handleEditComment = (id, newComment) => {
+    setComments((prevComments) =>
+      prevComments.map((comment) =>
+        comment.id === id ? { ...comment, comment: newComment } : comment
+      )
+    );
   };
 
   if (isLoading) {
@@ -181,7 +190,14 @@ const handleSaveAsDocx = async () => {
   }
 
   return (
-    <Box sx={{ fontFamily: "Arial, sans-serif", padding: 2, backgroundColor: "#f4f4f4", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        fontFamily: "Arial, sans-serif",
+        padding: 2,
+        backgroundColor: "#f4f4f4",
+        minHeight: "100vh",
+      }}
+    >
       <Paper
         id="editor-container"
         sx={{
@@ -198,28 +214,15 @@ const handleSaveAsDocx = async () => {
       />
 
       {/* Comment Drawer */}
-      <Drawer anchor="right" open={openDrawer} onClose={() => setOpenDrawer(false)}>
-        <Box sx={{ width: 250, padding: 2, position: 'relative', height: '100%' }}>
-          <Typography variant="h6">Add Comment</Typography>
-          <TextField
-            value={currentComment}
-            onChange={(e) => setCurrentComment(e.target.value)}
-            rows={4}
-            multiline
-            fullWidth
-            variant="outlined"
-            margin="normal"
-          />
-          <Button
-            variant="contained"
-            onClick={handleSaveComment}
-            sx={{ position: 'absolute', bottom: 16, left: 16, right: 16 }}
-            style={{ backgroundColor: "#E53471", color: "white" }}
-          >
-            Save Comment
-          </Button>
-        </Box>
-      </Drawer>
+      <CommentDrawer
+        open={openDrawer}
+        onClose={() => setOpenDrawer(false)}
+        currentComment={currentComment}
+        setCurrentComment={setCurrentComment}
+        handleSaveComment={handleSaveComment}
+        comments={comments}
+        handleEditComment={handleEditComment}
+      />
 
       {/* Save Confirmation Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
