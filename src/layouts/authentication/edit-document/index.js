@@ -19,7 +19,7 @@ import {
   FormLabel,
 } from "@mui/material";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
-import { useFetchDocumentDetailsQuery } from "api/auth/editDocumentApi";
+import { useFetchDocumentDetailsQuery, useUpdateDocumentMutation } from "api/auth/editDocumentApi";
 import { useFetchDocumentTypesQuery } from "api/auth/documentApi";
 import { useFetchWorkflowsQuery } from "api/auth/workflowApi"; // Adjust import according to your file structure
 
@@ -29,7 +29,7 @@ function EditDocument() {
   const [documentNumber, setDocumentNumber] = useState("");
   const [description, setDescription] = useState("");
   const [revisionTime, setRevisionTime] = useState("");
-  const [operations, setOperations] = useState("");
+  const [operations, setOperations] = useState("Upload files");
   const [workflow, setWorkflow] = useState("");
   const [trainingRequired, setTrainingRequired] = useState("No");
   const [templateFile, setTemplateFile] = useState(null);
@@ -40,6 +40,7 @@ function EditDocument() {
   // Fetch document details using API
   const { data: documentDetails, isLoading: documentDetailsLoading } =
     useFetchDocumentDetailsQuery(id);
+  const [updateDocument] = useUpdateDocumentMutation();
 
   // Fetch dropdown data using API
   const { data: documentTypesData, isLoading: documentTypesLoading } = useFetchDocumentTypesQuery();
@@ -51,20 +52,35 @@ function EditDocument() {
 
   useEffect(() => {
     if (documentDetails) {
-      setTitle(documentDetails.document_title || ""); // Ensure this maps correctly
-      setType(documentDetails.document_type || ""); // Map to document_type
-      setDocumentNumber(documentDetails.document_number || ""); // Map to document_number
-      setDescription(documentDetails.document_description || ""); // Map to document_description
-      setRevisionTime(documentDetails.revision_time || ""); // Map to revision_time
-      setOperations(documentDetails.document_operation || ""); // Map to document_operation
-      setWorkflow(documentDetails.workflow || ""); // Map to workflow
-      setTrainingRequired(documentDetails.trainingRequired || "No"); // If it's part of the response
+      setTitle(documentDetails.document_title || ""); 
+      setType(documentDetails.document_type || ""); 
+      setDocumentNumber(documentDetails.document_number || ""); 
+      setDescription(documentDetails.document_description || ""); 
+      setRevisionTime(documentDetails.revision_time || ""); 
+      setOperations(documentDetails.document_operation || ""); 
+      setWorkflow(documentDetails.workflow || ""); 
+      setTrainingRequired(documentDetails.trainingRequired || "No"); 
     }
   }, [documentDetails]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setOpenSignatureDialog(true);
+    try {
+      await updateDocument({
+        document_id: id,
+        document_title: title,
+        document_type: type,
+        document_number: documentNumber,
+        document_description: description,
+        revision_time: revisionTime,
+        document_operation: operations,
+        workflow,
+        trainingRequired,
+      });
+      setOpenSignatureDialog(true);
+    } catch (error) {
+      console.error("Error updating document:", error);
+    }
   };
 
   const handleClear = () => {
@@ -143,7 +159,7 @@ function EditDocument() {
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                  disabled={documentTypesLoading} // Disable while loading
+                  disabled={documentTypesLoading} 
                 >
                   {documentTypesLoading ? (
                     <MenuItem disabled>Loading...</MenuItem>
@@ -201,7 +217,6 @@ function EditDocument() {
               </RadioGroup>
             </MDBox>
 
-            {/* Upload Template File */}
             <MDBox mb={3}>
               <MDInput
                 type="file"
@@ -227,7 +242,7 @@ function EditDocument() {
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                  disabled={workflowsLoading} // Disable while loading
+                  disabled={workflowsLoading} 
                 >
                   {workflowsLoading ? (
                     <MenuItem disabled>Loading...</MenuItem>
@@ -251,7 +266,6 @@ function EditDocument() {
         </MDBox>
       </Card>
 
-      {/* Signature Dialog */}
       <ESignatureDialog open={openSignatureDialog} onClose={handleCloseSignatureDialog} />
     </BasicLayout>
   );
