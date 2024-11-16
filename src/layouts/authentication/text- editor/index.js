@@ -8,6 +8,7 @@ import { saveAs } from "file-saver";
 import { useParams } from "react-router-dom";
 import ReactDOM from "react-dom";
 import CommentBankIcon from "@mui/icons-material/CommentBank";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import {
   Box,
   Button,
@@ -19,7 +20,8 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useGetTemplateQuery, useCreateDocumentMutation } from "api/auth/texteditorApi";
-import CommentDrawer from "./Comments/CommentDialog";
+import CommentDrawer from "./Comments/CommentsDrawer"; // Adjusted import for CommentDrawer
+import CommentModal from "./Comments/CommentDialog"; // Adjusted import for CommentModal
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -37,7 +39,8 @@ const toolbarOptions = [
   ["clean"],
   [{ indent: "-1" }, { indent: "+1" }],
   ["code-block"],
-  ["comment"],
+  ["comment"], // Custom comment button
+  ["view-comments"], // Custom view comments button
 ];
 
 const DocumentView = () => {
@@ -46,15 +49,14 @@ const DocumentView = () => {
   const quillRef = useRef(null);
   const { id } = useParams();
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [opencommentDialog, setOpencommentDialog] = useState(false);
   const [currentComment, setCurrentComment] = useState("");
   const [selectedRange, setSelectedRange] = useState(null);
   const [comments, setComments] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [createDocument, { isSuccess, isError }] = useCreateDocumentMutation();
+  const [createDocument] = useCreateDocumentMutation();
 
   const { data, error, isLoading } = useGetTemplateQuery(id);
-  console.log("data", data);
-  console.log("document Id: ", id);
 
   useEffect(() => {
     const fetchDocxFile = async () => {
@@ -83,37 +85,65 @@ const DocumentView = () => {
           toolbar: {
             container: toolbarOptions,
             handlers: {
-              comment: () => handleAddComment(),
+              comment: handleAddComment, // Correct handler for adding comments
+              "view-comments": handleOpenCommentsDrawer, // Correct handler for viewing comments
             },
           },
           imageResize: {},
         },
       });
-  
+
       quillRef.current = quill;
       quill.clipboard.dangerouslyPasteHTML(docContent);
-  
+
       comments.forEach(({ range }) => {
         quill.formatText(range.index, range.length, { background: "yellow" });
       });
-  
+
+      // Add icons to the toolbar buttons
       const commentButton = document.querySelector(".ql-comment");
+      const viewCommentsButton = document.querySelector(".ql-view-comments");
+
       if (commentButton) {
-        // Clear existing content
         commentButton.innerHTML = "";
-  
-        // Create an instance of the CommentBankIcon
         const commentIcon = document.createElement("span");
         ReactDOM.render(<CommentBankIcon fontSize="small" />, commentIcon);
-  
-        // Append the rendered icon to the button
         commentButton.appendChild(commentIcon);
+      }
+
+      if (viewCommentsButton) {
+        viewCommentsButton.innerHTML = "";
+        const viewIcon = document.createElement("span");
+        ReactDOM.render(<PlaylistAddCheckIcon fontSize="small" />, viewIcon);
+        viewCommentsButton.appendChild(viewIcon);
       }
     }
   }, [isLoaded, docContent, comments]);
-  
 
-  // Save the document as DOCX
+  const handleOpenCommentsDrawer = () => {
+    setOpenDrawer(true);
+  };
+
+  const handleAddComment = () => {
+    const quill = quillRef.current;
+    const range = quill.getSelection();
+    if (range) {
+      setSelectedRange(range);
+      setOpencommentDialog(true);  // Open modal instead of drawer
+    } else {
+      alert("Please select text to add a comment.");
+    }
+  };
+
+  const handleSaveComment = () => {
+    if (currentComment.trim() === "") return;
+    const quill = quillRef.current;
+    quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
+    setComments([...comments, { id: Date.now(), range: selectedRange, comment: currentComment }]);
+    setCurrentComment("");
+    setOpencommentDialog(false); // Close modal after saving
+  };
+
   const handleSaveAsDocx = async () => {
     const quill = quillRef.current;
     const htmlContent = quill.root.innerHTML;
@@ -135,37 +165,6 @@ const DocumentView = () => {
     });
   };
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.key === "s") {
-        e.preventDefault();
-        setOpenDialog(true);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const handleAddComment = () => {
-    const quill = quillRef.current;
-    const range = quill.getSelection();
-    if (range) {
-      setSelectedRange(range);
-      setOpenDrawer(true);
-    } else {
-      alert("Please select text to add a comment.");
-    }
-  };
-
-  const handleSaveComment = () => {
-    if (currentComment.trim() === "") return;
-    const quill = quillRef.current;
-    quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
-    setComments([...comments, { id: Date.now(), range: selectedRange, comment: currentComment }]);
-    setCurrentComment("");
-    setOpenDrawer(false);
-  };
-
   const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
     const documentData = { document_id: id, document_data: content };
@@ -173,6 +172,7 @@ const DocumentView = () => {
     setOpenDialog(false);
     handleSaveAsDocx();
   };
+
 
   const handleEditComment = (id, newComment) => {
     setComments((prevComments) =>
@@ -182,6 +182,20 @@ const DocumentView = () => {
     );
   };
 
+  const handleSaveEdit = (id, newComment) => {
+    // Check if the new comment is not empty
+    if (newComment.trim() === "") return;
+  
+    // Update the comment in the state
+    setComments((prevComments) =>
+      prevComments.map((comment) =>
+        comment.id === id ? { ...comment, comment: newComment } : comment
+      )
+    );
+  
+    // Close the modal or drawer after saving
+    setOpenDrawer(false);  // Close the drawer or modal after saving the comment
+  };
   if (isLoading) {
     return <Box padding={2}>Loading document...</Box>;
   }
@@ -213,30 +227,31 @@ const DocumentView = () => {
         }}
       />
 
-      {/* Comment Drawer */}
       <CommentDrawer
         open={openDrawer}
         onClose={() => setOpenDrawer(false)}
+        comments={comments}
+        onAddCommentClick={handleAddComment}
+        onEditCommentClick={handleEditComment}
+        handleSaveEdit={handleSaveEdit}
+      />
+
+      <CommentModal
+        open={opencommentDialog}
+        onClose={() => setOpencommentDialog(false)}
         currentComment={currentComment}
         setCurrentComment={setCurrentComment}
         handleSaveComment={handleSaveComment}
-        comments={comments}
-        handleEditComment={handleEditComment}
       />
 
-      {/* Save Confirmation Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Save Document</DialogTitle>
         <DialogContent>
           <DialogContentText>Do you want to save this document?</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmSave} color="primary" variant="contained">
-            Confirm
-          </Button>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button onClick={handleConfirmSave} color="primary">Save</Button>
         </DialogActions>
       </Dialog>
     </Box>

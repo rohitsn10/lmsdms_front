@@ -1,8 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Box, Button, Typography, Drawer, List, ListItem, ListItemText } from "@mui/material";
+import { Box, Button, Typography, Drawer, List, ListItem, ListItemText, TextField } from "@mui/material";
 
-const CommentDrawer = ({ open, onClose, comments, onAddCommentClick, onEditCommentClick }) => {
+const CommentDrawer = ({ open, onClose, comments, onEditCommentClick, handleSaveEdit }) => {
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState("");
+
+  const startEditing = (id, currentText) => {
+    setEditingId(id);
+    setEditText(currentText);
+  };
+
+  const saveEdit = () => {
+    handleSaveEdit(editingId, editText);
+    setEditingId(null);
+    setEditText("");
+  };
+
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box sx={{ width: 300, padding: 2, position: "relative", height: "100%" }}>
@@ -12,23 +26,44 @@ const CommentDrawer = ({ open, onClose, comments, onAddCommentClick, onEditComme
         <List>
           {comments.map(({ id, comment }) => (
             <ListItem key={id} sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-              <ListItemText primary={comment} />
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => onEditCommentClick(id, comment)}
-                sx={{ mt: 1 }}
-              >
-                Edit
-              </Button>
+              {editingId === id ? (
+                <>
+                  <TextField
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                    sx={{ mb: 2 }}
+                  />
+                  <Box>
+                    <Button onClick={saveEdit} variant="contained" color="primary" size="small" sx={{ mr: 1 }}>
+                      Save
+                    </Button>
+                    <Button onClick={() => setEditingId(null)} size="small">
+                      Cancel
+                    </Button>
+                  </Box>
+                </>
+              ) : (
+                <>
+                  <ListItemText primary={comment} />
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => startEditing(id, comment)}
+                    sx={{ mt: 1 }}
+                  >
+                    Edit
+                  </Button>
+                </>
+              )}
             </ListItem>
           ))}
         </List>
         <Button
           variant="contained"
-          onClick={onAddCommentClick}
-          sx={{ mt: 2 }}
-          style={{ backgroundColor: "#E53471", color: "white" }}
+          onClick={onEditCommentClick}
+          sx={{ mt: 2, backgroundColor: "#E53471", color: "white" }}
         >
           Add Comment
         </Button>
@@ -41,8 +76,8 @@ CommentDrawer.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   comments: PropTypes.array.isRequired,
-  onAddCommentClick: PropTypes.func.isRequired,
   onEditCommentClick: PropTypes.func.isRequired,
+  handleSaveEdit: PropTypes.func.isRequired,
 };
 
 export default CommentDrawer;
