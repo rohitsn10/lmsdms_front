@@ -22,6 +22,8 @@ import {
 import { useGetTemplateQuery, useCreateDocumentMutation } from "api/auth/texteditorApi";
 import CommentDrawer from "./Comments/CommentsDrawer"; // Adjusted import for CommentDrawer
 import CommentModal from "./Comments/CommentDialog"; // Adjusted import for CommentModal
+import { useCreateCommentMutation } from 'api/auth/commentsApi';
+
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -55,7 +57,7 @@ const DocumentView = () => {
   const [comments, setComments] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [createDocument] = useCreateDocumentMutation();
-
+  const [createComment] = useCreateCommentMutation();
   const { data, error, isLoading } = useGetTemplateQuery(id);
 
   useEffect(() => {
@@ -120,6 +122,17 @@ const DocumentView = () => {
     }
   }, [isLoaded, docContent, comments]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        setOpenDialog(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const handleOpenCommentsDrawer = () => {
     setOpenDrawer(true);
   };
@@ -135,11 +148,36 @@ const DocumentView = () => {
     }
   };
 
+  // const handleSaveComment = () => {
+  //   if (currentComment.trim() === "") return;
+  //   const quill = quillRef.current;
+  //   quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
+  //   setComments([...comments, { id: Date.now(), range: selectedRange, comment: currentComment }]);
+  //   setCurrentComment("");
+  //   setOpencommentDialog(false); // Close modal after saving
+  // };
+
   const handleSaveComment = () => {
     if (currentComment.trim() === "") return;
+  
     const quill = quillRef.current;
+  
+    // Extract the selected word based on the selected range
+    const selectedText = quill.getText(selectedRange.index, selectedRange.length).trim();
+  
+    // If no text is selected, return early
+    if (!selectedText) return;
+  
+    // Highlight the selected text (optional)
     quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
-    setComments([...comments, { id: Date.now(), range: selectedRange, comment: currentComment }]);
+  
+    // Add the selected word and comment to the comments array
+    setComments([
+      ...comments,
+      { id: Date.now(), selectedWord: selectedText, range: selectedRange, comment: currentComment }
+    ]);
+  
+    // Clear the comment input and close the dialog
     setCurrentComment("");
     setOpencommentDialog(false); // Close modal after saving
   };
@@ -159,7 +197,6 @@ const DocumentView = () => {
         },
       ],
     });
-
     Packer.toBlob(docxDocument).then((blob) => {
       saveAs(blob, "document.docx");
     });
@@ -168,8 +205,39 @@ const DocumentView = () => {
   const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
     const documentData = { document_id: id, document_data: content };
+  
+    // Save the document data (existing functionality)
     await createDocument(documentData);
+  
+    // Prepare the comments data as an object where the key is the selected word and the value is the comment
+    const commentsObject = {};
+  
+    comments.forEach((comment, index) => {
+      console.log("Comment Object:", comment);
+  
+      // Ensure 'selectedWord' exists and is a valid string
+      if (comment.selectedWord && comment.selectedWord.trim()) {
+        const key = comment.selectedWord.trim(); // Use the selected word as the key
+        commentsObject[key] = comment.comment; // Map the word to the comment
+      } else {
+        // Fallback if selectedWord is not available
+        const fallbackKey = `comment-${index}`;
+        commentsObject[fallbackKey] = comment.comment;
+      }
+    });
+  
+    console.log("Comments Object:", commentsObject);  // Log the final object to verify the structure
+  
+    // Send comments data to the backend as a single object under 'comment_description'
+    await createComment({
+      document: id, // Document ID
+      comment_description: commentsObject, // All comments as key-value pairs
+    }).unwrap(); // Handle promise rejection
+  
+    // Close the dialog after saving
     setOpenDialog(false);
+  
+    // Save the document as a .docx file if needed
     handleSaveAsDocx();
   };
 
@@ -180,6 +248,7 @@ const DocumentView = () => {
         comment.id === id ? { ...comment, comment: newComment } : comment
       )
     );
+    console.log("Edit comment clicked");
   };
 
   const handleSaveEdit = (id, newComment) => {
@@ -226,7 +295,7 @@ const DocumentView = () => {
           boxShadow: 2,
         }}
       />
-
+      
       <CommentDrawer
         open={openDrawer}
         onClose={() => setOpenDrawer(false)}
@@ -235,6 +304,7 @@ const DocumentView = () => {
         onEditCommentClick={handleEditComment}
         handleSaveEdit={handleSaveEdit}
       />
+     
 
       <CommentModal
         open={opencommentDialog}
@@ -247,7 +317,7 @@ const DocumentView = () => {
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Save Document</DialogTitle>
         <DialogContent>
-          <DialogContentText>Do you want to save this document?</DialogContentText>
+          <DialogContentText>Do you want to save this document & All comments ?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>

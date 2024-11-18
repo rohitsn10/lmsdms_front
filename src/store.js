@@ -11,6 +11,7 @@ import { dashboardApi } from "api/auth/dashboardApi";
 import { esignatureApi } from "api/auth/esignatureApi";
 import { permissionApi } from "api/auth/permissionApi";
 import { editDocumentApi } from "api/auth/editDocumentApi";
+import { commentApi } from "api/auth/commentsApi";
 
 const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ const store = configureStore({
     [esignatureApi.reducerPath]:esignatureApi.reducer,
     [permissionApi.reducerPath]:permissionApi.reducer,
     [editDocumentApi.reducerPath]: editDocumentApi.reducer,
+    [commentApi.reducerPath]: commentApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -41,6 +43,7 @@ const store = configureStore({
       esignatureApi.middleware,
       permissionApi.middleware,
       editDocumentApi.middleware,
+      commentApi.middleware,
     ),
 });
 

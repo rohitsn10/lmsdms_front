@@ -81,7 +81,6 @@ function AddDocument() {
     setTrainingRequired("No");
     setTemplate("");
   };
-
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
     navigate("/document-listing");

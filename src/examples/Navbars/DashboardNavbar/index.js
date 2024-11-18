@@ -21,6 +21,7 @@ import MDInput from "components/MDInput";
 // Material Dashboard 2 React example components
 import Breadcrumbs from "examples/Breadcrumbs";
 import RolesPermissionsPopup from "layouts/authentication/roles-permission";
+import RoleSwitchPopup from "layouts/authentication/switch-role";
 
 // Custom styles for DashboardNavbar
 import {
