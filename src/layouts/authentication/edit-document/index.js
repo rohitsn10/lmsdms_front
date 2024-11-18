@@ -74,6 +74,7 @@ function EditDocument() {
         document_description: description,
         revision_time: revisionTime,
         document_operation: operations,
+        select_template:templateFile,
         workflow,
         trainingRequired,
       });

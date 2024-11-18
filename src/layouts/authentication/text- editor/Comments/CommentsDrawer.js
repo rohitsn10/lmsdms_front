@@ -65,7 +65,7 @@ const CommentDrawer = ({ open, onClose, comments, onEditCommentClick, handleSave
           onClick={onEditCommentClick}
           sx={{ mt: 2, backgroundColor: "#E53471", color: "white" }}
         >
-          Add Comment
+          Add All Comment
         </Button>
       </Box>
     </Drawer>
