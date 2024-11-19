@@ -1,4 +1,3 @@
-// src/api/inventoryApi.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import config from "constants/config";
 
@@ -15,6 +14,7 @@ export const inventoryApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ['Inventory'], // Define a tag type for inventory data
   endpoints: (builder) => ({
     // Mutation to create a new inventory
     createInventory: builder.mutation({
@@ -23,7 +23,7 @@ export const inventoryApi = createApi({
         method: "POST",
         body: inventoryData, // Ensure this matches backend expectations
       }),
-      invalidatesTags: [{ type: "Inventory", id: "LIST" }],
+      invalidatesTags: [{ type: "Inventory", id: "LIST" }], // Invalidate the inventory list cache after creation
       transformResponse: (response) => response.data,
     }),
 
@@ -34,7 +34,7 @@ export const inventoryApi = createApi({
         method: "PUT",
         body: inventoryData,
       }),
-      invalidatesTags: [{ type: "Inventory", id: "LIST" }],
+      invalidatesTags: [{ type: "Inventory", id: "LIST" }], // Invalidate the inventory list cache after update
       transformResponse: (response) => response.data,
     }),
 
@@ -44,8 +44,8 @@ export const inventoryApi = createApi({
         url: "dms_module/ViewInventory",
         method: "GET",
       }),
-      providesTags: [{ type: "Inventory", id: "LIST" }],
-      transformResponse: (response) => response.data || [],
+      providesTags: [{ type: "Inventory", id: "LIST" }], // Tag the response data for inventory list
+      transformResponse: (response) => response.data || [], // Return an empty array if no data
     }),
 
     // Mutation to delete an existing inventory
@@ -54,7 +54,7 @@ export const inventoryApi = createApi({
         url: `dms_module/DeleteInventory/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "Inventory", id: "LIST" }],
+      invalidatesTags: [{ type: "Inventory", id: "LIST" }], // Invalidate the inventory list cache after deletion
       transformResponse: (response) => response.data,
     }),
   }),
