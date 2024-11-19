@@ -250,7 +250,7 @@ export default function App() {
       <CssBaseline />
       <div>
 
-      {layout === "dashboard" && !isTextEditor && pathname !== "/user-listing" && pathname !== "/document-listing" && pathname !== "/workflow-listing" &&  pathname !== "/document-typelisting" && pathname !== "/status-list" && pathname !== "/template-listing" && pathname !== "/department-listing" && pathname !== "/inventory-list"&& pathname !== "/roles-listing" && pathname !== "/add-permissions" && !/^\/document-view\/\d+$/.test(pathname) &&(
+      {layout === "dashboard" && (
 
             <>
               <Sidenav

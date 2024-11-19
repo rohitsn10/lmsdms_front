@@ -23,7 +23,7 @@ const DepartmentListing = () => {
         serial_number: index + 1,
         department_name: item.department_name || "N/A",
         department_description: item.department_description || "N/A",
-        created_at: new Date(item.created_at).toLocaleDateString(),
+        department_created_at: new Date(item.department_created_at).toLocaleDateString(),
     }));
 
     const handleSearch = (event) => {
@@ -60,7 +60,7 @@ const DepartmentListing = () => {
 
     return (
         <MDBox p={3}>
-            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3 }}>
+            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
                 <MDBox p={3} display="flex" alignItems="center">
                     <MDInput
                         label="Search"

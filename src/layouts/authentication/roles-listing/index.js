@@ -58,7 +58,7 @@ const RolesPermissionsListing = () => {
     const columns = [
         { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: 'center' },
         { field: "role", headerName: "Role", flex: 1, headerAlign: 'center' },
-        { field: "added_date", headerName: "Added Date", flex: 1, headerAlign: 'center' },
+        // { field: "added_date", headerName: "Added Date", flex: 1, headerAlign: 'center' },
         {
             field: "action",
             headerName: "Action",
@@ -74,7 +74,7 @@ const RolesPermissionsListing = () => {
 
     return (
         <MDBox p={3}>
-            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3 }}>
+            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
                 <MDBox p={3} display="flex" alignItems="center">
                     <MDInput
                         label="Search"
