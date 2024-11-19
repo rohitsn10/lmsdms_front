@@ -34,6 +34,7 @@ function AddTemplate() {
     try {
       const response = await createTemplate(formData).unwrap(); //yaha pe sirf formdata jana chahiye only
       console.log("RESPONSE", response);
+      setOpenSignatureDialog(true);
     } catch (error) {
       console.error("Error in template action:", error);
     }
@@ -111,10 +112,8 @@ function AddTemplate() {
             </MDBox>
           </MDBox>
         </MDBox>
-      </Card>
-
-      {/* E-Signature Dialog */}
       <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      </Card>
     </BasicLayout>
   );
 }
