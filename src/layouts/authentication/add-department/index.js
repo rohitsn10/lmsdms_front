@@ -40,7 +40,7 @@ function AddDepartment() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/dashboard");
+    navigate("/department-listing");
   };
 
   return (

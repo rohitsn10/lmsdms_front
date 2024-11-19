@@ -8,6 +8,7 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import { useUpdateDeleteDepartmentMutation } from "api/auth/departmentApi";  
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 
 const UpdateDepartment = () => {
     const { state } = useLocation();
@@ -15,6 +16,7 @@ const UpdateDepartment = () => {
     const [departmentName, setDepartmentName] = useState(state?.department.department_name || "");
     const [departmentDescription, setDepartmentDescription] = useState(state?.department.department_description || "");
     const [updateDeleteDepartment, { isLoading }] = useUpdateDeleteDepartmentMutation(); // Updated hook
+    const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,7 +26,7 @@ const UpdateDepartment = () => {
                 department_name: departmentName,
                 department_description: departmentDescription,
             }).unwrap();
-
+            setOpenSignatureDialog(true);
             console.log("API Response:", response);
 
             if (response.status) {
@@ -41,6 +43,12 @@ const UpdateDepartment = () => {
         setDepartmentName("");
         setDepartmentDescription("");
     };
+
+    const handleCloseSignatureDialog = () => {
+        setOpenSignatureDialog(false);
+        navigate("/department-listing");
+      };
+    
 
     return (
         <BasicLayout image={bgImage} showNavbarFooter={false}>
@@ -103,6 +111,7 @@ const UpdateDepartment = () => {
                     </MDBox>
                 </MDBox>
             </Card>
+            <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
         </BasicLayout>
     );
 };
