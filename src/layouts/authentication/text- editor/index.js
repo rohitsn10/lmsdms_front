@@ -23,6 +23,7 @@ import { useGetTemplateQuery, useCreateDocumentMutation } from "api/auth/textedi
 import CommentDrawer from "./Comments/CommentsDrawer"; // Adjusted import for CommentDrawer
 import CommentModal from "./Comments/CommentDialog"; // Adjusted import for CommentModal
 import { useCreateCommentMutation } from 'api/auth/commentsApi';
+import AntiCopyPattern from "layouts/authentication/text- editor/anti-copy/AntiCopyPattern"
 
 
 // Register the ImageResize module
@@ -279,15 +280,20 @@ const DocumentView = () => {
         padding: 2,
         backgroundColor: "#f4f4f4",
         minHeight: "100vh",
+        position: "relative",  // Ensure this container has a relative position
       }}
     >
+      {/* Insert AntiCopyPattern as the background */}
+      <AntiCopyPattern />
+
       <Paper
         id="editor-container"
         sx={{
+          position: "relative",  // Ensure editor is on top of the pattern
           width: "210mm",
           height: "297mm",
           border: "1px solid #ccc",
-          backgroundColor: "#fff",
+          // backgroundColor: "#fff",
           padding: 2,
           borderRadius: 1,
           overflowY: "auto",

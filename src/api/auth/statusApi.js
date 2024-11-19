@@ -14,6 +14,7 @@ export const statusApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ['Status'], // Define a tag type for status data
   endpoints: (builder) => ({
     // Mutation to create a new status
     createStatus: builder.mutation({
@@ -22,12 +23,12 @@ export const statusApi = createApi({
         method: 'POST',
         body: { status },
       }),
-      // Invalidate cache and refetch viewStatus data
+      // Invalidate the cache for the status list after creation
       invalidatesTags: [{ type: 'Status', id: 'LIST' }],
       onQueryStarted: async (status, { dispatch, queryFulfilled }) => {
         try {
           await queryFulfilled; // Wait for the mutation to complete
-          // After creating the status, invalidate and refetch the list of statuses
+          // Invalidate and refetch the status list after creating a new status
           dispatch(statusApi.util.invalidateTags([{ type: 'Status', id: 'LIST' }]));
         } catch (error) {
           console.error('Error creating status:', error);
@@ -42,12 +43,12 @@ export const statusApi = createApi({
         method: 'PUT',
         body: { status },
       }),
-      // Invalidate cache and refetch viewStatus data
+      // Invalidate the cache for the status list after update
       invalidatesTags: [{ type: 'Status', id: 'LIST' }],
       onQueryStarted: async ({ id, status }, { dispatch, queryFulfilled }) => {
         try {
           await queryFulfilled;  // Wait for the mutation to complete
-          // Invalidate the cache and refetch data after updating status
+          // Invalidate and refetch the status list after updating
           dispatch(statusApi.util.invalidateTags([{ type: 'Status', id: 'LIST' }]));
         } catch (error) {
           console.error('Error updating status:', error);
@@ -61,8 +62,9 @@ export const statusApi = createApi({
         url: 'dms_module/view_status',
         method: 'GET',
       }),
-      providesTags: ['Status'],  // This tag will be invalidated after mutations
-      transformResponse: (response) => response.data || [],
+      // Tagging the response data with 'Status' so that it can be invalidated later
+      providesTags: [{ type: 'Status', id: 'LIST' }],
+      transformResponse: (response) => response.data || [],  // Return an empty array if no data is available
     }),
 
     // Mutation to delete an existing status
@@ -71,12 +73,12 @@ export const statusApi = createApi({
         url: `dms_module/delete_status/${id}`,
         method: 'DELETE',
       }),
-      // Invalidate cache and refetch viewStatus data
+      // Invalidate the cache for the status list after deletion
       invalidatesTags: [{ type: 'Status', id: 'LIST' }],
       onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
         try {
-          await queryFulfilled;  // Wait for the mutation to complete
-          // Invalidate the cache and refetch data after deleting status
+          await queryFulfilled; // Wait for the mutation to complete
+          // Invalidate and refetch the status list after deletion
           dispatch(statusApi.util.invalidateTags([{ type: 'Status', id: 'LIST' }]));
         } catch (error) {
           console.error('Error deleting status:', error);

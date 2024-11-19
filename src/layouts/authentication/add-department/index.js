@@ -40,7 +40,7 @@ function AddDepartment() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/dashboard");
+    navigate("/department-listing");
   };
 
   return (
@@ -105,6 +105,7 @@ function AddDepartment() {
 
       {/* E-Signature Dialog */}
       <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      
     </BasicLayout>
   );
 }

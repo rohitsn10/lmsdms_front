@@ -14,6 +14,7 @@ export const userApi = createApi({
             return headers;
         },
     }),
+    tagTypes: ['UserList'], // Define a tag for the user list data
     endpoints: (builder) => ({
         createUser: builder.mutation({
             query: (body) => ({
@@ -21,9 +22,12 @@ export const userApi = createApi({
                 method: 'POST',
                 body,
             }),
+            invalidatesTags: ['UserList'], // Invalidate the user list cache after user creation
         }),
+
         userList: builder.query({
             query: () => 'user_profile/user_list',
+            providesTags: ['UserList'], // Tag the user list data for cache management
         }),
     }),
 });
