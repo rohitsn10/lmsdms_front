@@ -170,7 +170,6 @@ const routes = [
   //   route: "/add-approval",
   //   component: <AddApproval />,
   // },
-   
   {
     type: "collapse",
     name: "Status",
@@ -179,7 +178,6 @@ const routes = [
     route: "/status-list",
     component: <StatusListing />,
   },
-
   {
     type: "collapse",
     name: "Document Type",
@@ -196,8 +194,6 @@ const routes = [
     route: "/template-listing",
     component: <TemplateListing/>,
   },
-
-
   {
     type: "collapse",
     name: "inventory",
@@ -206,7 +202,6 @@ const routes = [
     route: "/inventory-list",
     component: <InventoryListing />,
   },
-
   {
     type: "collapse",
     name: "Roles",
@@ -215,7 +210,6 @@ const routes = [
     route: "/roles-listing",
     component: <RolesPermissionsListing />,
   },
-  
 ];
 
 export default routes;

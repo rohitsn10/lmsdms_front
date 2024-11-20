@@ -14,7 +14,6 @@ import { Link } from 'react-router-dom';
 
 function Dashboard() {
   const { data, error, isLoading } = useGetDashboardCountsQuery(); // Fetch the dashboard counts
-
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading dashboard data</div>;
 

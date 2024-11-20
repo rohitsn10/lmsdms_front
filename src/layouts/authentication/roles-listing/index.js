@@ -45,16 +45,13 @@ const RolesPermissionsListing = () => {
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
     };
-
     const handleEditRole = (role) => {
         navigate("/update-role", { state: { role } });
     };
-
     const filteredData = formattedData.filter(
         (role) =>
             role.role.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
     const columns = [
         { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: 'center' },
         { field: "role", headerName: "Role", flex: 1, headerAlign: 'center' },
@@ -71,7 +68,6 @@ const RolesPermissionsListing = () => {
             ),
         },
     ];
-
     return (
         <MDBox p={3}>
             <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
@@ -87,7 +83,7 @@ const RolesPermissionsListing = () => {
                     <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
                         Roles & Permissions
                     </MDTypography>
-                    <MDButton variant="contained" color="primary" onClick={() => navigate("/add-role")} sx={{ ml: 2 }}>
+                    <MDButton variant="contained" color="primary" onClick={() => navigate("/add-permissions")} sx={{ ml: 2 }}>
                         Add Role
                     </MDButton>
                 </MDBox>
