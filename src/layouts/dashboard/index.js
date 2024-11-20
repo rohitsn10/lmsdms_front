@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 
 function Dashboard() {
   const { data, error, isLoading } = useGetDashboardCountsQuery(); // Fetch the dashboard counts
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading dashboard data</div>;
 
@@ -32,7 +33,7 @@ function Dashboard() {
                   count={data.user_count} // Dynamic count from API response
                   percentage={{
                     color: "success",
-                    label: "Just updated",
+                    label: "Updated yesterday",
                   }}
                 />
               </Link>
@@ -48,7 +49,7 @@ function Dashboard() {
                   count={data.document_count} // Dynamic count from API response
                   percentage={{
                     color: "success",
-                    label: "Updated last month",
+                    label: "Just updated",
                   }}
                 />
               </Link>

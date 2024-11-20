@@ -54,6 +54,7 @@ import TemplateListing from "layouts/authentication/template-listing";
 import InventoryListing from "layouts/authentication/inventory-handle";
 import DepartmentListing from "layouts/authentication/department-listing";
 import RolesPermissionsListing from "layouts/authentication/roles-listing";
+import PrintApprovalListing from "layouts/authentication/approval-lisitng";
 
 const routes = [
   // {
@@ -162,14 +163,7 @@ const routes = [
     route: "/workflow-listing",
     component: <WorkflowListing/>,
   },
-  // {
-  //   type: "collapse",
-  //   name: "AddApproval",
-  //   key: "add-approval",
-  //   icon: <Icon fontSize="small">notifications</Icon>,
-  //   route: "/add-approval",
-  //   component: <AddApproval />,
-  // },
+
   {
     type: "collapse",
     name: "Status",
@@ -209,6 +203,14 @@ const routes = [
     icon: <ApartmentIcon/>,
     route: "/roles-listing",
     component: <RolesPermissionsListing />,
+  },
+  {
+    type: "collapse",
+    name: "Approvel",
+    key: "approval-listing",
+    icon: <Icon fontSize="small">notifications</Icon>,
+    route: "/approval-listing",
+    component: <PrintApprovalListing />,
   },
 ];
 

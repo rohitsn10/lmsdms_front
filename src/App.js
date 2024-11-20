@@ -48,6 +48,7 @@ import UpdateDepartment from "layouts/authentication/add-department/updatedepart
 import RolesPermissionsListing from "layouts/authentication/roles-listing/index.js";
 import PermissionsTable from "layouts/authentication/add-permissions/index.js";
 import EditDocument from "layouts/authentication/edit-document/index.js";
+import PrintApprovalListing from "layouts/authentication/approval-lisitng/index.js";
 
 //Lms components
 
@@ -228,7 +229,7 @@ export default function App() {
       <Route path="/add-approval" element={<AddApproval />} />
       <Route path="/forgotpassword" element={<ResetPassword />} />
       <Route path="/e-sign" element={<ESignatureDialog />} />
-      <Route path="/print-document" element={<PrintDocument />} />
+      <Route path="/print-document/:id" element={<PrintDocument />} />
       <Route path="/release-document" element={<ReleaseDocument />} />
       <Route path="/Review" element={<ReviewDocument />} />
       <Route path="/watermark" element={<Watermark />} />
@@ -249,6 +250,7 @@ export default function App() {
       <Route path="/department-listing" element={<DepartmentListing />} />
       <Route path="/update-department" element={<UpdateDepartment />} />
       <Route path="/add-permissions" element={<PermissionsTable />} />
+      <Route path="/approval-listing" element={<PrintApprovalListing />} />
 
       {/* Lms components */}
       <Route path="/add-area" element={<AddArea />} />

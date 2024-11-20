@@ -19,12 +19,14 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import MDBox from "components/MDBox";
+import MDButton from "components/MDButton";
 import { useGetTemplateQuery, useCreateDocumentMutation } from "api/auth/texteditorApi";
 import CommentDrawer from "./Comments/CommentsDrawer"; // Adjusted import for CommentDrawer
 import CommentModal from "./Comments/CommentDialog"; // Adjusted import for CommentModal
-import { useCreateCommentMutation } from 'api/auth/commentsApi';
-import AntiCopyPattern from "layouts/authentication/text- editor/anti-copy/AntiCopyPattern"
-
+import { useCreateCommentMutation } from "api/auth/commentsApi";
+import AntiCopyPattern from "layouts/authentication/text- editor/anti-copy/AntiCopyPattern";
+import { useNavigate } from "react-router-dom";
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -60,6 +62,7 @@ const DocumentView = () => {
   const [createDocument] = useCreateDocumentMutation();
   const [createComment] = useCreateCommentMutation();
   const { data, error, isLoading } = useGetTemplateQuery(id);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDocxFile = async () => {
@@ -143,7 +146,7 @@ const DocumentView = () => {
     const range = quill.getSelection();
     if (range) {
       setSelectedRange(range);
-      setOpencommentDialog(true);  // Open modal instead of drawer
+      setOpencommentDialog(true); // Open modal instead of drawer
     } else {
       alert("Please select text to add a comment.");
     }
@@ -160,27 +163,31 @@ const DocumentView = () => {
 
   const handleSaveComment = () => {
     if (currentComment.trim() === "") return;
-  
+
     const quill = quillRef.current;
-  
+
     // Extract the selected word based on the selected range
     const selectedText = quill.getText(selectedRange.index, selectedRange.length).trim();
-  
+
     // If no text is selected, return early
     if (!selectedText) return;
-  
+
     // Highlight the selected text (optional)
     quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
-  
+
     // Add the selected word and comment to the comments array
     setComments([
       ...comments,
-      { id: Date.now(), selectedWord: selectedText, range: selectedRange, comment: currentComment }
+      { id: Date.now(), selectedWord: selectedText, range: selectedRange, comment: currentComment },
     ]);
-  
+
     // Clear the comment input and close the dialog
     setCurrentComment("");
     setOpencommentDialog(false); // Close modal after saving
+  };
+  const handlePrint = () => {
+    console.log("Id passed:",id)
+    navigate(`/print-document/${id}`);
   };
 
   const handleSaveAsDocx = async () => {
@@ -206,16 +213,16 @@ const DocumentView = () => {
   const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
     const documentData = { document_id: id, document_data: content };
-  
+
     // Save the document data (existing functionality)
     await createDocument(documentData);
-  
+
     // Prepare the comments data as an object where the key is the selected word and the value is the comment
     const commentsObject = {};
-  
+
     comments.forEach((comment, index) => {
       console.log("Comment Object:", comment);
-  
+
       // Ensure 'selectedWord' exists and is a valid string
       if (comment.selectedWord && comment.selectedWord.trim()) {
         const key = comment.selectedWord.trim(); // Use the selected word as the key
@@ -226,22 +233,21 @@ const DocumentView = () => {
         commentsObject[fallbackKey] = comment.comment;
       }
     });
-  
-    console.log("Comments Object:", commentsObject);  // Log the final object to verify the structure
-  
+
+    console.log("Comments Object:", commentsObject); // Log the final object to verify the structure
+
     // Send comments data to the backend as a single object under 'comment_description'
     await createComment({
       document: id, // Document ID
       comment_description: commentsObject, // All comments as key-value pairs
     }).unwrap(); // Handle promise rejection
-  
+
     // Close the dialog after saving
     setOpenDialog(false);
-  
+
     // Save the document as a .docx file if needed
     handleSaveAsDocx();
   };
-
 
   const handleEditComment = (id, newComment) => {
     setComments((prevComments) =>
@@ -255,16 +261,16 @@ const DocumentView = () => {
   const handleSaveEdit = (id, newComment) => {
     // Check if the new comment is not empty
     if (newComment.trim() === "") return;
-  
+
     // Update the comment in the state
     setComments((prevComments) =>
       prevComments.map((comment) =>
         comment.id === id ? { ...comment, comment: newComment } : comment
       )
     );
-  
+
     // Close the modal or drawer after saving
-    setOpenDrawer(false);  // Close the drawer or modal after saving the comment
+    setOpenDrawer(false); // Close the drawer or modal after saving the comment
   };
   if (isLoading) {
     return <Box padding={2}>Loading document...</Box>;
@@ -280,16 +286,27 @@ const DocumentView = () => {
         padding: 2,
         backgroundColor: "#f4f4f4",
         minHeight: "100vh",
-        position: "relative",  // Ensure this container has a relative position
+        position: "relative", // Ensure this container has a relative position
       }}
     >
       {/* Insert AntiCopyPattern as the background */}
       <AntiCopyPattern />
-
+      <MDButton
+      variant="gradient"
+      color="submit"
+      onClick={handlePrint} // Use onClick to trigger navigation
+      sx={{
+        float: "right",
+        mt: 1,
+        mr: 1,
+      }}
+    >
+      Print
+    </MDButton>
       <Paper
         id="editor-container"
         sx={{
-          position: "relative",  // Ensure editor is on top of the pattern
+          position: "relative", // Ensure editor is on top of the pattern
           width: "210mm",
           height: "297mm",
           border: "1px solid #ccc",
@@ -301,7 +318,7 @@ const DocumentView = () => {
           boxShadow: 2,
         }}
       />
-      
+
       <CommentDrawer
         open={openDrawer}
         onClose={() => setOpenDrawer(false)}
@@ -310,7 +327,6 @@ const DocumentView = () => {
         onEditCommentClick={handleEditComment}
         handleSaveEdit={handleSaveEdit}
       />
-     
 
       <CommentModal
         open={opencommentDialog}
@@ -327,9 +343,20 @@ const DocumentView = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleConfirmSave} color="primary">Save</Button>
+          <Button onClick={handleConfirmSave} color="primary">
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
+
+      <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
+        <MDButton variant="gradient" color="submit" type="submit">
+          Submit
+        </MDButton>
+        <MDButton variant="gradient" color="submit">
+          Save Draft
+        </MDButton>
+      </MDBox>
     </Box>
   );
 };
