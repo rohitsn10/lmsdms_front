@@ -10,9 +10,9 @@ import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/material";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
 import { useCreateUserMutation } from 'api/auth/userApi'; 
+import { useFetchDepartmentsQuery } from 'api/auth/departmentApi'; 
 
 const roles = ["Author", "Purchase", "Reviewer", "Approver", "Doc_Admin"];
-const departments = ["HR", "Finance", "IT", "Sales"]; 
 
 function AddUser() {
   const [firstName, setFirstName] = useState("");
@@ -29,6 +29,9 @@ function AddUser() {
   const navigate = useNavigate(); 
   const [createUser, { isLoading }] = useCreateUserMutation(); 
 
+  // Fetch departments using the hook
+  const { data: departmentsData, error, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true); 
@@ -38,14 +41,13 @@ function AddUser() {
       employee_id: employeeId,
       email: email,
       user_role: userRole,
-      department: department,
+      department_id: department,
       joining_date: joiningDate,
       job_position: jobPosition,
     };
 
     try {
       await createUser(userData).unwrap();
-      
       setOpenSignatureDialog(true);
     } catch (error) {
       console.error("Failed to create user:", error);
@@ -74,8 +76,8 @@ function AddUser() {
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto", mt: 10, mb: 10 }}>
         <MDBox
-           borderRadius="lg"
-           sx={{
+          borderRadius="lg"
+          sx={{
             background: "linear-gradient(212deg, #d5b282, #f5e0c3)",
             borderRadius: "lg",
             mx: 2,
@@ -89,6 +91,7 @@ function AddUser() {
             Add User
           </MDTypography>
         </MDBox>
+
         <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
           <MDButton
             variant="outlined"
@@ -164,6 +167,7 @@ function AddUser() {
                 </Select>
               </FormControl>
             </MDBox>
+            
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-department-label">Department</InputLabel>
@@ -180,15 +184,21 @@ function AddUser() {
                       padding: "0.75rem",
                     },
                   }}
+                  disabled={isDepartmentsLoading} // Disable dropdown while loading
                 >
-                  {departments.map((dept) => (
-                    <MenuItem key={dept} value={dept}>
-                      {dept}
-                    </MenuItem>
-                  ))}
+                  {isDepartmentsLoading ? (
+                    <MenuItem disabled>Loading departments...</MenuItem>
+                  ) : (
+                    departmentsData?.map((dept) => (
+                      <MenuItem key={dept.id} value={dept.id}>
+                        {dept.department_id}
+                      </MenuItem>
+                    ))
+                  )}
                 </Select>
               </FormControl>
             </MDBox>
+            
             <MDBox mb={3}>
               <MDInput
                 type="date"

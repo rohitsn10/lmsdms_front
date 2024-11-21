@@ -4,7 +4,7 @@ import config from 'constants/config';
 export const dashboardApi = createApi({
   reducerPath: 'dashboardApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: config.BACKEND_API_URL, // Make sure to replace with your actual backend API URL
+    baseUrl: config.BACKEND_API_URL, 
     prepareHeaders: (headers) => {
       const token = sessionStorage.getItem('token');
       if (token) {
@@ -18,7 +18,7 @@ export const dashboardApi = createApi({
     // Query to fetch dashboard counts
     getDashboardCounts: builder.query({
       query: () => 'dms_module/DashboardCount',
-      transformResponse: (response) => response.data,  // Ensure response data is correctly formatted
+      transformResponse: (response) => response.data,  
     }),
   }),
 });

@@ -15,7 +15,7 @@ export const departmentApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Departments'], // Add a tag type for departments
+  tagTypes: ['Departments'],
   endpoints: (builder) => ({
     createDepartment: builder.mutation({
       query: ({ department_name, department_description }) => ({
@@ -29,7 +29,7 @@ export const departmentApi = createApi({
         }
         throw new Error(response.message || 'Failed to create department');
       },
-      invalidatesTags: ['Departments'], // Invalidate department data to trigger refetch
+      invalidatesTags: ['Departments'], 
     }),
 
     fetchDepartments: builder.query({
@@ -43,7 +43,7 @@ export const departmentApi = createApi({
         }
         throw new Error(response.message || 'Failed to fetch departments');
       },
-      providesTags: ['Departments'], // Tag department data for cache management
+      providesTags: ['Departments'], 
     }),
 
     updateDeleteDepartment: builder.mutation({
@@ -58,7 +58,7 @@ export const departmentApi = createApi({
         }
         throw new Error(response.message || 'Failed to update/delete department');
       },
-      invalidatesTags: ['Departments'], // Invalidate department data to trigger refetch
+      invalidatesTags: ['Departments'], 
     }),
   }),
 });
