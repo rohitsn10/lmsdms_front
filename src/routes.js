@@ -206,7 +206,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Approvel",
+    name: "Approval",
     key: "approval-listing",
     icon: <Icon fontSize="small">notifications</Icon>,
     route: "/approval-listing",
