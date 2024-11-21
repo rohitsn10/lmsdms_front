@@ -9,7 +9,7 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/material";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
-import { useCreateUserMutation } from 'api/auth/userApi'; // Import your API hook
+import { useCreateUserMutation } from 'api/auth/userApi'; 
 
 const roles = ["Author", "Purchase", "Reviewer", "Approver", "Doc_Admin"];
 const departments = ["HR", "Finance", "IT", "Sales"]; 
@@ -24,15 +24,14 @@ function AddUser() {
   const [joiningDate, setJoiningDate] = useState("");
   const [jobPosition, setJobPosition] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // New state to manage submission status
+  const [isSubmitting, setIsSubmitting] = useState(false); 
 
   const navigate = useNavigate(); 
-  const [createUser, { isLoading }] = useCreateUserMutation(); // Create user mutation
+  const [createUser, { isLoading }] = useCreateUserMutation(); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true); // Set submitting state to true
-    // Prepare the user data for submission
+    setIsSubmitting(true); 
     const userData = {
       first_name: firstName,
       last_name: lastName,

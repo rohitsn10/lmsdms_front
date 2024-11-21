@@ -49,6 +49,7 @@ import RolesPermissionsListing from "layouts/authentication/roles-listing/index.
 import PermissionsTable from "layouts/authentication/add-permissions/index.js";
 import EditDocument from "layouts/authentication/edit-document/index.js";
 import PrintApprovalListing from "layouts/authentication/approval-lisitng/index.js";
+import PermissionsUpdate from "layouts/authentication/add-permissions/update-permissions.js";
 
 //Lms components
 
@@ -251,6 +252,7 @@ export default function App() {
       <Route path="/update-department" element={<UpdateDepartment />} />
       <Route path="/add-permissions" element={<PermissionsTable />} />
       <Route path="/approval-listing" element={<PrintApprovalListing />} />
+      <Route path="/update-permissions" element={<PermissionsUpdate/>} />
 
       {/* Lms components */}
       <Route path="/add-area" element={<AddArea />} />
@@ -268,6 +270,7 @@ export default function App() {
       <Route path="/training-matrix" element={<TrainingMatrix />} />
       <Route path="/exam-result" element={<ExamResultsReport />} />
       <Route path="/training-progressreport" element={<TrainingProgressReport />} />
+      
 
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>

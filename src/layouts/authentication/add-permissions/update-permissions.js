@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useFetchPermissionsQuery, useCreateGroupWithPermissionsMutation } from 'api/auth/permissionApi';
+import PropTypes from 'prop-types'; // Add PropTypes import
+import { useFetchPermissionsQuery, useCreateGroupWithPermissionsMutation, useFetchPermissionsByGroupIdQuery } from 'api/auth/permissionApi'; // Use `useFetchPermissionsByGroupIdQuery` instead of `useGetGroupPermissionsQuery`
 import { Card, Checkbox, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import MDBox from 'components/MDBox';
@@ -7,22 +8,23 @@ import MDTypography from 'components/MDTypography';
 import MDInput from 'components/MDInput';
 import MDButton from 'components/MDButton';
 
-const PermissionsTable = () => {
+const PermissionsUpdate = ({ groupId }) => {
     const { data: permissions = [], isLoading, error } = useFetchPermissionsQuery();
+    const { data: groupPermissions, isLoading: isGroupLoading, error: groupError } = useFetchPermissionsByGroupIdQuery(groupId); // Using `useFetchPermissionsByGroupIdQuery`
     const [permissionState, setPermissionState] = useState({});
-    const [searchTerm, setSearchTerm] = useState('');
     const [groupName, setGroupName] = useState('');
-    const [createGroupWithPermissions, { isLoading: isCreatingGroup, error: groupCreationError }] = useCreateGroupWithPermissionsMutation();
+    const [updateGroupPermissions, { isLoading: isUpdating, error: updateError }] = useCreateGroupWithPermissionsMutation();
 
     useEffect(() => {
         if (permissions.length > 0) {
             const initialState = {};
             permissions.forEach((perm) => {
+                const groupPermission = groupPermissions?.data.find(gp => gp.name === perm.name) || {};
                 initialState[perm.name] = {
-                    isAdd: false,
-                    isView: false,
-                    isChange: false,
-                    isDelete: false,
+                    isAdd: groupPermission.isAdd || false,
+                    isView: groupPermission.isView || false,
+                    isChange: groupPermission.isChange || false,
+                    isDelete: groupPermission.isDelete || false,
                     addId: perm.add,
                     viewId: perm.view,
                     changeId: perm.change,
@@ -30,8 +32,9 @@ const PermissionsTable = () => {
                 };
             });
             setPermissionState(initialState);
+            setGroupName(groupPermissions?.data?.[0]?.groupName || ''); // Adjust group name if needed
         }
-    }, [permissions]);
+    }, [permissions, groupPermissions]);
 
     const handleCheckboxChange = (name, action) => {
         setPermissionState((prevState) => ({
@@ -66,23 +69,15 @@ const PermissionsTable = () => {
 
         console.log('Payload to submit:', payload);
 
-        createGroupWithPermissions(payload)
+        updateGroupPermissions(payload)
             .unwrap()
             .then((response) => {
-                console.log('Group created successfully:', response);
+                console.log('Group permissions updated successfully:', response);
             })
             .catch((error) => {
-                console.error('Error creating group:', error);
+                console.error('Error updating group permissions:', error);
             });
     };
-
-    const handleSearch = (event) => {
-        setSearchTerm(event.target.value);
-    };
-
-    const filteredPermissions = permissions.filter((perm) =>
-        perm.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     const columns = [
         { field: 'srNo', headerName: 'Sr. No.', flex: 0.5, headerAlign: 'center' },
@@ -137,37 +132,35 @@ const PermissionsTable = () => {
         },
     ];
 
-    const rows = filteredPermissions.map((permission, index) => ({
+    const rows = permissions.map((permission, index) => ({
         id: index,
         srNo: index + 1,
         role: permission.name,
     }));
 
-    if (isLoading) return <div>Loading permissions...</div>;
-    if (error) return <div>Error loading permissions: {error.message}</div>;
+    if (isLoading || isGroupLoading) return <div>Loading permissions...</div>;
+    if (error || groupError) return <div>Error loading permissions: {error?.message || groupError?.message}</div>;
 
     return (
         <MDBox p={3}>
-            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0}}>
+            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3 }}>
                 <MDBox p={3} display="flex" alignItems="center">
                     <MDInput
                         label="Search Permissions"
                         variant="outlined"
                         size="small"
                         sx={{ width: '250px', mr: 2 }}
-                        value={searchTerm}
-                        onChange={handleSearch}
                     />
                     <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: 'center' }}>
-                        Roles & Permissions
+                        Update Roles & Permissions
                     </MDTypography>
                     <MDButton variant="contained" color="primary" onClick={handleSubmit} sx={{ ml: 2 }}>
-                        Submit
+                        Update
                     </MDButton>
                 </MDBox>
                 <MDBox display="flex" justifyContent="flex-start" sx={{ mt: 2, mb: 2, ml: 3 }}>
                     <MDInput
-                        label="Roles"
+                        label="Group Name"
                         variant="outlined"
                         size="small"
                         sx={{ width: '250px' }}
@@ -199,4 +192,9 @@ const PermissionsTable = () => {
     );
 };
 
-export default PermissionsTable;
+// Add PropTypes validation for groupId
+PermissionsUpdate.propTypes = {
+    groupId: PropTypes.string.isRequired,  // Assuming groupId is a string, adjust if necessary
+};
+
+export default PermissionsUpdate;

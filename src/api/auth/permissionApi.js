@@ -31,7 +31,21 @@ export const permissionApi = createApi({
                 body: { name, permissions },
             }),
         }),
+        // New API to fetch permissions by group ID
+        fetchPermissionsByGroupId: builder.query({
+            query: (group_id) => `user_profile/group_id_wise_permission_list?group_id=${group_id}`,
+            transformResponse: (response) => {
+                if (response.status) {
+                    return response.data;
+                }
+                throw new Error(response.message || 'Failed to fetch permissions by group ID');
+            },
+        }),
     }),
 });
 
-export const { useFetchPermissionsQuery, useCreateGroupWithPermissionsMutation } = permissionApi;
+export const { 
+    useFetchPermissionsQuery, 
+    useCreateGroupWithPermissionsMutation, 
+    useFetchPermissionsByGroupIdQuery 
+} = permissionApi;
