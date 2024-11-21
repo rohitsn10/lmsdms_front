@@ -7,29 +7,35 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
-import MDButton from "components/MDButton";
-import { useGetPrintRequestsQuery } from "api/auth/printApi"; // Updated import for the API hook
+import { useGetPrintRequestsQuery } from "api/auth/printApi";
+import ApprovalDialog from "./add-approval/index"; // Import the dialog component
 
 const PrintApprovalListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate();
-
-  // Use the custom hook to fetch data from the API
+  const [openDialog, setOpenDialog] = useState(false); // State for dialog open/close
+  const [selectedRequest, setSelectedRequest] = useState(null); // Selected print request data
   const { data: printRequests, error, isLoading } = useGetPrintRequestsQuery();
-
-  // Handle the search term input
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  // Prepare filtered data with serial numbers
   const filteredData = (printRequests || [])
     .filter((item) => item.document_title && item.document_title.toLowerCase().includes(searchTerm.toLowerCase()))
     .map((item, index) => ({
       ...item,
       serial_number: index + 1,
-      created_at: new Date(item.created_at).toLocaleDateString("en-GB"), // Format date as DD/MM/YYYY
+      created_at: new Date(item.created_at).toLocaleDateString("en-GB"),
     }));
+
+  const handleOpenDialog = (data) => {
+    setSelectedRequest(data); // Store the selected request
+    setOpenDialog(true); // Open the dialog
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false); // Close the dialog
+    setSelectedRequest(null); // Clear selected data
+  };
 
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
@@ -43,7 +49,7 @@ const PrintApprovalListing = () => {
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => navigate(`/print-approval/${params.id}`)}>
+        <IconButton color="primary" onClick={() => handleOpenDialog(params.row)}>
           <CheckCircleIcon />
         </IconButton>
       ),
@@ -68,21 +74,16 @@ const PrintApprovalListing = () => {
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>
-            {/* Show loading message while data is being fetched */}
             {isLoading && (
               <MDTypography align="center" color="textSecondary">
                 Loading...
               </MDTypography>
             )}
-
-            {/* Show error message if data fetch failed */}
             {error && (
               <MDTypography align="center" color="error">
                 Failed to load print requests
               </MDTypography>
             )}
-
-            {/* Render the data table */}
             <DataGrid
               rows={filteredData}
               columns={columns}
@@ -101,8 +102,6 @@ const PrintApprovalListing = () => {
                 },
               }}
             />
-
-            {/* Show no data message when no data is available */}
             {filteredData.length === 0 && !isLoading && (
               <MDTypography align="center" color="textSecondary">
                 No print approvals found
@@ -111,6 +110,16 @@ const PrintApprovalListing = () => {
           </div>
         </MDBox>
       </Card>
+
+      {/* Render ApprovalDialog */}
+      {selectedRequest && (
+        <ApprovalDialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          maxCopies={selectedRequest.no_of_print} // Pass max copies to the dialog
+           requestId={selectedRequest.id}
+        />
+      )}
     </MDBox>
   );
 };

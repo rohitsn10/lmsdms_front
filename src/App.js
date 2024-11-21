@@ -23,7 +23,6 @@ import DocumentView from "layouts/authentication/text- editor/index.js";
 import AddUser from "layouts/authentication/add-user";
 import AddDepartment from "layouts/authentication/add-department";
 import AddDocument from "layouts/authentication/add-document";
-import AddApproval from "layouts/authentication/add-approval";
 import ResetPassword from "layouts/authentication/forgot-password/index.js";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
 import ReviewDocument from "layouts/authentication/Review";
@@ -226,7 +225,6 @@ export default function App() {
       <Route path="/add-document" element={<AddDocument />} />
       <Route path="/edit-document/:id" element={<EditDocument />} />
       <Route path="/add-department" element={<AddDepartment />} />
-      <Route path="/add-approval" element={<AddApproval />} />
       <Route path="/forgotpassword" element={<ResetPassword />} />
       <Route path="/e-sign" element={<ESignatureDialog />} />
       <Route path="/print-document/:id" element={<PrintDocument />} />
