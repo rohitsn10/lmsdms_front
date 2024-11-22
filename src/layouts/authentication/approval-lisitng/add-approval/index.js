@@ -48,6 +48,8 @@ const ApprovalDialog = ({ open, onClose, maxCopies, requestId }) => {  // Accept
     setNumberOfCopies("");
   };
 
+  
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <MDBox sx={{ textAlign: "center" }}>

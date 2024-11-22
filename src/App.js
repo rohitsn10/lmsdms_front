@@ -202,7 +202,7 @@ export default function App() {
   <CssBaseline />
   <div>
     {/* Always render Sidenav */}
-    {window.location.pathname !== "/login" && !/^\/document-view\/\d+$/.test(pathname) && (
+    {window.location.pathname !== "/login" && !/^\/document-view\/\d+$/.test(pathname) && window.location.pathname !== "/forgotpassword" && (
       <Sidenav
         color={sidenavColor}
         brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}

@@ -10,6 +10,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
+import PreviewIcon from '@mui/icons-material/Preview';
 
 const DocumentListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,9 +52,7 @@ const DocumentListing = () => {
       headerName: 'Sr. No.',
       flex: 0.5,
       headerAlign: 'center',
-      renderCell: (params) => {
-        return <span>{params.row.index + 1}</span>;
-      },
+      renderCell: (params) => <span>{params.row.index + 1}</span>,
       sortable: false,
       filterable: false,
     },
@@ -81,6 +80,12 @@ const DocumentListing = () => {
       flex: 0.75, 
       headerAlign: 'center' 
     },
+    { 
+      field: 'current_status_name', 
+      headerName: 'Status', 
+      flex: 0.75, 
+      headerAlign: 'center' 
+    },
     {
       field: 'actions',
       headerName: 'Action',
@@ -95,17 +100,27 @@ const DocumentListing = () => {
             <EditIcon />
           </IconButton>
           
-          <IconButton
-            color="inherit"
-            onClick={() => handleClick(params.row.id)}
-          >
-            <EditCalendarIcon />
-          </IconButton>
+          {params.row.form_status === 'save_draft' ? (
+            <IconButton
+              color="secondary"
+              onClick={() => console.log('Preview clicked', params.row.id)}
+            >
+              <PreviewIcon />
+            </IconButton>
+          ) : (
+            <IconButton
+              color="inherit"
+              onClick={() => handleClick(params.row.id)}
+            >
+              <EditCalendarIcon />
+            </IconButton>
+          )}
         </MDBox>
       ),
       sortable: false,
       filterable: false,
     },
+    
   ];
 
   if (isLoading) return <div>Loading...</div>;

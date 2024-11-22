@@ -18,12 +18,18 @@ const DepartmentListing = () => {
     if (isLoading) return <div>Loading departments...</div>;
     if (error) return <div>Error loading departments: {error.message}</div>;
 
+    // Helper function to format date
+    const formatDate = (dateString) => {
+        const [day, month, year] = dateString.split("-");
+        return new Date(`${year}-${month}-${day}`).toLocaleDateString();
+    };
+
     const formattedData = departments.map((item, index) => ({
         id: item.id,
         serial_number: index + 1,
         department_name: item.department_name || "N/A",
         department_description: item.department_description || "N/A",
-        department_created_at: new Date(item.department_created_at).toLocaleDateString(),
+        department_created_at: formatDate(item.department_created_at), // Now we can call formatDate
     }));
 
     const handleSearch = (event) => {
@@ -44,7 +50,7 @@ const DepartmentListing = () => {
         { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: 'center' },
         { field: "department_name", headerName: "Department Name", flex: 1, headerAlign: 'center' },
         { field: "department_description", headerName: "Department Description", flex: 1.5, headerAlign: 'center' },
-        { field: "created_at", headerName: "Created At", flex: 0.75, headerAlign: 'center' },
+        { field: "department_created_at", headerName: "Created At", flex: 0.75, headerAlign: 'center' },
         {
             field: "action",
             headerName: "Action",
