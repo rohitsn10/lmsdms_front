@@ -25,13 +25,13 @@ const DocumentListing = () => {
   };
   const handleClick = (id) => {
     
-    navigate('/document-view/${id}');
+    navigate(`/document-view/${id}`); 
     console.log('Document id passed',id)
   };
 
   const handleEditClick = (id) => {
     
-    navigate('/edit-document/${id}');
+    navigate(`/edit-document/${id}`);
     console.log('Edit-Document id passed',id)
   };
   const filteredData = data?.filter((doc) =>

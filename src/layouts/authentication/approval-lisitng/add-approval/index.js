@@ -34,7 +34,7 @@ const ApprovalDialog = ({ open, onClose, maxCopies, requestId }) => {  // Accept
     printApprovals({
       print_request_id: requestId, // Pass the requestId here
       no_of_request_by_admin: numberOfCopies,
-      status_id: approvalStatusId,  // Pass the status id to the API
+      status: approvalStatusId,  // Pass the status id to the API
     }).then((response) => {
       console.log("Print approval response:", response);
       onClose(); // Close the dialog after submission
