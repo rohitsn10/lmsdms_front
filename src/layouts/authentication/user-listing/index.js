@@ -8,25 +8,32 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-import { useUserListQuery } from 'api/auth/userApi'; // Import the user list query
-
+import { useUserListQuery } from 'api/auth/userApi'; 
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi"; 
+import { useAuth } from "hooks/use-auth"; 
+import { hasPermission } from "utils/hasPermission"; 
 const UsersListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const { user, role } = useAuth(); 
+  const { data, error, isLoading } = useUserListQuery(); 
 
-  const { data, error, isLoading } = useUserListQuery(); // Fetch user list
+  
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role?.toString(), {
+    skip: !role,
+  });
 
-  // Handle loading state
+  
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching users</div>;
 
   const formattedData = data.data.map((item, index) => ({
     id: item.id,
     serial_number: index + 1,
-    email: item.email || "N/A", // Handle potential null values
+    email: item.email || "N/A", 
     full_name: item.first_name ? `${item.first_name} ${item.last_name || ''}`.trim() : "N/A",
     username: item.username || "N/A",
-    created_at: new Date(item.created_at).toLocaleDateString(), // Adjust if necessary
+    created_at: new Date(item.created_at).toLocaleDateString(), 
   }));
 
   const handleSearch = (event) => {
@@ -35,6 +42,10 @@ const UsersListing = () => {
 
   const handleAddUser = () => {
     navigate("/add-user");
+  };
+
+  const handleEditUser = (user) => {
+    navigate("/edit-user", { state: { user } });
   };
 
   const filteredData = formattedData.filter(
@@ -56,9 +67,11 @@ const UsersListing = () => {
       flex: 0.5,
       headerAlign: 'center',
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => navigate("/add-user")}>
-          <EditIcon />
-        </IconButton>
+        hasPermission(userPermissions, "customuser", "isChange") ? (
+          <IconButton color="primary" onClick={() => handleEditUser(params.row)}>
+            <EditIcon />
+          </IconButton>
+        ) : null
       ),
     },
   ];
@@ -78,9 +91,11 @@ const UsersListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Users Listing
           </MDTypography>
-          <MDButton variant="contained" color="primary" onClick={handleAddUser} sx={{ ml: 2 }}>
-            Add User
-          </MDButton>
+          {hasPermission(userPermissions, "customuser", "isAdd") && (
+            <MDButton variant="contained" color="primary" onClick={handleAddUser} sx={{ ml: 2 }}>
+              Add User
+            </MDButton>
+          )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>

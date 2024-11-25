@@ -217,7 +217,7 @@ const DocumentListing = () => {
   );
 };
 
-// Add propTypes validation
+
 DocumentListing.propTypes = {
   userPermissions: PropTypes.arrayOf(
     PropTypes.shape({

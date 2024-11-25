@@ -19,14 +19,13 @@ const DepartmentListing = () => {
   const { user, role } = useAuth();
   const { data: departments = [], isLoading, error } = useFetchDepartmentsQuery();
 
-  // Fetch permissions based on the user's role
   const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role?.toString(), {
     skip: !role,
   });
 
   if (isLoading) return <div>Loading departments...</div>;
   if (error) return <div>Error loading departments: {error.message}</div>;
-    // Helper function to format date
+    
     const formatDate = (dateString) => {
         const [day, month, year] = dateString.split("-");
         return new Date(`${year}-${month}-${day}`).toLocaleDateString();
@@ -37,16 +36,9 @@ const DepartmentListing = () => {
         serial_number: index + 1,
         department_name: item.department_name || "N/A",
         department_description: item.department_description || "N/A",
-        department_created_at: formatDate(item.department_created_at), // Now we can call formatDate
+        department_created_at: formatDate(item.department_created_at), 
     }));
 
-//   const formattedData = departments.map((item, index) => ({
-//     id: item.id,
-//     serial_number: index + 1,
-//     department_name: item.department_name || "N/A",
-//     department_description: item.department_description || "N/A",
-//     department_created_at: new Date(item.department_created_at).toLocaleDateString(),
-//   }));
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -61,23 +53,26 @@ const DepartmentListing = () => {
       department.department_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       department.department_description.toLowerCase().includes(searchTerm.toLowerCase())
   );
-    const columns = [
-        { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: 'center' },
-        { field: "department_name", headerName: "Department Name", flex: 1, headerAlign: 'center' },
-        { field: "department_description", headerName: "Department Description", flex: 1.5, headerAlign: 'center' },
-        { field: "department_created_at", headerName: "Created At", flex: 0.75, headerAlign: 'center' },
-        {
-            field: "action",
-            headerName: "Action",
-            flex: 0.5,
-            headerAlign: 'center',
-            renderCell: (params) => (
-                <IconButton color="primary" onClick={() => handleEditDepartment(params.row)}>
-                    <EditIcon />
-                </IconButton>
-            ),
-        },
-    ];
+  const columns = [
+    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: 'center' },
+    { field: "department_name", headerName: "Department Name", flex: 1, headerAlign: 'center' },
+    { field: "department_description", headerName: "Department Description", flex: 1.5, headerAlign: 'center' },
+    { field: "department_created_at", headerName: "Created At", flex: 0.75, headerAlign: 'center' },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 0.5,
+      headerAlign: 'center',
+      renderCell: (params) => (
+        hasPermission(userPermissions, "department", "isChange") ? (
+          <IconButton color="primary" onClick={() => handleEditDepartment(params.row)}>
+            <EditIcon />
+          </IconButton>
+        ) : null
+      ),
+    },
+  ];
+  
 
  
   return (
