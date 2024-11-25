@@ -12,7 +12,7 @@ import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import {
   Box,
   Button,
-  Paper,
+  Paper,  
   Dialog,
   DialogActions,
   DialogContent,
@@ -21,14 +21,14 @@ import {
 } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
-import { useGetTemplateQuery, useCreateDocumentMutation } from "api/auth/texteditorApi";
+import { useGetTemplateQuery, useCreateDocumentMutation, useDocumentReviewStatusMutation, } from "api/auth/texteditorApi";
 import CommentDrawer from "./Comments/CommentsDrawer"; // Adjusted import for CommentDrawer
 import CommentModal from "./Comments/CommentDialog"; // Adjusted import for CommentModal
 import { useCreateCommentMutation } from "api/auth/commentsApi";
 import AntiCopyPattern from "layouts/authentication/text- editor/anti-copy/AntiCopyPattern";
 import { useNavigate } from "react-router-dom";
 import { useDraftDocumentMutation } from "api/auth/texteditorApi";
-import { useDocumentApproveStatusMutation } from 'api/auth/texteditorApi';
+import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -65,12 +65,12 @@ const DocumentView = () => {
   const [createComment] = useCreateCommentMutation();
   const { data, error, isLoading } = useGetTemplateQuery(id);
   const [draftDocument] = useDraftDocumentMutation();
+  const [documentReviewStatus] = useDocumentReviewStatusMutation();
   const navigate = useNavigate();
   const [documentApproveStatus] = useDocumentApproveStatusMutation();
   const searchParams = new URLSearchParams(location.search);
-  const document_current_status = searchParams.get('status');
-  const current_status_name = searchParams.get('statusName');
-  console.log('Navigated with data:', { id, document_current_status, current_status_name });
+  const document_current_status = searchParams.get("status");
+  console.log("Navigated with data:", { id, document_current_status});
 
   useEffect(() => {
     const fetchDocxFile = async () => {
@@ -134,7 +134,6 @@ const DocumentView = () => {
     }
   }, [isLoaded, docContent, comments]);
 
-
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.key === "s") {
@@ -154,7 +153,7 @@ const DocumentView = () => {
     try {
       await draftDocument({ document_id: id, status_id: 11 }).unwrap();
       // Handle success (e.g., show success message)
-      navigate('/document-listing');
+      navigate("/document-listing");
     } catch (err) {
       // Handle error
       console.error(err);
@@ -165,18 +164,38 @@ const DocumentView = () => {
   const handleSubmit = async () => {
     try {
       const response = await documentApproveStatus({
-        document_id: id, 
-        documentdetails_id: '1',
-        status: '1',
+        document_id: id,
+        // documentdetails_id: '1',
+        status: "12",
       }).unwrap();
-      navigate('/document-listing');
-      console.log('API Response:', response);
-      alert('Document approved successfully!');
+      navigate("/document-listing");
+      // console.log('API Response:', response);
+      // alert('Document approved successfully!');
     } catch (err) {
-      console.error('API Error:', err);
-      alert('Failed to approve the document. Please try again.');
+      console.error("API Error:", err);
+      alert("Failed to approve the document. Please try again.");
     }
   };
+  const handleReview = async () => {
+    console.log("Review button clicked");
+    try {
+      const response = await documentReviewStatus({
+        document_id: id, // Replace with your actual document_id
+        status: "13",       // Replace with your desired status
+      }).unwrap();
+      navigate("/document-listing");
+      console.log('API Response:', response);
+      if (response.status) {
+        alert(response.message); // Success message
+      } else {
+        alert('Action failed');
+      }
+    } catch (error) {
+      console.error('Error calling API:', error);
+      alert('An error occurred. Please try again.');
+    }
+  };
+
 
   const handleAddComment = () => {
     const quill = quillRef.current;
@@ -223,7 +242,7 @@ const DocumentView = () => {
     setOpencommentDialog(false); // Close modal after saving
   };
   const handlePrint = () => {
-    console.log("Id passed:",id)
+    console.log("Id passed:", id);
     navigate(`/print-document/${id}`);
   };
 
@@ -247,6 +266,7 @@ const DocumentView = () => {
     });
   };
 
+  
   const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
     const documentData = { document_id: id, document_data: content };
@@ -329,17 +349,17 @@ const DocumentView = () => {
       {/* Insert AntiCopyPattern as the background */}
       <AntiCopyPattern />
       <MDButton
-      variant="gradient"
-      color="submit"
-      onClick={handlePrint} // Use onClick to trigger navigation
-      sx={{
-        float: "right",
-        mt: 1,
-        mr: 1,
-      }}
-    >
-      Print
-    </MDButton>
+        variant="gradient"
+        color="submit"
+        onClick={handlePrint} // Use onClick to trigger navigation
+        sx={{
+          float: "right",
+          mt: 1,
+          mr: 1,
+        }}
+      >
+        Print
+      </MDButton>
       <Paper
         id="editor-container"
         sx={{
@@ -387,15 +407,18 @@ const DocumentView = () => {
       </Dialog>
 
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
-      <MDButton 
-      variant="gradient" 
-      color="submit" 
-      type="button" // Set to "button" to prevent default form submission
-      onClick={handleSubmit}
-      disabled={isLoading} // Disable the button while the API call is in progress
-    >
-      {isLoading ? 'Submitting...' : 'Submit'}
-    </MDButton>
+  {/* Condition 1: Show Submit and Save Draft buttons when status is "10" or "11" */}
+  {(document_current_status === "10" || document_current_status === "11") && (
+    <>
+      <MDButton
+        variant="gradient"
+        color="submit"
+        type="button" // Set to "button" to prevent default form submission
+        onClick={handleSubmit}
+        disabled={isLoading} // Disable the button while the API call is in progress
+      >
+        {isLoading ? "Submitting..." : "Submit"}
+      </MDButton>
       <MDButton
         variant="gradient"
         color="submit"
@@ -404,9 +427,38 @@ const DocumentView = () => {
       >
         Save Draft
       </MDButton>
-      {data && <p>{data.message}</p>}
-      {error && <p>Error: {error.message}</p>}
-    </MDBox>
+    </>
+  )}
+
+  {/* Condition 2: Show Review button when status is "12" */}
+  {document_current_status === "12" && (
+    <MDButton
+      variant="gradient"
+      color="submit"
+      onClick={handleReview}
+      disabled={isLoading}
+    >
+      Review
+    </MDButton>
+  )}
+
+  {/* Condition 3: Show Approve button when status is "13" */}
+  {document_current_status === "13" && (
+    <MDButton
+      variant="gradient"
+      color="submit"
+      // onClick={handleApprove}
+      disabled={isLoading}
+    >
+      Approve
+    </MDButton>
+  )}
+
+  {/* Display success or error messages */}
+  {data && <p>{data.message}</p>}
+  {error && <p>Error: {error.message}</p>}
+</MDBox>
+
     </Box>
   );
 };

@@ -66,7 +66,7 @@ const WorkflowListing = () => {
             flex: 0.5,
             headerAlign: "center",
             renderCell: (params) => (
-                hasPermission(userpermissions, "workflow", "isChange") ? (
+                hasPermission(userpermissions, "workflowmodel", "isChange") ? (
                     <IconButton color="primary" onClick={() => handleEditWorkflow(params.row)}>
                         <EditIcon />
                     </IconButton>
@@ -92,7 +92,7 @@ const WorkflowListing = () => {
                     </MDTypography>
 
                     {/* Show the 'Add Workflow' button if the user has the 'isAdd' permission */}
-                    {hasPermission(userpermissions, "workflow", "isAdd") && (
+                    {hasPermission(userpermissions, "workflowmodel", "isAdd") && (
                         <MDButton
                             variant="contained"
                             color="primary"

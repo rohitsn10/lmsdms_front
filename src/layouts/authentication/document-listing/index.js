@@ -44,8 +44,7 @@ const DocumentListing = () => {
     // Ensure id, document_current_status, and current_status_name are defined
     if (
       id === undefined ||
-      document_current_status === undefined ||
-      current_status_name === undefined
+      document_current_status === undefined
     ) {
       console.error("Missing data in params.row:", params.row);
       return;
@@ -53,12 +52,12 @@ const DocumentListing = () => {
   
     // Navigate with all required data
     navigate(
-      `/document-view/${id}?status=${document_current_status}&statusName=${current_status_name}`
+      `/document-view/${id}?status=${document_current_status}`
     );
     console.log("Navigated with:", {
       id,
       document_current_status,
-      current_status_name,
+      
     });
   };
   
