@@ -33,10 +33,36 @@ const DocumentListing = () => {
   const handleAddDocument = () => {
     navigate("/add-document");
   };
-  const handleClick = (id) => {
-    navigate(`/document-view/${id}`);
-    console.log('Document id passed', id);
+  const handleClick = (params) => {
+    if (!params || !params.row) {
+      console.error("Invalid params object:", params);
+      return; // Exit if params or row is missing
+    }
+  
+    const { id, document_current_status, current_status_name } = params.row;
+  
+    // Ensure id, document_current_status, and current_status_name are defined
+    if (
+      id === undefined ||
+      document_current_status === undefined ||
+      current_status_name === undefined
+    ) {
+      console.error("Missing data in params.row:", params.row);
+      return;
+    }
+  
+    // Navigate with all required data
+    navigate(
+      `/document-view/${id}?status=${document_current_status}&statusName=${current_status_name}`
+    );
+    console.log("Navigated with:", {
+      id,
+      document_current_status,
+      current_status_name,
+    });
   };
+  
+  
   const handleEditClick = (id) => {
     navigate(`/edit-document/${id}`);
     console.log('Edit-Document id passed', id);
@@ -84,6 +110,12 @@ const DocumentListing = () => {
       flex: 0.75,
       headerAlign: 'center'
     },
+    { 
+      field: 'current_status_name', 
+      headerName: 'Status', 
+      flex: 0.75, 
+      headerAlign: 'center' 
+    },
     {
       field: 'actions',
       headerName: 'Action',
@@ -104,7 +136,10 @@ const DocumentListing = () => {
             hasPermission(userPermissions, "document", "isView") && (
               <IconButton
                 color="secondary"
-                onClick={() => console.log('Preview clicked', params.row.id)}
+                onClick={() => {
+                  console.log("Params passed to handleClick:", params);
+                  handleClick(params);
+                }}
               >
                 <PreviewIcon />
               </IconButton>
@@ -113,7 +148,11 @@ const DocumentListing = () => {
             hasPermission(userPermissions, "document", "isView") && (
               <IconButton
                 color="inherit"
-                onClick={() => handleClick(params.row.id)}
+                onClick={() => {
+                  console.log("Params passed to handleClick:", params);
+                  handleClick(params);
+                }}
+                
               >
                 <EditCalendarIcon />
               </IconButton>
@@ -125,10 +164,8 @@ const DocumentListing = () => {
       filterable: false,
     },    
   ];
-
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching documents.</div>;
-
   return (
     <MDBox p={3}>
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>

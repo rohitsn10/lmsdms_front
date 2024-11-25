@@ -67,6 +67,10 @@ const DocumentView = () => {
   const [draftDocument] = useDraftDocumentMutation();
   const navigate = useNavigate();
   const [documentApproveStatus] = useDocumentApproveStatusMutation();
+  const searchParams = new URLSearchParams(location.search);
+  const document_current_status = searchParams.get('status');
+  const current_status_name = searchParams.get('statusName');
+  console.log('Navigated with data:', { id, document_current_status, current_status_name });
 
   useEffect(() => {
     const fetchDocxFile = async () => {
