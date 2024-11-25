@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -9,41 +9,52 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/material";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
-import { useCreateUserMutation } from 'api/auth/userApi'; 
-import { useFetchDepartmentsQuery } from 'api/auth/departmentApi'; 
-
-const roles = ["Author", "Purchase", "Reviewer", "Approver", "Doc_Admin"];
+import { useCreateUserMutation } from "api/auth/userApi";
+import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
+import { getUserGroups } from "api/auth/auth";
 
 function AddUser() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [employeeId, setEmployeeId] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [username, setUsername] = useState("");
   const [userRole, setUserRole] = useState("");
   const [department, setDepartment] = useState("");
-  const [joiningDate, setJoiningDate] = useState("");
-  const [jobPosition, setJobPosition] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userRoles, setUserRoles] = useState([]);
 
-  const navigate = useNavigate(); 
-  const [createUser, { isLoading }] = useCreateUserMutation(); 
+  const navigate = useNavigate();
+  const [createUser, { isLoading }] = useCreateUserMutation();
 
-  // Fetch departments using the hook
-  const { data: departmentsData, error, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
+  const { data: departmentsData, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
+
+  useEffect(() => {
+    const fetchUserRoles = async () => {
+      try {
+        const response = await getUserGroups();
+        console.log("User Groups API Response:", response);
+        setUserRoles(response?.data?.data || []); // Ensure proper parsing of API response
+      } catch (error) {
+        console.error("Failed to fetch user roles:", error);
+      }
+    };
+
+    fetchUserRoles();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true); 
+    setIsSubmitting(true);
     const userData = {
       first_name: firstName,
       last_name: lastName,
-      employee_id: employeeId,
-      email: email,
-      user_role: userRole,
+      email,
+      phone,
+      username,
+      user_role: userRole, // Send ID of the selected role
       department_id: department,
-      joining_date: joiningDate,
-      job_position: jobPosition,
     };
 
     try {
@@ -59,12 +70,11 @@ function AddUser() {
   const handleClear = () => {
     setFirstName("");
     setLastName("");
-    setEmployeeId("");
     setEmail("");
+    setPhone("");
+    setUsername("");
     setUserRole("");
     setDepartment("");
-    setJoiningDate("");
-    setJobPosition("");
   };
 
   const handleCloseSignatureDialog = () => {
@@ -98,7 +108,7 @@ function AddUser() {
             color="error"
             size="small"
             onClick={handleClear}
-            sx={{ marginRight: '20px' }}
+            sx={{ marginRight: "20px" }}
           >
             Clear
           </MDButton>
@@ -126,20 +136,29 @@ function AddUser() {
             </MDBox>
             <MDBox mb={3}>
               <MDInput
-                type="text"
-                label="Employee ID"
-                fullWidth
-                value={employeeId}
-                onChange={(e) => setEmployeeId(e.target.value)}
-              />
-            </MDBox>
-            <MDBox mb={3}>
-              <MDInput
                 type="email"
                 label="Email"
                 fullWidth
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+              />
+            </MDBox>
+            <MDBox mb={3}>
+              <MDInput
+                type="text"
+                label="Phone"
+                fullWidth
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </MDBox>
+            <MDBox mb={3}>
+              <MDInput
+                type="text"
+                label="Username"
+                fullWidth
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </MDBox>
             <MDBox mb={3}>
@@ -159,15 +178,19 @@ function AddUser() {
                     },
                   }}
                 >
-                  {roles.map((role) => (
-                    <MenuItem key={role} value={role}>
-                      {role}
-                    </MenuItem>
-                  ))}
+                  {userRoles.length > 0 ? (
+                    userRoles.map((role) => (
+                      <MenuItem key={role.id} value={role.id}>
+                        {role.name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No roles available</MenuItem>
+                  )}
                 </Select>
               </FormControl>
             </MDBox>
-            
+
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-department-label">Department</InputLabel>
@@ -184,40 +207,29 @@ function AddUser() {
                       padding: "0.75rem",
                     },
                   }}
-                  disabled={isDepartmentsLoading} // Disable dropdown while loading
+                  disabled={isDepartmentsLoading}
                 >
                   {isDepartmentsLoading ? (
                     <MenuItem disabled>Loading departments...</MenuItem>
                   ) : (
                     departmentsData?.map((dept) => (
                       <MenuItem key={dept.id} value={dept.id}>
-                        {dept.department_id}
+                        {dept.department_name}
                       </MenuItem>
                     ))
                   )}
                 </Select>
               </FormControl>
             </MDBox>
-            
-            <MDBox mb={3}>
-              <MDInput
-                type="date"
-                fullWidth
-                value={joiningDate}
-                onChange={(e) => setJoiningDate(e.target.value)}
-              />
-            </MDBox>
-            <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Job Position"
-                fullWidth
-                value={jobPosition}
-                onChange={(e) => setJobPosition(e.target.value)}
-              />
-            </MDBox>
+
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading || isSubmitting}>
+              <MDButton
+                variant="gradient"
+                color="submit"
+                fullWidth
+                type="submit"
+                disabled={isLoading || isSubmitting}
+              >
                 {isLoading || isSubmitting ? "Submitting..." : "Submit"}
               </MDButton>
             </MDBox>
