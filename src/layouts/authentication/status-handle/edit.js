@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import MDInput from 'components/MDInput';
+import MDButton from "components/MDButton";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
 import PropTypes from "prop-types";
-import MDButton from 'components/MDButton';
+import FormControl from "@mui/material/FormControl";
+import TextField from "@mui/material/TextField";
 import { useUpdateStatusMutation } from 'api/auth/statusApi';
 
 const UpdateStatusDialog = ({ open, handleClose, statusId, statusText }) => {
@@ -33,25 +35,49 @@ const UpdateStatusDialog = ({ open, handleClose, statusId, statusText }) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Update Status</DialogTitle>
-      <DialogContent>
-        <MDInput
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+  <MDBox sx={{ textAlign: "center" }}>
+    <MDTypography variant="h4" fontWeight="medium" color="#344767" mt={1}>
+      Update Status
+    </MDTypography>
+  </MDBox>
+
+  <form onSubmit={(e) => e.preventDefault()}>
+    <DialogContent>
+      <MDBox display="flex" justifyContent="flex-end">
+        <MDButton
+          variant="outlined"
+          color="error"
+          size="small"
+          onClick={() => setStatus("")}
+          sx={{ marginRight: "20px" }}
+        >
+          Clear
+        </MDButton>
+      </MDBox>
+      <FormControl fullWidth margin="normal">
+        <TextField
+          label="Status"
+          variant="outlined"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
+          helperText="Enter the updated status name"
           fullWidth
-
         />
-      </DialogContent>
-      <DialogActions>
-        <MDButton onClick={handleClose} color="primary">
-          Cancel
-        </MDButton>
-        <MDButton onClick={handleUpdate} color="primary">
+      </FormControl>
+    </DialogContent>
+    <DialogActions>
+      <MDButton onClick={handleClose} color="error" sx={{ marginRight: "10px" }}>
+        Cancel
+      </MDButton>
+      <MDBox>
+        <MDButton variant="gradient" color="submit" fullWidth onClick={handleUpdate}>
           Update
         </MDButton>
-      </DialogActions>
-    </Dialog>
+      </MDBox>
+    </DialogActions>
+  </form>
+</Dialog>
   );
 };
 

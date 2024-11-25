@@ -27,6 +27,8 @@ import CommentModal from "./Comments/CommentDialog"; // Adjusted import for Comm
 import { useCreateCommentMutation } from "api/auth/commentsApi";
 import AntiCopyPattern from "layouts/authentication/text- editor/anti-copy/AntiCopyPattern";
 import { useNavigate } from "react-router-dom";
+import { useDraftDocumentMutation } from "api/auth/texteditorApi";
+import { useDocumentApproveStatusMutation } from 'api/auth/texteditorApi';
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -62,7 +64,9 @@ const DocumentView = () => {
   const [createDocument] = useCreateDocumentMutation();
   const [createComment] = useCreateCommentMutation();
   const { data, error, isLoading } = useGetTemplateQuery(id);
+  const [draftDocument] = useDraftDocumentMutation();
   const navigate = useNavigate();
+  const [documentApproveStatus] = useDocumentApproveStatusMutation();
 
   useEffect(() => {
     const fetchDocxFile = async () => {
@@ -126,6 +130,7 @@ const DocumentView = () => {
     }
   }, [isLoaded, docContent, comments]);
 
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.key === "s") {
@@ -139,6 +144,34 @@ const DocumentView = () => {
 
   const handleOpenCommentsDrawer = () => {
     setOpenDrawer(true);
+  };
+
+  const handleSaveDraft = async () => {
+    try {
+      await draftDocument({ document_id: id, status_id: 11 }).unwrap();
+      // Handle success (e.g., show success message)
+      navigate('/document-listing');
+    } catch (err) {
+      // Handle error
+      console.error(err);
+    }
+  };
+
+  // Function to handle Submit (you can add your submit logic here)
+  const handleSubmit = async () => {
+    try {
+      const response = await documentApproveStatus({
+        document_id: id, 
+        documentdetails_id: '1',
+        status: '1',
+      }).unwrap();
+      navigate('/document-listing');
+      console.log('API Response:', response);
+      alert('Document approved successfully!');
+    } catch (err) {
+      console.error('API Error:', err);
+      alert('Failed to approve the document. Please try again.');
+    }
   };
 
   const handleAddComment = () => {
@@ -350,13 +383,26 @@ const DocumentView = () => {
       </Dialog>
 
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
-        <MDButton variant="gradient" color="submit" type="submit">
-          Submit
-        </MDButton>
-        <MDButton variant="gradient" color="submit">
-          Save Draft
-        </MDButton>
-      </MDBox>
+      <MDButton 
+      variant="gradient" 
+      color="submit" 
+      type="button" // Set to "button" to prevent default form submission
+      onClick={handleSubmit}
+      disabled={isLoading} // Disable the button while the API call is in progress
+    >
+      {isLoading ? 'Submitting...' : 'Submit'}
+    </MDButton>
+      <MDButton
+        variant="gradient"
+        color="submit"
+        onClick={handleSaveDraft}
+        disabled={isLoading} // Disable button when mutation is in progress
+      >
+        Save Draft
+      </MDButton>
+      {data && <p>{data.message}</p>}
+      {error && <p>Error: {error.message}</p>}
+    </MDBox>
     </Box>
   );
 };

@@ -8,6 +8,7 @@ import {
   useRequestForgotPasswordOtpMutation,
   useVerifyForgotPasswordOtpMutation,
 } from "api/auth/forgotpassApi";
+import { Navigate } from "react-router-dom";
 
 function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -70,42 +71,73 @@ function ResetPassword() {
   };
 
   // Step 2: Handle OTP verification and Password Reset
+  // const handleVerifyAndResetPassword = async () => {
+  //   if (otp.join("").length === 6) {
+  //     try {
+  //       const response = await verifyForgotPasswordOtp({ email, otp: otp.join("") }).unwrap();
+
+  //       if (response.status) {
+  //         // OTP verified, now check for password reset
+  //         if (password && confirm_password && password === confirm_password) {
+  //           // Assuming we have an API endpoint specifically for resetting the password
+  //           const response = await verifyForgotPasswordOtp({
+  //             email,
+  //             otp: otp.join(""),
+  //             password,
+  //             confirmPassword: confirm_password, // Fixed key name
+  //           }).unwrap();
+
+  //           if (resetResponse.status) {
+  //             setMessage("Password reset successfully.");
+  //             // Optionally, navigate to login or show success message
+  //           } else {
+  //             setMessage(resetResponse.message || "Password reset failed. Please try again.");
+  //           }
+  //         } else {
+  //           setMessage("Passwords do not match. Please ensure both fields are filled.");
+  //         }
+  //       } else {
+  //         setMessage(response.message || "OTP verification failed. Please try again.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error during verification or resetting password:", error);
+  //       setMessage(error.data?.message || "Error processing your request");
+  //     }
+  //   } else {
+  //     setMessage("Invalid OTP. Please enter a 6-digit OTP.");
+  //   }
+  // };
+
   const handleVerifyAndResetPassword = async () => {
     if (otp.join("").length === 6) {
-      try {
-        const response = await verifyForgotPasswordOtp({ email, otp: otp.join("") }).unwrap();
-
-        if (response.status) {
-          // OTP verified, now check for password reset
-          if (password && confirm_password && password === confirm_password) {
-            // Assuming we have an API endpoint specifically for resetting the password
-            const resetResponse = await resetPassword({
-              email,
-              otp: otp.join(""),
-              password,
-              confirm_password,
-            }).unwrap();
-
-            if (resetResponse.status) {
-              setMessage("Password reset successfully.");
-              // Optionally, navigate to login or show success message
-            } else {
-              setMessage(resetResponse.message || "Password reset failed. Please try again.");
-            }
+      if (password && confirm_password && password === confirm_password) {
+        try {
+          const response = await verifyForgotPasswordOtp({
+            email,
+            otp: otp.join(""),
+            password,
+            confirmPassword: confirm_password, // Fixed key name
+          }).unwrap();
+  
+          if (response.status) {
+            setMessage("Password reset successfully.");
+            navigate("/login");
+            // Optionally, navigate to login or show success message
           } else {
-            setMessage("Passwords do not match. Please ensure both fields are filled.");
+            setMessage(response.message || "OTP verification failed.");
           }
-        } else {
-          setMessage(response.message || "OTP verification failed. Please try again.");
+        } catch (error) {
+          console.error("Error during verification or resetting password:", error);
+          setMessage(error.data?.message || "Error processing your request");
         }
-      } catch (error) {
-        console.error("Error during verification or resetting password:", error);
-        setMessage(error.data?.message || "Error processing your request");
+      } else {
+        setMessage("Passwords do not match. Please ensure both fields are filled.");
       }
     } else {
       setMessage("Invalid OTP. Please enter a 6-digit OTP.");
     }
   };
+  
 
   return (
     <Card sx={{ width: 400, mx: "auto", mt: 20 }}>

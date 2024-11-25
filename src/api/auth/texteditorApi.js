@@ -31,7 +31,23 @@ export const texteditorApi = createApi({
       }),
       transformResponse: (response) => response.data,
     }),
+    draftDocument: builder.mutation({
+      query: ({ document_id, status_id }) => ({
+        url: `dms_module/draft_document`,
+        method: 'PUT',
+        body: { document_id, status_id },
+      }),
+      transformResponse: (response) => response,
+    }),
+    documentApproveStatus: builder.mutation({
+      query: ({ document_id, documentdetails_id, status }) => ({
+        url: `dms_module/document_approve_status`,
+        method: 'POST',
+        body: { document_id, documentdetails_id, status },
+      }),
+      transformResponse: (response) => response,
+    }),
   }),
 });
 
-export const { useGetTemplateQuery, useCreateDocumentMutation } = texteditorApi;
+export const { useGetTemplateQuery, useCreateDocumentMutation, useDraftDocumentMutation, useDocumentApproveStatusMutation,} = texteditorApi;
