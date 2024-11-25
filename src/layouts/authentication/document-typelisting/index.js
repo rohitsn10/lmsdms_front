@@ -50,7 +50,7 @@ const DocumentTypesListing = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
-          {hasPermission(userPermissions, "document_type", "isChange") && (
+          {hasPermission(userPermissions, "documenttype", "isChange") && (
             <IconButton color="primary" onClick={() => navigate("/add_update_document_type")}>
               <EditIcon />
             </IconButton>
@@ -80,7 +80,7 @@ const DocumentTypesListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Document Types Listing
           </MDTypography>
-          {hasPermission(userPermissions, "document_type", "isAdd") && (
+          {hasPermission(userPermissions, "documenttype", "isAdd") && (
             <MDButton variant="contained" color="primary" onClick={handleAddDocumentType} sx={{ ml: 2 }}>
               Add Document Type
             </MDButton>

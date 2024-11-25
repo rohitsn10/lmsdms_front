@@ -9,13 +9,22 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { useViewTemplateQuery } from "api/auth/documentApi";
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { useAuth } from "hooks/use-auth";
+import { hasPermission } from "utils/hasPermission";
 
 const TemplateListing = () => {
+  const { user, role } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   // Fetch templates data
   const { data, error, isLoading } = useViewTemplateQuery();
+
+  // Fetch user permissions for the given role
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role.toString(), {
+    skip: !role,
+  });
 
   const handleAddTemplate = () => {
     navigate("/add-template");
@@ -44,16 +53,19 @@ const TemplateListing = () => {
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => navigate(`/add-template/${params.id}`)}>
-          <EditIcon />
-        </IconButton>
+        
+        hasPermission(userPermissions, "templatemodel", "isChange") ? (
+          <IconButton color="primary" onClick={() => navigate(`/add-template/${params.id}`)}>
+            <EditIcon />
+          </IconButton>
+        ) : null
       ),
     },
   ];
 
   return (
     <MDBox p={3}>
-      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search Template"
@@ -66,9 +78,12 @@ const TemplateListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Template Listing
           </MDTypography>
-          <MDButton variant="contained" color="primary" onClick={handleAddTemplate} sx={{ ml: 2 }}>
-            Add Template
-          </MDButton>
+          
+          {hasPermission(userPermissions, "templatemodel", "isAdd") && (
+            <MDButton variant="contained" color="primary" onClick={handleAddTemplate} sx={{ ml: 2 }}>
+              Add Template
+            </MDButton>
+          )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           {error ? (
