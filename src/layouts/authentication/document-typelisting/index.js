@@ -9,10 +9,18 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { useFetchDocumentTypesQuery } from 'api/auth/documentApi';
+import { useFetchPermissionsByGroupIdQuery } from 'api/auth/permissionApi';
+import { hasPermission } from "utils/hasPermission";
+import { useAuth } from "hooks/use-auth";
 
 const DocumentTypesListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { user, role } = useAuth();
   const { data, error, isLoading } = useFetchDocumentTypesQuery();  
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role?.toString(), {
+    skip: !role
+  });
+
   const navigate = useNavigate();
 
   const handleAddDocumentType = () => {
@@ -41,12 +49,21 @@ const DocumentTypesListing = () => {
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => navigate("/add_update_document_type")}>
-          <EditIcon />
-        </IconButton>
+        <MDBox display="flex" gap={1}>
+          {hasPermission(userPermissions, "document_type", "isChange") && (
+            <IconButton color="primary" onClick={() => navigate("/add_update_document_type")}>
+              <EditIcon />
+            </IconButton>
+          )}
+        </MDBox>
       ),
+      sortable: false,
+      filterable: false,
     },
   ];
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error || permissionError) return <div>Error loading data or permissions.</div>;
 
   return (
     <MDBox p={3}>
@@ -63,9 +80,11 @@ const DocumentTypesListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Document Types Listing
           </MDTypography>
-          <MDButton variant="contained" color="primary" onClick={handleAddDocumentType} sx={{ ml: 2 }}>
-            Add Document Type
-          </MDButton>
+          {hasPermission(userPermissions, "document_type", "isAdd") && (
+            <MDButton variant="contained" color="primary" onClick={handleAddDocumentType} sx={{ ml: 2 }}>
+              Add Document Type
+            </MDButton>
+          )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>

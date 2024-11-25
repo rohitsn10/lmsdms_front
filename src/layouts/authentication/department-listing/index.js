@@ -67,7 +67,7 @@ const DepartmentListing = () => {
         { field: "department_description", headerName: "Department Description", flex: 1.5, headerAlign: 'center' },
         { field: "department_created_at", headerName: "Created At", flex: 0.75, headerAlign: 'center' },
         {
-            field: "action", 
+            field: "action",
             headerName: "Action",
             flex: 0.5,
             headerAlign: 'center',
