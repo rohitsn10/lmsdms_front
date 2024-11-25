@@ -8,12 +8,27 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-import { useFetchWorkflowsQuery } from 'api/auth/workflowApi'; 
+import { useFetchWorkflowsQuery } from "api/auth/workflowApi";
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { useAuth } from "hooks/use-auth";
+import { hasPermission } from "utils/hasPermission";
 
 const WorkflowListing = () => {
+    const { role } = useAuth();
     const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
+
+    // Fetch workflows
     const { data: workflows = [], isLoading, error } = useFetchWorkflowsQuery();
+
+    // Fetch user permissions based on role
+    const { data: userpermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role.toString(), {
+        skip: !role,
+    });
+
+    // Debugging outputs
+    console.log("Fetched Permissions:", userpermissions);
+    console.log("User Role:", role);
 
     if (isLoading) return <div>Loading workflows...</div>;
     if (error) return <div>Error loading workflows: {error.message}</div>;
@@ -41,26 +56,28 @@ const WorkflowListing = () => {
     );
 
     const columns = [
-        { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: 'center' },
-        { field: "workflow_name", headerName: "Workflow Name", flex: 1, headerAlign: 'center' },
-        { field: "workflow_description", headerName: "Workflow Description", flex: 1.5, headerAlign: 'center' },
-        { field: "created_at", headerName: "Created At", flex: 0.75, headerAlign: 'center' },
+        { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
+        { field: "workflow_name", headerName: "Workflow Name", flex: 1, headerAlign: "center" },
+        { field: "workflow_description", headerName: "Workflow Description", flex: 1.5, headerAlign: "center" },
+        { field: "created_at", headerName: "Created At", flex: 0.75, headerAlign: "center" },
         {
             field: "action",
             headerName: "Action",
             flex: 0.5,
-            headerAlign: 'center',
+            headerAlign: "center",
             renderCell: (params) => (
-                <IconButton color="primary" onClick={() => handleEditWorkflow(params.row)}>
-                    <EditIcon />
-                </IconButton>
+                hasPermission(userpermissions, "workflow", "isChange") ? (
+                    <IconButton color="primary" onClick={() => handleEditWorkflow(params.row)}>
+                        <EditIcon />
+                    </IconButton>
+                ) : null
             ),
         },
     ];
-    
+
     return (
         <MDBox p={3}>
-            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
+            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
                 <MDBox p={3} display="flex" alignItems="center">
                     <MDInput
                         label="Search"
@@ -73,9 +90,18 @@ const WorkflowListing = () => {
                     <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
                         Workflow Listing
                     </MDTypography>
-                    <MDButton variant="contained" color="primary" onClick={() => navigate("/add-workflow")} sx={{ ml: 2 }}>
-                        Add Workflow
-                    </MDButton>
+
+                    {/* Show the 'Add Workflow' button if the user has the 'isAdd' permission */}
+                    {hasPermission(userpermissions, "workflow", "isAdd") && (
+                        <MDButton
+                            variant="contained"
+                            color="primary"
+                            onClick={() => navigate("/add-workflow")}
+                            sx={{ ml: 2 }}
+                        >
+                            Add Workflow
+                        </MDButton>
+                    )}
                 </MDBox>
                 <MDBox display="flex" justifyContent="center" p={2}>
                     <div style={{ height: 500, width: "100%" }}>
@@ -88,14 +114,14 @@ const WorkflowListing = () => {
                             sx={{
                                 border: "1px solid #ddd",
                                 borderRadius: "4px",
-                                '& .MuiDataGrid-columnHeaders': {
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    backgroundColor: '#f5f5f5',
-                                    fontWeight: 'bold',
+                                "& .MuiDataGrid-columnHeaders": {
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    backgroundColor: "#f5f5f5",
+                                    fontWeight: "bold",
                                 },
-                                '& .MuiDataGrid-cell': {
-                                    textAlign: 'center',
+                                "& .MuiDataGrid-cell": {
+                                    textAlign: "center",
                                 },
                             }}
                         />
