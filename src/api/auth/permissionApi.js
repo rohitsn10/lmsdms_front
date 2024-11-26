@@ -41,11 +41,26 @@ export const permissionApi = createApi({
                 throw new Error(response.message || 'Failed to fetch permissions by group ID');
             },
         }),
+       
+        updateGroupPermissions: builder.mutation({
+            query: ({ group_id, permissions }) => ({
+                url: 'user_profile/group_update_with_permissions',
+                method: 'PUT',
+                body: { name ,permissions , group_id },
+            }),
+            transformResponse: (response) => {
+                if (response.status) {
+                    return response.message;
+                }
+                throw new Error(response.message || 'Failed to update group permissions');
+            },
+        }),
     }),
 });
 
 export const { 
     useFetchPermissionsQuery, 
     useCreateGroupWithPermissionsMutation, 
-    useFetchPermissionsByGroupIdQuery 
+    useFetchPermissionsByGroupIdQuery, 
+    useUpdateGroupPermissionsMutation 
 } = permissionApi;
