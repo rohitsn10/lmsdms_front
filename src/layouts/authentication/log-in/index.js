@@ -29,7 +29,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { login, getUserGroups } from '../../../api/auth/auth';
+import { login, requestUserGroupList } from '../../../api/auth/auth';
 import { useAuth } from "hooks/use-auth";
 
 function Login() {
@@ -85,7 +85,7 @@ function Login() {
   
   const fetchRoles = async (token) => {
     try {
-        const response = await getUserGroups(token);
+        const response = await requestUserGroupList(token);
         console.log("User groups response:", response); 
 
         
