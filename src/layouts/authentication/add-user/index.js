@@ -19,7 +19,7 @@ function AddUser() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
-  const [userRole, setUserRole] = useState("");
+  const [userRole, setUserRole] = useState([]);
   const [department, setDepartment] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,18 +47,20 @@ function AddUser() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+  
     const userData = {
       first_name: firstName,
       last_name: lastName,
       email,
       phone,
       username,
-      user_role: userRole, // Send ID of the selected role
+      user_role: userRole, // Send IDs of the selected roles
       department_id: department,
     };
-
+  
     try {
-      await createUser(userData).unwrap();
+      const response = await createUser(userData).unwrap();
+      console.log("Response (JSON):", response); // Log the JSON response
       setOpenSignatureDialog(true);
     } catch (error) {
       console.error("Failed to create user:", error);
@@ -66,6 +68,7 @@ function AddUser() {
       setIsSubmitting(false);
     }
   };
+  
 
   const handleClear = () => {
     setFirstName("");
@@ -162,34 +165,42 @@ function AddUser() {
               />
             </MDBox>
             <MDBox mb={3}>
-              <FormControl fullWidth margin="dense">
-                <InputLabel id="select-role-label">User Role</InputLabel>
-                <Select
-                  labelId="select-role-label"
-                  id="select-role"
-                  value={userRole}
-                  onChange={(e) => setUserRole(e.target.value)}
-                  input={<OutlinedInput label="User Role" />}
-                  sx={{
-                    minWidth: 200,
-                    height: "3rem",
-                    ".MuiSelect-select": {
-                      padding: "0.45rem",
-                    },
-                  }}
-                >
-                  {userRoles.length > 0 ? (
-                    userRoles.map((role) => (
-                      <MenuItem key={role.id} value={role.id}>
-                        {role.name}
-                      </MenuItem>
-                    ))
-                  ) : (
-                    <MenuItem disabled>No roles available</MenuItem>
-                  )}
-                </Select>
-              </FormControl>
-            </MDBox>
+  <FormControl fullWidth margin="dense">
+    <InputLabel id="select-role-label">User Role</InputLabel>
+    <Select
+      labelId="select-role-label"
+      id="select-role"
+      multiple // Enable multiple selection
+      value={userRole} // Ensure this is an array
+      onChange={(e) => setUserRole(e.target.value)} // Update the state with the selected array
+      input={<OutlinedInput label="User Role" />}
+      renderValue={(selected) =>
+        selected.map((roleId) => {
+          const role = userRoles.find((r) => r.id === roleId);
+          return role?.name || roleId;
+        }).join(', ')
+      } // Display selected roles as comma-separated names
+      sx={{
+        minWidth: 200,
+        height: "3rem",
+        ".MuiSelect-select": {
+          padding: "0.45rem",
+        },
+      }}
+    >
+      {userRoles.length > 0 ? (
+        userRoles.map((role) => (
+          <MenuItem key={role.id} value={role.id}>
+            {role.name}
+          </MenuItem>
+        ))
+      ) : (
+        <MenuItem disabled>No roles available</MenuItem>
+      )}
+    </Select>
+  </FormControl>
+</MDBox>
+
 
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
