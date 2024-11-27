@@ -407,8 +407,8 @@ const DocumentView = () => {
       </Dialog>
 
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
-  {/* Condition 1: Show Submit and Save Draft buttons when status is "10" or "11" */}
-  {(document_current_status === "10" || document_current_status === "11") && (
+  {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
+  {(document_current_status === "1" || document_current_status === "2") && (
     <>
       <MDButton
         variant="gradient"
@@ -430,8 +430,8 @@ const DocumentView = () => {
     </>
   )}
 
-  {/* Condition 2: Show Review button when status is "12" */}
-  {document_current_status === "12" && (
+  {/* Condition 2: Show Review button when status is "3" */}
+  {document_current_status === "3" && (
     <MDButton
       variant="gradient"
       color="submit"
@@ -442,8 +442,8 @@ const DocumentView = () => {
     </MDButton>
   )}
 
-  {/* Condition 3: Show Approve button when status is "13" */}
-  {document_current_status === "13" && (
+  {/* Condition 3: Show Approve button when status is "4" */}
+  {document_current_status === "4" && (
     <MDButton
       variant="gradient"
       color="submit"
