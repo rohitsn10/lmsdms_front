@@ -22,9 +22,10 @@ const TemplateListing = () => {
   const { data, error, isLoading } = useViewTemplateQuery();
 
   // Fetch user permissions for the given role
-  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role.toString(), {
-    skip: !role,
-  });
+  const { data: userPermissions = [], isError: permissionError } =
+    useFetchPermissionsByGroupIdQuery(role.toString(), {
+      skip: !role,
+    });
 
   const handleAddTemplate = () => {
     navigate("/add-template");
@@ -52,14 +53,12 @@ const TemplateListing = () => {
       headerName: "Action",
       flex: 0.5,
       headerAlign: "center",
-      renderCell: (params) => (
-        
+      renderCell: (params) =>
         hasPermission(userPermissions, "templatemodel", "isChange") ? (
           <IconButton color="primary" onClick={() => navigate(`/add-template/${params.id}`)}>
             <EditIcon />
           </IconButton>
-        ) : null
-      ),
+        ) : null,
     },
   ];
 
@@ -78,9 +77,14 @@ const TemplateListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Template Listing
           </MDTypography>
-          
+
           {hasPermission(userPermissions, "templatemodel", "isAdd") && (
-            <MDButton variant="contained" color="primary" onClick={handleAddTemplate} sx={{ ml: 2 }}>
+            <MDButton
+              variant="contained"
+              color="primary"
+              onClick={handleAddTemplate}
+              sx={{ ml: 2 }}
+            >
               Add Template
             </MDButton>
           )}

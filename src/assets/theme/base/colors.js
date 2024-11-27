@@ -111,8 +111,8 @@ const colors = {
       state: "#2F1B14"
     },
     info: {
-      main: "#f5e0c3",
-      state: "#f5e0c3",
+      main: "#FEA01C",
+      state: "#FEA01C",
     },
 
     success: {
