@@ -66,8 +66,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [anchorEl, setAnchorEl] = useState(null); // State for settings dropdown
   const [showPassword, setShowPassword] = useState(false);
 
-  const [switchUserRole, { isLoading: isSwitching, isError, error, isSuccess }] =
-    useSwitchUserRoleMutation();
+  const [switchUserRole, { isLoading: isSwitching, isError, error, isSuccess }] = useSwitchUserRoleMutation();
   const [feedbackMessage, setFeedbackMessage] = useState("");
 
   useEffect(() => {
@@ -91,19 +90,18 @@ function DashboardNavbar({ absolute, light, isMini }) {
     // Fetch the user group list on component mount
     const fetchRoles = async () => {
       try {
-        const response = await requestUserGroupList(); 
-        setRoles(response.data || []); 
+        const response = await requestUserGroupList();
+        setRoles(response.data || []);
       } catch (error) {
         console.error("Error fetching user groups:", error);
       }
     };
 
     fetchRoles();
-  }, []); 
+  }, []);
 
   const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
-  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
-
+ 
   const handleSettingsClick = (event) => setAnchorEl(event.currentTarget);
   const handleCloseSettings = () => setAnchorEl(null);
 
@@ -159,7 +157,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
               <MDInput label="Search here" />
             </MDBox>
             <MDBox color={light ? "white" : "inherit"} display="flex" alignItems="center">
-              <IconButton sx={navbarIconButton} size="small" disableRipple onClick={handleClickOpen}>
+              <IconButton
+                sx={navbarIconButton}
+                size="small"
+                disableRipple
+                onClick={handleClickOpen}
+              >
                 <Icon sx={iconsStyle}>account_circle</Icon>
               </IconButton>
               <Dialog
@@ -213,10 +216,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowPassword(!showPassword)}
-                              edge="end"
-                            >
+                            <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                               {showPassword ? <VisibilityOff /> : <Visibility />}
                             </IconButton>
                           </InputAdornment>
@@ -229,25 +229,20 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   )}
                 </DialogContent>
                 <DialogActions>
-                <MDButton 
-  onClick={handleClose} 
-  color="error" 
-  sx={{ marginRight: "10px" }}
->
-  Cancel
-</MDButton>
-<MDBox>
-  <MDButton 
-    variant="gradient" 
-    color="submit" 
-    fullWidth 
-    onClick={handleSubmit}
-    disabled={isSwitching}
-  >
-    {isSwitching ? <CircularProgress size={20} /> : "Submit"}
-  </MDButton>
-</MDBox>
-
+                  <MDButton onClick={handleClose} color="error" sx={{ marginRight: "10px" }}>
+                    Cancel
+                  </MDButton>
+                  <MDBox>
+                    <MDButton
+                      variant="gradient"
+                      color="submit"
+                      fullWidth
+                      onClick={handleSubmit}
+                      disabled={isSwitching}
+                    >
+                      {isSwitching ? <CircularProgress size={20} /> : "Submit"}
+                    </MDButton>
+                  </MDBox>
                 </DialogActions>
               </Dialog>
               <IconButton

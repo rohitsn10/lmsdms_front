@@ -4,13 +4,20 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   MenuItem,
-  Select,
   FormControl,
+  Select,
+  OutlinedInput,
   InputLabel,
-  Button,
 } from "@mui/material";
+import MDButton from "components/MDButton";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import { useUserListQuery } from "api/auth/userApi"; // Replace with the actual path to your query hook
+
+const handleClear = () => {
+  setAssignedTo("");
+};
 
 const SendBackDialog = ({
   open,
@@ -21,41 +28,70 @@ const SendBackDialog = ({
   statusSendBack,
   setStatusSendBack,
 }) => {
+  const { data: userData, isLoading, error } = useUserListQuery();
+
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Send Back</DialogTitle>
-      <DialogContent>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Assigned To</InputLabel>
-          <Select
-            value={assignedTo}
-            onChange={(e) => setAssignedTo(e.target.value)}
-          >
-            <MenuItem value="user1">User 1</MenuItem>
-            <MenuItem value="user2">User 2</MenuItem>
-            <MenuItem value="user3">User 3</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Status Send Back</InputLabel>
-          <Select
-            value={statusSendBack}
-            onChange={(e) => setStatusSendBack(e.target.value)}
-          >
-            <MenuItem value="pending">Pending</MenuItem>
-            <MenuItem value="review">Review</MenuItem>
-            <MenuItem value="rejected">Rejected</MenuItem>
-          </Select>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        <Button color="error" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button color="primary" onClick={onConfirm}>
-          Confirm
-        </Button>
-      </DialogActions>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <MDBox sx={{ textAlign: "center" }}>
+        <MDTypography variant="h4" fontWeight="medium" color="#344767" mt={1}>
+          Send Back
+        </MDTypography>
+      </MDBox>
+
+      <form onSubmit={(e) => e.preventDefault()}>
+        <DialogContent>
+          <MDBox display="flex" justifyContent="flex-end">
+            <MDButton
+              variant="outlined"
+              color="error"
+              size="small"
+              onClick={handleClear}
+              sx={{ marginRight: "20px" }}
+            >
+              Clear
+            </MDButton>
+          </MDBox>
+
+          {/* Assigned To Dropdown */}
+          <FormControl fullWidth margin="dense">
+            <InputLabel id="assigned-to-label">Assigned To</InputLabel>
+            <Select
+              labelId="assigned-to-label"
+              id="assigned-to"
+              value={assignedTo}
+              onChange={(e) => setAssignedTo(e.target.value)}
+              input={<OutlinedInput label="Assigned To" />}
+              sx={{
+                minWidth: 200,
+                height: "3rem",
+                ".MuiSelect-select": { padding: "0.45rem" },
+              }}
+            >
+              {!isLoading && userData?.data?.map((user) => (
+                <MenuItem key={user.id} value={user.id}>
+                  {`${user.first_name || ""} ${user.last_name || ""}`.trim()}
+                </MenuItem>
+              ))}
+              {error && (
+                <MenuItem disabled>
+                  Error loading users
+                </MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </DialogContent>
+
+        <DialogActions>
+          <MDButton onClick={onClose} color="error" sx={{ marginRight: "10px" }}>
+            Cancel
+          </MDButton>
+          <MDBox>
+            <MDButton variant="gradient" color="submit" fullWidth onClick={onConfirm}>
+              Confirm
+            </MDButton>
+          </MDBox>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };

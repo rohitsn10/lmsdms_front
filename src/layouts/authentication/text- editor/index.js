@@ -1,15 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { EditorContent, useEditor, Extension } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
-import TextAlign from "@tiptap/extension-text-align";
-import Image from "@tiptap/extension-image";
-import Link from "@tiptap/extension-link";
-import Placeholder from "@tiptap/extension-placeholder";
+import Quill from "quill";
+import "quill/dist/quill.snow.css";
+import ImageResize from "quill-image-resize-module-react";
 import Mammoth from "mammoth";
 import { Document, Packer, Paragraph } from "docx";
 import { saveAs } from "file-saver";
+import { useParams } from "react-router-dom";
+import ReactDOM from "react-dom";
+import CommentBankIcon from "@mui/icons-material/CommentBank";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import {
   Box,
   Button,
@@ -34,85 +33,55 @@ import AntiCopyPattern from "layouts/authentication/text- editor/anti-copy/AntiC
 import { useNavigate } from "react-router-dom";
 import { useDraftDocumentMutation } from "api/auth/texteditorApi";
 import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
-import { useDocumentApproverStatusMutation } from "api/auth/texteditorApi";
-import { useDocumentDocadminStatusMutation } from "api/auth/texteditorApi";
 import SendBackDialog from "./sendback";
+import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
 
-import { useGetTemplateQuery, useCreateDocumentMutation } from "api/auth/texteditorApi";
-import { useCreateCommentMutation } from "api/auth/commentsApi";
+// Register the ImageResize module
+Quill.register("modules/imageResize", ImageResize);
 
-const CustomComment = Extension.create({
-  name: "comment",
-  addOptions() {
-    return {
-      comments: [],
-    };
-  },
-  addAttributes() {
-    return {
-      comment: {
-        default: null,
-        renderHTML: (attributes) => ({
-          "data-comment": attributes.comment,
-        }),
-      },
-    };
-  },
-});
-
-const AntiCopyPattern = () => {
-  return (
-    <Box
-      sx={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        zIndex: -1,
-        background: `
-          repeating-linear-gradient(
-            45deg,
-            rgba(255,0,0,0.05) 0,
-            rgba(255,0,0,0.05) 10px,
-            transparent 10px,
-            transparent 20px
-          )
-        `,
-        opacity: 0.3,
-        userSelect: "none",
-      }}
-    />
-  );
-};
+// Toolbar options for the editor
+const toolbarOptions = [
+  [{ font: [] }],
+  [{ header: [1, 2, 3, 4, 5, 6, false] }],
+  [{ size: ["small", "normal", "large", "huge"] }],
+  ["bold", "italic", "underline", "strike"],
+  [{ color: [] }, { background: [] }],
+  [{ list: "ordered" }, { list: "bullet" }],
+  [{ align: [] }],
+  ["link", "image", "video", "blockquote", "hr", "formula"],
+  ["clean"],
+  [{ indent: "-1" }, { indent: "+1" }],
+  ["code-block"],
+  ["comment"], // Custom comment button
+  ["view-comments"], // Custom view comments button
+];
 
 const DocumentView = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
   const [docContent, setDocContent] = useState("");
-  const [comments, setComments] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [openCommentDialog, setOpenCommentDialog] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const quillRef = useRef(null);
+  const { id } = useParams();
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [opencommentDialog, setOpencommentDialog] = useState(false);
   const [currentComment, setCurrentComment] = useState("");
   const [selectedRange, setSelectedRange] = useState(null);
-
+  const [comments, setComments] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
   const [createDocument] = useCreateDocumentMutation();
   const [createComment] = useCreateCommentMutation();
-  const { data, error, isLoading } = useGetTemplateQuery(id, {
-    skip: !id,
-  });
+  const { data, error, isLoading } = useGetTemplateQuery(id);
   const [draftDocument] = useDraftDocumentMutation();
   const [documentReviewStatus] = useDocumentReviewStatusMutation();
-  const [documentApproverStatus] = useDocumentApproverStatusMutation();
+  const navigate = useNavigate();
   const [documentApproveStatus] = useDocumentApproveStatusMutation();
-  const [documentDocadminStatus] = useDocumentDocadminStatusMutation();
+  const [ documentSendBackStatus] = useDocumentSendBackStatusMutation();
   const searchParams = new URLSearchParams(location.search);
   const document_current_status = searchParams.get("status");
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(''); // State for Assigned To dropdown
   const [statusSendBack, setStatusSendBack] = useState(''); // State for Status Send Back dropdown
-
+  console.log("Navigated with data:", { id, document_current_status});
+  
   useEffect(() => {
     const fetchDocxFile = async () => {
       if (data?.template_url) {
@@ -121,8 +90,10 @@ const DocumentView = () => {
           const arrayBuffer = await response.arrayBuffer();
           const result = await Mammoth.convertToHtml({ arrayBuffer });
           setDocContent(result.value);
+          setIsLoaded(true);
         } catch (err) {
           console.error("Error converting DOCX to HTML:", err);
+          setIsLoaded(true);
         }
       }
     };
@@ -130,44 +101,63 @@ const DocumentView = () => {
     fetchDocxFile();
   }, [data]);
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      Image,
-      Link,
-      Placeholder.configure({
-        placeholder: "Start editing your document...",
-      }),
-      CustomComment,
-    ],
-    content: docContent,
-  });
+  useEffect(() => {
+    if (isLoaded && !quillRef.current) {
+      const quill = new Quill("#editor-container", {
+        theme: "snow",
+        modules: {
+          toolbar: {
+            container: toolbarOptions,
+            handlers: {
+              comment: handleAddComment, // Correct handler for adding comments
+              "view-comments": handleOpenCommentsDrawer, // Correct handler for viewing comments
+            },
+          },
+          imageResize: {},
+        },
+      });
 
-  // const handleConfirmSave = async () => {
-  //   if (!editor) return;
+      quillRef.current = quill;
+      quill.clipboard.dangerouslyPasteHTML(docContent);
 
-  //   const content = editor.getHTML();
-  //   const documentData = { document_id: id, document_data: content };
+      comments.forEach(({ range }) => {
+        quill.formatText(range.index, range.length, { background: "yellow" });
+      });
 
-  //   await createDocument(documentData);
+      // Add icons to the toolbar buttons
+      const commentButton = document.querySelector(".ql-comment");
+      const viewCommentsButton = document.querySelector(".ql-view-comments");
 
-  //   const commentsObject = {};
-  //   comments.forEach((comment, index) => {
-  //     const key = comment.selectedText?.trim() || `comment-${index}`;
-  //     commentsObject[key] = comment.comment;
-  //   });
+      if (commentButton) {
+        commentButton.innerHTML = "";
+        const commentIcon = document.createElement("span");
+        ReactDOM.render(<CommentBankIcon fontSize="small" />, commentIcon);
+        commentButton.appendChild(commentIcon);
+      }
 
-  //   await createComment({
-  //     document: id,
-  //     comment_description: commentsObject,
-  //   });
+      if (viewCommentsButton) {
+        viewCommentsButton.innerHTML = "";
+        const viewIcon = document.createElement("span");
+        ReactDOM.render(<PlaylistAddCheckIcon fontSize="small" />, viewIcon);
+        viewCommentsButton.appendChild(viewIcon);
+      }
+    }
+  }, [isLoaded, docContent, comments]);
 
-  //   setOpenDialog(false);
-  // };
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        setOpenDialog(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleOpenCommentsDrawer = () => {
+    setOpenDrawer(true);
+  };
 
   const handleSaveDraft = async () => {
     try {
@@ -202,7 +192,6 @@ const DocumentView = () => {
       const response = await documentReviewStatus({
         document_id: id, // Replace with your actual document_id
         status: "4", // Replace with your desired status
-
       }).unwrap();
       navigate("/document-listing");
       console.log("API Response:", response);
@@ -236,7 +225,6 @@ const DocumentView = () => {
       alert("An error occurred. Please try again.");
     }
   };
-
   const handleDoc = async () => {
     console.log("Doc click button ");
     try {
@@ -258,62 +246,58 @@ const DocumentView = () => {
   };
 
   const handleAddComment = () => {
-    if (!editor) return;
-
-    const { from, to } = editor.state.selection;
-    const selectedText = editor.state.doc.textBetween(from, to, " ");
-
-    if (selectedText.trim()) {
-      setSelectedRange({ from, to });
-      setOpenCommentDialog(true);
+    const quill = quillRef.current;
+    const range = quill.getSelection();
+    if (range) {
+      setSelectedRange(range);
+      setOpencommentDialog(true); // Open modal instead of drawer
     } else {
       alert("Please select text to add a comment.");
     }
   };
-  const handleOpenDialog = () => {
-    setDialogOpen(true);
-  };
 
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-  };
-
-  // Handle dialog confirm
-  const handleConfirmDialog = () => {
-    console.log('Assigned To:', assignedTo);
-    console.log('Status Send Back:', statusSendBack);
-    setDialogOpen(false); // Close dialog after confirmation
-  };
+  // const handleSaveComment = () => {
+  //   if (currentComment.trim() === "") return;
+  //   const quill = quillRef.current;
+  //   quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
+  //   setComments([...comments, { id: Date.now(), range: selectedRange, comment: currentComment }]);
+  //   setCurrentComment("");
+  //   setOpencommentDialog(false); // Close modal after saving
+  // };
 
   const handleSaveComment = () => {
-    if (!currentComment.trim()) return;
+    if (currentComment.trim() === "") return;
 
-    const selectedText = editor.state.doc.textBetween(selectedRange.from, selectedRange.to, " ");
+    const quill = quillRef.current;
 
+    // Extract the selected word based on the selected range
+    const selectedText = quill.getText(selectedRange.index, selectedRange.length).trim();
+
+    // If no text is selected, return early
+    if (!selectedText) return;
+
+    // Highlight the selected text (optional)
+    quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
+
+    // Add the selected word and comment to the comments array
     setComments([
       ...comments,
-      {
-        id: Date.now(),
-        selectedText,
-        comment: currentComment,
-      },
+      { id: Date.now(), selectedWord: selectedText, range: selectedRange, comment: currentComment },
     ]);
 
-    editor.commands.setMark(CustomComment, { comment: currentComment });
-
+    // Clear the comment input and close the dialog
     setCurrentComment("");
-    setOpenCommentDialog(false);
+    setOpencommentDialog(false); // Close modal after saving
   };
-
   const handlePrint = () => {
     console.log("Id passed:", id);
-    navigate(`/print-document/${id}`);
+    navigate("/print-document/${id}");
   };
 
   const handleSaveAsDocx = async () => {
-    if (!editor) return;
+    const quill = quillRef.current;
+    const htmlContent = quill.root.innerHTML;
 
-    const htmlContent = editor.getHTML();
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, "text/html");
     const plainText = doc.body.innerText.split("\n");
@@ -325,10 +309,42 @@ const DocumentView = () => {
         },
       ],
     });
-
     Packer.toBlob(docxDocument).then((blob) => {
       saveAs(blob, "document.docx");
     });
+  };
+  const handleOpenDialog = () => {
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
+  // Handle dialog confirm
+  const handleConfirmDialog = async () => {
+    console.log("Send Back button clicked");
+  
+    try {
+      // Call the API using the mutation hook and pass the required data directly
+      const response = await documentSendBackStatus({
+        document_id: id, // Replace with your actual document_id
+        assigned_to: assignedTo, // Value from the dialog's state
+        status_sendback: document_current_status, // The current status (replace with actual status if needed)
+      }).unwrap();
+  
+      console.log("API Response:", response);
+      if (response.status) {
+        alert(response.message); // Success message from the API response
+        setDialogOpen(false); // Close dialog on success
+        navigate("/document-listing"); // Navigate to document listing page
+      } else {
+        alert("Action failed. Please try again."); // Failure alert
+      }
+    } catch (error) {
+      console.error("Error calling API:", error);
+      alert("An error occurred. Please try again."); // General error handling
+    }
   };
 
   const handleConfirmSave = async () => {
@@ -350,7 +366,7 @@ const DocumentView = () => {
         commentsObject[key] = comment.comment; // Map the word to the comment
       } else {
         // Fallback if selectedWord is not available
-        const fallbackKey = `comment-${index}`;
+        const fallbackKey = "comment-${index}";
         commentsObject[fallbackKey] = comment.comment;
       }
     });
@@ -399,8 +415,6 @@ const DocumentView = () => {
   if (error) {
     return <Box padding={2}>Error loading document</Box>;
   }
-  if (isLoading) return <Box padding={2}>Loading document...</Box>;
-  if (error) return <Box padding={2}>Error loading document</Box>;
 
   return (
     <Box
@@ -409,10 +423,11 @@ const DocumentView = () => {
         padding: 2,
         backgroundColor: "#f4f4f4",
         minHeight: "100vh",
+        position: "relative", // Ensure this container has a relative position
       }}
     >
+      {/* Insert AntiCopyPattern as the background */}
       <AntiCopyPattern />
-
       <MDButton
         variant="gradient"
         color="submit"
@@ -422,48 +437,52 @@ const DocumentView = () => {
           mt: 1,
           mr: 1,
         }}
-        
       >
         Print
       </MDButton>
-
-      <Box
+      <Paper
+        id="editor-container"
         sx={{
+          position: "relative", // Ensure editor is on top of the pattern
           width: "210mm",
           height: "297mm",
-          margin: "20px auto",
-          padding: 2,
           border: "1px solid #ccc",
-          backgroundColor: "#fff",
+          // backgroundColor: "#fff",
+          padding: 2,
+          borderRadius: 1,
+          overflowY: "auto",
+          margin: "20px auto",
+          boxShadow: 2,
         }}
-      >
-        <EditorContent editor={editor} />
-      </Box>
+      />
 
-      <Dialog open={openCommentDialog} onClose={() => setOpenCommentDialog(false)}>
-        <DialogTitle>Add Comment</DialogTitle>
-        <DialogContent>
-          <textarea
-            value={currentComment}
-            onChange={(e) => setCurrentComment(e.target.value)}
-            placeholder="Enter your comment"
-            rows={4}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenCommentDialog(false)}>Cancel</Button>
-          <Button onClick={handleSaveComment}>Save</Button>
-        </DialogActions>
-      </Dialog>
+      <CommentDrawer
+        open={openDrawer}
+        onClose={() => setOpenDrawer(false)}
+        comments={comments}
+        onAddCommentClick={handleAddComment}
+        onEditCommentClick={handleEditComment}
+        handleSaveEdit={handleSaveEdit}
+      />
+
+      <CommentModal
+        open={opencommentDialog}
+        onClose={() => setOpencommentDialog(false)}
+        currentComment={currentComment}
+        setCurrentComment={setCurrentComment}
+        handleSaveComment={handleSaveComment}
+      />
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Save Document</DialogTitle>
         <DialogContent>
-          <DialogContentText>Do you want to save this document & all comments?</DialogContentText>
+          <DialogContentText>Do you want to save this document & All comments ?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleConfirmSave}>Save</Button>
+          <Button onClick={handleConfirmSave} color="primary">
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -500,7 +519,7 @@ const DocumentView = () => {
             <MDButton
               variant="gradient"
               color="error" // Change color to indicate sending back
-              onClick={handleConfirmDialog}
+              onClick={handleOpenDialog}
               disabled={isLoading}
             >
               Send Back
@@ -521,7 +540,7 @@ const DocumentView = () => {
             </MDButton>
             <MDButton
               variant="gradient"
-              onClick={handleConfirmDialog}
+              onClick={handleOpenDialog}
               color="error"
               disabled={isLoading}
             >
@@ -537,7 +556,7 @@ const DocumentView = () => {
             <MDButton
               variant="gradient"
               color="error"
-              onClick={handleConfirmDialog}
+              onClick={handleOpenDialog}
               disabled={isLoading}
             >
               Send Back

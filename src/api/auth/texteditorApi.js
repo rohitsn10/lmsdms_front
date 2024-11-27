@@ -71,6 +71,14 @@ export const texteditorApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    documentSendBackStatus: builder.mutation({
+      query: ({ document_id , assigned_to,status_sendback }) => ({
+        url: `dms_module/document_send_back_status`,
+        method: "POST",
+        body: { document_id , assigned_to,status_sendback },
+      }),
+      transformResponse: (response) => response,
+    }),
   }),
 });
 
@@ -81,5 +89,6 @@ export const {
   useDocumentApproveStatusMutation,
   useDocumentReviewStatusMutation,
   useDocumentApproverStatusMutation,
-  useDocumentDocadminStatusMutation
+  useDocumentDocadminStatusMutation,
+  useDocumentSendBackStatusMutation,
 } = texteditorApi;
