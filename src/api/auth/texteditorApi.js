@@ -55,6 +55,22 @@ export const texteditorApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    documentApproverStatus: builder.mutation({
+      query: ({ document_id, status }) => ({
+        url: `dms_module/document_approver_status`,
+        method: "POST",
+        body: { document_id, status },
+      }),
+      transformResponse: (response) => response,
+    }),
+    documentDocadminStatus: builder.mutation({
+      query: ({ document_id, status }) => ({
+        url: `dms_module/document_docadmin_status`,
+        method: "POST",
+        body: { document_id, status },
+      }),
+      transformResponse: (response) => response,
+    }),
   }),
 });
 
@@ -64,4 +80,6 @@ export const {
   useDraftDocumentMutation,
   useDocumentApproveStatusMutation,
   useDocumentReviewStatusMutation,
+  useDocumentApproverStatusMutation,
+  useDocumentDocadminStatusMutation
 } = texteditorApi;

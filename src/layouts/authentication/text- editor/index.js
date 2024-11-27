@@ -12,7 +12,7 @@ import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import {
   Box,
   Button,
-  Paper,  
+  Paper,
   Dialog,
   DialogActions,
   DialogContent,
@@ -21,7 +21,11 @@ import {
 } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
-import { useGetTemplateQuery, useCreateDocumentMutation, useDocumentReviewStatusMutation, } from "api/auth/texteditorApi";
+import {
+  useGetTemplateQuery,
+  useCreateDocumentMutation,
+  useDocumentReviewStatusMutation,
+} from "api/auth/texteditorApi";
 import CommentDrawer from "./Comments/CommentsDrawer"; // Adjusted import for CommentDrawer
 import CommentModal from "./Comments/CommentDialog"; // Adjusted import for CommentModal
 import { useCreateCommentMutation } from "api/auth/commentsApi";
@@ -29,6 +33,9 @@ import AntiCopyPattern from "layouts/authentication/text- editor/anti-copy/AntiC
 import { useNavigate } from "react-router-dom";
 import { useDraftDocumentMutation } from "api/auth/texteditorApi";
 import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
+import { useDocumentApproverStatusMutation } from "api/auth/texteditorApi";
+import { useDocumentDocadminStatusMutation } from "api/auth/texteditorApi";
+import SendBackDialog from "./sendback";
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -66,11 +73,15 @@ const DocumentView = () => {
   const { data, error, isLoading } = useGetTemplateQuery(id);
   const [draftDocument] = useDraftDocumentMutation();
   const [documentReviewStatus] = useDocumentReviewStatusMutation();
+  const [documentApproverStatus] = useDocumentApproverStatusMutation();
   const navigate = useNavigate();
   const [documentApproveStatus] = useDocumentApproveStatusMutation();
+  const [documentDocadminStatus] = useDocumentDocadminStatusMutation();
   const searchParams = new URLSearchParams(location.search);
   const document_current_status = searchParams.get("status");
-  console.log("Navigated with data:", { id, document_current_status});
+  const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
+  const [assignedTo, setAssignedTo] = useState(''); // State for Assigned To dropdown
+  const [statusSendBack, setStatusSendBack] = useState(''); // State for Status Send Back dropdown
 
   useEffect(() => {
     const fetchDocxFile = async () => {
@@ -151,7 +162,7 @@ const DocumentView = () => {
 
   const handleSaveDraft = async () => {
     try {
-      await draftDocument({ document_id: id, status_id: 11 }).unwrap();
+      await draftDocument({ document_id: id, status_id: 2 }).unwrap();
       // Handle success (e.g., show success message)
       navigate("/document-listing");
     } catch (err) {
@@ -166,7 +177,7 @@ const DocumentView = () => {
       const response = await documentApproveStatus({
         document_id: id,
         // documentdetails_id: '1',
-        status: "12",
+        status: "3",
       }).unwrap();
       navigate("/document-listing");
       // console.log('API Response:', response);
@@ -181,21 +192,60 @@ const DocumentView = () => {
     try {
       const response = await documentReviewStatus({
         document_id: id, // Replace with your actual document_id
-        status: "13",       // Replace with your desired status
+        status: "4", // Replace with your desired status
       }).unwrap();
       navigate("/document-listing");
-      console.log('API Response:', response);
+      console.log("API Response:", response);
       if (response.status) {
         alert(response.message); // Success message
       } else {
-        alert('Action failed');
+        alert("Action failed");
       }
     } catch (error) {
-      console.error('Error calling API:', error);
-      alert('An error occurred. Please try again.');
+      console.error("Error calling API:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
+  const handleApprove = async () => {
+    console.log("Approve button clicked");
+    try {
+      const response = await documentApproverStatus({
+        document_id: id, // Replace with your actual document_id
+        status: "5", // Replace with your desired status
+      }).unwrap();
+      navigate("/document-listing");
+      console.log("API Response:", response);
+      if (response.status) {
+        alert(response.message); // Success message
+      } else {
+        alert("Action failed");
+      }
+    } catch (error) {
+      console.error("Error calling API:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
+
+  const handleDoc = async () => {
+    console.log("Doc click button ");
+    try {
+      const response = await documentDocadminStatus({
+        document_id: id, // Replace with your actual document_id
+        status: "6", // Replace with your desired status
+      }).unwrap();
+      navigate("/document-listing");
+      console.log("API Response:", response);
+      if (response.status) {
+        alert(response.message); // Success message
+      } else {
+        alert("Action failed");
+      }
+    } catch (error) {
+      console.error("Error calling API:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
 
   const handleAddComment = () => {
     const quill = quillRef.current;
@@ -206,6 +256,20 @@ const DocumentView = () => {
     } else {
       alert("Please select text to add a comment.");
     }
+  };
+  const handleOpenDialog = () => {
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
+  // Handle dialog confirm
+  const handleConfirmDialog = () => {
+    console.log('Assigned To:', assignedTo);
+    console.log('Status Send Back:', statusSendBack);
+    setDialogOpen(false); // Close dialog after confirmation
   };
 
   // const handleSaveComment = () => {
@@ -266,7 +330,6 @@ const DocumentView = () => {
     });
   };
 
-  
   const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
     const documentData = { document_id: id, document_data: content };
@@ -407,58 +470,95 @@ const DocumentView = () => {
       </Dialog>
 
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
-  {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-  {(document_current_status === "1" || document_current_status === "2") && (
-    <>
-      <MDButton
-        variant="gradient"
-        color="submit"
-        type="button" // Set to "button" to prevent default form submission
-        onClick={handleSubmit}
-        disabled={isLoading} // Disable the button while the API call is in progress
-      >
-        {isLoading ? "Submitting..." : "Submit"}
-      </MDButton>
-      <MDButton
-        variant="gradient"
-        color="submit"
-        onClick={handleSaveDraft}
-        disabled={isLoading} // Disable button when mutation is in progress
-      >
-        Save Draft
-      </MDButton>
-    </>
-  )}
+        {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
+        {(document_current_status === "1" || document_current_status === "2") && (
+          <>
+            <MDButton
+              variant="gradient"
+              color="submit"
+              type="button" // Set to "button" to prevent default form submission
+              onClick={handleSubmit}
+              disabled={isLoading} // Disable the button while the API call is in progress
+            >
+              {isLoading ? "Submitting..." : "Submit"}
+            </MDButton>
+            <MDButton
+              variant="gradient"
+              color="submit"
+              onClick={handleSaveDraft}
+              disabled={isLoading} // Disable button when mutation is in progress
+            >
+              Save Draft
+            </MDButton>
+          </>
+        )}
 
-  {/* Condition 2: Show Review button when status is "3" */}
-  {document_current_status === "3" && (
-    <MDButton
-      variant="gradient"
-      color="submit"
-      onClick={handleReview}
-      disabled={isLoading}
-    >
-      Review
-    </MDButton>
-  )}
+        {/* Condition 2: Show Review button when status is "3" */}
+        {document_current_status === "3" && (
+          <>
+            <MDButton variant="gradient" color="submit" onClick={handleReview} disabled={isLoading}>
+              Review
+            </MDButton>
+            <MDButton
+              variant="gradient"
+              color="error" // Change color to indicate sending back
+              onClick={handleConfirmDialog}
+              disabled={isLoading}
+            >
+              Send Back
+            </MDButton>
+          </>
+        )}
 
-  {/* Condition 3: Show Approve button when status is "4" */}
-  {document_current_status === "4" && (
-    <MDButton
-      variant="gradient"
-      color="submit"
-      // onClick={handleApprove}
-      disabled={isLoading}
-    >
-      Approve
-    </MDButton>
-  )}
-
-  {/* Display success or error messages */}
-  {data && <p>{data.message}</p>}
-  {error && <p>Error: {error.message}</p>}
-</MDBox>
-
+        {/* Condition 3: Show Approve button when status is "4" */}
+        {document_current_status === "4" && (
+          <>
+            <MDButton
+              variant="gradient"
+              color="submit"
+              onClick={handleApprove}
+              disabled={isLoading}
+            >
+              Approve
+            </MDButton>
+            <MDButton
+              variant="gradient"
+              onClick={handleConfirmDialog}
+              color="error"
+              disabled={isLoading}
+            >
+              Send Back
+            </MDButton>
+          </>
+        )}
+        {document_current_status === "5" && (
+          <>
+            <MDButton variant="gradient" color="submit" onClick={handleDoc} disabled={isLoading}>
+              Doc Admin Approve
+            </MDButton>
+            <MDButton
+              variant="gradient"
+              color="error"
+              onClick={handleConfirmDialog}
+              disabled={isLoading}
+            >
+              Send Back
+            </MDButton>
+          </>
+        )}
+        {/* Display success or error messages */}
+        {data && <p>{data.message}</p>}
+        {error && <p>Error: {error.message}</p>}
+      </MDBox>
+      <SendBackDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        onConfirm={handleConfirmDialog}
+        assignedTo={assignedTo}
+        setAssignedTo={setAssignedTo}
+        statusSendBack={statusSendBack}
+        setStatusSendBack={setStatusSendBack}
+      />
     </Box>
   );
 };
