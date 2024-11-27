@@ -33,38 +33,32 @@ const PermissionsTable = () => {
         }
     }, [permissions]);
 
-    const handleCheckboxChange = (name, action) => {
+    const handleCheckboxChange = (role, action) => {
         setPermissionState((prevState) => ({
             ...prevState,
-            [name]: {
-                ...prevState[name],
-                [action]: !prevState[name][action], // Toggle the checkbox state
+            [role]: {
+                ...prevState[role],
+                [action]: !prevState[role][action],
             },
         }));
     };
 
     const handleSubmit = () => {
-        console.log('Permission State before submission:', permissionState);
-
-        // Create an array of selected permission IDs
-        const selectedPermissionIds = Object.keys(permissionState)
-            .map((role) => {
-                const perm = permissionState[role];
-                const selectedIds = [];
-                if (perm.isAdd) selectedIds.push(perm.addId);
-                if (perm.isView) selectedIds.push(perm.viewId);
-                if (perm.isChange) selectedIds.push(perm.changeId);
-                if (perm.isDelete) selectedIds.push(perm.deleteId);
-                return selectedIds;
-            })
-            .flat(); // Flatten the array to get a single list of IDs
+        // Collect permissions for the group
+        const selectedPermissionIds = Object.keys(permissionState).map((role) => {
+            const perm = permissionState[role];
+            const selectedIds = [];
+            if (perm.isAdd) selectedIds.push(perm.addId);
+            if (perm.isView) selectedIds.push(perm.viewId);
+            if (perm.isChange) selectedIds.push(perm.changeId);
+            if (perm.isDelete) selectedIds.push(perm.deleteId);
+            return selectedIds;
+        }).flat();
 
         const payload = {
             name: groupName,
             permissions: selectedPermissionIds,
         };
-
-        console.log('Payload to submit:', payload);
 
         createGroupWithPermissions(payload)
             .unwrap()
@@ -85,8 +79,8 @@ const PermissionsTable = () => {
     );
 
     const columns = [
-        { field: 'srNo', headerName: 'Sr. No.', flex: 0.5, headerAlign: 'center' },
-        { field: 'role', headerName: 'Role', flex: 1, headerAlign: 'center' },
+        { field: 'srNo', headerName: 'Sr. No.', flex: 0.5, headerAlign: 'center', align: 'center' },
+        { field: 'role', headerName: 'Role', flex: 1, headerAlign: 'center', align: 'center' },
         {
             field: 'add',
             headerName: 'Add',
@@ -98,6 +92,7 @@ const PermissionsTable = () => {
                     onChange={() => handleCheckboxChange(params.row.role, 'isAdd')}
                 />
             ),
+            align: 'center',
         },
         {
             field: 'view',
@@ -110,6 +105,7 @@ const PermissionsTable = () => {
                     onChange={() => handleCheckboxChange(params.row.role, 'isView')}
                 />
             ),
+            align: 'center',
         },
         {
             field: 'update',
@@ -122,6 +118,7 @@ const PermissionsTable = () => {
                     onChange={() => handleCheckboxChange(params.row.role, 'isChange')}
                 />
             ),
+            align: 'center',
         },
         {
             field: 'delete',
@@ -134,6 +131,7 @@ const PermissionsTable = () => {
                     onChange={() => handleCheckboxChange(params.row.role, 'isDelete')}
                 />
             ),
+            align: 'center',
         },
     ];
 
@@ -148,7 +146,7 @@ const PermissionsTable = () => {
 
     return (
         <MDBox p={3}>
-            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0}}>
+            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
                 <MDBox p={3} display="flex" alignItems="center">
                     <MDInput
                         label="Search Permissions"
@@ -167,7 +165,7 @@ const PermissionsTable = () => {
                 </MDBox>
                 <MDBox display="flex" justifyContent="flex-start" sx={{ mt: 2, mb: 2, ml: 3 }}>
                     <MDInput
-                        label="Roles"
+                        label="Group Name"
                         variant="outlined"
                         size="small"
                         sx={{ width: '250px' }}
@@ -189,6 +187,11 @@ const PermissionsTable = () => {
                                 '& .MuiDataGrid-columnHeaders': {
                                     backgroundColor: '#f5f5f5',
                                     fontWeight: 'bold',
+                                },
+                                '& .MuiDataGrid-cell': {
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
                                 },
                             }}
                         />

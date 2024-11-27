@@ -7,11 +7,8 @@ export const login = async (loginData) => {
       password: loginData.password,
     });
 
-    
     if (response.data && response.data.data && response.data.data.token) {
-
       sessionStorage.setItem('token', response.data.data.token);
-     
     }
 
     return response;
@@ -20,6 +17,7 @@ export const login = async (loginData) => {
     throw error;
   }
 };
+
 export const authenticateToken = (token) => {
   return apiService.post('/get_user_from_token', {}, {
     headers: {
@@ -33,12 +31,21 @@ export const logout = (navigate) => {
   navigate('/login');
 };
 
-
 export const getUserGroups = () => {
   const token = sessionStorage.getItem('token');
   console.log("Token:", token); 
 
   return apiService.get('/user_profile/user_group_list', {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+};
+
+// New API call for `requestuser_group_list`
+export const requestUserGroupList = () => {
+  const token = sessionStorage.getItem('token');
+  return apiService.get('/user_profile/requestuser_group_list', {
     headers: {
       'Authorization': `Bearer ${token}`,
     },

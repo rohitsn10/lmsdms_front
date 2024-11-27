@@ -1,34 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Card from '@mui/material/Card';
-import { DataGrid } from '@mui/x-data-grid';
-import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import MDBox from 'components/MDBox';
-import MDTypography from 'components/MDTypography';
-import MDInput from 'components/MDInput';
-import MDButton from 'components/MDButton';
-import AddinventoryDialog from './inventory';
-import UpdateinventoryDialog from './edit';
-import { useViewInventoryQuery, useDeleteInventoryMutation } from 'api/auth/inventoryApi';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Card from "@mui/material/Card";
+import { DataGrid } from "@mui/x-data-grid";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import MDInput from "components/MDInput";
+import MDButton from "components/MDButton";
+import AddinventoryDialog from "./inventory";
+import UpdateinventoryDialog from "./edit";
+import { useViewInventoryQuery, useDeleteInventoryMutation } from "api/auth/inventoryApi";
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { useAuth } from "hooks/use-auth";
+import { hasPermission } from "utils/hasPermission";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 
 const InventoryListing = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
   const [inventories, setInventories] = useState([]);
   const [inventoryToDelete, setInventoryToDelete] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [inventoryId, setInventoryId] = useState(null);
-  const [inventoryName, setInventoryName] = useState('');
-  const navigate = useNavigate();
+  const [inventoryName, setInventoryName] = useState("");
 
+  const { user, role } = useAuth();
+  const navigate = useNavigate();
   const { data, isLoading, isError, refetch } = useViewInventoryQuery();
+
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role?.toString(), {
+    skip: !role,
+  });
 
   useEffect(() => {
     if (data) {
@@ -59,10 +67,10 @@ const InventoryListing = () => {
           setConfirmationDialogOpen(false);
           setInventoryToDelete(null);
         } else {
-          console.error('Error deleting inventory:', response.message || 'Unknown error');
+          console.error("Error deleting inventory:", response.message || "Unknown error");
         }
       } catch (error) {
-        console.error('Error deleting inventory:', error);
+        console.error("Error deleting inventory:", error);
       }
     }
   };
@@ -89,22 +97,26 @@ const InventoryListing = () => {
   }));
 
   const columns = [
-    { field: 'srNo', headerName: 'Sr. No.', flex: 0.5, headerAlign: 'center' },
-    { field: 'inventory_name', headerName: 'Inventory Name', flex: 1, headerAlign: 'center' },
-    { field: 'created_at', headerName: 'Date', flex: 1, headerAlign: 'center' },
+    { field: "srNo", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
+    { field: "inventory_name", headerName: "Inventory Name", flex: 1, headerAlign: "center" },
+    { field: "created_at", headerName: "Date", flex: 1, headerAlign: "center" },
     {
-      field: 'action',
-      headerName: 'Action',
+      field: "action",
+      headerName: "Action",
       flex: 1,
-      headerAlign: 'center',
+      headerAlign: "center",
       renderCell: (params) => (
         <div>
-          <IconButton color="primary" onClick={() => handleUpdate(params.id, params.row.inventory_name)}>
-            <EditIcon />
-          </IconButton>
-          <IconButton color="error" onClick={() => handleDeleteClick(params.id)}>
-            <DeleteIcon />
-          </IconButton>
+          {hasPermission(userPermissions, "dynamicinventory", "isChange") && (
+            <IconButton color="primary" onClick={() => handleUpdate(params.id, params.row.inventory_name)}>
+              <EditIcon />
+            </IconButton>
+          )}
+          {hasPermission(userPermissions, "dynamicinventory", "isDelete") && (
+            <IconButton color="error" onClick={() => handleDeleteClick(params.id)}>
+              <DeleteIcon />
+            </IconButton>
+          )}
         </div>
       ),
     },
@@ -123,25 +135,27 @@ const InventoryListing = () => {
 
   return (
     <MDBox p={3}>
-      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search"
             variant="outlined"
             size="small"
-            sx={{ width: '250px', mr: 2 }}
+            sx={{ width: "250px", mr: 2 }}
             value={searchTerm}
             onChange={handleSearch}
           />
-          <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: 'center' }}>
+          <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Inventory
           </MDTypography>
-          <MDButton variant="contained" color="primary" sx={{ ml: 2 }} onClick={handleAddClick}>
-            Add
-          </MDButton>
+          {hasPermission(userPermissions, "dynamicinventory", "isAdd") && (
+            <MDButton variant="contained" color="primary" sx={{ ml: 2 }} onClick={handleAddClick}>
+              Add
+            </MDButton>
+          )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
-          <div style={{ height: 500, width: '100%' }}>
+          <div style={{ height: 500, width: "100%" }}>
             <DataGrid
               rows={rowsWithSerial || []}
               columns={columns}
@@ -149,18 +163,18 @@ const InventoryListing = () => {
               rowsPerPageOptions={[5, 10, 20]}
               disableSelectionOnClick
               sx={{
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                '& .MuiDataGrid-columnHeaders': {
-                  display: 'flex',
-                  justifyContent: 'center',
-                  backgroundColor: '#f5f5f5',
-                  fontWeight: 'bold',
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                "& .MuiDataGrid-columnHeaders": {
+                  display: "flex",
+                  justifyContent: "center",
+                  backgroundColor: "#f5f5f5",
+                  fontWeight: "bold",
                 },
-                '& .MuiDataGrid-cell': {
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                "& .MuiDataGrid-cell": {
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 },
               }}
             />
@@ -184,7 +198,9 @@ const InventoryListing = () => {
         </DialogContent>
         <DialogActions>
           <MDButton onClick={handleCloseConfirmationDialog}>Cancel</MDButton>
-          <MDButton color="error" onClick={handleDelete}>Delete</MDButton>
+          <MDButton color="error" onClick={handleDelete}>
+            Delete
+          </MDButton>
         </DialogActions>
       </Dialog>
     </MDBox>

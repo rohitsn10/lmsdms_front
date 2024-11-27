@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import { DataGrid } from '@mui/x-data-grid';
@@ -16,6 +16,9 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import { useFetchPermissionsByGroupIdQuery } from 'api/auth/permissionApi';
+import { useAuth } from 'hooks/use-auth';
+import { hasPermission } from 'utils/hasPermission';
 
 const StatusListing = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,14 +26,19 @@ const StatusListing = () => {
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
   const [statuses, setStatuses] = useState([]);
   const [statusToDelete, setStatusToDelete] = useState(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);  // State to open the edit dialog
-  const [statusId, setStatusId] = useState(null);  // Store the status ID for editing
-  const [statusText, setStatusText] = useState('');  // Store the status text for editing
+  const [editDialogOpen, setEditDialogOpen] = useState(false);  
+  const [statusId, setStatusId] = useState(null);  
+  const [statusText, setStatusText] = useState(''); 
   const navigate = useNavigate();
+  const { user, role } = useAuth();
 
   const { data, isLoading, isError, refetch } = useViewStatusQuery();
 
-  React.useEffect(() => {
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role?.toString(), {
+    skip: !role,
+  });
+
+  useEffect(() => {
     if (data) {
       setStatuses(data);
     }
@@ -96,12 +104,17 @@ const StatusListing = () => {
       headerAlign: 'center',
       renderCell: (params) => (
         <div>
-          <IconButton color="primary" onClick={() => handleUpdate(params.id, params.row.status)}>
-            <EditIcon />
-          </IconButton>
-          <IconButton color="error" onClick={() => handleDeleteClick(params.id)}>
-            <DeleteIcon />
-          </IconButton>
+          {/* Role-based rendering for Edit and Delete buttons */}
+          {hasPermission(userPermissions, "dynamicstatus", "isChange") && (
+            <IconButton color="primary" onClick={() => handleUpdate(params.id, params.row.status)}>
+              <EditIcon />
+            </IconButton>
+          )}
+          {/* {hasPermission(userPermissions, "dynamicstatus", "isDelete") && (
+            <IconButton color="error" onClick={() => handleDeleteClick(params.id)}>
+              <DeleteIcon />
+            </IconButton>
+          )} */}
         </div>
       ),
     },
@@ -133,9 +146,11 @@ const StatusListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: 'center' }}>
             Status
           </MDTypography>
-          <MDButton variant="contained" color="primary" sx={{ ml: 2 }} onClick={handleAddClick}>
-            Add
-          </MDButton>
+          {hasPermission(userPermissions, "dynamicstatus", "isAdd") && (
+            <MDButton variant="contained" color="primary" sx={{ ml: 2 }} onClick={handleAddClick}>
+              Add
+            </MDButton>
+          )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: '100%' }}>

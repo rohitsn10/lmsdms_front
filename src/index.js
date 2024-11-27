@@ -24,16 +24,19 @@ import { MaterialUIControllerProvider } from "context";
 // Import Redux Provider and your store
 import { Provider } from 'react-redux';
 import store from './store'; // Adjust the path to your Redux store
+import AuthProvider from "context/auth-context";
 
 const container = document.getElementById("app");
 const root = createRoot(container);
 
 root.render(
   <Provider store={store}>  {/* Wrap your app with Provider */}
+        <AuthProvider>
     <BrowserRouter>
       <MaterialUIControllerProvider>
-        <App />
+          <App />
       </MaterialUIControllerProvider>
     </BrowserRouter>
+        </AuthProvider>
   </Provider>
 );

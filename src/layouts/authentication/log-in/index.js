@@ -29,7 +29,8 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { login, getUserGroups } from '../../../api/auth/auth';
+import { login, requestUserGroupList } from '../../../api/auth/auth';
+import { useAuth } from "hooks/use-auth";
 
 function Login() {
   const [userId, setUserId] = useState(""); 
@@ -42,6 +43,7 @@ function Login() {
   const [error, setError] = useState(""); 
   const navigate = useNavigate(); 
   const [firstName, setFirstName] = useState("");
+  const {updateUser, updateRole} = useAuth()
 
   const handleLogin = async () => {
     if (!userId || !password) {
@@ -52,6 +54,8 @@ function Login() {
     try {
       const response = await login({ username: userId, password });
   
+      console.log("---RESPONSE-DATA",response.data)
+
       if (response && response.data && response.data.message === "Login successfully") {
         const token = response.data.data?.token;
         const userFirstName = response.data.data?.first_name; // Extract first name
@@ -60,6 +64,7 @@ function Login() {
         if (token && userFirstName) {
           sessionStorage.setItem("token", token); // Store token
           setFirstName(userFirstName); // Store first name in state
+          updateUser(response.data.data, token)
           await fetchRoles(token); // Fetch roles with the token
           setDialogOpen(true); // Open role selection dialog
           setError(""); // Clear error if login is successful
@@ -80,7 +85,7 @@ function Login() {
   
   const fetchRoles = async (token) => {
     try {
-        const response = await getUserGroups(token);
+        const response = await requestUserGroupList(token);
         console.log("User groups response:", response); 
 
         
@@ -115,7 +120,7 @@ function Login() {
   };
 
   const handleOk = () => {
-    console.log("Selected Role:", selectedRole);
+    updateRole(selectedRole)
     setDialogOpen(false);
     navigate("/dashboard");
   };
@@ -282,7 +287,7 @@ function Login() {
             >
               {roles.length > 0 ? (
                 roles.map((role) => (
-                  <MenuItem key={role.id} value={role.name}>
+                  <MenuItem key={role.id} value={role.id}>
                     {role.name} 
                   </MenuItem>
                 ))

@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useCreateStatusMutation } from "api/auth/statusApi"; // Assuming the statusApi is placed in services folder
 import { Dialog, DialogActions, DialogContent, DialogTitle, FormControl, TextField, Button } from "@mui/material";
+import MDButton from "components/MDButton";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+
 
 function AddStatusDialog({ open, handleClose }) {
   const [status, setStatus] = useState("");
@@ -24,31 +28,55 @@ function AddStatusDialog({ open, handleClose }) {
     }
   };
 
+  const handleClear = () => {
+    setStatus("");
+  };
+
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
-      <DialogTitle>Add Status</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <MDBox sx={{ textAlign: "center" }}>
+      <MDTypography variant="h4" fontWeight="medium" color="#344767" mt={1}>
+        Add Status
+      </MDTypography>
+    </MDBox>
+
+    <form onSubmit={(e) => e.preventDefault()}>
       <DialogContent>
-        <FormControl fullWidth margin="dense">
+        <MDBox display="flex" justifyContent="flex-end">
+          <MDButton
+            variant="outlined"
+            color="error"
+            size="small"
+            onClick={handleClear}
+            sx={{ marginRight: "20px" }}
+          >
+            Clear
+          </MDButton>
+        </MDBox>
+        <FormControl fullWidth margin="normal">
           <TextField
             label="Status"
             variant="outlined"
             value={status}
             onChange={handleStatusChange}
+            helperText="Enter the status name"
             fullWidth
-            sx={{ minWidth: 200, height: "3rem" }}
           />
         </FormControl>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="secondary">
+        <MDButton onClick={handleClose} color="error" sx={{ marginRight: "10px" }}>
           Cancel
-        </Button>
-        <Button onClick={handleSubmit} color="primary" disabled={isLoading}>
-          {isLoading ? "Submitting..." : "Submit"}
-        </Button>
+        </MDButton>
+        <MDBox>
+          <MDButton variant="gradient" color="submit" fullWidth onClick={handleSubmit}>
+            Submit
+          </MDButton>
+        </MDBox>
       </DialogActions>
-    </Dialog>
-  );
+    </form>
+  </Dialog>
+);
 }
 
 AddStatusDialog.propTypes = {
