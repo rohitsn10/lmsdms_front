@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -8,44 +10,52 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useCreateWorkflowMutation } from "api/auth/workflowApi"; 
+import { useCreateWorkflowMutation } from "api/auth/workflowApi";
 
 function AddWorkflow() {
   const [workflowName, setWorkflowName] = useState("");
   const [workflowDescription, setWorkflowDescription] = useState("");
+  const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const [createWorkflow, { isLoading }] = useCreateWorkflowMutation(); 
+  const [createWorkflow, { isLoading }] = useCreateWorkflowMutation();
   const navigate = useNavigate();
+
+  const validateInputs = () => {
+    const newErrors = {};
+    if (!workflowName.trim()) newErrors.workflowName = "Workflow Name is required.";
+    if (!workflowDescription.trim()) newErrors.workflowDescription = "Workflow Description is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateInputs()) return;
+
     try {
       const response = await createWorkflow({
-        workflow_name: workflowName,
-        workflow_description: workflowDescription,
+        workflow_name: workflowName.trim(),
+        workflow_description: workflowDescription.trim(),
       }).unwrap();
 
       console.log("API Response:", response);
-
-    
-      if (response.status) {
-        setOpenSignatureDialog(true); 
-      } else {
-        console.error("Workflow creation failed:", response.message);
-      }
+      toast.success("Workflow added successfully!");
+      setOpenSignatureDialog(true);
     } catch (error) {
       console.error("Error creating workflow:", error);
+      toast.error("Failed to add workflow. Please try again.");
     }
   };
 
   const handleClear = () => {
     setWorkflowName("");
     setWorkflowDescription("");
+    setErrors({});
   };
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/dashboard");
+    navigate("/workflow-listing");
   };
 
   return (
@@ -73,12 +83,11 @@ function AddWorkflow() {
             color="error"
             size="small"
             onClick={handleClear}
-            sx={{ marginLeft: '10px', marginRight: '10px' }}
+            sx={{ marginLeft: "10px", marginRight: "10px" }}
           >
             Clear
           </MDButton>
         </MDBox>
-
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <MDBox mb={3}>
@@ -88,6 +97,8 @@ function AddWorkflow() {
                 fullWidth
                 value={workflowName}
                 onChange={(e) => setWorkflowName(e.target.value)}
+                error={!!errors.workflowName}
+                helperText={errors.workflowName}
               />
             </MDBox>
             <MDBox mb={3}>
@@ -98,6 +109,8 @@ function AddWorkflow() {
                 fullWidth
                 value={workflowDescription}
                 onChange={(e) => setWorkflowDescription(e.target.value)}
+                error={!!errors.workflowDescription}
+                helperText={errors.workflowDescription}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
@@ -111,6 +124,9 @@ function AddWorkflow() {
 
       {/* E-Signature Dialog */}
       <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }

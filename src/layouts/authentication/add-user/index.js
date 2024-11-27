@@ -12,6 +12,8 @@ import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
 import { useCreateUserMutation } from "api/auth/userApi";
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 import { getUserGroups } from "api/auth/auth";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function AddUser() {
   const [firstName, setFirstName] = useState("");
@@ -24,6 +26,7 @@ function AddUser() {
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userRoles, setUserRoles] = useState([]);
+  const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
   const [createUser, { isLoading }] = useCreateUserMutation();
@@ -34,41 +37,58 @@ function AddUser() {
     const fetchUserRoles = async () => {
       try {
         const response = await getUserGroups();
-        console.log("User Groups API Response:", response);
-        setUserRoles(response?.data?.data || []); // Ensure proper parsing of API response
+        setUserRoles(response?.data?.data || []);
       } catch (error) {
         console.error("Failed to fetch user roles:", error);
       }
     };
-
     fetchUserRoles();
   }, []);
+
+  const validateInputs = () => {
+    const newErrors = {};
+    if (!firstName.trim()) newErrors.firstName = "First Name is required.";
+    if (!lastName.trim()) newErrors.lastName = "Last Name is required.";
+    if (!email.trim()) newErrors.email = "Email is required.";
+    if (!phone.trim()) newErrors.phone = "Phone is required.";
+    if (!username.trim()) newErrors.username = "Username is required.";
+    if (!userRole.length) newErrors.userRole = "User Role is required.";
+    if (!department) newErrors.department = "Department is required.";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-  
+    if (!validateInputs()) {
+      toast.error("Please fill all required fields.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const userData = {
       first_name: firstName,
       last_name: lastName,
       email,
       phone,
       username,
-      user_role: userRole, // Send IDs of the selected roles
+      user_role: userRole,
       department_id: department,
     };
-  
+
     try {
       const response = await createUser(userData).unwrap();
-      console.log("Response (JSON):", response); // Log the JSON response
+      toast.success("User added successfully!");
       setOpenSignatureDialog(true);
     } catch (error) {
+      toast.error("Failed to create user. Please try again.");
       console.error("Failed to create user:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
-  
 
   const handleClear = () => {
     setFirstName("");
@@ -76,13 +96,14 @@ function AddUser() {
     setEmail("");
     setPhone("");
     setUsername("");
-    setUserRole("");
+    setUserRole([]);
     setDepartment("");
+    setErrors({});
   };
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/dashboard");
+    navigate("/user-listing");
   };
 
   return (
@@ -126,6 +147,8 @@ function AddUser() {
                 fullWidth
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
+                error={!!errors.firstName}
+                helperText={errors.firstName}
               />
             </MDBox>
             <MDBox mb={3}>
@@ -135,6 +158,8 @@ function AddUser() {
                 fullWidth
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
+                error={!!errors.lastName}
+                helperText={errors.lastName}
               />
             </MDBox>
             <MDBox mb={3}>
@@ -144,6 +169,8 @@ function AddUser() {
                 fullWidth
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                error={!!errors.email}
+                helperText={errors.email}
               />
             </MDBox>
             <MDBox mb={3}>
@@ -153,6 +180,8 @@ function AddUser() {
                 fullWidth
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                error={!!errors.phone}
+                helperText={errors.phone}
               />
             </MDBox>
             <MDBox mb={3}>
@@ -162,45 +191,53 @@ function AddUser() {
                 fullWidth
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                error={!!errors.username}
+                helperText={errors.username}
               />
             </MDBox>
             <MDBox mb={3}>
-  <FormControl fullWidth margin="dense">
-    <InputLabel id="select-role-label">User Role</InputLabel>
-    <Select
-      labelId="select-role-label"
-      id="select-role"
-      multiple // Enable multiple selection
-      value={userRole} // Ensure this is an array
-      onChange={(e) => setUserRole(e.target.value)} // Update the state with the selected array
-      input={<OutlinedInput label="User Role" />}
-      renderValue={(selected) =>
-        selected.map((roleId) => {
-          const role = userRoles.find((r) => r.id === roleId);
-          return role?.name || roleId;
-        }).join(', ')
-      } // Display selected roles as comma-separated names
-      sx={{
-        minWidth: 200,
-        height: "3rem",
-        ".MuiSelect-select": {
-          padding: "0.45rem",
-        },
-      }}
-    >
-      {userRoles.length > 0 ? (
-        userRoles.map((role) => (
-          <MenuItem key={role.id} value={role.id}>
-            {role.name}
-          </MenuItem>
-        ))
-      ) : (
-        <MenuItem disabled>No roles available</MenuItem>
-      )}
-    </Select>
-  </FormControl>
-</MDBox>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="select-role-label">User Role</InputLabel>
+                <Select
+                  labelId="select-role-label"
+                  id="select-role"
+                  multiple
+                  value={userRole}
+                  onChange={(e) => setUserRole(e.target.value)}
+                  input={<OutlinedInput label="User Role" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem",
+                    ".MuiSelect-select": {
+                      padding: "0.75rem",
+                    },
+                  }}
+                  renderValue={(selected) =>
+                    selected.map((roleId) => {
+                      const role = userRoles.find((r) => r.id === roleId);
+                      return role?.name || roleId;
+                    }).join(', ')
+                  }
+                  error={!!errors.userRole}
+                >
+                  {userRoles.length > 0 ? (
+                    userRoles.map((role) => (
+                      <MenuItem key={role.id} value={role.id}>
+                        {role.name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No roles available</MenuItem>
+                  )}
+                </Select>
+                {errors.userRole && (
+                  <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+                    {errors.userRole}
+                  </p>
+                )}
+              </FormControl>
 
+            </MDBox>
 
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
@@ -218,6 +255,7 @@ function AddUser() {
                       padding: "0.75rem",
                     },
                   }}
+                  error={!!errors.department}
                   disabled={isDepartmentsLoading}
                 >
                   {isDepartmentsLoading ? (
@@ -230,7 +268,13 @@ function AddUser() {
                     ))
                   )}
                 </Select>
+                {errors.department && (
+                  <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+                    {errors.department}
+                  </p>
+                )}
               </FormControl>
+
             </MDBox>
 
             <MDBox mt={2} mb={1}>
@@ -247,7 +291,8 @@ function AddUser() {
           </MDBox>
         </MDBox>
       </Card>
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ToastContainer />
+      <ESignatureDialog open={openSignatureDialog} onClose={handleCloseSignatureDialog} />
     </BasicLayout>
   );
 }

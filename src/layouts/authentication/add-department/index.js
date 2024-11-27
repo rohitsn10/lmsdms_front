@@ -1,6 +1,7 @@
-// AddDepartment.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -14,28 +15,42 @@ import { useCreateDepartmentMutation } from "api/auth/departmentApi";
 function AddDepartment() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
   const navigate = useNavigate();
   const [createDepartment, { isLoading }] = useCreateDepartmentMutation();
 
+  const validateInputs = () => {
+    const newErrors = {};
+    if (!name.trim()) newErrors.name = "Department Name is required.";
+    if (!description.trim()) newErrors.description = "Description is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Valid if no errors
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateInputs()) return; // Stop submission if validation fails
+
     try {
       const response = await createDepartment({
-        department_name: name,
-        department_description: description,
+        department_name: name.trim(),
+        department_description: description.trim(),
       }).unwrap();
       console.log("API Response:", response);
+      toast.success("Department added successfully!");
       setOpenSignatureDialog(true);
     } catch (error) {
       console.error("Failed to create department:", error.message);
+      toast.error("Failed to add department. Please try again.");
     }
   };
 
   const handleClear = () => {
     setName("");
     setDescription("");
+    setErrors({});
   };
 
   const handleCloseSignatureDialog = () => {
@@ -68,7 +83,7 @@ function AddDepartment() {
             color="error"
             size="small"
             onClick={handleClear}
-            sx={{ marginLeft: '10px', marginRight: '10px' }}
+            sx={{ marginLeft: "10px", marginRight: "10px" }}
           >
             Clear
           </MDButton>
@@ -82,6 +97,8 @@ function AddDepartment() {
                 fullWidth
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                error={!!errors.name}
+                helperText={errors.name}
               />
             </MDBox>
             <MDBox mb={3}>
@@ -92,6 +109,8 @@ function AddDepartment() {
                 fullWidth
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                error={!!errors.description}
+                helperText={errors.description}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
@@ -105,7 +124,9 @@ function AddDepartment() {
 
       {/* E-Signature Dialog */}
       <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
-      
+
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }
