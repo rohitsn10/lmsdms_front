@@ -44,7 +44,7 @@ const TemplateListing = () => {
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => navigate(`/add-template/${params.id}`)}>
+        <IconButton color="primary" onClick={() => navigate(`/document-view/${params.id}`)}>
           <EditIcon />
         </IconButton>
       ),
@@ -53,7 +53,7 @@ const TemplateListing = () => {
 
   return (
     <MDBox p={3}>
-      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search Template"
