@@ -127,6 +127,7 @@ export const {
   useFetchDocumentsQuery,
   useCreateTemplateMutation,
   useViewTemplateQuery,
+  useEditTemplateMutation,
   useUpdateTemplateMutation,
   useUpdateDocumentTypeMutation,
 } = documentApi;
