@@ -70,7 +70,7 @@ const DocumentViewer = () => {
         )}
       </Box>
 
-      <Box sx={{ marginTop: 2, textAlign: "center" }}>
+      {/* <Box sx={{ marginTop: 2, textAlign: "center" }}>
         {isEditing ? (
           <Button variant="contained" color="primary" onClick={handleSave}>
             Save Changes
@@ -80,7 +80,7 @@ const DocumentViewer = () => {
             Edit Document
           </Button>
         )}
-      </Box>
+      </Box> */}
     </Box>
   );
 };

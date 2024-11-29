@@ -257,8 +257,7 @@ export default function App() {
       <Route path="/update-permissions" element={<UpdatePermissionsTable/>} />
       <Route path="/update-template" element={<UpdateTemplate/>} />
       <Route path="/comments" element={<ParentComponent />} /> 
-
-      <Route path="doc-example" element={<DocumentViewer />} /> 
+      <Route path="/doc-example" element={<DocumentViewer />} /> 
       <Route path="/edit-documenttype" element={<EditDocumentType />} /> 
 
 

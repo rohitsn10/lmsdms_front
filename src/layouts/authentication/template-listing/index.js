@@ -35,14 +35,13 @@ const TemplateListing = () => {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
-  
+
   const handleEditTemplate = (item) => {
     navigate("/update-template", { state: { item } });
   };
 
   const handleViewFile = (url) => {
-    // Navigate to the document link (this could open in a new tab or download)
-    window.open(url, "_blank");
+    navigate("/doc-example", { state: { templateDoc: url } }); // Pass the URL as state
   };
 
   // Prepare filtered data with serial numbers
@@ -51,7 +50,7 @@ const TemplateListing = () => {
     .map((item, index) => ({
       ...item,
       serial_number: index + 1,
-      created_at: new Date(item.created_at).toLocaleDateString("en-GB"), 
+      created_at: new Date(item.created_at).toLocaleDateString("en-GB"),
     }));
 
   const columns = [
@@ -65,13 +64,13 @@ const TemplateListing = () => {
       headerAlign: "center",
       renderCell: (params) => {
         const { template_doc } = params.row;
-        const fileName = template_doc.split("/").pop();  // Extract file name from URL
+        const fileName = template_doc.split("/").pop(); // Extract file name from URL
         return (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
             <MDTypography variant="body2" sx={{ mr: 1 }}>
               {fileName}
             </MDTypography>
-            <IconButton color="primary" onClick={() => handleViewFile(template_doc)}>
+            <IconButton color="primary" onClick={() => handleViewFile(params.row.template_doc)}>
               <VisibilityIcon />
             </IconButton>
           </div>
