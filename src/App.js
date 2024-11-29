@@ -50,7 +50,6 @@ import EditDocument from "layouts/authentication/edit-document/index.js";
 import PrintApprovalListing from "layouts/authentication/approval-lisitng/index.js";
 import UpdatePermissionsTable from "layouts/authentication/add-permissions/update-permissions.js";
 import UpdateTemplate from "layouts/authentication/add-template/updatetemplate.js";
-import DocumentViewer from "layouts/authentication/doc-example/index.js";
 //Lms components
 
 import AddArea from "dmscomponent/add-area/index.js";
@@ -253,8 +252,7 @@ export default function App() {
       <Route path="/approval-listing" element={<PrintApprovalListing />} />
       <Route path="/update-permissions" element={<UpdatePermissionsTable/>} />
       <Route path="/update-template" element={<UpdateTemplate/>} />
-      <Route path="/doc-example" element={<DocumentViewer/>} />
- 
+      
 
 
       {/* Lms components */}
