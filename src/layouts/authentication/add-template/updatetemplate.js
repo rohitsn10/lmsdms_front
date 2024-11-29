@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
@@ -10,21 +10,21 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useCreateTemplateMutation } from "api/auth/documentApi";
+import { useUpdateTemplateMutation } from "api/auth/documentApi";
 
-function AddTemplate() {
+function UpdateTemplate() {
+  const { templateId } = useParams();
   const [templateName, setTemplateName] = useState("");
   const [templateFile, setTemplateFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const navigate = useNavigate();
 
-  const [createTemplate, { isLoading: isCreating }] = useCreateTemplateMutation();
+  const [updateTemplate, { isLoading: isUpdating }] = useUpdateTemplateMutation();
 
   const validateInputs = () => {
     const newErrors = {};
     if (!templateName.trim()) newErrors.templateName = "Template Name is required.";
-    if (!templateFile) newErrors.templateFile = "Template File is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -35,16 +35,18 @@ function AddTemplate() {
 
     const formData = new FormData();
     formData.append("template_name", templateName);
-    formData.append("template_doc", templateFile);
+    if (templateFile) {
+      formData.append("template_doc", templateFile);
+    }
 
     try {
-      const response = await createTemplate(formData).unwrap();
+      const response = await updateTemplate({ temp_id: templateId, formData }).unwrap();
       console.log("RESPONSE", response);
-      toast.success("Template added successfully!");
+      toast.success("Template updated successfully!");
       setOpenSignatureDialog(true);
     } catch (error) {
-      console.error("Error in template action:", error);
-      toast.error("Failed to add template. Please try again.");
+      console.error("Error in template update action:", error);
+      toast.error("Failed to update template. Please try again.");
     }
   };
 
@@ -79,7 +81,7 @@ function AddTemplate() {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Add Template
+            Update Template
           </MDTypography>
         </MDBox>
         <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
@@ -109,18 +111,16 @@ function AddTemplate() {
             <MDBox mb={3}>
               <MDInput
                 type="file"
-                label="Upload Template File"
+                label="Upload Template File (Optional)"
                 fullWidth
                 onChange={handleFileChange}
                 InputLabelProps={{ shrink: true }}
                 inputProps={{ accept: ".pdf,.docx,.txt" }}
-                error={!!errors.templateFile}
-                helperText={errors.templateFile}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isCreating}>
-                {isCreating ? "Processing..." : "Submit"}
+              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isUpdating}>
+                {isUpdating ? "Updating..." : "Submit"}
               </MDButton>
             </MDBox>
           </MDBox>
@@ -132,4 +132,4 @@ function AddTemplate() {
   );
 }
 
-export default AddTemplate;
+export default UpdateTemplate;

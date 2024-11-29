@@ -50,15 +50,12 @@ export const documentApi = createApi({
       providesTags: ['Documents'], // Tag documents data for cache management
     }),
 
-    // Modified createTemplate mutation to handle file uploads
     createTemplate: builder.mutation({
-      query: (templateData) => {
-        return {
-          url: "dms_module/CreateTemplate",
-          method: "POST",
-          body: templateData,
-        };
-      },
+      query: (templateData) => ({
+        url: "dms_module/CreateTemplate",
+        method: "POST",
+        body: templateData,
+      }),
       transformResponse: (response) => response.data,
       invalidatesTags: ['Documents'], // Invalidate document data to trigger refetch
     }),
@@ -71,7 +68,6 @@ export const documentApi = createApi({
       transformResponse: (response) => response.data,
     }),
 
-    // New editTemplate mutation to edit a template
     editTemplate: builder.mutation({
       query: ({ templateId, templateData }) => {
         const formData = new FormData();
@@ -89,6 +85,25 @@ export const documentApi = createApi({
       transformResponse: (response) => response.data,
       invalidatesTags: ['Documents'], // Invalidate document data to trigger refetch
     }),
+
+
+    updateTemplate: builder.mutation({
+      query: ({ temp_id, template_name, template_doc }) => {
+        const formData = new FormData();
+        formData.append("template_name", template_name);
+        if (template_doc) {
+          formData.append("template_doc", template_doc);
+        }
+
+        return {
+          url: `dms_module/UpdateTemplate/${temp_id}`,
+          method: "PUT",
+          body: formData,
+        };
+      },
+      transformResponse: (response) => response.data,
+      invalidatesTags: ['Documents'], // Invalidate document data to trigger refetch
+
     updateDocumentType: builder.mutation({
       query: ({ document_type_id, document_name }) => {
         return {
@@ -101,6 +116,7 @@ export const documentApi = createApi({
       },
       transformResponse: (response) => response,
       invalidatesTags: ['DocumentTypes'], // Invalidate document types data to trigger refetch
+
     }),
   }),
 });
@@ -113,5 +129,9 @@ export const {
   useCreateTemplateMutation,
   useViewTemplateQuery,
   useEditTemplateMutation,
+
+  useUpdateTemplateMutation,
+
   useUpdateDocumentTypeMutation,
+
 } = documentApi;

@@ -41,7 +41,7 @@ const TemplateListing = () => {
     .map((item, index) => ({
       ...item,
       serial_number: index + 1,
-      created_at: new Date(item.created_at).toLocaleDateString("en-GB"), // Format date as DD/MM/YYYY
+      created_at: new Date(item.created_at).toLocaleDateString("en-GB"), 
     }));
 
   const columns = [
@@ -55,7 +55,7 @@ const TemplateListing = () => {
       headerAlign: "center",
       renderCell: (params) =>
         hasPermission(userPermissions, "templatemodel", "isChange") ? (
-          <IconButton color="primary" onClick={() => navigate(`/add-template/${params.id}`)}>
+          <IconButton color="primary" onClick={() => navigate(`/update-template/${params.id}`)}>
             <EditIcon />
           </IconButton>
         ) : null,
