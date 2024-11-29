@@ -4,6 +4,7 @@ import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
@@ -34,9 +35,15 @@ const TemplateListing = () => {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
+  
   const handleEditTemplate = (item) => {
     navigate("/update-template", { state: { item } });
-};
+  };
+
+  const handleViewFile = (url) => {
+    // Navigate to the document link (this could open in a new tab or download)
+    window.open(url, "_blank");
+  };
 
   // Prepare filtered data with serial numbers
   const filteredData = (data || [])
@@ -51,6 +58,26 @@ const TemplateListing = () => {
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "template_name", headerName: "Template Name", flex: 1, headerAlign: "center" },
     { field: "created_at", headerName: "Created At", flex: 1, headerAlign: "center" },
+    {
+      field: "file",
+      headerName: "File",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => {
+        const { template_doc } = params.row;
+        const fileName = template_doc.split("/").pop();  // Extract file name from URL
+        return (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <MDTypography variant="body2" sx={{ mr: 1 }}>
+              {fileName}
+            </MDTypography>
+            <IconButton color="primary" onClick={() => handleViewFile(template_doc)}>
+              <VisibilityIcon />
+            </IconButton>
+          </div>
+        );
+      },
+    },
     {
       field: "action",
       headerName: "Action",
