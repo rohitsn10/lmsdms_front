@@ -49,11 +49,11 @@ import PermissionsTable from "layouts/authentication/add-permissions/index.js";
 import EditDocument from "layouts/authentication/edit-document/index.js";
 import PrintApprovalListing from "layouts/authentication/approval-lisitng/index.js";
 import UpdatePermissionsTable from "layouts/authentication/add-permissions/update-permissions.js";
-
+import DocumentViewer from "layouts/authentication/doc-example/index.js";
 import UpdateTemplate from "layouts/authentication/add-template/updatetemplate.js";
 
 import EditDocumentType from "layouts/edit-documenttype/index.js";
-
+import ParentComponent from "layouts/authentication/text- editor/Comments/CommentParent.js";
 //Lms components
 
 import AddArea from "dmscomponent/add-area/index.js";
@@ -257,9 +257,9 @@ export default function App() {
       <Route path="/update-permissions" element={<UpdatePermissionsTable/>} />
 
       <Route path="/update-template" element={<UpdateTemplate/>} />
-      
+      <Route path="/comments" element={<ParentComponent />} /> 
 
-
+      <Route path="doc-example" element={<DocumentViewer />} /> 
       <Route path="/edit-documenttype" element={<EditDocumentType />} /> 
 
 

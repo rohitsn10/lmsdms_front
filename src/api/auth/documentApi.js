@@ -13,7 +13,7 @@ export const documentApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Documents', 'DocumentTypes'], // Define tags for documents and document types
+  tagTypes: ["Documents", "DocumentTypes"], // Define tags for cache management
   endpoints: (builder) => ({
     createDocument: builder.mutation({
       query: (documentData) => ({
@@ -22,7 +22,7 @@ export const documentApi = createApi({
         body: documentData,
       }),
       transformResponse: (response) => response.data,
-      invalidatesTags: ['Documents'], // Invalidate document data to trigger refetch
+      invalidatesTags: ["Documents"], // Invalidate document data to trigger refetch
     }),
 
     createDocumentType: builder.mutation({
@@ -32,7 +32,7 @@ export const documentApi = createApi({
         body: documentTypeData,
       }),
       transformResponse: (response) => response.data,
-      invalidatesTags: ['DocumentTypes'], // Invalidate document type data to trigger refetch
+      invalidatesTags: ["DocumentTypes"], // Invalidate document type data to trigger refetch
     }),
 
     fetchDocumentTypes: builder.query({
@@ -41,13 +41,13 @@ export const documentApi = createApi({
         method: "GET",
       }),
       transformResponse: (response) => response.data,
-      providesTags: ['DocumentTypes'], // Tag document types data for cache management
+      providesTags: ["DocumentTypes"], // Tag document types data for cache management
     }),
 
     fetchDocuments: builder.query({
       query: () => "dms_module/view_document",
       transformResponse: (response) => response.data,
-      providesTags: ['Documents'], // Tag documents data for cache management
+      providesTags: ["Documents"], // Tag documents data for cache management
     }),
 
     createTemplate: builder.mutation({
@@ -57,7 +57,7 @@ export const documentApi = createApi({
         body: templateData,
       }),
       transformResponse: (response) => response.data,
-      invalidatesTags: ['Documents'], // Invalidate document data to trigger refetch
+      invalidatesTags: ["Documents"], // Invalidate document data to trigger refetch
     }),
 
     viewTemplate: builder.query({
@@ -83,9 +83,8 @@ export const documentApi = createApi({
         };
       },
       transformResponse: (response) => response.data,
-      invalidatesTags: ['Documents'], // Invalidate document data to trigger refetch
+      invalidatesTags: ["Documents"], // Invalidate document data to trigger refetch
     }),
-
 
     updateTemplate: builder.mutation({
       query: ({ temp_id, template_name, template_doc }) => {
@@ -102,7 +101,8 @@ export const documentApi = createApi({
         };
       },
       transformResponse: (response) => response.data,
-      invalidatesTags: ['Documents'], // Invalidate document data to trigger refetch
+      invalidatesTags: ["Documents"], // Invalidate document data to trigger refetch
+    }),
 
     updateDocumentType: builder.mutation({
       query: ({ document_type_id, document_name }) => {
@@ -115,8 +115,7 @@ export const documentApi = createApi({
         };
       },
       transformResponse: (response) => response,
-      invalidatesTags: ['DocumentTypes'], // Invalidate document types data to trigger refetch
-
+      invalidatesTags: ["DocumentTypes"], // Invalidate document types data to trigger refetch
     }),
   }),
 });
@@ -129,9 +128,6 @@ export const {
   useCreateTemplateMutation,
   useViewTemplateQuery,
   useEditTemplateMutation,
-
   useUpdateTemplateMutation,
-
   useUpdateDocumentTypeMutation,
-
 } = documentApi;
