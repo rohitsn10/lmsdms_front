@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Box, Button, TextField, Typography, Dialog, DialogContent } from "@mui/material";
+import MDButton from "components/MDButton";
 
 const CommentModal = ({
   open,
@@ -23,13 +24,14 @@ const CommentModal = ({
             variant="outlined"
             margin="normal"
           />
-          <Button
-            variant="contained"
+          <MDButton
+            variant="gradient"
+            color="submit"
             onClick={handleSaveComment}
-            sx={{ marginBottom: 2, backgroundColor: "#E53471", color: "white" }}
+            sx={{ marginBottom: 2, backgroundColor: "black", color: "white" }}
           >
             Save Comment
-          </Button>
+          </MDButton>
         </Box>
       </DialogContent>
     </Dialog>
