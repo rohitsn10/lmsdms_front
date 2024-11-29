@@ -53,7 +53,7 @@ const toolbarOptions = [
   [{ indent: "-1" }, { indent: "+1" }],
   ["code-block"],
   ["comment"], // Custom comment button
-  ["view-comments"], // Custom view comments button
+  // ["view-comments"], // Custom view comments button
 ];
 
 const DocumentView = () => {
@@ -110,7 +110,7 @@ const DocumentView = () => {
             container: toolbarOptions,
             handlers: {
               comment: handleAddComment, // Correct handler for adding comments
-              "view-comments": handleOpenCommentsDrawer, // Correct handler for viewing comments
+              // "view-comments": handleOpenCommentsDrawer, // Correct handler for viewing comments
             },
           },
           imageResize: {},
@@ -350,41 +350,17 @@ const DocumentView = () => {
   const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
     const documentData = { document_id: id, document_data: content };
-
+  
     // Save the document data (existing functionality)
     await createDocument(documentData);
-
-    // Prepare the comments data as an object where the key is the selected word and the value is the comment
-    const commentsObject = {};
-
-    comments.forEach((comment, index) => {
-      console.log("Comment Object:", comment);
-
-      // Ensure 'selectedWord' exists and is a valid string
-      if (comment.selectedWord && comment.selectedWord.trim()) {
-        const key = comment.selectedWord.trim(); // Use the selected word as the key
-        commentsObject[key] = comment.comment; // Map the word to the comment
-      } else {
-        // Fallback if selectedWord is not available
-        const fallbackKey = "comment-${index}";
-        commentsObject[fallbackKey] = comment.comment;
-      }
-    });
-
-    console.log("Comments Object:", commentsObject); // Log the final object to verify the structure
-
-    // Send comments data to the backend as a single object under 'comment_description'
-    await createComment({
-      document: id, // Document ID
-      comment_description: commentsObject, // All comments as key-value pairs
-    }).unwrap(); // Handle promise rejection
-
+  
     // Close the dialog after saving
     setOpenDialog(false);
-
+  
     // Save the document as a .docx file if needed
     handleSaveAsDocx();
   };
+  
 
   const handleEditComment = (id, newComment) => {
     setComments((prevComments) =>

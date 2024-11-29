@@ -86,6 +86,7 @@ export const documentApi = createApi({
       invalidatesTags: ['Documents'], // Invalidate document data to trigger refetch
     }),
 
+
     updateTemplate: builder.mutation({
       query: ({ temp_id, template_name, template_doc }) => {
         const formData = new FormData();
@@ -102,6 +103,20 @@ export const documentApi = createApi({
       },
       transformResponse: (response) => response.data,
       invalidatesTags: ['Documents'], // Invalidate document data to trigger refetch
+
+    updateDocumentType: builder.mutation({
+      query: ({ document_type_id, document_name }) => {
+        return {
+          url: `dms_module/update_document_type/${document_type_id}`,
+          method: "PUT",
+          body: {
+            document_name: document_name,
+          },
+        };
+      },
+      transformResponse: (response) => response,
+      invalidatesTags: ['DocumentTypes'], // Invalidate document types data to trigger refetch
+
     }),
   }),
 });
@@ -114,5 +129,9 @@ export const {
   useCreateTemplateMutation,
   useViewTemplateQuery,
   useEditTemplateMutation,
+
   useUpdateTemplateMutation,
+
+  useUpdateDocumentTypeMutation,
+
 } = documentApi;
