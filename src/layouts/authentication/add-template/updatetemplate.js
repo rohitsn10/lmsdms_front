@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
@@ -10,18 +10,24 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useUpdateTemplateMutation } from "api/auth/documentApi";
 
 function UpdateTemplate() {
-  const { templateId } = useParams();
-  const [templateName, setTemplateName] = useState("");
-  const [templateFile, setTemplateFile] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const templateData = location.state?.item;
+
+  const [templateName, setTemplateName] = useState(templateData?.template_name || "");
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const navigate = useNavigate();
 
-  const [updateTemplate, { isLoading: isUpdating }] = useUpdateTemplateMutation();
-
+  useEffect(() => {
+    if (templateData) {
+      console.log("Template Data:", templateData);
+    } else {
+      console.error("No template data found. Redirecting...");
+      navigate("/template-listing");
+    }
+  }, [templateData, navigate]);
   const validateInputs = () => {
     const newErrors = {};
     if (!templateName.trim()) newErrors.templateName = "Template Name is required.";
@@ -29,25 +35,12 @@ function UpdateTemplate() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
 
-    const formData = new FormData();
-    formData.append("template_name", templateName);
-    if (templateFile) {
-      formData.append("template_doc", templateFile);
-    }
-
-    try {
-      const response = await updateTemplate({ temp_id: templateId, formData }).unwrap();
-      console.log("RESPONSE", response);
-      toast.success("Template updated successfully!");
-      setOpenSignatureDialog(true);
-    } catch (error) {
-      console.error("Error in template update action:", error);
-      toast.error("Failed to update template. Please try again.");
-    }
+    toast.success("Template form submitted successfully! (UI Only)");
+    setOpenSignatureDialog(true);
   };
 
   const handleClear = () => {
@@ -119,8 +112,8 @@ function UpdateTemplate() {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isUpdating}>
-                {isUpdating ? "Updating..." : "Submit"}
+              <MDButton variant="gradient" color="submit" fullWidth type="submit">
+                Submit
               </MDButton>
             </MDBox>
           </MDBox>
