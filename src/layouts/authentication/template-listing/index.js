@@ -34,6 +34,9 @@ const TemplateListing = () => {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
+  const handleEditTemplate = (item) => {
+    navigate("/update-template", { state: { item } });
+};
 
   // Prepare filtered data with serial numbers
   const filteredData = (data || [])
@@ -55,7 +58,7 @@ const TemplateListing = () => {
       headerAlign: "center",
       renderCell: (params) =>
         hasPermission(userPermissions, "templatemodel", "isChange") ? (
-          <IconButton color="primary" onClick={() => navigate(`/update-template/${params.id}`)}>
+          <IconButton color="primary" onClick={() => handleEditTemplate(params.row)}>
             <EditIcon />
           </IconButton>
         ) : null,

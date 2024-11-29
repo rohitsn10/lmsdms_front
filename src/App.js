@@ -255,7 +255,6 @@ export default function App() {
       <Route path="/add-permissions" element={<PermissionsTable />} />
       <Route path="/approval-listing" element={<PrintApprovalListing />} />
       <Route path="/update-permissions" element={<UpdatePermissionsTable/>} />
-
       <Route path="/update-template" element={<UpdateTemplate/>} />
       <Route path="/comments" element={<ParentComponent />} /> 
 
