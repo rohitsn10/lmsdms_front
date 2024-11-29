@@ -16,7 +16,7 @@ import { useAuth } from "hooks/use-auth";
 const DocumentTypesListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { user, role } = useAuth();
-  const { data, error, isLoading } = useFetchDocumentTypesQuery();  
+  const { data, error, isLoading } = useFetchDocumentTypesQuery();
   const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role?.toString(), {
     skip: !role
   });
@@ -39,7 +39,7 @@ const DocumentTypesListing = () => {
   const filteredData = data ? data
     .filter((item) => item.document_name.toLowerCase().includes(searchTerm.toLowerCase()))
     .map((item, index) => ({
-      ...item, 
+      ...item,
       serial_number: index + 1  // Add serial number based on the index
     })) : [];
 
@@ -112,6 +112,9 @@ const DocumentTypesListing = () => {
                 },
                 "& .MuiDataGrid-cell": {
                   textAlign: "center",
+                  display: "flex", 
+                  justifyContent: "center", 
+                  alignItems: "center", 
                 },
               }}
             />

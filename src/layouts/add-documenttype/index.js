@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -7,42 +9,58 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog";  
-import { useCreateDocumentTypeMutation } from 'api/auth/documentApi'; 
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
+import { useCreateDocumentTypeMutation } from "api/auth/documentApi";
+
 function AddDocumentType() {
   const [documentTypeName, setDocumentTypeName] = useState("");
-  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);  
-  const [createDocumentType, { isLoading }] = useCreateDocumentTypeMutation(); 
+  const [errors, setErrors] = useState({});
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+  const [createDocumentType, { isLoading }] = useCreateDocumentTypeMutation();
   const navigate = useNavigate();
+
+  const validateInputs = () => {
+    const newErrors = {};
+    if (!documentTypeName.trim()) {
+      newErrors.documentTypeName = "Document Type Name is required.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateInputs()) return;
+
     try {
       const response = await createDocumentType({
-        document_name: documentTypeName,
-        token: sessionStorage.getItem("token"), 
+        document_name: documentTypeName.trim(),
+        token: sessionStorage.getItem("token"),
       }).unwrap();
 
-      console.log("API Response:", response); 
+      console.log("API Response:", response);
 
-    
       if (response.status) {
-        setOpenSignatureDialog(true); 
+        toast.success("Document Type added successfully!");
+        setOpenSignatureDialog(true);
       } else {
         console.error("Document type creation failed:", response.message);
+        toast.error("Failed to add Document Type. Please try again.");
       }
     } catch (error) {
       console.error("Error creating document type:", error);
+      toast.error("Failed to add Document Type. Please try again.");
     }
   };
 
   const handleClear = () => {
     setDocumentTypeName("");
+    setErrors({});
   };
 
   const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);  // Close the dialog
-    navigate("/document-typelisting");  // Redirect to document types listing page
+    setOpenSignatureDialog(false); // Close the dialog
+    navigate("/document-typelisting"); // Redirect to document types listing page
   };
 
   return (
@@ -70,7 +88,7 @@ function AddDocumentType() {
             color="error"
             size="small"
             onClick={handleClear}
-            sx={{ marginLeft: '10px', marginRight: '10px' }}
+            sx={{ marginLeft: "10px", marginRight: "10px" }}
           >
             Clear
           </MDButton>
@@ -85,6 +103,8 @@ function AddDocumentType() {
                 fullWidth
                 value={documentTypeName}
                 onChange={(e) => setDocumentTypeName(e.target.value)}
+                error={!!errors.documentTypeName}
+                helperText={errors.documentTypeName}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
@@ -98,6 +118,9 @@ function AddDocumentType() {
 
       {/* E-Signature Dialog */}
       <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }
