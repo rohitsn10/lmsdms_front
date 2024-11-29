@@ -31,6 +31,10 @@ const DocumentTypesListing = () => {
     setSearchTerm(event.target.value);
   };
 
+  const handleEditType = (item) => {
+    navigate("/edit-documenttype", { state: { item } });
+};
+
   // Add serial number based on index
   const filteredData = data ? data
     .filter((item) => item.document_name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -51,7 +55,10 @@ const DocumentTypesListing = () => {
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
           {hasPermission(userPermissions, "documenttype", "isChange") && (
-            <IconButton color="primary" onClick={() => navigate("/add_update_document_type")}>
+            <IconButton 
+              color="primary" 
+              onClick={() => handleEditType(params.row)}  // Pass the document type ID
+            >
               <EditIcon />
             </IconButton>
           )}
