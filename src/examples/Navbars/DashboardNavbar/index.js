@@ -77,9 +77,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
 
     function handleTransparentNavbar() {
-      setTransparentNavbar(dispatch, (fixedNavbar && window.scrollY === 0) || !fixedNavbar);
+      setTransparentNavbar(dispatch, false); // Always set transparentNavbar to false
     }
-
     window.addEventListener("scroll", handleTransparentNavbar);
     handleTransparentNavbar();
 

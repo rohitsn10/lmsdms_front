@@ -77,11 +77,12 @@ const DocumentView = () => {
   const [ documentSendBackStatus] = useDocumentSendBackStatusMutation();
   const searchParams = new URLSearchParams(location.search);
   const document_current_status = searchParams.get("status");
+  const trainingRequired = searchParams.get("training_required");
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(''); // State for Assigned To dropdown
   const [statusSendBack, setStatusSendBack] = useState(''); // State for Status Send Back dropdown
-  console.log("Navigated with data:", { id, document_current_status});
-  
+  console.log("Navigated with data in text Editor :", { id, document_current_status});
+  console.log("Training Required:", trainingRequired)
   useEffect(() => {
     const fetchDocxFile = async () => {
       if (data?.template_url) {
@@ -209,7 +210,7 @@ const DocumentView = () => {
   const handleApprove = async () => {
     console.log("Approve button clicked");
     try {
-      const response = await documentApproverStatus({
+      const response = await documentApproveStatus({
         document_id: id, // Replace with your actual document_id
         status: "5", // Replace with your desired status
       }).unwrap();
@@ -360,8 +361,6 @@ const DocumentView = () => {
     // Save the document as a .docx file if needed
     handleSaveAsDocx();
   };
-  
-
   const handleEditComment = (id, newComment) => {
     setComments((prevComments) =>
       prevComments.map((comment) =>
@@ -404,18 +403,7 @@ const DocumentView = () => {
     >
       {/* Insert AntiCopyPattern as the background */}
       <AntiCopyPattern />
-      <MDButton
-        variant="gradient"
-        color="submit"
-        onClick={handlePrint} // Use onClick to trigger navigation
-        sx={{
-          float: "right",
-          mt: 1,
-          mr: 1,
-        }}
-      >
-        Print
-      </MDButton>
+      
       <Paper
         id="editor-container"
         sx={{
@@ -542,6 +530,18 @@ const DocumentView = () => {
         {/* Display success or error messages */}
         {data && <p>{data.message}</p>}
         {error && <p>Error: {error.message}</p>}
+        <MDButton
+        variant="gradient"
+        color="submit"
+        onClick={handlePrint} // Use onClick to trigger navigation
+        sx={{
+          float: "right",
+          mt: 1,
+          mr: 20,
+        }}
+      >
+        Print
+      </MDButton>
       </MDBox>
       <SendBackDialog
         open={dialogOpen}

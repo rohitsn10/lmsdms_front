@@ -39,12 +39,13 @@ const DocumentListing = () => {
       return; // Exit if params or row is missing
     }
   
-    const { id, document_current_status, current_status_name } = params.row;
+    const { id, document_current_status, training_required } = params.row;
   
-    // Ensure id, document_current_status, and current_status_name are defined
+    // Ensure required fields are defined
     if (
       id === undefined ||
-      document_current_status === undefined
+      document_current_status === undefined ||
+      training_required === undefined
     ) {
       console.error("Missing data in params.row:", params.row);
       return;
@@ -52,14 +53,15 @@ const DocumentListing = () => {
   
     // Navigate with all required data
     navigate(
-      `/document-view/${id}?status=${document_current_status}`
+      `/document-view/${id}?status=${document_current_status}&training_required=${training_required}`
     );
     console.log("Navigated with:", {
       id,
       document_current_status,
-      
+      training_required,
     });
   };
+  
   
   
   const handleEditClick = (id) => {

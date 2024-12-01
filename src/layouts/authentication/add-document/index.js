@@ -61,6 +61,8 @@ function AddDocument() {
         document_operation: operations,
         select_template: template,
         workflow: workflow,
+        training_required: trainingRequired.toLowerCase() === "yes", // Normalize and check
+        document_current_status_id:"1"
       };
       await createDocument(documentData).unwrap();
       setOpenSignatureDialog(true);
@@ -68,7 +70,6 @@ function AddDocument() {
       console.error("Error creating document:", error);
     }
   };
-
   const handleClear = () => {
     setTitle("");
     setType("");
