@@ -79,7 +79,7 @@ const DocumentListing = () => {
     {
       field: 'index',
       headerName: 'Sr. No.',
-      flex: 0.5,
+      flex: 0.4,
       headerAlign: 'center',
       renderCell: (params) => <span>{params.row.index + 1}</span>,
       sortable: false,
@@ -100,7 +100,13 @@ const DocumentListing = () => {
     {
       field: 'document_number',
       headerName: 'Document No.',
-      flex: 1,
+      flex: 0.75,
+      headerAlign: 'center'
+    },
+    {
+      field: 'version',
+      headerName: 'Version',
+      flex: 0.75,
       headerAlign: 'center'
     },
     {
