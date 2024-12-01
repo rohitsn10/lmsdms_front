@@ -34,6 +34,7 @@ import { useNavigate } from "react-router-dom";
 import { useDraftDocumentMutation } from "api/auth/texteditorApi";
 import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
 import SendBackDialog from "./sendback";
+import ConditionalDialog from "./effective";
 import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
 
 // Register the ImageResize module
@@ -78,6 +79,7 @@ const DocumentView = () => {
   const searchParams = new URLSearchParams(location.search);
   const document_current_status = searchParams.get("status");
   const trainingRequired = searchParams.get("training_required");
+  const [dialogeffectiveOpen, setDialogeffectiveOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(''); // State for Assigned To dropdown
   const [statusSendBack, setStatusSendBack] = useState(''); // State for Status Send Back dropdown
@@ -348,6 +350,21 @@ const DocumentView = () => {
     }
   };
 
+  const handleDialogConfirm = () => {
+   
+    setDialogeffectiveOpen(false); // Close the dialog after confirmation
+    // Additional actions on confirm can be added here
+  };
+
+  const handleDialogOpen = () => {
+    console.log("Doc Admin Approve clicked - Confirmed");
+    setDialogeffectiveOpen(true); // Open the dialog
+  };
+
+  const handleDialogClose = () => {
+    setDialogeffectiveOpen(false); // Close the dialog
+  };
+
   const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
     const documentData = { document_id: id, document_data: content };
@@ -514,7 +531,7 @@ const DocumentView = () => {
         )}
         {document_current_status === "5" && (
           <>
-            <MDButton variant="gradient" color="submit" onClick={handleDoc} disabled={isLoading}>
+            <MDButton variant="gradient" color="submit" onClick={handleDialogOpen} disabled={isLoading}>
               Doc Admin Approve
             </MDButton>
             <MDButton
@@ -551,6 +568,12 @@ const DocumentView = () => {
         setAssignedTo={setAssignedTo}
         statusSendBack={statusSendBack}
         setStatusSendBack={setStatusSendBack}
+      />
+       <ConditionalDialog
+        open={dialogOpen}
+        onClose={handleDialogClose} // Handle dialog close
+        onConfirm={handleDialogConfirm} // Handle dialog confirmation
+        trainingStatus={trainingRequired} // Pass trainingRequired as trainingStatus
       />
     </Box>
   );
