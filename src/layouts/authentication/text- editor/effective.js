@@ -16,7 +16,7 @@ const ConditionalDialog = ({
   trainingStatus 
 }) => {
   const heading =
-    trainingStatus === "yes"
+    trainingStatus === "false"
       ? "Are you sure effective?"
       : "Are you sure you want to release the document?";
 
