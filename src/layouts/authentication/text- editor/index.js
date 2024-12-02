@@ -333,7 +333,7 @@ const DocumentView = () => {
       const response = await documentSendBackStatus({
         document_id: id, // Replace with your actual document_id
         assigned_to: assignedTo, // Value from the dialog's state
-        status_sendback: document_current_status, // The current status (replace with actual status if needed)
+        status_sendback: "8", // The current status (replace with actual status if needed)
       }).unwrap();
   
       console.log("API Response:", response);
