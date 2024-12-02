@@ -9,6 +9,7 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import { useGetPrintRequestsQuery } from "api/auth/printApi";
 import ApprovalDialog from "./add-approval/index"; // Import the dialog component
+import moment from 'moment';
 
 const PrintApprovalListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,7 +43,16 @@ const PrintApprovalListing = () => {
     { field: "document_title", headerName: "Document Title", flex: 1, headerAlign: "center" },
     { field: "no_of_print", headerName: "No. of Copies", flex: 1, headerAlign: "center" },
     { field: "issue_type", headerName: "Issue Type", flex: 1, headerAlign: "center" },
-    { field: "created_at", headerName: "Created At", flex: 1, headerAlign: "center" },
+    {
+      field: "created_at",
+      headerName: "Date",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => {
+        // Format the date using moment
+        return moment(params.row.created_at).format("DD-MM-YY HH:mm");
+      },
+    },
     {
       field: "action",
       headerName: "Action",

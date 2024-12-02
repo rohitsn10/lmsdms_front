@@ -12,6 +12,7 @@ import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 import { useAuth } from "hooks/use-auth";
 import { hasPermission } from "utils/hasPermission";
+import moment from "moment";  // Import moment.js
 
 const DepartmentListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,20 +26,19 @@ const DepartmentListing = () => {
 
   if (isLoading) return <div>Loading departments...</div>;
   if (error) return <div>Error loading departments: {error.message}</div>;
-    
-    const formatDate = (dateString) => {
-        const [day, month, year] = dateString.split("-");
-        return new Date(`${year}-${month}-${day}`).toLocaleDateString();
-    };
 
-    const formattedData = departments.map((item, index) => ({
-        id: item.id,
-        serial_number: index + 1,
-        department_name: item.department_name || "N/A",
-        department_description: item.department_description || "N/A",
-        department_created_at: formatDate(item.department_created_at), 
-    }));
+  // Use moment.js to format the date
+  const formatDate = (dateString) => {
+    return moment(dateString).format('DD-MM-YY HH:mm');
+  };
 
+  const formattedData = departments.map((item, index) => ({
+    id: item.id,
+    serial_number: index + 1,
+    department_name: item.department_name || "N/A",
+    department_description: item.department_description || "N/A",
+    department_created_at: formatDate(item.department_created_at),  // Format date using moment.js
+  }));
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -53,6 +53,7 @@ const DepartmentListing = () => {
       department.department_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       department.department_description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: 'center' },
     { field: "department_name", headerName: "Department Name", flex: 1, headerAlign: 'center' },
@@ -72,9 +73,7 @@ const DepartmentListing = () => {
       ),
     },
   ];
-  
 
- 
   return (
     <MDBox p={3}>
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>

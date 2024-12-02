@@ -19,6 +19,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import moment from 'moment';
 
 const InventoryListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,6 +50,7 @@ const InventoryListing = () => {
   };
 
   const handleUpdate = (id, inventory_name) => {
+    console.log("Clicked Edit, ID:", id, "Name:", inventory_name);
     setInventoryId(id);
     setInventoryName(inventory_name);
     setEditDialogOpen(true);
@@ -99,7 +101,16 @@ const InventoryListing = () => {
   const columns = [
     { field: "srNo", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "inventory_name", headerName: "Inventory Name", flex: 1, headerAlign: "center" },
-    { field: "created_at", headerName: "Date", flex: 1, headerAlign: "center" },
+    {
+    field: "created_at",
+    headerName: "Date",
+    flex: 1,
+    headerAlign: "center",
+    renderCell: (params) => {
+      // Format the date using moment
+      return moment(params.row.created_at).format("DD-MM-YY HH:mm");
+    },
+  },
     {
       field: "action",
       headerName: "Action",
