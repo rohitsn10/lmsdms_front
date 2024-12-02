@@ -1,15 +1,42 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Box, Button, TextField, Typography, Dialog, DialogContent } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Dialog,
+  DialogContent,
+} from "@mui/material";
 import MDButton from "components/MDButton";
+import { useCreateCommentMutation } from "api/auth/commentsApi";
 
 const CommentModal = ({
   open,
   onClose,
   currentComment,
   setCurrentComment,
-  handleSaveComment,
+  documentId,
 }) => {
+  const [createComment, { isLoading, isSuccess, isError }] = useCreateCommentMutation();
+
+  const handleSaveComment = async () => {
+    try {
+      const response = await createComment({
+        id: documentId, 
+        comment_description: currentComment,
+      }).unwrap();
+      if (response.status === "success") {
+        console.log("Comment saved successfully!");
+        onClose();
+      } else {
+        console.error("Failed to save comment:", response.message);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogContent>
@@ -28,10 +55,20 @@ const CommentModal = ({
             variant="gradient"
             color="submit"
             onClick={handleSaveComment}
-            sx={{ marginBottom: 2, backgroundColor: "black", color: "white" }}
+            sx={{
+              marginBottom: 2,
+              backgroundColor: isLoading ? "gray" : "black",
+              color: "white",
+            }}
+            disabled={isLoading}
           >
-            Save Comment
+            {isLoading ? "Saving..." : "Save Comment"}
           </MDButton>
+          {isError && (
+            <Typography color="error" variant="body2">
+              Failed to save comment. Please try again.
+            </Typography>
+          )}
         </Box>
       </DialogContent>
     </Dialog>
@@ -43,7 +80,7 @@ CommentModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   currentComment: PropTypes.string.isRequired,
   setCurrentComment: PropTypes.func.isRequired,
-  handleSaveComment: PropTypes.func.isRequired,
+  documentId: PropTypes.string.isRequired,
 };
 
 export default CommentModal;
