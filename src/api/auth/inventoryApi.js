@@ -29,10 +29,10 @@ export const inventoryApi = createApi({
 
     // Mutation to update an existing inventory
     updateInventory: builder.mutation({
-      query: ({ id, inventoryData }) => ({
+      query: ({ id, inventory_name }) => ({
         url: `dms_module/UpdateInventory/${id}`,
         method: "PUT",
-        body: inventoryData,
+        body: { inventory_name },
       }),
       invalidatesTags: [{ type: "Inventory", id: "LIST" }], // Invalidate the inventory list cache after update
       transformResponse: (response) => response.data,
@@ -62,7 +62,7 @@ export const inventoryApi = createApi({
 
 export const {
   useCreateInventoryMutation,
-  useUpdateInventoryMutation,
+  useUpdateInventoryMutation, // Export the new update mutation hook
   useViewInventoryQuery,
   useDeleteInventoryMutation,
 } = inventoryApi;
