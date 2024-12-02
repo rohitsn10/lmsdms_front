@@ -294,7 +294,7 @@ const DocumentView = () => {
   };
   const handlePrint = () => {
     console.log("Id passed:", id);
-    navigate("/print-document/${id}");
+    navigate(`/print-document/${id}`);
   };
 
   const handleSaveAsDocx = async () => {
