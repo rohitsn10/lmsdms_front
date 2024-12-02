@@ -469,6 +469,7 @@ const DocumentView = () => {
         currentComment={currentComment}
         setCurrentComment={setCurrentComment}
         handleSaveComment={handleSaveComment} 
+        documentId={id}
       />
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>

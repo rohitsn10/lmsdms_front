@@ -23,9 +23,10 @@ const CommentModal = ({
   const handleSaveComment = async () => {
     try {
       const response = await createComment({
-        id: documentId, 
+        document: documentId,
         comment_description: currentComment,
       }).unwrap();
+      console.log("id:",documentId);
       if (response.status === "success") {
         console.log("Comment saved successfully!");
         onClose();
