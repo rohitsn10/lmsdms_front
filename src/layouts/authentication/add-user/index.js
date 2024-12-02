@@ -8,12 +8,12 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/material";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
 import { useCreateUserMutation } from "api/auth/userApi";
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 import { getUserGroups } from "api/auth/auth";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 
 function AddUser() {
   const [firstName, setFirstName] = useState("");
@@ -23,10 +23,10 @@ function AddUser() {
   const [username, setUsername] = useState("");
   const [userRole, setUserRole] = useState([]);
   const [department, setDepartment] = useState("");
-  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userRoles, setUserRoles] = useState([]);
   const [errors, setErrors] = useState({});
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
   const navigate = useNavigate();
   const [createUser, { isLoading }] = useCreateUserMutation();
@@ -82,6 +82,7 @@ function AddUser() {
       const response = await createUser(userData).unwrap();
       toast.success("User added successfully!");
       setOpenSignatureDialog(true);
+  
     } catch (error) {
       toast.error("Failed to create user. Please try again.");
       console.error("Failed to create user:", error);
@@ -100,7 +101,6 @@ function AddUser() {
     setDepartment("");
     setErrors({});
   };
-
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
     navigate("/user-listing");
@@ -236,7 +236,6 @@ function AddUser() {
                   </p>
                 )}
               </FormControl>
-
             </MDBox>
 
             <MDBox mb={3}>
@@ -274,7 +273,6 @@ function AddUser() {
                   </p>
                 )}
               </FormControl>
-
             </MDBox>
 
             <MDBox mt={2} mb={1}>
@@ -292,7 +290,8 @@ function AddUser() {
         </MDBox>
       </Card>
       <ToastContainer />
-      <ESignatureDialog open={openSignatureDialog} onClose={handleCloseSignatureDialog} />
+      {/* E-signature dialog */}
+      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
     </BasicLayout>
   );
 }
