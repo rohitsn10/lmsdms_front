@@ -46,9 +46,15 @@ export const documentApi = createApi({
 
     fetchDocuments: builder.query({
       query: () => "dms_module/view_document",
-      transformResponse: (response) => response.data,
+      transformResponse: (response) => {
+        return {
+          documents: response.data,
+          userGroupIds: response.user_group_ids, // Include user_group_ids
+        };
+      },
       providesTags: ["Documents"], // Tag documents data for cache management
     }),
+    
 
     createTemplate: builder.mutation({
       query: (templateData) => ({

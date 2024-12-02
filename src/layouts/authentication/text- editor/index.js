@@ -36,6 +36,7 @@ import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
 import SendBackDialog from "./sendback";
 import ConditionalDialog from "./effective";
 import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
+import { useFetchDocumentsQuery} from "api/auth/documentApi";
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -85,6 +86,13 @@ const DocumentView = () => {
   const [statusSendBack, setStatusSendBack] = useState(''); // State for Status Send Back dropdown
   // console.log("Navigated with data in text Editor :", { id, document_current_status});
   // console.log("Training Required:", trainingRequired)
+  const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
+
+  const isButtonVisible = (requiredGroupIds) => {
+    const userGroupIds = documentsData?.user_group_ids || [];
+    return requiredGroupIds.some((id) => userGroupIds.includes(id));
+  };
+
   useEffect(() => {
     const fetchDocxFile = async () => {
       if (data?.template_url) {
@@ -486,8 +494,9 @@ const DocumentView = () => {
       </Dialog>
 
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
+
         {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-        {(document_current_status === "1" || document_current_status === "2") && (
+        {(document_current_status === "1" || document_current_status === "2") && isButtonVisible([40]) && (
           <>
             <MDButton
               variant="gradient"
@@ -510,7 +519,7 @@ const DocumentView = () => {
         )}
 
         {/* Condition 2: Show Review button when status is "3" */}
-        {document_current_status === "3" && (
+        {document_current_status === "3" && isButtonVisible([2]) &&  (
           <>
             <MDButton variant="gradient" color="submit" onClick={handleReview} disabled={isLoading}>
               Review
@@ -527,7 +536,7 @@ const DocumentView = () => {
         )}
 
         {/* Condition 3: Show Approve button when status is "4" */}
-        {document_current_status === "4" && (
+        {document_current_status === "4"  && isButtonVisible([38]) && (
           <>
             <MDButton
               variant="gradient"
@@ -547,7 +556,8 @@ const DocumentView = () => {
             </MDButton>
           </>
         )}
-        {document_current_status === "5" && (
+  {/* Condition 4 */}
+        {document_current_status === "5"  && isButtonVisible([39]) && (
           <>
             <MDButton variant="gradient" color="submit" onClick={handleDialogOpen} disabled={isLoading}>
               Doc Admin Approve
@@ -562,6 +572,7 @@ const DocumentView = () => {
             </MDButton>
           </>
         )}
+      
         {/* Display success or error messages */}
         {data && <p>{data.message}</p>}
         {error && <p>Error: {error.message}</p>}

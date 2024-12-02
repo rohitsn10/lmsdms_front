@@ -22,11 +22,13 @@ const DocumentListing = () => {
   const navigate = useNavigate();
   const { data, isLoading, isError } = useFetchDocumentsQuery();
   console.log("USER_ROLE", role)
+  const documents = data?.documents || []; 
   const {data: userPermissions = [], isError: permissionError} = useFetchPermissionsByGroupIdQuery(role.toString(), {
     skip: !role
   });
   console.log("USER_PERMISSIONS", userPermissions)
   console.log("pERMISSON_ERROR",permissionError)
+
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -68,14 +70,15 @@ const DocumentListing = () => {
     navigate(`/edit-document/${id}`);
     console.log('Edit-Document id passed', id);
   };
-  const filteredData = data?.filter((doc) =>
+  const filteredData = documents.filter((doc) =>
     doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     doc.document_number.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
-  const rows = filteredData?.map((doc, index) => ({
+  );
+
+  const rows = filteredData.map((doc, index) => ({
     ...doc,
-    index, // Add index to each row
+    index,
   }));
   const columns = [
     {
