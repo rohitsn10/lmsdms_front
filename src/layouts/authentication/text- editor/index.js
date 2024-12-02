@@ -83,8 +83,8 @@ const DocumentView = () => {
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(''); // State for Assigned To dropdown
   const [statusSendBack, setStatusSendBack] = useState(''); // State for Status Send Back dropdown
-  console.log("Navigated with data in text Editor :", { id, document_current_status});
-  console.log("Training Required:", trainingRequired)
+  // console.log("Navigated with data in text Editor :", { id, document_current_status});
+  // console.log("Training Required:", trainingRequired)
   useEffect(() => {
     const fetchDocxFile = async () => {
       if (data?.template_url) {
@@ -350,11 +350,28 @@ const DocumentView = () => {
     }
   };
 
-  const handleDialogConfirm = () => {
-   
+  const handleDialogConfirm = async () => {
     setDialogeffectiveOpen(false); // Close the dialog after confirmation
-    // Additional actions on confirm can be added here
+  
+    console.log("Doc Admin Approve clicked - Confirmed");
+    try {
+      const response = await documentDocadminStatus({
+        document_id: id, // Replace with your actual document_id
+        status: "6", // Replace with your desired status
+      }).unwrap();
+      navigate("/document-listing");
+      console.log("API Response:", response);
+      if (response.status) {
+        alert(response.message); // Success message
+      } else {
+        alert("Action failed");
+      }
+    } catch (error) {
+      console.error("Error calling API:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
+  
 
   const handleDialogOpen = () => {
     console.log("Doc Admin Approve clicked - Confirmed");
@@ -451,7 +468,7 @@ const DocumentView = () => {
         onClose={() => setOpencommentDialog(false)}
         currentComment={currentComment}
         setCurrentComment={setCurrentComment}
-        handleSaveComment={handleSaveComment}
+        handleSaveComment={handleSaveComment} 
       />
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
@@ -570,7 +587,7 @@ const DocumentView = () => {
         setStatusSendBack={setStatusSendBack}
       />
        <ConditionalDialog
-        open={dialogOpen}
+        open={dialogeffectiveOpen}
         onClose={handleDialogClose} // Handle dialog close
         onConfirm={handleDialogConfirm} // Handle dialog confirmation
         trainingStatus={trainingRequired} // Pass trainingRequired as trainingStatus
