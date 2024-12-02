@@ -1,40 +1,34 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useLocation } from "react-router-dom"; // Import useLocation
 import { renderAsync } from "docx-preview";
-import { Box, Button, AppBar, Toolbar, Typography } from "@mui/material";
-import ReactQuill from "react-quill"; // Quill for editing
-import "react-quill/dist/quill.snow.css"; // Quill styles
+import { Box, AppBar, Toolbar, Typography } from "@mui/material";
 
 const DocumentViewer = () => {
+  const location = useLocation(); // Access the state passed via navigate
   const [docContent, setDocContent] = useState(null); // Blob for docx-preview
-  const [editableContent, setEditableContent] = useState(""); // Quill content
-  const [isEditing, setIsEditing] = useState(false);
   const docxContainerRef = useRef(null);
 
-  // Load .docx file for rendering
-  useEffect(() => {
-    fetch("/template.docx")
-      .then((response) => response.blob())
-      .then((blob) => setDocContent(blob));
-  }, []);
+  // Retrieve the document URL from the location state
+  const { templateDoc } = location.state || {};
 
-  // Render .docx file using docx-preview
+  // Load the .docx file dynamically based on the URL
+  useEffect(() => {
+    if (templateDoc) {
+      fetch(templateDoc)
+        .then((response) => response.blob())
+        .then((blob) => setDocContent(blob))
+        .catch((error) => console.error("Error fetching document:", error));
+    }
+  }, [templateDoc]);
+
+  // Render the .docx file using docx-preview
   useEffect(() => {
     if (docContent && docxContainerRef.current) {
-      renderAsync(docContent, docxContainerRef.current);
+      renderAsync(docContent, docxContainerRef.current).catch((error) =>
+        console.error("Error rendering document:", error)
+      );
     }
   }, [docContent]);
-
-  // Extract content for editing (mockup example)
-  const handleEdit = () => {
-    setEditableContent("<p>Editable content here...</p>"); // Replace with extracted content
-    setIsEditing(true);
-  };
-
-  // Save edited content (mockup example)
-  const handleSave = () => {
-    console.log("Edited content:", editableContent); // Save to backend or file
-    setIsEditing(false);
-  };
 
   return (
     <Box sx={{ padding: 2 }}>
@@ -47,40 +41,19 @@ const DocumentViewer = () => {
       </AppBar>
 
       <Box sx={{ marginTop: 2 }}>
-        {isEditing ? (
-          <ReactQuill
-            value={editableContent}
-            onChange={setEditableContent}
-            theme="snow"
-            style={{ height: "400px" }}
-          />
-        ) : (
-          <Box
-            ref={docxContainerRef}
-            sx={{
-              width: "80%",
-              height: "80vh",
-              margin: "0 auto",
-              border: "1px solid #ccc",
-              overflowY: "auto",
-              padding: 2,
-              backgroundColor: "#fff",
-            }}
-          ></Box>
-        )}
+        <Box
+          ref={docxContainerRef}
+          sx={{
+            width: "80%",
+            height: "80vh",
+            margin: "0 auto",
+            border: "1px solid #ccc",
+            overflowY: "auto",
+            padding: 2,
+            backgroundColor: "#fff",
+          }}
+        ></Box>
       </Box>
-
-      {/* <Box sx={{ marginTop: 2, textAlign: "center" }}>
-        {isEditing ? (
-          <Button variant="contained" color="primary" onClick={handleSave}>
-            Save Changes
-          </Button>
-        ) : (
-          <Button variant="contained" color="secondary" onClick={handleEdit}>
-            Edit Document
-          </Button>
-        )}
-      </Box> */}
     </Box>
   );
 };
