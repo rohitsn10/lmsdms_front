@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import { useFetchPermissionsQuery, useCreateGroupWithPermissionsMutation } from 'api/auth/permissionApi';
-import { Card, Checkbox, TextField } from '@mui/material';
+import { Card, Checkbox } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
@@ -8,10 +9,12 @@ import MDInput from 'components/MDInput';
 import MDButton from 'components/MDButton';
 
 const PermissionsTable = () => {
+    const navigate = useNavigate(); 
     const { data: permissions = [], isLoading, error } = useFetchPermissionsQuery();
     const [permissionState, setPermissionState] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
     const [groupName, setGroupName] = useState('');
+    const [selectAll, setSelectAll] = useState(false);
     const [createGroupWithPermissions, { isLoading: isCreatingGroup, error: groupCreationError }] = useCreateGroupWithPermissionsMutation();
 
     useEffect(() => {
@@ -43,8 +46,25 @@ const PermissionsTable = () => {
         }));
     };
 
+    const handleSelectAll = () => {
+        const newSelectAllState = !selectAll;
+        setSelectAll(newSelectAllState);
+
+        setPermissionState((prevState) => {
+            const updatedState = {};
+            Object.keys(prevState).forEach((role) => {
+                updatedState[role] = {
+                    isAdd: newSelectAllState,
+                    isView: newSelectAllState,
+                    isChange: newSelectAllState,
+                    isDelete: newSelectAllState,
+                };
+            });
+            return updatedState;
+        });
+    };
+
     const handleSubmit = () => {
-        // Collect permissions for the group
         const selectedPermissionIds = Object.keys(permissionState).map((role) => {
             const perm = permissionState[role];
             const selectedIds = [];
@@ -64,6 +84,7 @@ const PermissionsTable = () => {
             .unwrap()
             .then((response) => {
                 console.log('Group created successfully:', response);
+                navigate('/roles-listing'); 
             })
             .catch((error) => {
                 console.error('Error creating group:', error);
@@ -159,6 +180,9 @@ const PermissionsTable = () => {
                     <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: 'center' }}>
                         Roles & Permissions
                     </MDTypography>
+                    <MDButton variant="contained" color="primary" onClick={handleSelectAll} sx={{ ml: 2 }}>
+                        {selectAll ? 'Deselect All' : 'Select All'}
+                    </MDButton>
                     <MDButton variant="contained" color="primary" onClick={handleSubmit} sx={{ ml: 2 }}>
                         Submit
                     </MDButton>
