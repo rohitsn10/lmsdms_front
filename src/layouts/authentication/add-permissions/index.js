@@ -49,21 +49,26 @@ const PermissionsTable = () => {
     const handleSelectAll = () => {
         const newSelectAllState = !selectAll;
         setSelectAll(newSelectAllState);
-
+    
         setPermissionState((prevState) => {
             const updatedState = {};
             Object.keys(prevState).forEach((role) => {
+                const { addId, viewId, changeId, deleteId } = prevState[role];
                 updatedState[role] = {
                     isAdd: newSelectAllState,
                     isView: newSelectAllState,
                     isChange: newSelectAllState,
                     isDelete: newSelectAllState,
+                    addId,
+                    viewId,
+                    changeId,
+                    deleteId,
                 };
             });
             return updatedState;
         });
     };
-
+    
     const handleSubmit = () => {
         const selectedPermissionIds = Object.keys(permissionState).map((role) => {
             const perm = permissionState[role];
