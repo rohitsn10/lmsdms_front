@@ -31,27 +31,28 @@ function AddDocumentType() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
-
+  
     try {
       const response = await createDocumentType({
         document_name: documentTypeName.trim(),
         token: sessionStorage.getItem("token"),
       }).unwrap();
-
+  
       console.log("API Response:", response);
-
-      if (response.status) {
+  
+      if (response && response.status === true) {
         toast.success("Document Type added successfully!");
         setOpenSignatureDialog(true);
       } else {
-        console.error("Document type creation failed:", response.message);
-        toast.error("Failed to add Document Type. Please try again.");
+        console.error("Document type creation failed:", response.message || "Unknown error");
+        toast.error(response.message || "Failed to add Document Type. Please try again.");
       }
     } catch (error) {
       console.error("Error creating document type:", error);
       toast.error("Failed to add Document Type. Please try again.");
     }
   };
+  
 
   const handleClear = () => {
     setDocumentTypeName("");

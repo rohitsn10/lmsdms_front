@@ -150,8 +150,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
         <MDBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
           <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
         </MDBox>
+       
         {!isMini && (
+          
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
+            <MDBox pr={1}>
+              <MDInput label="User" />
+            </MDBox>
             <MDBox color={light ? "white" : "inherit"} display="flex" alignItems="center">
               <IconButton
                 sx={navbarIconButton}
