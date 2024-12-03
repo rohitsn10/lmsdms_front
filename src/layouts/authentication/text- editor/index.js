@@ -88,10 +88,19 @@ const DocumentView = () => {
   // console.log("Training Required:", trainingRequired)
   const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
 
+  // Log the documentsData structure
+  console.log('Documents Data:', documentsData);
+  
+  // Extract userGroupIds directly from documentsData
+  const userGroupIds = documentsData?.userGroupIds || [];
+  console.log('Extracted User Group IDs:', userGroupIds);
+  
+  // Visibility function using extracted userGroupIds
   const isButtonVisible = (requiredGroupIds) => {
-    const userGroupIds = documentsData?.user_group_ids || [];
+    console.log('Checking visibility for groups:', requiredGroupIds, 'against user groups:', userGroupIds);
     return requiredGroupIds.some((id) => userGroupIds.includes(id));
   };
+  
 
   useEffect(() => {
     const fetchDocxFile = async () => {
@@ -496,7 +505,7 @@ const DocumentView = () => {
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
 
         {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-        {(document_current_status === "1" || document_current_status === "2") && isButtonVisible([2]) && (
+        {(document_current_status === "1" || document_current_status === "2") && isButtonVisible([40]) && (
           <>
             <MDButton
               variant="gradient"
@@ -519,7 +528,7 @@ const DocumentView = () => {
         )}
 
         {/* Condition 2: Show Review button when status is "3" */}
-        {document_current_status === "3" && isButtonVisible([5]) &&  (
+        {document_current_status === "3" && isButtonVisible([2]) &&  (
           <>
             <MDButton variant="gradient" color="submit" onClick={handleReview} disabled={isLoading}>
               Review
