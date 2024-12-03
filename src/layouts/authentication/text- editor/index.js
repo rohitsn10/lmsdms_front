@@ -88,10 +88,19 @@ const DocumentView = () => {
   // console.log("Training Required:", trainingRequired)
   const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
 
+  // Log the documentsData structure
+  console.log('Documents Data:', documentsData);
+  
+  // Extract userGroupIds directly from documentsData
+  const userGroupIds = documentsData?.userGroupIds || [];
+  console.log('Extracted User Group IDs:', userGroupIds);
+  
+  // Visibility function using extracted userGroupIds
   const isButtonVisible = (requiredGroupIds) => {
-    const userGroupIds = documentsData?.user_group_ids || [];
+    console.log('Checking visibility for groups:', requiredGroupIds, 'against user groups:', userGroupIds);
     return requiredGroupIds.some((id) => userGroupIds.includes(id));
   };
+  
 
   useEffect(() => {
     const fetchDocxFile = async () => {
