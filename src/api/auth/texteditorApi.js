@@ -79,6 +79,13 @@ export const texteditorApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    getApprovedStatusUsers: builder.query({
+      query: (documentId) => ({
+        url: `dms_module/approved_status_users/${documentId}`,  // Pass it as a query param
+        method: "GET",
+      }),
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
@@ -91,4 +98,5 @@ export const {
   useDocumentApproverStatusMutation,
   useDocumentDocadminStatusMutation,
   useDocumentSendBackStatusMutation,
+  useGetApprovedStatusUsersQuery,
 } = texteditorApi;

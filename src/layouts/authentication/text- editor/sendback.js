@@ -13,7 +13,7 @@ import {
 import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import { useUserListQuery } from "api/auth/userApi"; // Replace with the actual path to your query hook
+import { useGetApprovedStatusUsersQuery } from "api/auth/texteditorApi";
 
 const handleClear = () => {
   setAssignedTo("");
@@ -27,8 +27,12 @@ const SendBackDialog = ({
   setAssignedTo,
   statusSendBack,
   setStatusSendBack,
+  documentId,
 }) => {
-  const { data: userData, isLoading, error } = useUserListQuery();
+  const { data: userData, isLoading, error } = useGetApprovedStatusUsersQuery(documentId);
+
+  // Log to check the documentId
+  console.log('Document ID:', documentId);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -67,16 +71,13 @@ const SendBackDialog = ({
                 ".MuiSelect-select": { padding: "0.45rem" },
               }}
             >
-              {!isLoading && userData?.data?.map((user) => (
-                <MenuItem key={user.id} value={user.id}>
-                  {`${user.first_name || ""} ${user.last_name || ""}`.trim()}
-                </MenuItem>
-              ))}
-              {error && (
-                <MenuItem disabled>
-                  Error loading users
-                </MenuItem>
-              )}
+              {!isLoading &&
+                userData?.data?.map((user) => (
+                  <MenuItem key={user.id} value={user.id}>
+                    {user.first_name}
+                  </MenuItem>
+                ))}
+              {error && <MenuItem disabled>Error loading users</MenuItem>}
             </Select>
           </FormControl>
         </DialogContent>
@@ -96,6 +97,7 @@ const SendBackDialog = ({
   );
 };
 
+
 SendBackDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
@@ -104,6 +106,7 @@ SendBackDialog.propTypes = {
   setAssignedTo: PropTypes.func.isRequired,
   statusSendBack: PropTypes.string,
   setStatusSendBack: PropTypes.func.isRequired,
+  documentId: PropTypes.string.isRequired,
 };
 
 export default SendBackDialog;

@@ -505,7 +505,7 @@ const DocumentView = () => {
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
 
         {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-        {(document_current_status === "1" || document_current_status === "2") && isButtonVisible([40]) && (
+        {(document_current_status === "1" || document_current_status === "2") && isButtonVisible([2]) && (
           <>
             <MDButton
               variant="gradient"
@@ -545,7 +545,7 @@ const DocumentView = () => {
         )}
 
         {/* Condition 3: Show Approve button when status is "4" */}
-        {document_current_status === "4"  && isButtonVisible([38]) && (
+        {document_current_status === "4"  && isButtonVisible([7]) && (
           <>
             <MDButton
               variant="gradient"
@@ -566,7 +566,7 @@ const DocumentView = () => {
           </>
         )}
   {/* Condition 4 */}
-        {document_current_status === "5"  && isButtonVisible([39]) && (
+        {document_current_status === "5"  && isButtonVisible([8]) && (
           <>
             <MDButton variant="gradient" color="submit" onClick={handleDialogOpen} disabled={isLoading}>
               Doc Admin Approve
@@ -606,6 +606,7 @@ const DocumentView = () => {
         setAssignedTo={setAssignedTo}
         statusSendBack={statusSendBack}
         setStatusSendBack={setStatusSendBack}
+        documentId={id}
       />
        <ConditionalDialog
         open={dialogeffectiveOpen}
