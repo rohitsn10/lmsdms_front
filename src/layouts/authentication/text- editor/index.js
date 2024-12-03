@@ -36,7 +36,7 @@ import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
 import SendBackDialog from "./sendback";
 import ConditionalDialog from "./effective";
 import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
-import { useFetchDocumentsQuery} from "api/auth/documentApi";
+import { useFetchDocumentsQuery } from "api/auth/documentApi";
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -76,31 +76,36 @@ const DocumentView = () => {
   const [documentReviewStatus] = useDocumentReviewStatusMutation();
   const navigate = useNavigate();
   const [documentApproveStatus] = useDocumentApproveStatusMutation();
-  const [ documentSendBackStatus] = useDocumentSendBackStatusMutation();
+  const [documentSendBackStatus] = useDocumentSendBackStatusMutation();
   const searchParams = new URLSearchParams(location.search);
   const document_current_status = searchParams.get("status");
   const trainingRequired = searchParams.get("training_required");
+  const approval_status = searchParams.get("approval_status");
   const [dialogeffectiveOpen, setDialogeffectiveOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
-  const [assignedTo, setAssignedTo] = useState(''); // State for Assigned To dropdown
-  const [statusSendBack, setStatusSendBack] = useState(''); // State for Status Send Back dropdown
+  const [assignedTo, setAssignedTo] = useState(""); // State for Assigned To dropdown
+  const [statusSendBack, setStatusSendBack] = useState(""); // State for Status Send Back dropdown
   // console.log("Navigated with data in text Editor :", { id, document_current_status});
   // console.log("Training Required:", trainingRequired)
   const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
 
   // Log the documentsData structure
-  console.log('Documents Data:', documentsData);
-  
+  console.log("Documents Data:", documentsData);
+
   // Extract userGroupIds directly from documentsData
   const userGroupIds = documentsData?.userGroupIds || [];
-  console.log('Extracted User Group IDs:', userGroupIds);
-  
+  console.log("Extracted User Group IDs:", userGroupIds);
+
   // Visibility function using extracted userGroupIds
   const isButtonVisible = (requiredGroupIds) => {
-    console.log('Checking visibility for groups:', requiredGroupIds, 'against user groups:', userGroupIds);
+    console.log(
+      "Checking visibility for groups:",
+      requiredGroupIds,
+      "against user groups:",
+      userGroupIds
+    );
     return requiredGroupIds.some((id) => userGroupIds.includes(id));
   };
-  
 
   useEffect(() => {
     const fetchDocxFile = async () => {
@@ -245,25 +250,25 @@ const DocumentView = () => {
       alert("An error occurred. Please try again.");
     }
   };
-  const handleDoc = async () => {
-    console.log("Doc click button ");
-    try {
-      const response = await documentDocadminStatus({
-        document_id: id, // Replace with your actual document_id
-        status: "6", // Replace with your desired status
-      }).unwrap();
-      navigate("/document-listing");
-      console.log("API Response:", response);
-      if (response.status) {
-        alert(response.message); // Success message
-      } else {
-        alert("Action failed");
-      }
-    } catch (error) {
-      console.error("Error calling API:", error);
-      alert("An error occurred. Please try again.");
-    }
-  };
+  // const handleDoc = async () => {
+  //   console.log("Doc click button ");
+  //   try {
+  //     const response = await documentDocadminStatus({
+  //       document_id: id, // Replace with your actual document_id
+  //       status: "6", // Replace with your desired status
+  //     }).unwrap();
+  //     navigate("/document-listing");
+  //     console.log("API Response:", response);
+  //     if (response.status) {
+  //       alert(response.message); // Success message
+  //     } else {
+  //       alert("Action failed");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error calling API:", error);
+  //     alert("An error occurred. Please try again.");
+  //   }
+  // };
 
   const handleAddComment = () => {
     const quill = quillRef.current;
@@ -314,6 +319,10 @@ const DocumentView = () => {
     navigate(`/print-document/${id}`);
   };
 
+  const handleNewPrint = () => {
+    console.log("New Print Function Triggered for ID:", id);
+  };
+
   const handleSaveAsDocx = async () => {
     const quill = quillRef.current;
     const htmlContent = quill.root.innerHTML;
@@ -344,7 +353,7 @@ const DocumentView = () => {
   // Handle dialog confirm
   const handleConfirmDialog = async () => {
     console.log("Send Back button clicked");
-  
+
     try {
       // Call the API using the mutation hook and pass the required data directly
       const response = await documentSendBackStatus({
@@ -352,7 +361,7 @@ const DocumentView = () => {
         assigned_to: assignedTo, // Value from the dialog's state
         status_sendback: "8", // The current status (replace with actual status if needed)
       }).unwrap();
-  
+
       console.log("API Response:", response);
       if (response.status) {
         alert(response.message); // Success message from the API response
@@ -369,7 +378,7 @@ const DocumentView = () => {
 
   const handleDialogConfirm = async () => {
     setDialogeffectiveOpen(false); // Close the dialog after confirmation
-  
+
     console.log("Doc Admin Approve clicked - Confirmed");
     try {
       const response = await documentDocadminStatus({
@@ -388,7 +397,6 @@ const DocumentView = () => {
       alert("An error occurred. Please try again.");
     }
   };
-  
 
   const handleDialogOpen = () => {
     console.log("Doc Admin Approve clicked - Confirmed");
@@ -402,13 +410,13 @@ const DocumentView = () => {
   const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
     const documentData = { document_id: id, document_data: content };
-  
+
     // Save the document data (existing functionality)
     await createDocument(documentData);
-  
+
     // Close the dialog after saving
     setOpenDialog(false);
-  
+
     // Save the document as a .docx file if needed
     handleSaveAsDocx();
   };
@@ -454,7 +462,7 @@ const DocumentView = () => {
     >
       {/* Insert AntiCopyPattern as the background */}
       <AntiCopyPattern />
-      
+
       <Paper
         id="editor-container"
         sx={{
@@ -485,7 +493,7 @@ const DocumentView = () => {
         onClose={() => setOpencommentDialog(false)}
         currentComment={currentComment}
         setCurrentComment={setCurrentComment}
-        handleSaveComment={handleSaveComment} 
+        handleSaveComment={handleSaveComment}
         documentId={id}
       />
 
@@ -503,32 +511,31 @@ const DocumentView = () => {
       </Dialog>
 
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
-
         {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-        {(document_current_status === "1" || document_current_status === "2") && isButtonVisible([2]) && (
-          <>
-            <MDButton
-              variant="gradient"
-              color="submit"
-              type="button" // Set to "button" to prevent default form submission
-              onClick={handleSubmit}
-              disabled={isLoading} // Disable the button while the API call is in progress
-            >
-              {isLoading ? "Submitting..." : "Submit"}
-            </MDButton>
-            <MDButton
-              variant="gradient"
-              color="submit"
-              onClick={handleSaveDraft}
-              disabled={isLoading} // Disable button when mutation is in progress
-            >
-              Save Draft
-            </MDButton>
-          </>
-        )}
-
+        {(document_current_status === "1" || document_current_status === "2") &&
+          isButtonVisible([2]) && (
+            <>
+              <MDButton
+                variant="gradient"
+                color="submit"
+                type="button" // Set to "button" to prevent default form submission
+                onClick={handleSubmit}
+                disabled={isLoading} // Disable the button while the API call is in progress
+              >
+                {isLoading ? "Submitting..." : "Submit"}
+              </MDButton>
+              <MDButton
+                variant="gradient"
+                color="submit"
+                onClick={handleSaveDraft}
+                disabled={isLoading} // Disable button when mutation is in progress
+              >
+                Save Draft
+              </MDButton>
+            </>
+          )}
         {/* Condition 2: Show Review button when status is "3" */}
-        {document_current_status === "3" && isButtonVisible([2]) &&  (
+        {document_current_status === "3" && isButtonVisible([2]) && (
           <>
             <MDButton variant="gradient" color="submit" onClick={handleReview} disabled={isLoading}>
               Review
@@ -543,9 +550,8 @@ const DocumentView = () => {
             </MDButton>
           </>
         )}
-
         {/* Condition 3: Show Approve button when status is "4" */}
-        {document_current_status === "4"  && isButtonVisible([7]) && (
+        {document_current_status === "4" && isButtonVisible([7]) && (
           <>
             <MDButton
               variant="gradient"
@@ -565,10 +571,15 @@ const DocumentView = () => {
             </MDButton>
           </>
         )}
-  {/* Condition 4 */}
-        {document_current_status === "5"  && isButtonVisible([8]) && (
+        {/* Condition 4 */}
+        {document_current_status === "5" && isButtonVisible([8]) && (
           <>
-            <MDButton variant="gradient" color="submit" onClick={handleDialogOpen} disabled={isLoading}>
+            <MDButton
+              variant="gradient"
+              color="submit"
+              onClick={handleDialogOpen}
+              disabled={isLoading}
+            >
               Doc Admin Approve
             </MDButton>
             <MDButton
@@ -581,22 +592,28 @@ const DocumentView = () => {
             </MDButton>
           </>
         )}
-      
         {/* Display success or error messages */}
         {data && <p>{data.message}</p>}
         {error && <p>Error: {error.message}</p>}
         <MDButton
-        variant="gradient"
-        color="submit"
-        onClick={handlePrint} // Use onClick to trigger navigation
-        sx={{
-          float: "right",
-          mt: 1,
-          mr: 20,
-        }}
-      >
-        Print
-      </MDButton>
+          variant="gradient"
+          color="submit"
+          onClick={() => {
+            if (approval_status === "Approve") {
+              handleNewPrint(); // Call handleNewPrint if approval_status is "Approve"
+            } else {
+              handlePrint(); // Call handlePrint otherwise
+            }
+          }}
+          sx={{
+            float: "right",
+            mt: 1,
+            mr: 20,
+          }}
+        >
+          Print
+        </MDButton>
+        ;
       </MDBox>
       <SendBackDialog
         open={dialogOpen}
@@ -608,7 +625,7 @@ const DocumentView = () => {
         setStatusSendBack={setStatusSendBack}
         documentId={id}
       />
-       <ConditionalDialog
+      <ConditionalDialog
         open={dialogeffectiveOpen}
         onClose={handleDialogClose} // Handle dialog close
         onConfirm={handleDialogConfirm} // Handle dialog confirmation

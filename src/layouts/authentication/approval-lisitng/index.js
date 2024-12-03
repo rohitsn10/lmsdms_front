@@ -58,12 +58,21 @@ const PrintApprovalListing = () => {
       headerName: "Action",
       flex: 0.5,
       headerAlign: "center",
-      renderCell: (params) => (
-        <IconButton color="primary" onClick={() => handleOpenDialog(params.row)}>
-          <CheckCircleIcon />
-        </IconButton>
-      ),
+      renderCell: (params) => {
+        const isApproved = params.row.status === "Approve";
+    
+        return (
+          <IconButton
+            color={isApproved ? "success" : "primary"} // Green color for approved
+            onClick={() => handleOpenDialog(params.row)}
+            disabled={isApproved} // Disable button if approved
+          >
+            <CheckCircleIcon />
+          </IconButton>
+        );
+      },
     },
+    
   ];
 
   return (

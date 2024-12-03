@@ -34,7 +34,7 @@ const ApprovalDialog = ({ open, onClose, maxCopies, requestId }) => {  // Accept
     printApprovals({
       print_request_id: requestId, // Pass the requestId here
       no_of_request_by_admin: numberOfCopies,
-      status: approvalStatusId,  // Pass the status id to the API
+      status: "9",  // Pass the status id to the API
     }).then((response) => {
       console.log("Print approval response:", response);
       onClose(); // Close the dialog after submission
@@ -83,7 +83,7 @@ const ApprovalDialog = ({ open, onClose, maxCopies, requestId }) => {  // Accept
               fullWidth
             />
           </FormControl>
-          <FormControl fullWidth margin="normal">
+          {/* <FormControl fullWidth margin="normal">
             <InputLabel id="approval-status-label">Approval Status</InputLabel>
             <Select
               labelId="approval-status-label"
@@ -98,19 +98,19 @@ const ApprovalDialog = ({ open, onClose, maxCopies, requestId }) => {  // Accept
               }}
               fullWidth
             >
-              {/* Handle loading and error states */}
+             
               {isLoading && <MenuItem disabled>Loading...</MenuItem>}
               {error && <MenuItem disabled>Error loading statuses</MenuItem>}
 
-              {/* Map fetched data into MenuItem components */}
+             
               {data &&
                 data.map((statusItem) => (
                   <MenuItem key={statusItem.id} value={statusItem.id}>
-                    {statusItem.status} {/* Display status name */}
+                    {statusItem.status} 
                   </MenuItem>
                 ))}
             </Select>
-          </FormControl>
+          </FormControl> */}
         </DialogContent>
         <DialogActions>
           <MDButton onClick={onClose} color="error" sx={{ marginRight: "10px" }}>
@@ -118,7 +118,7 @@ const ApprovalDialog = ({ open, onClose, maxCopies, requestId }) => {  // Accept
           </MDButton>
           <MDBox>
             <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? 'Submitting...' : 'Approve  '}
             </MDButton>
           </MDBox>
         </DialogActions>
