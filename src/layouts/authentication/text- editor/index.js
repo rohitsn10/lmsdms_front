@@ -512,28 +512,28 @@ const DocumentView = () => {
 
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
         {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-        {(document_current_status === "1" || document_current_status === "2") &&
-          isButtonVisible([2]) && (
-            <>
-              <MDButton
-                variant="gradient"
-                color="submit"
-                type="button" // Set to "button" to prevent default form submission
-                onClick={handleSubmit}
-                disabled={isLoading} // Disable the button while the API call is in progress
-              >
-                {isLoading ? "Submitting..." : "Submit"}
-              </MDButton>
-              <MDButton
-                variant="gradient"
-                color="submit"
-                onClick={handleSaveDraft}
-                disabled={isLoading} // Disable button when mutation is in progress
-              >
-                Save Draft
-              </MDButton>
-            </>
-          )}
+        {(document_current_status === "1" || document_current_status === "2") && isButtonVisible([40]) && (
+          <>
+            <MDButton
+              variant="gradient"
+              color="submit"
+              type="button" // Set to "button" to prevent default form submission
+              onClick={handleSubmit}
+              disabled={isLoading} // Disable the button while the API call is in progress
+            >
+              {isLoading ? "Submitting..." : "Submit"}
+            </MDButton>
+            <MDButton
+              variant="gradient"
+              color="submit"
+              onClick={handleSaveDraft}
+              disabled={isLoading} // Disable button when mutation is in progress
+            >
+              Save Draft
+            </MDButton>
+          </>
+        )}
+
         {/* Condition 2: Show Review button when status is "3" */}
         {document_current_status === "3" && isButtonVisible([2]) && (
           <>
@@ -551,7 +551,7 @@ const DocumentView = () => {
           </>
         )}
         {/* Condition 3: Show Approve button when status is "4" */}
-        {document_current_status === "4" && isButtonVisible([7]) && (
+        {document_current_status === "4"  && isButtonVisible([38]) && (
           <>
             <MDButton
               variant="gradient"
@@ -571,8 +571,8 @@ const DocumentView = () => {
             </MDButton>
           </>
         )}
-        {/* Condition 4 */}
-        {document_current_status === "5" && isButtonVisible([8]) && (
+  {/* Condition 4 */}
+        {document_current_status === "5"  && isButtonVisible([39]) && (
           <>
             <MDButton
               variant="gradient"

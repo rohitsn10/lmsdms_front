@@ -44,8 +44,8 @@ const DocumentViewer = () => {
         <Box
           ref={docxContainerRef}
           sx={{
-            width: "80%",
-            height: "80vh",
+            width: "794px",  
+            height: "950px", 
             margin: "0 auto",
             border: "1px solid #ccc",
             overflowY: "auto",

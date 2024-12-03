@@ -18,22 +18,27 @@ const ConditionalDialog = ({
       ? "Are you sure effective?"
       : "Are you sure you want to release the document?";
 
-  // Use the mutation hook
   const [documentDocadminStatus, { isLoading, isError, error }] = useDocumentDocadminStatusMutation();
 
   const handleConfirm = async () => {
     try {
-      // Call the mutation when the user confirms
-      await documentDocadminStatus({ document_id: documentId, status: "approved" });
-
-      // Call the onConfirm prop if necessary after mutation
+      console.log("Document ID:", documentId);
+  
+      // Create a FormData object and append documentId and status
+      const formData = new FormData();
+      formData.append("document_id", documentId);
+      formData.append("status", "approved");  // or use the relevant status value
+  
+      // Call the mutation with FormData
+      await documentDocadminStatus(formData);
+      
       onConfirm();
-      onClose(); // Close the dialog after successful mutation
+      onClose(); 
     } catch (err) {
-      // Handle error (optional)
       console.error("Error updating document status:", err);
     }
   };
+  
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -62,7 +67,7 @@ const ConditionalDialog = ({
               color="submit"
               fullWidth
               onClick={handleConfirm}
-              disabled={isLoading} // Disable button while mutation is in progress
+              disabled={isLoading} 
             >
               {isLoading ? "Submitting..." : "Submit"}
             </MDButton>
@@ -87,7 +92,7 @@ ConditionalDialog.propTypes = {
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,
   trainingStatus: PropTypes.string.isRequired, 
-  documentId: PropTypes.string.isRequired, // Pass documentId as a prop
+  documentId: PropTypes.string.isRequired, 
 };
 
 export default ConditionalDialog;

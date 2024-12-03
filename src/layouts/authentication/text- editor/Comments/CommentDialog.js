@@ -1,43 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Dialog,
-  DialogContent,
-} from "@mui/material";
-import MDButton from "components/MDButton";
-import { useCreateCommentMutation } from "api/auth/commentsApi";
+import { Box, Button, TextField, Typography, Dialog, DialogContent } from "@mui/material";
 
 const CommentModal = ({
   open,
   onClose,
   currentComment,
   setCurrentComment,
-  documentId,
+  handleSaveComment,
 }) => {
-  const [createComment, { isLoading, isSuccess, isError }] = useCreateCommentMutation();
-
-  const handleSaveComment = async () => {
-    try {
-      const response = await createComment({
-        document: documentId,
-        comment_description: currentComment,
-      }).unwrap();
-      console.log("id:",documentId);
-      if (response.status === "success") {
-        console.log("Comment saved successfully!");
-        onClose();
-      } else {
-        console.error("Failed to save comment:", response.message);
-      }
-    } catch (error) {
-      console.error("An error occurred:", error);
-    }
-  };
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogContent>
@@ -52,24 +23,13 @@ const CommentModal = ({
             variant="outlined"
             margin="normal"
           />
-          <MDButton
-            variant="gradient"
-            color="submit"
+          <Button
+            variant="contained"
             onClick={handleSaveComment}
-            sx={{
-              marginBottom: 2,
-              backgroundColor: isLoading ? "gray" : "black",
-              color: "white",
-            }}
-            disabled={isLoading}
+            sx={{ marginBottom: 2, backgroundColor: "#E53471", color: "white" }}
           >
-            {isLoading ? "Saving..." : "Save Comment"}
-          </MDButton>
-          {isError && (
-            <Typography color="error" variant="body2">
-              Failed to save comment. Please try again.
-            </Typography>
-          )}
+            Save Comment
+          </Button>
         </Box>
       </DialogContent>
     </Dialog>
@@ -81,7 +41,7 @@ CommentModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   currentComment: PropTypes.string.isRequired,
   setCurrentComment: PropTypes.func.isRequired,
-  documentId: PropTypes.string.isRequired,
+  handleSaveComment: PropTypes.func.isRequired,
 };
 
 export default CommentModal;
