@@ -25,7 +25,7 @@ const PrintApprovalListing = () => {
     .map((item, index) => ({
       ...item,
       serial_number: index + 1,
-      created_at: new Date(item.created_at).toLocaleDateString("en-GB"),
+      created_at: moment(item.created_at).format("DD-MM-YY HH:mm"),
     }));
 
   const handleOpenDialog = (data) => {

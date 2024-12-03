@@ -13,6 +13,7 @@ import { useViewTemplateQuery } from "api/auth/documentApi";
 import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 import { useAuth } from "hooks/use-auth";
 import { hasPermission } from "utils/hasPermission";
+import moment from "moment";
 
 const TemplateListing = () => {
   const { user, role } = useAuth();
@@ -50,7 +51,7 @@ const TemplateListing = () => {
     .map((item, index) => ({
       ...item,
       serial_number: index + 1,
-      created_at: new Date(item.created_at).toLocaleDateString("en-GB"),
+      created_at: moment(item.created_at).format("DD-MM-YY HH:mm"),
     }));
 
   const columns = [

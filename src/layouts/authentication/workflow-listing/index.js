@@ -12,6 +12,7 @@ import { useFetchWorkflowsQuery } from "api/auth/workflowApi";
 import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 import { useAuth } from "hooks/use-auth";
 import { hasPermission } from "utils/hasPermission";
+import moment from "moment";
 
 const WorkflowListing = () => {
     const { role } = useAuth();
@@ -38,7 +39,7 @@ const WorkflowListing = () => {
         serial_number: index + 1,
         workflow_name: item.workflow_name || "N/A",
         workflow_description: item.workflow_description || "N/A",
-        created_at: new Date(item.created_at).toLocaleDateString(),
+        created_at: moment(item.created_at).format("DD-MM-YY HH:mm"),
     }));
 
     const handleSearch = (event) => {
