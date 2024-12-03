@@ -127,6 +127,22 @@ const DocumentView = () => {
   }, [data]);
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        setOpenDialog(true);
+      }
+      if (e.ctrlKey && e.key === "p") {
+        e.preventDefault();
+        handlePrint2(); // Trigger the print function when Ctrl + P is pressed
+      }
+    };
+  
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+  
+  useEffect(() => {
     if (isLoaded && !quillRef.current) {
       const quill = new Quill("#editor-container", {
         theme: "snow",
@@ -319,8 +335,57 @@ const DocumentView = () => {
     navigate(`/print-document/${id}`);
   };
 
-  const handleNewPrint = () => {
-    console.log("New Print Function Triggered for ID:", id);
+  // const handleNewPrint = () => {
+  //   console.log("New Print Function Triggered for ID:", id);
+  // };
+  const handlePrint2 = () => {
+    const quill = quillRef.current; // Get the Quill instance
+    const editorContent = quill.root.innerHTML; // Get the HTML content from the editor
+  
+    // Create a temporary hidden iframe to load the content and trigger print
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "absolute";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "none";
+    document.body.appendChild(iframe);
+  
+    const iframeDocument = iframe.contentWindow.document;
+    iframeDocument.open();
+    iframeDocument.write(`
+      <html>
+        <head>
+          <style>
+            /* Add basic print styles */
+            body {
+              font-family: Arial, sans-serif;
+              padding: 20px;
+              margin: 0;
+              font-size: 12px;
+            }
+            #editor-container {
+              width: 100%;
+              max-width: 210mm;
+              margin: 0 auto;
+              padding: 10px;
+              background-color: #fff;
+              border: 1px solid #ccc;
+            }
+          </style>
+        </head>
+        <body>
+          <div id="editor-container">${editorContent}</div>
+        </body>
+      </html>
+    `);
+    iframeDocument.close();
+  
+   
+    iframe.onload = () => {
+      iframe.contentWindow.focus(); 
+      iframe.contentWindow.print(); 
+      document.body.removeChild(iframe); 
+    };
   };
 
   const handleSaveAsDocx = async () => {
