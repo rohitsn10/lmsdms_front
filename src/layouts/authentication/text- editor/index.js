@@ -496,7 +496,7 @@ const DocumentView = () => {
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
 
         {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-        {(document_current_status === "1" || document_current_status === "2") && isButtonVisible([40]) && (
+        {(document_current_status === "1" || document_current_status === "2") && isButtonVisible([2]) && (
           <>
             <MDButton
               variant="gradient"
@@ -519,7 +519,7 @@ const DocumentView = () => {
         )}
 
         {/* Condition 2: Show Review button when status is "3" */}
-        {document_current_status === "3" && isButtonVisible([2]) &&  (
+        {document_current_status === "3" && isButtonVisible([5]) &&  (
           <>
             <MDButton variant="gradient" color="submit" onClick={handleReview} disabled={isLoading}>
               Review

@@ -12,6 +12,7 @@ import { useFetchDocumentTypesQuery } from 'api/auth/documentApi';
 import { useFetchPermissionsByGroupIdQuery } from 'api/auth/permissionApi';
 import { hasPermission } from "utils/hasPermission";
 import { useAuth } from "hooks/use-auth";
+import moment from "moment";
 
 const DocumentTypesListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,7 +41,9 @@ const DocumentTypesListing = () => {
     .filter((item) => item.document_name.toLowerCase().includes(searchTerm.toLowerCase()))
     .map((item, index) => ({
       ...item,
-      serial_number: index + 1  // Add serial number based on the index
+      serial_number: index + 1,  // Add serial number based on the index
+      created_at: moment(item.created_at).format("DD-MM-YY HH:mm"), 
+      
     })) : [];
 
   const columns = [

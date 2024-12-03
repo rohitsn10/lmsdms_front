@@ -15,6 +15,7 @@ import { hasPermission } from "utils/hasPermission";
 import PropTypes from 'prop-types'; 
 import {useFetchPermissionsByGroupIdQuery} from "api/auth/permissionApi"
 import { useAuth } from "hooks/use-auth";
+import moment from "moment";
 
 const DocumentListing = () => {
   const {user, role} = useAuth()
@@ -73,12 +74,13 @@ const DocumentListing = () => {
   const filteredData = documents.filter((doc) =>
     doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doc.document_number.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    doc.document_number.toLowerCase().includes(searchTerm.toLowerCase())||
+    doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())  );
 
   const rows = filteredData.map((doc, index) => ({
     ...doc,
     index,
+    created_at: moment(doc.created_at).format("DD-MM-YY HH:mm"), 
   }));
   const columns = [
     {
@@ -115,7 +117,7 @@ const DocumentListing = () => {
       headerAlign: 'center'
     },
     {
-      field: 'formatted_created_at',
+      field: 'created_at',
       headerName: 'Created Date',
       flex: 0.75,
       headerAlign: 'center'

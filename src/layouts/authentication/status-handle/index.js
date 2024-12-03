@@ -19,6 +19,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useFetchPermissionsByGroupIdQuery } from 'api/auth/permissionApi';
 import { useAuth } from 'hooks/use-auth';
 import { hasPermission } from 'utils/hasPermission';
+import moment from 'moment';
 
 const StatusListing = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -72,10 +73,10 @@ const StatusListing = () => {
     }
   };
 
-  const handleDeleteClick = (id) => {
-    setStatusToDelete(id);
-    setConfirmationDialogOpen(true);
-  };
+  // const handleDeleteClick = (id) => {
+  //   setStatusToDelete(id);
+  //   setConfirmationDialogOpen(true);
+  // };
 
   const handleCloseConfirmationDialog = () => {
     setConfirmationDialogOpen(false);
@@ -91,6 +92,7 @@ const StatusListing = () => {
   const rowsWithSerial = filteredData?.map((status, index) => ({
     ...status,
     srNo: index + 1,
+    created_at: moment(status.created_at).format("DD-MM-YY HH:mm"), 
   }));
 
   const columns = [
