@@ -13,7 +13,7 @@ import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useCreateDocumentTypeMutation } from "api/auth/documentApi";
 
 function AddDocumentType() {
-  const [documentTypeName, setDocumentTypeName] = useState("");
+  const [documentName, setDocumentName] = useState("");
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [createDocumentType, { isLoading }] = useCreateDocumentTypeMutation();
@@ -21,9 +21,7 @@ function AddDocumentType() {
 
   const validateInputs = () => {
     const newErrors = {};
-    if (!documentTypeName.trim()) {
-      newErrors.documentTypeName = "Document Type Name is required.";
-    }
+    if (!documentName.trim()) newErrors.documentName = "Document Name is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -31,37 +29,29 @@ function AddDocumentType() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
-  
+
     try {
       const response = await createDocumentType({
-        document_name: documentTypeName.trim(),
-        token: sessionStorage.getItem("token"),
+        document_name: documentName.trim(),
       }).unwrap();
-  
+
       console.log("API Response:", response);
-  
-      if (response && response.status === true) {
-        toast.success("Document Type added successfully!");
-        setOpenSignatureDialog(true);
-      } else {
-        console.error("Document type creation failed:", response.message || "Unknown error");
-        toast.error(response.message || "Failed to add Document Type. Please try again.");
-      }
+      toast.success("Document Type added successfully!");
+      setOpenSignatureDialog(true);
     } catch (error) {
       console.error("Error creating document type:", error);
-      toast.error("Failed to add Document Type. Please try again.");
+      toast.error("Failed to add document type. Please try again.");
     }
   };
-  
 
   const handleClear = () => {
-    setDocumentTypeName("");
+    setDocumentName("");
     setErrors({});
   };
 
   const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false); // Close the dialog
-    navigate("/document-typelisting"); // Redirect to document types listing page
+    setOpenSignatureDialog(false);
+    navigate("/document-typelisting");
   };
 
   return (
@@ -94,18 +84,17 @@ function AddDocumentType() {
             Clear
           </MDButton>
         </MDBox>
-
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Document Type Name"
+                label="Document Name"
                 fullWidth
-                value={documentTypeName}
-                onChange={(e) => setDocumentTypeName(e.target.value)}
-                error={!!errors.documentTypeName}
-                helperText={errors.documentTypeName}
+                value={documentName}
+                onChange={(e) => setDocumentName(e.target.value)}
+                error={!!errors.documentName}
+                helperText={errors.documentName}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>

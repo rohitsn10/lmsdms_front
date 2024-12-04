@@ -1,4 +1,3 @@
-
 import Dashboard from "layouts/dashboard";
 import AddUser from "layouts/authentication/add-user";
 import AddDepartment from "layouts/authentication/add-department";
@@ -20,103 +19,108 @@ import RolesPermissionsListing from "layouts/authentication/roles-listing";
 import PrintApprovalListing from "layouts/authentication/approval-lisitng";
 
 
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import WorkspacesIcon from '@mui/icons-material/Workspaces';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import SettingsIcon from '@mui/icons-material/Settings';
+import ApprovalIcon from '@mui/icons-material/ThumbUp';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+
 const routes = [
- 
   {
     type: "collapse",
     name: "Dashboard",
     key: "dashboard",
-    icon: <Icon fontSize="small">dashboard</Icon>,
+    icon: <DashboardIcon fontSize="small" />,
     route: "/dashboard",
     component: <Dashboard />,
   },
   {
     type: "collapse",
-    name: "lmsDashboard",
+    name: "LMS Dashboard",
     key: "lms-dashboard",
-    icon: <Icon fontSize="small">dashboard</Icon>,
+    icon: <DashboardIcon fontSize="small" />,
     route: "/lms-dashboard",
     component: <LMSDashboard />,
   },
-
   {
     type: "collapse",
-    name: "User",
+    name: "User Management",
     key: "user-listing",
-    icon:<PersonAddIcon/>,
+    icon: <PersonAddIcon />,
     route: "/user-listing",
-    component: <UsersListing/>,
+    component: <UsersListing />,
   },
   {
     type: "collapse",
-    name: "Department",
+    name: "Departments",
     key: "department-listing",
-    icon: <ApartmentIcon/>,
+    icon: <ApartmentIcon />,
     route: "/department-listing",
     component: <DepartmentListing />,
   },
   {
     type: "collapse",
-    name: "Document",
+    name: "Documents",
     key: "document-listing",
-    icon:<TopicIcon/>,
+    icon: <LibraryBooksIcon />,
     route: "/document-listing",
     component: <DocumentListing />,
   },
   {
     type: "collapse",
-    name: "Workflow",
+    name: "Workflows",
     key: "workflow-listing",
-    icon:<TopicIcon/>,
+    icon: <WorkspacesIcon />,
     route: "/workflow-listing",
-    component: <WorkflowListing/>,
+    component: <WorkflowListing />,
   },
-
   {
     type: "collapse",
-    name: "Status",
+    name: "Status Management",
     key: "status-list",
-    icon: <Icon fontSize="small">notifications</Icon>,
+    icon: <SettingsIcon />,
     route: "/status-list",
     component: <StatusListing />,
   },
   {
     type: "collapse",
-    name: "Document Type",
+    name: "Document Types",
     key: "document-typelisting",
-    icon:<TopicIcon/>,
+    icon: <AssignmentIcon />,
     route: "/document-typelisting",
-    component: <DocumentTypesListing/>,
+    component: <DocumentTypesListing />,
   },
   {
     type: "collapse",
-    name: "Template",
+    name: "Templates",
     key: "template-listing",
-    icon:<TopicIcon/>,
+    icon: <TopicIcon />,
     route: "/template-listing",
-    component: <TemplateListing/>,
+    component: <TemplateListing />,
   },
   {
     type: "collapse",
-    name: "inventory",
+    name: "Inventory",
     key: "inventory-list",
-    icon:<TopicIcon/>,
+    icon: <Inventory2Icon />,
     route: "/inventory-list",
     component: <InventoryListing />,
   },
   {
     type: "collapse",
-    name: "Roles",
+    name: "Roles & Permissions",
     key: "roles-listing",
-    icon: <ApartmentIcon/>,
+    icon: <SettingsIcon />,
     route: "/roles-listing",
     component: <RolesPermissionsListing />,
   },
   {
     type: "collapse",
-    name: "Approval",
+    name: "Approvals",
     key: "approval-listing",
-    icon: <Icon fontSize="small">notifications</Icon>,
+    icon: <ApprovalIcon />,
     route: "/approval-listing",
     component: <PrintApprovalListing />,
   },
