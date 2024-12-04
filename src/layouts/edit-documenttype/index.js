@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -7,6 +9,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useUpdateDocumentTypeMutation } from "api/auth/documentApi";
 
 function EditDocumentType() {
@@ -15,24 +18,38 @@ function EditDocumentType() {
   const { item } = location.state || {}; // Get the passed item from state
 
   const [documentTypeName, setDocumentTypeName] = useState(item?.document_name || "");
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [updateDocumentType, { isLoading: isUpdating }] = useUpdateDocumentTypeMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!documentTypeName.trim()) {
+      toast.error("Document Type Name is required.");
+      return;
+    }
+
     try {
       await updateDocumentType({
         document_type_id: item?.id, // Use the id from the passed item
-        document_name: documentTypeName,
+        document_name: documentTypeName.trim(),
       }).unwrap();
-      console.log("Document Type Updated Successfully");
-      navigate("/document-typelisting"); // Navigate back to the listing page after editing
+
+      toast.success("Document Type updated successfully!");
+      setOpenSignatureDialog(true);
     } catch (error) {
       console.error("Error updating document type:", error);
+      toast.error("Failed to update document type. Please try again.");
     }
   };
 
   const handleClear = () => {
     setDocumentTypeName(""); // Clear the input field
+  };
+
+  const handleCloseSignatureDialog = () => {
+    setOpenSignatureDialog(false);
+    navigate("/document-typelisting"); // Navigate back to the listing page after editing
   };
 
   if (!item) {
@@ -94,6 +111,12 @@ function EditDocumentType() {
           </MDBox>
         </MDBox>
       </Card>
+
+      {/* E-Signature Dialog */}
+      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }
