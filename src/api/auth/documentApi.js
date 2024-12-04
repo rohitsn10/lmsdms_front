@@ -42,6 +42,8 @@ export const documentApi = createApi({
       }),
       transformResponse: (response) => response.data,
       providesTags: ["DocumentTypes"], // Tag document types data for cache management
+      keepUnusedDataFor: 30, // Keep unused data for 30 seconds
+      refetchInterval: 30000, // Auto-refetch every 30 seconds
     }),
 
     fetchDocuments: builder.query({
@@ -53,8 +55,9 @@ export const documentApi = createApi({
         };
       },
       providesTags: ["Documents"], // Tag documents data for cache management
+      keepUnusedDataFor: 30, // Keep unused data for 30 seconds
+      refetchInterval: 30000, // Auto-refetch every 30 seconds
     }),
-    
 
     createTemplate: builder.mutation({
       query: (templateData) => ({

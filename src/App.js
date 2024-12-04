@@ -51,9 +51,10 @@ import PrintApprovalListing from "layouts/authentication/approval-lisitng/index.
 import UpdatePermissionsTable from "layouts/authentication/add-permissions/update-permissions.js";
 import DocumentViewer from "layouts/authentication/doc-example/index.js";
 import UpdateTemplate from "layouts/authentication/add-template/updatetemplate.js";
-
 import EditDocumentType from "layouts/edit-documenttype/index.js";
-
+import PrinterListing from "layouts/authentication/printer-listing/index.js";
+import AddPrinter from "layouts/authentication/add-printer/index.js";
+import EditPrinter from "layouts/authentication/edit-printer/index.js";
 //Lms components
 
 import AddArea from "dmscomponent/add-area/index.js";
@@ -256,11 +257,11 @@ export default function App() {
       <Route path="/approval-listing" element={<PrintApprovalListing />} />
       <Route path="/update-permissions" element={<UpdatePermissionsTable/>} />
       <Route path="/update-template" element={<UpdateTemplate/>} />
-     
       <Route path="/doc-example" element={<DocumentViewer />} /> 
       <Route path="/edit-documenttype" element={<EditDocumentType />} /> 
-
-
+      <Route path="/printer-listing" element={<PrinterListing />} /> 
+      <Route path="/add-printer" element={<AddPrinter />} /> 
+      <Route path="/update-printer" element={<EditPrinter />} />
       {/* Lms components */}
       <Route path="/add-area" element={<AddArea />} />
       <Route path="/add-departments" element={<AddDepartments />} />

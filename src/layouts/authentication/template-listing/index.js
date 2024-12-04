@@ -71,9 +71,9 @@ const TemplateListing = () => {
             <MDTypography variant="body2" sx={{ mr: 1 }}>
               {fileName}
             </MDTypography>
-            <IconButton color="primary" onClick={() => handleViewFile(params.row.template_doc)}>
+            {/* <IconButton color="primary" onClick={() => handleViewFile(params.row.template_doc)}>
               <VisibilityIcon />
-            </IconButton>
+            </IconButton> */}
           </div>
         );
       },
@@ -85,9 +85,14 @@ const TemplateListing = () => {
       headerAlign: "center",
       renderCell: (params) =>
         hasPermission(userPermissions, "templatemodel", "isChange") ? (
-          <IconButton color="primary" onClick={() => handleEditTemplate(params.row)}>
-            <EditIcon />
-          </IconButton>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
+        <IconButton color="primary" onClick={() => handleEditTemplate(params.row)}>
+          <EditIcon />
+        </IconButton>
+        <IconButton color="primary" onClick={() => handleViewFile(params.row.template_doc)}>
+          <VisibilityIcon />
+        </IconButton>
+      </div>
         ) : null,
     },
   ];

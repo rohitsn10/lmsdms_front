@@ -21,13 +21,12 @@ const PrintApprovalListing = () => {
   };
 
   const filteredData = (printRequests || [])
-    .filter((item) => item.document_title && item.document_title.toLowerCase().includes(searchTerm.toLowerCase()))
-    .map((item, index) => ({
-      ...item,
-      serial_number: index + 1,
-      created_at: moment(item.created_at).format("DD-MM-YY HH:mm"),
-    }));
-
+  .filter((item) => item.document_title && item.document_title.toLowerCase().includes(searchTerm.toLowerCase()))
+  .reverse()  // Reverse the data so latest comes first
+  .map((item, index) => ({
+    ...item,
+    serial_number: index + 1, // Correct sequence after reverse
+  }));
   const handleOpenDialog = (data) => {
     setSelectedRequest(data); // Store the selected request
     setOpenDialog(true); // Open the dialog
@@ -41,7 +40,7 @@ const PrintApprovalListing = () => {
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "document_title", headerName: "Document Title", flex: 1, headerAlign: "center" },
-    { field: "no_of_print", headerName: "No. of Copies", flex: 1, headerAlign: "center" },
+    { field: "no_of_print", headerName: "Copies Requested", flex: 1, headerAlign: "center" },
     { field: "issue_type", headerName: "Issue Type", flex: 1, headerAlign: "center" },
     {
       field: "created_at",
@@ -53,6 +52,9 @@ const PrintApprovalListing = () => {
         return moment(params.row.created_at).format("DD-MM-YY HH:mm");
       },
     },
+    { field: "pending", headerName: "Copies Approved", flex: 1, headerAlign: "center" },
+    {field: "status", headerName: "Status" , flex: 1, headerAlign: "center" },
+    { field: "Approve ", headerName: "Approve Date & Time)", flex: 1, headerAlign: "center" },
     {
       field: "action",
       headerName: "Action",
