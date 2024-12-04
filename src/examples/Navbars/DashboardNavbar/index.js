@@ -48,10 +48,6 @@ import {
   setOpenConfigurator,
 } from "context";
 
-// API hook
-import { useSwitchUserRoleMutation } from "api/auth/userRoleApi";
-import { requestUserGroupList } from "api/auth/auth";
-
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
@@ -59,14 +55,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
 
-  const [roles, setRoles] = useState([]); // Store the roles fetched from the API
+  const [roles, setRoles] = useState(["reviewer", "approver", "docadmin"]); // Static roles
   const [open, setOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [password, setPassword] = useState("");
   const [anchorEl, setAnchorEl] = useState(null); // State for settings dropdown
   const [showPassword, setShowPassword] = useState(false);
-
-  const [switchUserRole, { isLoading: isSwitching, isError, error, isSuccess }] = useSwitchUserRoleMutation();
   const [feedbackMessage, setFeedbackMessage] = useState("");
 
   useEffect(() => {
@@ -85,22 +79,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
     return () => window.removeEventListener("scroll", handleTransparentNavbar);
   }, [dispatch, fixedNavbar]);
 
-  useEffect(() => {
-    // Fetch the user group list on component mount
-    const fetchRoles = async () => {
-      try {
-        const response = await requestUserGroupList();
-        setRoles(response.data || []);
-      } catch (error) {
-        console.error("Error fetching user groups:", error);
-      }
-    };
-
-    fetchRoles();
-  }, []);
-
   const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
- 
+
   const handleSettingsClick = (event) => setAnchorEl(event.currentTarget);
   const handleCloseSettings = () => setAnchorEl(null);
 
@@ -115,20 +95,15 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
   const handleSubmit = async () => {
     if (password && selectedRole) {
-      try {
-        const response = await switchUserRole({ group_name: selectedRole, password }).unwrap();
-        setFeedbackMessage("Role switched successfully!");
-        setTimeout(() => {
-          setFeedbackMessage("");
-          handleClose();
-        }, 2000);
-      } catch (err) {
-        setFeedbackMessage(err?.data?.message || "Failed to switch role. Please try again.");
-      }
+      // Mock role switch logic
+      // const response = await switchUserRole({ group_name: selectedRole, password }).unwrap(); 
+      setFeedbackMessage("Role switched successfully!");
+      handleClose(); // Close the dialog immediately after submitting
     } else {
       setFeedbackMessage("Please select a role and enter a password.");
     }
   };
+  
 
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {
@@ -152,11 +127,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
         </MDBox>
        
         {!isMini && (
-          
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
             <MDBox pr={1}>
               <MDInput label="User" />
-            </MDBox>
+            </MDBox>
             <MDBox color={light ? "white" : "inherit"} display="flex" alignItems="center">
               <IconButton
                 sx={navbarIconButton}
@@ -226,7 +200,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     />
                   </MDBox>
                   {feedbackMessage && (
-                    <Alert severity={isError ? "error" : "success"}>{feedbackMessage}</Alert>
+                    <Alert severity={feedbackMessage.includes("Failed") ? "error" : "success"}>
+                      {feedbackMessage}
+                    </Alert>
                   )}
                 </DialogContent>
                 <DialogActions>
@@ -239,9 +215,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
                       color="submit"
                       fullWidth
                       onClick={handleSubmit}
-                      disabled={isSwitching}
+                      disabled={false} // Disable loading state for now
                     >
-                      {isSwitching ? <CircularProgress size={20} /> : "Submit"}
+                      Submit
                     </MDButton>
                   </MDBox>
                 </DialogActions>
