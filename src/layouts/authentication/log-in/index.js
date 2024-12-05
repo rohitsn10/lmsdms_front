@@ -1,5 +1,5 @@
 // Login.js
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import Card from "@mui/material/Card";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -29,7 +29,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { login, requestUserGroupList } from '../../../api/auth/auth';
+import { login, groupList } from '../../../api/auth/auth';
 import { useAuth } from "hooks/use-auth";
 
 function Login() {
@@ -43,7 +43,7 @@ function Login() {
   const [error, setError] = useState(""); 
   const navigate = useNavigate(); 
   const [firstName, setFirstName] = useState("");
-  const {updateUser, updateRole} = useAuth()
+  const { updateUser, updateRole } = useAuth();
 
   const handleLogin = async () => {
     if (!userId || !password) {
@@ -52,77 +52,81 @@ function Login() {
     }
   
     try {
-      const response = await login({ username: userId, password });
+      const response = await groupList({ username: userId, password });
   
-      console.log("---RESPONSE-DATA",response.data)
-
-      if (response && response.data && response.data.message === "Login successfully") {
-        const token = response.data.data?.token;
-        const userFirstName = response.data.data?.first_name; // Extract first name
+      console.log("---GROUP LIST RESPONSE---", response.data);
   
-        // Ensure token and first name exist before proceeding
-        if (token && userFirstName) {
-          sessionStorage.setItem("token", token); // Store token
-          setFirstName(userFirstName); // Store first name in state
-          updateUser(response.data.data, token)
-          await fetchRoles(token); // Fetch roles with the token
-          setDialogOpen(true); // Open role selection dialog
-          setError(""); // Clear error if login is successful
+      if (response && response.data && response.data.status) {
+        const rolesList = response.data.data;
+  
+        if (rolesList && Array.isArray(rolesList)) {
+          setRoles(rolesList);
+          setDialogOpen(true);
+          setError("");
         } else {
-          setError("Login successful, but missing required information.");
+          setError("No roles available or invalid response structure.");
         }
       } else {
         setError("Incorrect User ID or Password.");
         setDialogOpen(false);
       }
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("Group list failed:", error);
       setError("Incorrect User ID or Password.");
       setDialogOpen(false);
     }
   };
   
+  const handleOk = async () => {
+    if (!selectedRole) return;
   
-  const fetchRoles = async (token) => {
-    try {
-        const response = await requestUserGroupList(token);
-        console.log("User groups response:", response); 
-
-        
-        if (response && response.status === 200 && response.data) {
+    // Find the group_id based on the selected role
+    const selectedRoleObj = roles.find(role => role.name === selectedRole);
+    const group_id = selectedRoleObj ? selectedRoleObj.id : null;
   
-            if (response.data.data && Array.isArray(response.data.data)) {
-                setRoles(response.data.data); 
-            } else {
-                console.error("Unexpected response structure:", response.data);
-                setRoles([]);
-                setError("No roles available or invalid response structure.");
-            }
-        } else {
-            console.error("Server responded with an error:", response);
-            setError("Unable to fetch user groups. Please check your connection or try again later.");
-        }
-    } catch (error) {
-        console.error("Failed to fetch user groups:", error);
-        setRoles([]);
-        setError("Failed to fetch user groups. Please try again later.");
+    if (!group_id) {
+      setError("Role selection is invalid.");
+      return;
     }
-};
-
   
-
+    try {
+      const response = await login({
+        username: userId,
+        password,
+        group_id,
+      });
+  
+  
+      if (response && response.data && response.data.status === true) {
+        const token = response.data.data?.token;
+        const userFirstName = response.data.data?.first_name;
+  
+        if (token && userFirstName) {
+          sessionStorage.setItem("token", token);
+          updateUser(response.data.data, token);
+          updateRole(selectedRole);
+          setFirstName(userFirstName);
+          setDialogOpen(false);
+          setError(""); 
+          navigate("/dashboard"); 
+        } else {
+          setError("Login successful, but missing required information.");
+        }
+      } else {
+        setError("Failed to login. Please try again.");
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      setError("Failed to login. Please try again.");
+    }
+  };
+  
   const handleCloseDialog = () => {
     setDialogOpen(false);
   };
 
   const handleRoleChange = (event) => {
     setSelectedRole(event.target.value);
-  };
-
-  const handleOk = () => {
-    updateRole(selectedRole)
-    setDialogOpen(false);
-    navigate("/dashboard");
   };
 
   const handleForgotPassword = () => {
@@ -285,26 +289,44 @@ function Login() {
                 boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", 
               }}
             >
-              {roles.length > 0 ? (
-                roles.map((role) => (
-                  <MenuItem key={role.id} value={role.id}>
-                    {role.name} 
-                  </MenuItem>
-                ))
-              ) : (
-                <MenuItem disabled>No roles available</MenuItem>
-              )}
+              {roles.map((role) => (
+                <MenuItem key={role.id} value={role.name}>
+                  {role.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="secondary">
+          <Button
+            sx={{
+              backgroundColor: "#ccc", 
+              color: "#fff", 
+              fontSize: "15px", 
+              borderRadius: "8px", 
+              margin: "1px 2.2vw",
+              "&:hover": {
+                backgroundColor: "black",
+              },
+            }}
+            onClick={handleCloseDialog}
+          >
             Cancel
           </Button>
-          <Button onClick={handleOk} color="primary"  disabled={!selectedRole}>
-            OK
+          <Button
+            sx={{
+              backgroundColor: "#4CAF50", 
+              color: "#fff", 
+              fontSize: "15px",
+              borderRadius: "8px", 
+              "&:hover": {
+                backgroundColor: "#3E8E41", 
+              },
+            }}
+            onClick={handleOk}
+          >
+            Ok
           </Button>
-         
         </DialogActions>
       </Dialog>
     </BasicLayout>

@@ -1,95 +1,152 @@
-// ESignatureDialog.js
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography, IconButton } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useSubmitESignatureMutation } from 'api/auth/esignatureApi'; // Import the new mutation hook
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  IconButton,
+  FormControl,
+  OutlinedInput,
+  InputLabel,
+  InputAdornment,
+  CircularProgress,
+} from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import MDButton from "components/MDButton";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import { useSubmitESignatureMutation } from "api/auth/esignatureApi"; 
 
-const ESignatureDialog = ({ open, handleClose }) => {
-  const [password, setPassword] = useState('');
+const EsignatureDialog = ({ open, onClose, onConfirm }) => {
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(null); // State to handle error messages
+  const [error, setError] = useState("");
+  const [submitESignature, { isLoading, error: apiError }] = useSubmitESignatureMutation(); 
 
-  const [submitESignature, { isLoading }] = useSubmitESignatureMutation(); // Destructure the mutation
-
-  const handleToggleShowPassword = () => {
-    setShowPassword(!showPassword);
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
-  const handleSubmit = async () => {
+  const handleConfirm = async () => {
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
+
+    setError(""); // Clear any previous error
+
     try {
-      setError(null); // Reset any previous error
-      const response = await submitESignature(password).unwrap(); // Use unwrap to get the response
-      if (response.status) {
-        console.log(response.message); // Handle success (e.g., show a success message)
-        handleClose(); // Close the dialog after successful submission
+      // Log password and call API to verify signature
+      console.log("Submitting password:", password);
+
+      const response = await submitESignature(password).unwrap(); // Submit password to the API
+
+      console.log("API Response:", response);
+
+      // Update the condition to check if status is true
+      if (response?.status === true) {
+        onConfirm(password); // Pass password to handleSignatureComplete
+        onClose(); // Close dialog after successful signature
       } else {
-        setError("Submission failed, please try again."); // Handle error response
+        setError("Invalid password or e-signature submission failed.");
       }
-    } catch (error) {
-      setError("An error occurred while submitting the signature."); // Set error message on catch
+    } catch (err) {
+      // Log error for better debugging
+      console.error("API Error:", err);
+
+      if (err?.data?.message) {
+        setError(err.data.message); // Show specific API error message
+      } else {
+        setError("An error occurred while submitting the e-signature.");
+      }
     }
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" sx={{ zIndex: 1300 }}>
-      <DialogTitle sx={{ textAlign: 'center' }}>E-Signature</DialogTitle>
-      <DialogContent>
-        <TextField
-          placeholder="Enter Password"
-          type={showPassword ? 'text' : 'password'}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          fullWidth
-          variant="outlined"
-          InputProps={{
-            endAdornment: (
-              <IconButton onClick={handleToggleShowPassword}>
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            ),
-            sx: { paddingRight: '8px' }
-          }}
-          sx={{
-            marginBottom: 2,
-            '& .MuiInputBase-input': {
-              padding: '12px',
-            },
-          }}
-        />
-        {error && <Typography color="error" variant="body2">{error}</Typography>} {/* Error message display */}
-      </DialogContent>
-      <DialogActions sx={{ justifyContent: 'center' }}>
-        <Typography 
-          variant="body2" 
-          onClick={handleClose} 
-          sx={{ cursor: 'pointer', color: 'black', marginRight: 2 }}
-        >
-          Cancel
-        </Typography>
-        <Button 
-          onClick={handleSubmit} 
-          variant="contained" 
-          disabled={isLoading} // Disable button while loading
-          sx={{ 
-            backgroundColor: '#3f51b5', 
-            color: '#fff', 
-            '&:hover': { 
-              backgroundColor: '#303f9f' 
-            } 
-          }}
-        >
-          Submit
-        </Button>
-      </DialogActions>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <MDBox sx={{ textAlign: "center" }}>
+        <MDTypography variant="h4" fontWeight="medium" color="#344767" mt={1}>
+          E-Signature
+        </MDTypography>
+      </MDBox>
+
+      <form onSubmit={(e) => e.preventDefault()}>
+        <DialogContent>
+          {/* Password Field */}
+          <FormControl fullWidth margin="dense" variant="outlined">
+            <InputLabel htmlFor="password">Enter Your Password</InputLabel>
+            <OutlinedInput
+              id="password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              label="Enter Your Password"
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleTogglePasswordVisibility}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              error={!!error}
+            />
+          </FormControl>
+          {error && (
+            <MDTypography variant="caption" color="error">
+              {error}
+            </MDTypography>
+          )}
+
+          {isLoading && (
+            <MDBox display="flex" justifyContent="center" mt={2}>
+              <CircularProgress />
+            </MDBox>
+          )}
+
+          {apiError && (
+            <MDTypography variant="caption" color="error">
+              {apiError.message || "An error occurred while submitting the e-signature."}
+            </MDTypography>
+          )}
+        </DialogContent>
+
+        <DialogActions>
+          <MDButton
+            onClick={() => {
+              setPassword(""); 
+              setError(""); 
+              onClose(); 
+            }}
+            color="error"
+            sx={{ marginRight: "10px" }}
+          >
+            Cancel
+          </MDButton>
+          <MDBox>
+            <MDButton
+              variant="gradient"
+              color="submit"
+              fullWidth
+              onClick={handleConfirm}
+              disabled={isLoading} 
+            >
+              {isLoading ? "Submitting..." : "Confirm Signature"}
+            </MDButton>
+          </MDBox>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };
 
-// Add prop types validation
-ESignatureDialog.propTypes = {
+EsignatureDialog.propTypes = {
   open: PropTypes.bool.isRequired,
-  handleClose: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onConfirm: PropTypes.func.isRequired,
 };
 
-export default ESignatureDialog;
+export default EsignatureDialog;

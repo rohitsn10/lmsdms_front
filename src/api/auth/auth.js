@@ -5,6 +5,7 @@ export const login = async (loginData) => {
     const response = await apiService.post('/user_profile/login', {
       username: loginData.username,
       password: loginData.password,
+      group_id: loginData.group_id,
     });
 
     if (response.data && response.data.data && response.data.data.token) {
@@ -42,7 +43,6 @@ export const getUserGroups = () => {
   });
 };
 
-// New API call for `requestuser_group_list`
 export const requestUserGroupList = () => {
   const token = sessionStorage.getItem('token');
   return apiService.get('/user_profile/requestuser_group_list', {
@@ -50,4 +50,18 @@ export const requestUserGroupList = () => {
       'Authorization': `Bearer ${token}`,
     },
   });
+};
+
+export const groupList = async (credentials) => {
+  try {
+    const response = await apiService.post('/user_profile/group_list', {
+      username: credentials.username,
+      password: credentials.password,
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Group List error:', error);
+    throw error;
+  }
 };

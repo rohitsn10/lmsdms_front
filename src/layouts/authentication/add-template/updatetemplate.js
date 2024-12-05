@@ -39,7 +39,7 @@ function UpdateTemplate() {
     e.preventDefault();
     if (!validateInputs()) return;
 
-    toast.success("Template form submitted successfully! (UI Only)");
+    toast.success("Template form submitted successfully!");
     setOpenSignatureDialog(true);
   };
 

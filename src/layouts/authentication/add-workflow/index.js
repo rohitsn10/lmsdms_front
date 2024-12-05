@@ -23,14 +23,28 @@ function AddWorkflow() {
   const validateInputs = () => {
     const newErrors = {};
     if (!workflowName.trim()) newErrors.workflowName = "Workflow Name is required.";
-    if (!workflowDescription.trim()) newErrors.workflowDescription = "Workflow Description is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
+    setOpenSignatureDialog(true); 
+  };
+
+  const handleClear = () => {
+    setWorkflowName("");
+    setWorkflowDescription("");
+    setErrors({});
+  };
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
 
     try {
       const response = await createWorkflow({
@@ -40,22 +54,14 @@ function AddWorkflow() {
 
       console.log("API Response:", response);
       toast.success("Workflow added successfully!");
-      setOpenSignatureDialog(true);
+      setTimeout(() => {
+        navigate("/workflow-listing");
+      }, 1500);  
+
     } catch (error) {
       console.error("Error creating workflow:", error);
       toast.error("Failed to add workflow. Please try again.");
     }
-  };
-
-  const handleClear = () => {
-    setWorkflowName("");
-    setWorkflowDescription("");
-    setErrors({});
-  };
-
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/workflow-listing");
   };
 
   return (
@@ -93,7 +99,7 @@ function AddWorkflow() {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Workflow Name"
+                label={<><span style={{ color: "red" }}>*</span> Workflow Name</>} 
                 fullWidth
                 value={workflowName}
                 onChange={(e) => setWorkflowName(e.target.value)}
@@ -109,8 +115,6 @@ function AddWorkflow() {
                 fullWidth
                 value={workflowDescription}
                 onChange={(e) => setWorkflowDescription(e.target.value)}
-                error={!!errors.workflowDescription}
-                helperText={errors.workflowDescription}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
@@ -123,7 +127,11 @@ function AddWorkflow() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}  
+        onConfirm={handleSignatureComplete}  
+      />
 
       {/* Toast Container */}
       <ToastContainer position="top-right" autoClose={3000} />

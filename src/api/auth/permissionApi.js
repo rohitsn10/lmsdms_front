@@ -33,14 +33,18 @@ export const permissionApi = createApi({
         }),
         // New API to fetch permissions by group ID
         fetchPermissionsByGroupId: builder.query({
-            query: (group_id) => `user_profile/group_id_wise_permission_list?group_id=${group_id}`,
-            transformResponse: (response) => {
-                if (response.status) {
-                    return response.data;
-                }
-                throw new Error(response.message || 'Failed to fetch permissions by group ID');
+            query: (group_id) => {
+              console.log("Group ID:", group_id); // Log the group_id
+              return `user_profile/group_id_wise_permission_list?group_id=${group_id}`;
             },
-        }),
+            transformResponse: (response) => {
+              if (response.status) {
+                return response.data;
+              }
+              throw new Error(response.message || 'Failed to fetch permissions by group ID');
+            },
+          }),
+          
        
         updateGroupPermissions: builder.mutation({
             query: ({ group_id, permissions }) => ({

@@ -59,36 +59,29 @@ const TemplateListing = () => {
     { field: "template_name", headerName: "Template Name", flex: 1, headerAlign: "center" },
     { field: "created_at", headerName: "Created At", flex: 1, headerAlign: "center" },
     {
-      field: "file",
-      headerName: "File",
+      field: "action",
+      headerName: "Action",
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => {
         const { template_doc } = params.row;
-        const fileName = template_doc.split("/").pop(); // Extract file name from URL
         return (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <MDTypography variant="body2" sx={{ mr: 1 }}>
-              {fileName}
-            </MDTypography>
-            <IconButton color="primary" onClick={() => handleViewFile(params.row.template_doc)}>
+            <IconButton
+              color="primary"
+              onClick={() => handleViewFile(template_doc)}
+              sx={{ marginRight: 1 }}
+            >
               <VisibilityIcon />
             </IconButton>
+            {hasPermission(userPermissions, "templatemodel", "isChange") && (
+              <IconButton color="primary" onClick={() => handleEditTemplate(params.row)}>
+                <EditIcon />
+              </IconButton>
+            )}
           </div>
         );
       },
-    },
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 0.5,
-      headerAlign: "center",
-      renderCell: (params) =>
-        hasPermission(userPermissions, "templatemodel", "isChange") ? (
-          <IconButton color="primary" onClick={() => handleEditTemplate(params.row)}>
-            <EditIcon />
-          </IconButton>
-        ) : null,
     },
   ];
 

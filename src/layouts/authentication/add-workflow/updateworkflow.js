@@ -16,9 +16,7 @@ const UpdateWorkflow = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const [workflowName, setWorkflowName] = useState(state?.workflow.workflow_name || "");
-  const [workflowDescription, setWorkflowDescription] = useState(
-    state?.workflow.workflow_description || ""
-  );
+  const [workflowDescription, setWorkflowDescription] = useState(state?.workflow.workflow_description || "");
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [updateWorkflow, { isLoading }] = useUpdateWorkflowMutation();
@@ -26,14 +24,29 @@ const UpdateWorkflow = () => {
   const validateInputs = () => {
     const newErrors = {};
     if (!workflowName.trim()) newErrors.workflowName = "Workflow Name is required.";
-    if (!workflowDescription.trim()) newErrors.workflowDescription = "Workflow Description is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // Valid if no errors
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return; // Stop submission if validation fails
+    setOpenSignatureDialog(true); // Open signature dialog if validation passes
+  };
+
+  const handleClear = () => {
+    setWorkflowName("");
+    setWorkflowDescription("");
+    setErrors({});
+  };
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+
 
     try {
       const response = await updateWorkflow({
@@ -46,7 +59,12 @@ const UpdateWorkflow = () => {
 
       if (response.status) {
         toast.success("Workflow updated successfully!");
-        setOpenSignatureDialog(true);
+
+        // Delay navigation to show the toast message before navigating
+        setTimeout(() => {
+          navigate("/workflow-listing");
+        }, 1500);  // Adjust delay as needed (in milliseconds)
+
       } else {
         toast.error(response.message || "Failed to update workflow. Please try again.");
       }
@@ -56,15 +74,9 @@ const UpdateWorkflow = () => {
     }
   };
 
-  const handleClear = () => {
-    setWorkflowName("");
-    setWorkflowDescription("");
-    setErrors({});
-  };
-
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/workflow-listing");
+    navigate("/workflow-listing"); // Navigate to the listing when dialog is closed
   };
 
   return (
@@ -104,7 +116,7 @@ const UpdateWorkflow = () => {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Workflow Name"
+                label={<><span style={{ color: "red" }}>*</span> Workflow Name</>}
                 fullWidth
                 value={workflowName}
                 onChange={(e) => setWorkflowName(e.target.value)}
@@ -120,8 +132,6 @@ const UpdateWorkflow = () => {
                 fullWidth
                 value={workflowDescription}
                 onChange={(e) => setWorkflowDescription(e.target.value)}
-                error={!!errors.workflowDescription}
-                helperText={errors.workflowDescription}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
@@ -134,7 +144,11 @@ const UpdateWorkflow = () => {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}  
+        onConfirm={handleSignatureComplete}  
+      />
 
       {/* Toast Container */}
       <ToastContainer position="top-right" autoClose={3000} />

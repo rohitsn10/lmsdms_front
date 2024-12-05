@@ -100,7 +100,7 @@ function UpdatePassword() {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Update Password
+           Change Password
           </MDTypography>
         </MDBox>
 

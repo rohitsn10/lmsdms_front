@@ -240,7 +240,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseSettings}>
                 <MenuItem component={RouterLink} to="/update-password">
-                  Update Password
+                  Change Password
                 </MenuItem>
                 <MenuItem component={RouterLink} to="/logout">
                   Logout
