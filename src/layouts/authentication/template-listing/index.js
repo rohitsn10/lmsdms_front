@@ -23,11 +23,13 @@ const TemplateListing = () => {
   // Fetch templates data
   const { data, error, isLoading } = useViewTemplateQuery();
 
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
+ 
   // Fetch user permissions for the given role
-  const { data: userPermissions = [], isError: permissionError } =
-    useFetchPermissionsByGroupIdQuery(role.toString(), {
-      skip: !role,
-    });
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+    skip: !groupId, // Ensure it skips if groupId is missing
+  });
 
   const handleAddTemplate = () => {
     navigate("/add-template");

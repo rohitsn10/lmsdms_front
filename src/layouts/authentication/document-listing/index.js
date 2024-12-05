@@ -22,11 +22,16 @@ const DocumentListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { data, isLoading, isError } = useFetchDocumentsQuery();
-  console.log("USER_ROLE", role)
+  
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
+ 
   const documents = data?.documents || []; 
-  const {data: userPermissions = [], isError: permissionError} = useFetchPermissionsByGroupIdQuery(role.toString(), {
-    skip: !role
+ 
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+    skip: !groupId, // Ensure it skips if groupId is missing
   });
+
   console.log("USER_PERMISSIONS", userPermissions)
   console.log("pERMISSON_ERROR",permissionError)
 

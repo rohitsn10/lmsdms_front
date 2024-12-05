@@ -19,9 +19,12 @@ const DepartmentListing = () => {
   const navigate = useNavigate();
   const { user, role } = useAuth();
   const { data: departments = [], isLoading, error } = useFetchDepartmentsQuery();
-
-  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role?.toString(), {
-    skip: !role,
+  
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
+ 
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+    skip: !groupId, // Ensure it skips if groupId is missing
   });
 
   if (isLoading) return <div>Loading departments...</div>;

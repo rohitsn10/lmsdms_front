@@ -18,9 +18,12 @@ const UsersListing = () => {
   const { user, role } = useAuth(); 
   const { data, error, isLoading } = useUserListQuery(); 
 
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
+ 
   
-  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role?.toString(), {
-    skip: !role,
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+    skip: !groupId, // Ensure it skips if groupId is missing
   });
 
   

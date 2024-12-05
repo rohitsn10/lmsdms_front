@@ -18,8 +18,12 @@ const DocumentTypesListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { user, role } = useAuth();
   const { data, error, isLoading } = useFetchDocumentTypesQuery();
-  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role?.toString(), {
-    skip: !role
+
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
+ 
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+    skip: !groupId, // Ensure it skips if groupId is missing
   });
 
   const navigate = useNavigate();

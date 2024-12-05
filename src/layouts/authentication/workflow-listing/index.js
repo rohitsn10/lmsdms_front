@@ -15,21 +15,20 @@ import { hasPermission } from "utils/hasPermission";
 import moment from "moment";
 
 const WorkflowListing = () => {
-    const { role } = useAuth();
+    const { user, role } = useAuth(); 
     const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
 
     // Fetch workflows
     const { data: workflows = [], isLoading, error } = useFetchWorkflowsQuery();
 
-    // Fetch user permissions based on role
-    const { data: userpermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role.toString(), {
-        skip: !role,
-    });
-
-    // Debugging outputs
-    console.log("Fetched Permissions:", userpermissions);
-    console.log("User Role:", role);
+    const group = user?.user_permissions?.group || {};
+    const groupId = group.id;
+   
+    const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+        skip: !groupId, // Ensure it skips if groupId is missing
+      });
+    
 
     if (isLoading) return <div>Loading workflows...</div>;
     if (error) return <div>Error loading workflows: {error.message}</div>;
