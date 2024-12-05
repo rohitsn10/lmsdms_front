@@ -80,7 +80,6 @@ function Login() {
   const handleOk = async () => {
     if (!selectedRole) return;
   
-    // Find the group_id based on the selected role
     const selectedRoleObj = roles.find(role => role.name === selectedRole);
     const group_id = selectedRoleObj ? selectedRoleObj.id : null;
   
@@ -96,16 +95,15 @@ function Login() {
         group_id,
       });
   
-  
       if (response && response.data && response.data.status === true) {
         const token = response.data.data?.token;
-        const userFirstName = response.data.data?.first_name;
+        const userFirstName = response.data.data?.first_name || "User"; // Default to "User" if null.
   
-        if (token && userFirstName) {
+        if (token) {
           sessionStorage.setItem("token", token);
           updateUser(response.data.data, token);
           updateRole(selectedRole);
-          setFirstName(userFirstName);
+          setFirstName(userFirstName); // This will default to "User" if first_name is null.
           setDialogOpen(false);
           setError(""); 
           navigate("/dashboard"); 
