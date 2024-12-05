@@ -21,11 +21,26 @@ function EditDocumentType() {
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [updateDocumentType, { isLoading: isUpdating }] = useUpdateDocumentTypeMutation();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!documentTypeName.trim()) {
       toast.error("Document Type Name is required.");
+      return;
+    }
+
+    setOpenSignatureDialog(true); // Open the signature dialog for confirmation
+  };
+
+  const handleClear = () => {
+    setDocumentTypeName(""); // Clear the input field
+  };
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
       return;
     }
 
@@ -36,20 +51,13 @@ function EditDocumentType() {
       }).unwrap();
 
       toast.success("Document Type updated successfully!");
-      setOpenSignatureDialog(true);
+      setTimeout(() => {
+        navigate("/document-typelisting"); // Navigate after success
+      }, 1500);
     } catch (error) {
       console.error("Error updating document type:", error);
       toast.error("Failed to update document type. Please try again.");
     }
-  };
-
-  const handleClear = () => {
-    setDocumentTypeName(""); // Clear the input field
-  };
-
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/document-typelisting"); // Navigate back to the listing page after editing
   };
 
   if (!item) {
@@ -91,7 +99,7 @@ function EditDocumentType() {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Document Type Name"
+                label={<><span style={{ color: "red" }}>*</span>Document type name</>}
                 fullWidth
                 value={documentTypeName}
                 onChange={(e) => setDocumentTypeName(e.target.value)}
@@ -113,7 +121,11 @@ function EditDocumentType() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)} 
+        onConfirm={handleSignatureComplete} // Call handleSignatureComplete when confirmed
+      />
 
       {/* Toast Container */}
       <ToastContainer position="top-right" autoClose={3000} />

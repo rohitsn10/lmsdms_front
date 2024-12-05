@@ -26,9 +26,23 @@ function AddDocumentType() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
+    setOpenSignatureDialog(true); 
+  };
+
+  const handleClear = () => {
+    setDocumentName("");
+    setErrors({});
+  };
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
 
     try {
       const response = await createDocumentType({
@@ -37,21 +51,14 @@ function AddDocumentType() {
 
       console.log("API Response:", response);
       toast.success("Document Type added successfully!");
-      setOpenSignatureDialog(true);
+      setTimeout(() => {
+        navigate("/document-typelisting");
+      }, 1500);  
+
     } catch (error) {
       console.error("Error creating document type:", error);
       toast.error("Failed to add document type. Please try again.");
     }
-  };
-
-  const handleClear = () => {
-    setDocumentName("");
-    setErrors({});
-  };
-
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/document-typelisting");
   };
 
   return (
@@ -89,7 +96,7 @@ function AddDocumentType() {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Document Name"
+                label={<><span style={{ color: "red" }}>*</span>Document type name</>}
                 fullWidth
                 value={documentName}
                 onChange={(e) => setDocumentName(e.target.value)}
@@ -107,7 +114,11 @@ function AddDocumentType() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}  
+        onConfirm={handleSignatureComplete}  
+      />
 
       {/* Toast Container */}
       <ToastContainer position="top-right" autoClose={3000} />
