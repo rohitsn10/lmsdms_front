@@ -5,50 +5,58 @@ import {
   DialogContent,
   DialogActions,
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   TextField,
-  Button,
-  OutlinedInput,
 } from "@mui/material";
 import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
 import React, { useState } from "react";
 import MDTypography from "components/MDTypography";
-import { useViewStatusQuery } from "api/auth/statusApi"; // Assuming this hook fetches the data
-import { usePrintApprovalsMutation } from "api/auth/printApi"; // Importing the new API hook
+import { usePrintApprovalsMutation } from "api/auth/printApi";
 
-const ApprovalDialog = ({ open, onClose, maxCopies, requestId }) => {  // Accept requestId here
-  const [approvalStatusId, setApprovalStatusId] = useState(""); // State to hold the ID of the selected status
+const ApprovalDialog = ({ open, onClose, maxCopies, requestId }) => {
   const [numberOfCopies, setNumberOfCopies] = useState("");
-  const [printApprovals, { isLoading: isSubmitting, error: submissionError }] = usePrintApprovalsMutation();
-
-  // Fetch status data
-  const { data, isLoading, error } = useViewStatusQuery();
+  const [isInvalid, setIsInvalid] = useState(false); // Track if the input is invalid
+  const [printApprovals, { isLoading: isSubmitting }] = usePrintApprovalsMutation();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Handle the mutation for print approvals
+    if (isInvalid) return; // Prevent submission if invalid
+
     printApprovals({
-      print_request_id: requestId, // Pass the requestId here
+      print_request_id: requestId,
       no_of_request_by_admin: numberOfCopies,
-      status: "9",  // Pass the status id to the API
-    }).then((response) => {
-      console.log("Print approval response:", response);
-      onClose(); // Close the dialog after submission
-    }).catch((err) => {
-      console.error("Error in print approval:", err);
-    });
+      status: "9",
+    })
+      .then((response) => {
+        console.log("Print approval response:", response);
+        onClose();
+      })
+      .catch((err) => {
+        console.error("Error in print approval:", err);
+      });
+  };
+
+  const handleReject = () => {
+    // Implement reject logic
+    console.log("Request rejected:", requestId);
+    onClose();
   };
 
   const handleClear = () => {
-    setApprovalStatusId("");
     setNumberOfCopies("");
+    setIsInvalid(false);
   };
 
-  
+  const handleChange = (e) => {
+    const value = Number(e.target.value);
+    if (value > maxCopies) {
+      setIsInvalid(true);
+    } else {
+      setIsInvalid(false);
+    }
+    setNumberOfCopies(value);
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -76,63 +84,50 @@ const ApprovalDialog = ({ open, onClose, maxCopies, requestId }) => {  // Accept
               label="Number of Copies"
               type="number"
               value={numberOfCopies}
-              onChange={(e) =>
-                setNumberOfCopies(Math.min(Number(e.target.value), maxCopies))
+              onChange={handleChange}
+              helperText={
+                isInvalid
+                  ? `Value cannot exceed ${maxCopies}`
+                  : `Maximum copies allowed: ${maxCopies}`
               }
-              helperText={`Maximum copies allowed: ${maxCopies}`}
+              error={isInvalid} // Highlight the field in red if invalid
               fullWidth
             />
           </FormControl>
-          {/* <FormControl fullWidth margin="normal">
-            <InputLabel id="approval-status-label">Approval Status</InputLabel>
-            <Select
-              labelId="approval-status-label"
-              id="approval-status"
-              value={approvalStatusId}
-              onChange={(e) => setApprovalStatusId(e.target.value)}
-              input={<OutlinedInput label="Approval Status" />}
-              sx={{
-                minWidth: 200,
-                height: "3rem",
-                ".MuiSelect-select": { padding: "0.45rem" },
-              }}
-              fullWidth
-            >
-             
-              {isLoading && <MenuItem disabled>Loading...</MenuItem>}
-              {error && <MenuItem disabled>Error loading statuses</MenuItem>}
-
-             
-              {data &&
-                data.map((statusItem) => (
-                  <MenuItem key={statusItem.id} value={statusItem.id}>
-                    {statusItem.status} 
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl> */}
         </DialogContent>
         <DialogActions>
           <MDButton onClick={onClose} color="error" sx={{ marginRight: "10px" }}>
             Cancel
           </MDButton>
-          <MDBox>
-            <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Submitting...' : 'Approve  '}
-            </MDButton>
-          </MDBox>
+          <MDButton
+            variant="gradient"
+            color="error"
+            fullWidth
+            disabled={isInvalid || isSubmitting} // Disable if invalid
+            onClick={handleReject}
+          >
+            Reject
+          </MDButton>
+          <MDButton
+            variant="gradient"
+            color="success"
+            fullWidth
+            type="submit"
+            disabled={isInvalid || isSubmitting} // Disable if invalid
+          >
+            {isSubmitting ? "Submitting..." : "Approve"}
+          </MDButton>
         </DialogActions>
       </form>
     </Dialog>
   );
 };
 
-// Define PropTypes
 ApprovalDialog.propTypes = {
-  open: PropTypes.bool.isRequired, // Dialog open state
-  onClose: PropTypes.func.isRequired, // Callback function to close dialog
-  maxCopies: PropTypes.number.isRequired, // Maximum allowed copies
-  requestId: PropTypes.number.isRequired, // requestId prop added
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  maxCopies: PropTypes.number.isRequired,
+  requestId: PropTypes.number.isRequired,
 };
 
 export default ApprovalDialog;

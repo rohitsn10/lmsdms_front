@@ -17,6 +17,7 @@ import InventoryListing from "layouts/authentication/inventory-handle";
 import DepartmentListing from "layouts/authentication/department-listing";
 import RolesPermissionsListing from "layouts/authentication/roles-listing";
 import PrintApprovalListing from "layouts/authentication/approval-lisitng";
+import PrinterListing from "layouts/authentication/printer-listing";
 
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -123,6 +124,14 @@ const routes = [
     icon: <ApprovalIcon />,
     route: "/approval-listing",
     component: <PrintApprovalListing />,
+  },
+  {
+    type: "collapse",
+    name: "Printer",
+    key: "printer-listing",
+    icon: <Icon fontSize="small">notifications</Icon>,
+    route: "printer-listing",
+    component: <PrinterListing />,
   },
 ];
 
