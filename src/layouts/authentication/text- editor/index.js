@@ -665,7 +665,7 @@ const DocumentView = () => {
           color="submit"
           onClick={() => {
             if (approval_status === "Approve") {
-              handleNewPrint(); // Call handleNewPrint if approval_status is "Approve"
+              handlePrint2(); // Call handleNewPrint if approval_status is "Approve"
             } else {
               handlePrint(); // Call handlePrint otherwise
             }

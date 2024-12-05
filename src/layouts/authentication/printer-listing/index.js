@@ -8,19 +8,14 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
+import { useGetPrintersQuery } from "api/auth/PrinterApi"; // Import the API hook
 
 const PrinterListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // Mock data for printers
-  const mockPrinters = [
-    { id: 1, serial_number: 1, printer_name: "Printer A", printer_location: "Room 101" },
-    { id: 2, serial_number: 2, printer_name: "Printer B", printer_location: "Room 102" },
-    { id: 3, serial_number: 3, printer_name: "Printer C", printer_location: "Room 103" },
-    { id: 4, serial_number: 4, printer_name: "Printer D", printer_location: "Room 104" },
-    { id: 5, serial_number: 5, printer_name: "Printer E", printer_location: "Room 105" },
-  ];
+  // Use the useViewPrintersQuery hook to fetch printers
+  const { data: printers, isLoading, isError } = useGetPrintersQuery();
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -30,16 +25,25 @@ const PrinterListing = () => {
     navigate("/update-printer", { state: { printer } });
   };
 
-  const filteredData = mockPrinters.filter(
-    (printer) =>
-      printer.printer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      printer.printer_location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter printers based on search term
+  const filteredData = printers
+  ? printers
+      .filter(
+        (printer) =>
+          printer.printer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          printer.printer_description.toLowerCase().includes(searchTerm.toLowerCase()) // Use printer_description for location
+      )
+      .map((printer, index) => ({
+        ...printer,
+        serial_number: index + 1, // Add serial_number after filtering
+      }))
+  : [];
+
 
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "printer_name", headerName: "Printer Name", flex: 1, headerAlign: "center" },
-    { field: "printer_location", headerName: "Printer Location", flex: 1.5, headerAlign: "center" },
+    { field: "printer_description", headerName: "Printer Location", flex: 1.5, headerAlign: "center" }, // Changed to printer_description
     {
       field: "action",
       headerName: "Action",
@@ -52,6 +56,15 @@ const PrinterListing = () => {
       ),
     },
   ];
+
+  // Handle loading and error states
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error loading printers.</div>;
+  }
 
   return (
     <MDBox p={3}>

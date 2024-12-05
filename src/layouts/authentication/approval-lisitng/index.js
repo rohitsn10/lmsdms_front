@@ -9,7 +9,7 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import { useGetPrintRequestsQuery } from "api/auth/printApi";
 import ApprovalDialog from "./add-approval/index"; // Import the dialog component
-import moment from 'moment';
+import moment from "moment";
 
 const PrintApprovalListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,12 +21,15 @@ const PrintApprovalListing = () => {
   };
 
   const filteredData = (printRequests || [])
-  .filter((item) => item.document_title && item.document_title.toLowerCase().includes(searchTerm.toLowerCase()))
-  .reverse()  // Reverse the data so latest comes first
-  .map((item, index) => ({
-    ...item,
-    serial_number: index + 1, // Correct sequence after reverse
-  }));
+    .filter(
+      (item) =>
+        item.document_title && item.document_title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .reverse() // Reverse the data so latest comes first
+    .map((item, index) => ({
+      ...item,
+      serial_number: index + 1, // Correct sequence after reverse
+    }));
   const handleOpenDialog = (data) => {
     setSelectedRequest(data); // Store the selected request
     setOpenDialog(true); // Open the dialog
@@ -38,44 +41,104 @@ const PrintApprovalListing = () => {
   };
 
   const columns = [
-    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-    { field: "document_title", headerName: "Document Title", flex: 1, headerAlign: "center" },
-    { field: "no_of_print", headerName: "Copies Requested", flex: 1, headerAlign: "center" },
-    { field: "issue_type", headerName: "Issue Type", flex: 1, headerAlign: "center" },
-    {
-      field: "created_at",
-      headerName: "Date",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => {
-        // Format the date using moment
-        return moment(params.row.created_at).format("DD-MM-YY HH:mm");
-      },
+  { 
+    field: "serial_number", 
+    headerName: "Sr. No.", 
+    flex: 0.5, 
+    headerAlign: "center", 
+    renderCell: (params) => params.row.serial_number ?? "-" // Handle null or undefined
+  },
+  { 
+    field: "document_title", 
+    headerName: "Document Title", 
+    flex: 1, 
+    headerAlign: "center", 
+    renderCell: (params) => params.row.document_title ?? "-" // Handle null or undefined
+  },
+  { 
+    field: "no_of_print", 
+    headerName: "Copies Requested", 
+    flex: 1, 
+    headerAlign: "center", 
+    renderCell: (params) => params.row.no_of_print ?? "-" // Handle null or undefined
+  },
+  { 
+    field: "issue_type", 
+    headerName: "Issue Type", 
+    flex: 1, 
+    headerAlign: "center", 
+    renderCell: (params) => params.row.issue_type ?? "-" // Handle null or undefined
+  },
+  {
+    field: "created_at",
+    headerName: "Date",
+    flex: 1,
+    headerAlign: "center",
+    renderCell: (params) => {
+      const date = params.row.created_at ? moment(params.row.created_at).format("DD-MM-YY HH:mm") : "-";
+      return date;
     },
-    { field: "pending", headerName: "Copies Approved", flex: 1, headerAlign: "center" },
-    {field: "status", headerName: "Status" , flex: 1, headerAlign: "center" },
-    { field: "Approve ", headerName: "Approve Date & Time)", flex: 1, headerAlign: "center" },
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 0.5,
-      headerAlign: "center",
-      renderCell: (params) => {
-        const isApproved = params.row.status === "Approve";
-    
-        return (
-          <IconButton
-            color={isApproved ? "success" : "primary"} // Green color for approved
-            onClick={() => handleOpenDialog(params.row)}
-            disabled={isApproved} // Disable button if approved
-          >
-            <CheckCircleIcon />
-          </IconButton>
-        );
-      },
+  },
+  { 
+    field: "no_of_request_by_admin", 
+    headerName: "Copies Approved", 
+    flex: 0.5, 
+    headerAlign: "center", 
+    renderCell: (params) => params.row.pending ?? "-" // Handle null or undefined
+  },
+  { 
+    field: "status", 
+    headerName: "Status", 
+    flex: 1, 
+    headerAlign: "center", 
+    renderCell: (params) => params.row.status ?? "-" // Handle null or undefined
+  },
+  { 
+    field: "Approve ", 
+    headerName: "Approve Date", 
+    flex: 1, 
+    headerAlign: "center", 
+    renderCell: (params) => params.row.Approve ?? "-" // Handle null or undefined
+  },
+  { 
+    field: "first_name", 
+    headerName: "User", 
+    flex: 0.5, 
+    headerAlign: "center", 
+    renderCell: (params) => params.row.first_name ?? "-" // Handle null or undefined
+  },
+  {
+    field: "action",
+    headerName: "Action",
+    flex: 0.5,
+    headerAlign: "center",
+    renderCell: (params) => {
+      const status = params.row.status;
+      let color;
+  
+      // Set the button color based on status
+      if (status === "Approve") {
+        color = "success"; // Green color for approved
+      } else if (status === "Reject") {
+        color = "error"; // Red color for rejected
+      } else {
+        color = "primary"; // Default color (blue) for null or other statuses
+      }
+  
+      return (
+        <IconButton
+          color={color} // Set the color dynamically based on status
+          onClick={() => handleOpenDialog(params.row)}
+          disabled={status === "Approve"} // Disable button if status is "Approve"
+        >
+          <CheckCircleIcon />
+        </IconButton>
+      );
     },
-    
-  ];
+  }
+  
+];
+
 
   return (
     <MDBox p={3}>
@@ -138,7 +201,7 @@ const PrintApprovalListing = () => {
           open={openDialog}
           onClose={handleCloseDialog}
           maxCopies={selectedRequest.no_of_print} // Pass max copies to the dialog
-           requestId={selectedRequest.id}
+          requestId={selectedRequest.id}
         />
       )}
     </MDBox>

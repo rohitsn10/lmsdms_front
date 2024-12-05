@@ -13,6 +13,8 @@ import { permissionApi } from "api/auth/permissionApi";
 import { editDocumentApi } from "api/auth/editDocumentApi";
 import { commentApi } from "api/auth/commentsApi";
 import { printApi } from "api/auth/printApi";
+import { switchRoleApi } from "api/auth/switchRoleApi";
+import { printerApi } from "api/auth/PrinterApi";
 
 const store = configureStore({
   reducer: {
@@ -30,6 +32,8 @@ const store = configureStore({
     [editDocumentApi.reducerPath]: editDocumentApi.reducer,
     [commentApi.reducerPath]: commentApi.reducer,
     [printApi.reducerPath]: printApi.reducer,
+    [switchRoleApi.reducerPath]:switchRoleApi.reducer,
+    [printerApi.reducerPath]: printerApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -47,6 +51,8 @@ const store = configureStore({
       editDocumentApi.middleware,
       commentApi.middleware,
       printApi.middleware,
+      switchRoleApi.middleware,
+      printerApi.middleware,
     ),
 });
 

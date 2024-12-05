@@ -207,7 +207,7 @@ function UpdatePassword() {
               </MDBox>
               <MDBox mt={2} mb={1}>
                 <MDButton variant="gradient" color="submit" fullWidth type="submit">
-                  Update Password
+                 Change password
                 </MDButton>
               </MDBox>
             </MDBox>

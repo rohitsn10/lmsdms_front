@@ -1,4 +1,3 @@
-// Import necessary components
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Card from "@mui/material/Card";
@@ -13,6 +12,7 @@ import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/m
 
 // Import the mutation hook
 import { usePrintDocumentMutation } from "api/auth/printApi";
+import { useGetPrintersQuery } from "api/auth/PrinterApi";
 
 // Example issue types (Replace with actual options)
 const issueTypes = ["issue 1", "issue 2", "issue 3"];
@@ -21,13 +21,19 @@ function PrintDocument() {
   const [numberOfPrints, setNumberOfPrints] = useState(1);
   const [issueType, setIssueType] = useState("");
   const [reasonForPrint, setReasonForPrint] = useState("");
+  const [selectedPrinter, setSelectedPrinter] = useState(""); // New state for printer selection
   const { id } = useParams(); // Fetch sop_document_id from URL
   const navigate = useNavigate();
 
-  console.log("Id : ",id);
+  console.log("Id : ", id);
 
   // Initialize the mutation hook
   const [printDocument, { isLoading, isSuccess, error }] = usePrintDocumentMutation();
+
+  // Fetch printers using useGetPrintersQuery
+  const { data: printersResponse, isFetching: isFetchingPrinters } = useGetPrintersQuery();
+  console.log("Printers Response:", printersResponse);
+  console.log("Printers Data:", printersResponse?.data);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,17 +43,18 @@ function PrintDocument() {
         no_of_print: numberOfPrints,
         issue_type: issueType,
         reason_for_print: reasonForPrint,
+        printer_id: selectedPrinter, // Include selected printer
       }).unwrap(); // Unwrap the promise to handle the result directly
       console.log("API Response:", response);
       if (response.status) {
-        alert(response.message); // Show success message
+        toast.success(response.message); // Show success message
         navigate("/document-listing"); // Navigate after success
       } else {
-        alert("Failed to process print request.");
+        toast.error("Failed to process print request.");
       }
     } catch (err) {
       console.error("Error while submitting print request:", err);
-      alert("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
     }
   };
 
@@ -56,6 +63,7 @@ function PrintDocument() {
     setNumberOfPrints(1);
     setIssueType("");
     setReasonForPrint("");
+    setSelectedPrinter("");
   };
 
   return (
@@ -129,6 +137,37 @@ function PrintDocument() {
               </FormControl>
             </MDBox>
 
+            {/* Select Printer */}
+            <FormControl fullWidth margin="dense" disabled={isFetchingPrinters}>
+              <InputLabel id="select-printer-label">Select Printer</InputLabel>
+              <Select
+                labelId="select-printer-label"
+                id="select-printer"
+                value={selectedPrinter}
+                onChange={(e) => setSelectedPrinter(e.target.value)}
+                input={<OutlinedInput label="Select Printer" />}
+                sx={{
+                  minWidth: 200,
+                  height: "3rem",
+                  ".MuiSelect-select": {
+                    padding: "0.45rem",
+                  },
+                }}
+              >
+                {isFetchingPrinters ? (
+                  <MenuItem disabled>Loading printers...</MenuItem>
+                ) : printersResponse?.length > 0 ? (
+                  printersResponse.map((printer) => (
+                    <MenuItem key={printer.id} value={printer.id}>
+                      {printer.printer_name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No printers available</MenuItem>
+                )}
+              </Select>
+            </FormControl>
+
             {/* Reason for Print */}
             <MDBox mb={3}>
               <MDInput
@@ -144,7 +183,13 @@ function PrintDocument() {
 
             {/* Submit Button */}
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
+              <MDButton
+                variant="gradient"
+                color="submit"
+                fullWidth
+                type="submit"
+                disabled={isLoading}
+              >
                 {isLoading ? "Submitting..." : "Submit"}
               </MDButton>
             </MDBox>

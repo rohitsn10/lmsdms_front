@@ -14,6 +14,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Menu from "@mui/material/Menu";
 import MDButton from "components/MDButton";
 import MenuItem from "@mui/material/MenuItem";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {
   Dialog,
   DialogTitle,
@@ -39,6 +40,7 @@ import {
   navbarIconButton,
   navbarMobileMenu,
 } from "examples/Navbars/DashboardNavbar/styles";
+import { useRequestUserGroupListQuery } from "api/auth/switchRoleApi";
 
 // Material Dashboard 2 React context
 import {
@@ -47,6 +49,7 @@ import {
   setMiniSidenav,
   setOpenConfigurator,
 } from "context";
+import { useAuth } from "hooks/use-auth";
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
@@ -54,14 +57,15 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
-
-  const [roles, setRoles] = useState(["reviewer", "approver", "docadmin"]); // Static roles
+  const { user, role } = useAuth();
+  const [roles, setRoles] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [password, setPassword] = useState("");
   const [anchorEl, setAnchorEl] = useState(null); // State for settings dropdown
   const [showPassword, setShowPassword] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
+  const { data, status, error } = useRequestUserGroupListQuery();
 
   useEffect(() => {
     if (fixedNavbar) {
@@ -78,6 +82,19 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
     return () => window.removeEventListener("scroll", handleTransparentNavbar);
   }, [dispatch, fixedNavbar]);
+
+  useEffect(() => {
+    if (status === "success" ) {
+      console.log("switch role =====================",data); 
+      if (data.status) {
+        setRoles(data.data); // Store roles from the API response if successful
+      } else {
+        setFeedbackMessage("Failed to load roles.");
+      }
+    } else if (error) {
+      setFeedbackMessage("Error fetching roles.");
+    }
+  }, [status, data, error]);
 
   const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
 
@@ -96,14 +113,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleSubmit = async () => {
     if (password && selectedRole) {
       // Mock role switch logic
-      // const response = await switchUserRole({ group_name: selectedRole, password }).unwrap(); 
+      // const response = await switchUserRole({ group_name: selectedRole, password }).unwrap();
       setFeedbackMessage("Role switched successfully!");
       handleClose(); // Close the dialog immediately after submitting
     } else {
       setFeedbackMessage("Please select a role and enter a password.");
     }
   };
-  
 
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {
@@ -125,32 +141,35 @@ function DashboardNavbar({ absolute, light, isMini }) {
         <MDBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
           <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
         </MDBox>
-       
+
         {!isMini && (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
             <MDBox pr={1}>
-              <MDInput label="User" />
+              <Button
+                endIcon={<AccountCircleIcon />}
+                variant="text"
+                size="large"
+                sx={navbarIconButton}
+                onClick={handleClickOpen} // Open dialog on button click
+              >
+                {role}
+              </Button>
             </MDBox>
             <MDBox color={light ? "white" : "inherit"} display="flex" alignItems="center">
-              <IconButton
+              {/* <IconButton
                 sx={navbarIconButton}
                 size="small"
                 disableRipple
                 onClick={handleClickOpen}
               >
                 <Icon sx={iconsStyle}>account_circle</Icon>
-              </IconButton>
+              </IconButton> */}
               <Dialog
                 open={open}
                 onClose={handleClose}
                 fullWidth
                 maxWidth="md"
-                sx={{
-                  "& .MuiDialog-paper": {
-                    width: "30vw",
-                    height: "42vh",
-                  },
-                }}
+                sx={{ "& .MuiDialog-paper": { width: "30vw", height: "42vh" } }}
               >
                 <DialogTitle sx={{ textAlign: "center" }}>Change Role</DialogTitle>
                 <DialogContent>
@@ -172,8 +191,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     >
                       {roles.length > 0 ? (
                         roles.map((role) => (
-                          <MenuItem key={role} value={role}>
-                            {role}
+                          <MenuItem key={role.id} value={role.id}>
+                            {role.name} {/* Show 'name' from the API response */}
                           </MenuItem>
                         ))
                       ) : (
@@ -215,7 +234,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                       color="submit"
                       fullWidth
                       onClick={handleSubmit}
-                      disabled={false} // Disable loading state for now
+                      disabled={false}
                     >
                       Submit
                     </MDButton>
@@ -223,7 +242,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 </DialogActions>
               </Dialog>
               <IconButton
-                size="small"
+                size="large"
                 disableRipple
                 sx={navbarMobileMenu}
                 onClick={handleMiniSidenav}

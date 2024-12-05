@@ -10,6 +10,7 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
+import { useCreatePrinterMutation } from "api/auth/PrinterApi";  // Import the mutation hook
 
 function AddPrinter() {
   const [printerName, setPrinterName] = useState("");
@@ -18,6 +19,7 @@ function AddPrinter() {
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
   const navigate = useNavigate();
+  const [createPrinter] = useCreatePrinterMutation();  // Initialize the mutation
 
   const validateInputs = () => {
     const newErrors = {};
@@ -27,12 +29,19 @@ function AddPrinter() {
     return Object.keys(newErrors).length === 0; // Valid if no errors
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateInputs()) return; // Stop submission if validation fails
 
-    toast.success("Printer added successfully!");
-    setOpenSignatureDialog(true);
+    try {
+      // Call the mutation to create the printer
+      await createPrinter({ printer_name: printerName, printer_location: printerPath }).unwrap();
+      toast.success("Printer added successfully!");
+      setOpenSignatureDialog(true);  // Show the signature dialog after successful creation
+    } catch (error) {
+      toast.error("Error adding printer. Please try again.");
+      console.error("Error adding printer:", error);
+    }
   };
 
   const handleClear = () => {
@@ -43,7 +52,7 @@ function AddPrinter() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/printer-listing");
+    navigate("/printer-listing"); // Navigate to the printer listing page
   };
 
   return (

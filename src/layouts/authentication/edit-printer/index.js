@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
@@ -10,27 +10,18 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
+import { useUpdatePrinterMutation } from 'api/auth/PrinterApi';
 
 function EditPrinter() {
-  const { id } = useParams(); // Assume the printer ID is passed via URL parameters
-  const [printerName, setPrinterName] = useState("");
-  const [printerPath, setPrinterPath] = useState("");
+  const { state } = useLocation(); // Access state passed via navigation
+  const [printerName, setPrinterName] = useState(state?.printer?.printer_name || "");
+  const [printerPath, setPrinterPath] = useState(state?.printer?.printer_location || "");
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
   const navigate = useNavigate();
-
-  // Simulating fetching existing printer data (Replace with actual API call)
-  useEffect(() => {
-    // Example: Fetch printer data using the ID
-    // fetchPrinterById(id).then((data) => {
-    //   setPrinterName(data.printerName);
-    //   setPrinterPath(data.printerPath);
-    // });
-    // Mock data for demonstration:
-    setPrinterName("Example Printer");
-    setPrinterPath("C:\\Printers\\Example");
-  }, [id]);
+  
+  const [updatePrinter] = useUpdatePrinterMutation();
 
   const validateInputs = () => {
     const newErrors = {};
@@ -40,12 +31,21 @@ function EditPrinter() {
     return Object.keys(newErrors).length === 0; // Valid if no errors
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateInputs()) return; // Stop submission if validation fails
-
-    toast.success("Printer updated successfully!");
-    setOpenSignatureDialog(true);
+    
+    try {
+      await updatePrinter({
+        printer_id: state?.printer?.id, // Using ID from state
+        printer_name: printerName,
+        printer_location: printerPath,
+    }).unwrap();
+      toast.success("Printer updated successfully!");
+      setOpenSignatureDialog(true);
+    } catch (error) {
+      toast.error("Failed to update printer.");
+    }
   };
 
   const handleClear = () => {
