@@ -20,39 +20,44 @@ const UpdateDepartment = () => {
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
-  const [updateDeleteDepartment, { isLoading }] = useUpdateDeleteDepartmentMutation(); // Updated hook
+  const [updateDeleteDepartment, { isLoading }] = useUpdateDeleteDepartmentMutation();
 
   const validateInputs = () => {
     const newErrors = {};
     if (!departmentName.trim()) newErrors.departmentName = "Department Name is required.";
-    if (!departmentDescription.trim()) newErrors.departmentDescription = "Description is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // Valid if no errors
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validateInputs()) return; // Stop submission if validation fails
+    if (!validateInputs()) return;
+
+    setOpenSignatureDialog(true); // Open e-signature dialog
+  };
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
 
     try {
-      const response = await updateDeleteDepartment({
-        department_id: state.department.id, // Pass the dynamic department_id
-        department_name: departmentName,
-        department_description: departmentDescription,
+      await updateDeleteDepartment({
+        department_id: state.department.id, // Use dynamic department ID
+        department_name: departmentName.trim(),
+        department_description: departmentDescription.trim() || null, // Optional description
       }).unwrap();
-      setOpenSignatureDialog(true);
-      console.log("API Response:", response);
 
-      if (response.status) {
-        toast.success("Department updated successfully!");
+      toast.success("Department updated successfully!");
+      setTimeout(() => {
         navigate("/department-listing");
-      } else {
-        console.error("Department update failed:", response.message);
-        toast.error("Failed to update department. Please try again.");
-      }
+      }, 1500);
     } catch (error) {
       console.error("Error updating department:", error.message || error);
-      toast.error("An error occurred. Please try again.");
+      toast.error("Failed to update department. Please try again.");
     }
   };
 
@@ -60,11 +65,6 @@ const UpdateDepartment = () => {
     setDepartmentName("");
     setDepartmentDescription("");
     setErrors({});
-  };
-
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/department-listing");
   };
 
   return (
@@ -104,7 +104,7 @@ const UpdateDepartment = () => {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Department Name"
+                label={<><span style={{ color: "red" }}>*</span>Department name</>}
                 fullWidth
                 value={departmentName}
                 onChange={(e) => setDepartmentName(e.target.value)}
@@ -120,8 +120,6 @@ const UpdateDepartment = () => {
                 fullWidth
                 value={departmentDescription}
                 onChange={(e) => setDepartmentDescription(e.target.value)}
-                error={!!errors.departmentDescription}
-                helperText={errors.departmentDescription}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
@@ -134,7 +132,11 @@ const UpdateDepartment = () => {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete} 
+      />
 
       {/* Toast Container */}
       <ToastContainer position="top-right" autoClose={3000} />

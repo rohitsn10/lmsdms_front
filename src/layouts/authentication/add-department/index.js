@@ -24,23 +24,35 @@ function AddDepartment() {
   const validateInputs = () => {
     const newErrors = {};
     if (!name.trim()) newErrors.name = "Department Name is required.";
-    if (!description.trim()) newErrors.description = "Description is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // Valid if no errors
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return; // Stop submission if validation fails
 
+    setOpenSignatureDialog(true); // Open signature dialog
+  };
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+
     try {
-      const response = await createDepartment({
+      await createDepartment({
         department_name: name.trim(),
-        department_description: description.trim(),
+        department_description: description.trim() || null, // Allow optional description
       }).unwrap();
-      console.log("API Response:", response);
+
       toast.success("Department added successfully!");
-      setOpenSignatureDialog(true);
+      setTimeout(() => {
+        navigate("/department-listing");
+      }, 1500);
     } catch (error) {
       console.error("Failed to create department:", error.message);
       toast.error("Failed to add department. Please try again.");
@@ -51,11 +63,6 @@ function AddDepartment() {
     setName("");
     setDescription("");
     setErrors({});
-  };
-
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/department-listing");
   };
 
   return (
@@ -93,7 +100,7 @@ function AddDepartment() {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Department Name"
+                label={<><span style={{ color: "red" }}>*</span>Department name</>}
                 fullWidth
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -109,8 +116,6 @@ function AddDepartment() {
                 fullWidth
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                error={!!errors.description}
-                helperText={errors.description}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
@@ -123,7 +128,11 @@ function AddDepartment() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete} // Call handleSignatureComplete when confirmed
+      />
 
       {/* Toast Container */}
       <ToastContainer position="top-right" autoClose={3000} />
