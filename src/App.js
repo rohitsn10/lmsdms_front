@@ -213,8 +213,8 @@ export default function App() {
         brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
         brandName="Bharat parenterals"
         routes={routes}
-        onMouseEnter={handleOnMouseEnter}
-        onMouseLeave={handleOnMouseLeave}
+        // onMouseEnter={handleOnMouseEnter}
+        // onMouseLeave={handleOnMouseLeave}
         style={{ position: "fixed", zIndex: 3 }}
       />
     )}

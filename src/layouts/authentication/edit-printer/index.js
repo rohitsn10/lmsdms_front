@@ -104,7 +104,7 @@ function EditPrinter() {
             </MDBox>
             <MDBox mb={3}>
               <MDInput
-                label="Printer Path"
+                label="Printer location"
                 fullWidth
                 value={printerPath}
                 onChange={(e) => setPrinterPath(e.target.value)}

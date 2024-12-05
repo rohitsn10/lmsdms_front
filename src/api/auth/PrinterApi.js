@@ -19,7 +19,7 @@ export const printerApi = createApi({
     // Mutation to create a new printer
     createPrinter: builder.mutation({
       query: ({ printer_name, printer_location }) => ({
-        url: 'dms_module/create_get_Printer',
+        url: 'dms_module/create_printer',
         method: 'POST',
         body: { printer_name, printer_location },
       }),
@@ -37,7 +37,7 @@ export const printerApi = createApi({
     // Query to fetch all printers (updated to integrate the get_printer API)
     getPrinters: builder.query({
       query: () => ({
-        url: 'dms_module/create_get_Printer',  // The route to fetch printers
+        url: 'dms_module/get_printer',  // The route to fetch printers
         method: 'GET',
       }),
       providesTags: [{ type: 'Printer', id: 'LIST' }],
