@@ -35,8 +35,11 @@ const StatusListing = () => {
 
   const { data, isLoading, isError, refetch } = useViewStatusQuery();
 
-  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(role?.toString(), {
-    skip: !role,
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
+ 
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+    skip: !groupId, // Ensure it skips if groupId is missing
   });
 
   useEffect(() => {
