@@ -174,7 +174,7 @@ function AddDocument() {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Revision Time"
+                label="Revision Time (In Month)"
                 value={revisionTime}
                 onChange={(e) => setRevisionTime(e.target.value)}
                 fullWidth

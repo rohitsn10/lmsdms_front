@@ -53,14 +53,14 @@ function Login() {
   
     try {
       const response = await groupList({ username: userId, password });
-  
-      console.log("---GROUP LIST RESPONSE---", response.data);
+      console.log("GroupList API Response:", response);
   
       if (response && response.data && response.data.status) {
-        const rolesList = response.data.data;
-  
-        if (rolesList && Array.isArray(rolesList)) {
+        const userFirstName = response.data.data.user_first_name;
+        const rolesList = response.data.data.groups; 
+        if (rolesList && Array.isArray(rolesList) && rolesList.length > 0) {
           setRoles(rolesList);
+          setFirstName(userFirstName); 
           setDialogOpen(true);
           setError("");
         } else {
@@ -72,7 +72,7 @@ function Login() {
       }
     } catch (error) {
       console.error("Group list failed:", error);
-      setError("Incorrect User ID or Password.");
+      setError("Unable to connect to the server. Please try again.");
       setDialogOpen(false);
     }
   };
