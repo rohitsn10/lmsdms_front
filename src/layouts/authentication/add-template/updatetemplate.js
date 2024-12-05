@@ -17,17 +17,17 @@ function UpdateTemplate() {
   const templateData = location.state?.item;
 
   const [templateName, setTemplateName] = useState(templateData?.template_name || "");
+  const [templateFile, setTemplateFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
   useEffect(() => {
-    if (templateData) {
-      console.log("Template Data:", templateData);
-    } else {
+    if (!templateData) {
       console.error("No template data found. Redirecting...");
       navigate("/template-listing");
     }
   }, [templateData, navigate]);
+
   const validateInputs = () => {
     const newErrors = {};
     if (!templateName.trim()) newErrors.templateName = "Template Name is required.";
@@ -38,20 +38,42 @@ function UpdateTemplate() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
+    setOpenSignatureDialog(true); // Open e-signature dialog
+  };
 
-    toast.success("Template form submitted successfully!");
-    setOpenSignatureDialog(true);
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+
+    try {
+      // Simulate API request payload
+      const formData = new FormData();
+      formData.append("template_name", templateName.trim());
+      if (templateFile) {
+        formData.append("template_doc", templateFile);
+      }
+
+      console.log("Payload Submitted: ", { templateName, templateFile });
+
+      // Simulate API success
+      toast.success("Template updated successfully!");
+      setTimeout(() => {
+        navigate("/template-listing");
+      }, 1500);
+    } catch (error) {
+      console.error("Error updating template:", error);
+      toast.error("Failed to update template. Please try again.");
+    }
   };
 
   const handleClear = () => {
     setTemplateName("");
     setTemplateFile(null);
     setErrors({});
-  };
-
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/template-listing");
   };
 
   const handleFileChange = (e) => {
@@ -93,7 +115,7 @@ function UpdateTemplate() {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Template Name"
+                label={<><span style={{ color: "red" }}>*</span>Template name</>}
                 fullWidth
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
@@ -104,7 +126,7 @@ function UpdateTemplate() {
             <MDBox mb={3}>
               <MDInput
                 type="file"
-                label="Upload Template File (Optional)"
+                label={<><span style={{ color: "red" }}>*</span>Upload template file</>}
                 fullWidth
                 onChange={handleFileChange}
                 InputLabelProps={{ shrink: true }}
@@ -118,7 +140,11 @@ function UpdateTemplate() {
             </MDBox>
           </MDBox>
         </MDBox>
-        <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+        <ESignatureDialog
+          open={openSignatureDialog}
+          onClose={() => setOpenSignatureDialog(false)}
+          onConfirm={handleSignatureComplete} 
+        />
       </Card>
       <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>

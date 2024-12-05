@@ -29,19 +29,30 @@ function AddTemplate() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
+    setOpenSignatureDialog(true); // Open e-signature dialog
+  };
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
 
     const formData = new FormData();
-    formData.append("template_name", templateName);
+    formData.append("template_name", templateName.trim());
     formData.append("template_doc", templateFile);
 
     try {
-      const response = await createTemplate(formData).unwrap();
-      console.log("RESPONSE", response);
+      await createTemplate(formData).unwrap();
       toast.success("Template added successfully!");
-      setOpenSignatureDialog(true);
+      setTimeout(() => {
+        navigate("/template-listing");
+      }, 1500);
     } catch (error) {
       console.error("Error in template action:", error);
       toast.error("Failed to add template. Please try again.");
@@ -52,11 +63,6 @@ function AddTemplate() {
     setTemplateName("");
     setTemplateFile(null);
     setErrors({});
-  };
-
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/template-listing");
   };
 
   const handleFileChange = (e) => {
@@ -98,7 +104,7 @@ function AddTemplate() {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Template Name"
+                label={<><span style={{ color: "red" }}>*</span>Template name</>}
                 fullWidth
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
@@ -109,7 +115,7 @@ function AddTemplate() {
             <MDBox mb={3}>
               <MDInput
                 type="file"
-                label="Upload Template File"
+                label={<><span style={{ color: "red" }}>*</span>Upload template file</>}
                 fullWidth
                 onChange={handleFileChange}
                 InputLabelProps={{ shrink: true }}
@@ -125,7 +131,11 @@ function AddTemplate() {
             </MDBox>
           </MDBox>
         </MDBox>
-        <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+        <ESignatureDialog
+          open={openSignatureDialog}
+          onClose={() => setOpenSignatureDialog(false)}
+          onConfirm={handleSignatureComplete} 
+        />
       </Card>
       <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>

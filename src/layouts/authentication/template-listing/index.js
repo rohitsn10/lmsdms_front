@@ -63,25 +63,6 @@ const TemplateListing = () => {
     {
       field: "action",
       headerName: "Action",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => {
-        const { template_doc } = params.row;
-        return (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <MDTypography variant="body2" sx={{ mr: 1 }}>
-              {fileName}
-            </MDTypography>
-            {/* <IconButton color="primary" onClick={() => handleViewFile(params.row.template_doc)}>
-              <VisibilityIcon />
-            </IconButton> */}
-          </div>
-        );
-      },
-    },
-    {
-      field: "action",
-      headerName: "Action",
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) =>
@@ -151,7 +132,7 @@ const TemplateListing = () => {
               />
               {!isLoading && filteredData.length === 0 && (
                 <MDTypography align="center" color="textSecondary">
-                  No templates found
+                
                 </MDTypography>
               )}
             </div>
