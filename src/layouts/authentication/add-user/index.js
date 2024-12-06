@@ -59,11 +59,21 @@ function AddUser() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     if (!validateInputs()) {
       toast.error("Please fill all required fields.");
+      setIsSubmitting(false);
+      return;
+    }
+    setOpenSignatureDialog(true); // Open E-Signature dialog
+  };
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
       setIsSubmitting(false);
       return;
     }
@@ -81,8 +91,9 @@ function AddUser() {
     try {
       const response = await createUser(userData).unwrap();
       toast.success("User added successfully!");
-      setOpenSignatureDialog(true);
-  
+      setTimeout(() => {
+        navigate("/user-listing");
+      }, 1500);
     } catch (error) {
       toast.error("Failed to create user. Please try again.");
       console.error("Failed to create user:", error);
@@ -100,10 +111,6 @@ function AddUser() {
     setUserRole([]);
     setDepartment("");
     setErrors({});
-  };
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/user-listing");
   };
 
   return (
@@ -290,8 +297,13 @@ function AddUser() {
         </MDBox>
       </Card>
       <ToastContainer />
-      {/* E-signature dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+
+      {/* E-Signature Dialog */}
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete}
+      />
     </BasicLayout>
   );
 }

@@ -1,11 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  useCreateDocumentMutation,
-  useFetchDocumentTypesQuery,
-  useViewTemplateQuery,
-} from "api/auth/documentApi";
-import { useFetchWorkflowsQuery } from "api/auth/workflowApi";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -13,6 +9,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import {
   FormControl,
   InputLabel,
@@ -24,7 +21,13 @@ import {
   FormControlLabel,
   FormLabel,
 } from "@mui/material";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
+import {
+  useCreateDocumentMutation,
+  useFetchDocumentTypesQuery,
+  useViewTemplateQuery,
+} from "api/auth/documentApi";
+import { useFetchWorkflowsQuery } from "api/auth/workflowApi";
+
 
 function AddDocument() {
   const [title, setTitle] = useState("");
@@ -33,59 +36,92 @@ function AddDocument() {
   const [description, setDescription] = useState("");
   const [revisionTime, setRevisionTime] = useState("");
   const [workflow, setWorkflow] = useState("");
-  const [parentDocument, setParentDocument] = useState("");
   const [trainingRequired, setTrainingRequired] = useState("No");
   const [template, setTemplate] = useState("");
+  const [operations, setOperations] = useState("Create online");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const [operations, setOperations] = useState('Create online');
-
-  const navigate = useNavigate();
+  const [errors, setErrors] = useState({});
   const [createDocument] = useCreateDocumentMutation();
+  const navigate = useNavigate();
+
   const { data: documentTypesData } = useFetchDocumentTypesQuery();
   const { data: templateData } = useViewTemplateQuery();
-  const {
-    data: workflowsData,
-    error: workflowsError,
-    isLoading: workflowsLoading,
-  } = useFetchWorkflowsQuery();
+  const { data: workflowsData, isLoading: workflowsLoading, error: workflowsError } =
+    useFetchWorkflowsQuery();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const documentData = {
-        document_title: title,
-        document_number: documentNumber,
-        document_type: type,
-        document_description: description,
-        revision_time: revisionTime,
-        document_operation: operations,
-        select_template: template,
-        workflow: workflow,
-        training_required: trainingRequired.toLowerCase() === "yes", // Normalize and check
-        document_current_status_id:"1"
-      };
-      await createDocument(documentData).unwrap();
-      setOpenSignatureDialog(true);
-    } catch (error) {
-      console.error("Error creating document:", error);
+  const validateInputs = () => {
+    const newErrors = {};
+
+    if (!title.trim()) newErrors.title = "Title is required.";
+    if (!type || (typeof type === "string" && type.trim() === "")) {
+      newErrors.type = "Type is required.";
     }
+    if (!documentNumber.trim()) newErrors.documentNumber = "Document number is required.";
+    if (!description.trim()) newErrors.description = "Description is required.";
+    if (!revisionTime.trim() || isNaN(revisionTime) || parseInt(revisionTime, 10) <= 0) {
+      newErrors.revisionTime = "Valid revision time is required.";
+    }
+    if (!workflow || (typeof workflow === "string" && workflow.trim() === "")) {
+      newErrors.workflow = "Workflow is required.";
+    }
+    if (!template || (typeof template === "string" && template.trim() === "")) {
+      newErrors.template = "Template is required.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!validateInputs()) return;
+    setOpenSignatureDialog(true);
+  };
+
   const handleClear = () => {
     setTitle("");
     setType("");
     setDocumentNumber("");
     setDescription("");
     setRevisionTime("");
-    setOperations("");
     setWorkflow("");
-    setParentDocument("");
-    setTrainingRequired("No");
     setTemplate("");
+    setTrainingRequired("No");
+    setOperations("Create online");
+    setErrors({});
   };
-  const handleCloseSignatureDialog = () => {
+
+  const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
-    navigate("/document-listing");
-    console.log("template id: ", template);
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+
+    try {
+      const documentData = {
+        document_title: title.trim(),
+        document_number: documentNumber.trim(),
+        document_type: type,
+        document_description: description.trim(),
+        revision_time: revisionTime.trim(),
+        workflow,
+        document_operation: operations,
+        select_template: template,
+        training_required: trainingRequired.toLowerCase() === "yes",
+        document_current_status_id: "1",
+      };
+
+      const response = await createDocument(documentData).unwrap();
+      toast.success("Document added successfully!");
+      console.log("API Response:", response);
+      setTimeout(() => {
+        navigate("/document-listing");
+      }, 1500);
+    } catch (error) {
+      console.error("Error creating document:", error);
+      toast.error("Failed to add document. Please try again.");
+    }
   };
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
@@ -125,12 +161,14 @@ function AddDocument() {
                 label="Title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                error={Boolean(errors.title)}
+                helperText={errors.title}
                 fullWidth
               />
             </MDBox>
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
-                <InputLabel id="select-type-label">Type</InputLabel>
+                <InputLabel id="select-type-label">Document Type</InputLabel>
                 <Select
                   labelId="select-type-label"
                   id="select-type"
@@ -149,6 +187,11 @@ function AddDocument() {
                     </MenuItem>
                   ))}
                 </Select>
+                {errors.type && (
+                  <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+                    {errors.type}
+                  </p>
+                )}
               </FormControl>
             </MDBox>
             <MDBox mb={3}>
@@ -157,6 +200,8 @@ function AddDocument() {
                 label="Document Number"
                 value={documentNumber}
                 onChange={(e) => setDocumentNumber(e.target.value)}
+                error={Boolean(errors.documentNumber)}
+                helperText={errors.documentNumber}
                 fullWidth
               />
             </MDBox>
@@ -167,6 +212,8 @@ function AddDocument() {
                 label="Description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                error={Boolean(errors.description)}
+                helperText={errors.description}
                 fullWidth
               />
             </MDBox>
@@ -174,9 +221,11 @@ function AddDocument() {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Revision Time (In Month)"
+                label="Revision Time"
                 value={revisionTime}
                 onChange={(e) => setRevisionTime(e.target.value)}
+                error={Boolean(errors.revisionTime)}
+                helperText={errors.revisionTime}
                 fullWidth
               />
             </MDBox>
@@ -194,7 +243,7 @@ function AddDocument() {
                   value="Upload files"
                   control={<Radio />}
                   label="Upload files"
-                  disabled // Disable the "Upload files" option
+                  disabled
                 />
               </RadioGroup>
             </MDBox>
@@ -226,6 +275,11 @@ function AddDocument() {
                     ))
                   )}
                 </Select>
+                {errors.workflow && (
+                  <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+                    {errors.workflow}
+                  </p>
+                )}
               </FormControl>
             </MDBox>
             <MDBox mb={3}>
@@ -249,6 +303,11 @@ function AddDocument() {
                     </MenuItem>
                   ))}
                 </Select>
+                {errors.template && (
+                  <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+                    {errors.template}
+                  </p>
+                )}
               </FormControl>
             </MDBox>
             <MDBox mb={3} display="flex" alignItems="center">
@@ -276,11 +335,18 @@ function AddDocument() {
           </MDBox>
         </MDBox>
 
-        <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+        {/* E-Signature Dialog */}
+        <ESignatureDialog
+          open={openSignatureDialog}
+          onClose={() => setOpenSignatureDialog(false)}
+          onConfirm={handleSignatureComplete}
+        />
+
+        {/* Toast Notifications */}
+        <ToastContainer position="top-right" autoClose={3000} />
       </Card>
     </BasicLayout>
   );
 }
-
 
 export default AddDocument;
