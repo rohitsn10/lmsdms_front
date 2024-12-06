@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from "prop-types"; // Correctly imported
+import PropTypes from "prop-types";
 import {
   Dialog,
   DialogActions,
@@ -15,7 +15,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { useGetApprovedStatusUsersQuery } from "api/auth/texteditorApi";
 
-const handleClear = () => {
+const handleClear = (setAssignedTo) => {
   setAssignedTo("");
 };
 
@@ -29,10 +29,14 @@ const SendBackDialog = ({
   setStatusSendBack,
   documentId,
 }) => {
-  const { data: userData, isLoading, error } = useGetApprovedStatusUsersQuery(documentId);
+  // Fetch approved status users using RTK Query
+  const { data: users, isLoading, error } = useGetApprovedStatusUsersQuery(documentId);
 
-  // Log to check the documentId
-  console.log('Document ID:', documentId);
+  // Debug logs
+  console.log("Document ID:", documentId);
+  console.log("API Loading:", isLoading);
+  console.log("API Error:", error);
+  console.log("API Users Data:", users);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -49,7 +53,7 @@ const SendBackDialog = ({
               variant="outlined"
               color="error"
               size="small"
-              onClick={handleClear}
+              onClick={() => handleClear(setAssignedTo)}
               sx={{ marginRight: "20px" }}
             >
               Clear
@@ -71,14 +75,16 @@ const SendBackDialog = ({
                 ".MuiSelect-select": { padding: "0.45rem" },
               }}
             >
+              {isLoading && <MenuItem disabled>Loading users...</MenuItem>}
+              {error && <MenuItem disabled>Error loading users</MenuItem>}
               {!isLoading &&
-                userData?.data?.map((user) => (
+                users?.map((user) => (
                   <MenuItem key={user.id} value={user.id}>
                     {user.first_name}
                   </MenuItem>
                 ))}
-              {error && <MenuItem disabled>Error loading users</MenuItem>}
             </Select>
+
           </FormControl>
         </DialogContent>
 
@@ -96,7 +102,6 @@ const SendBackDialog = ({
     </Dialog>
   );
 };
-
 
 SendBackDialog.propTypes = {
   open: PropTypes.bool.isRequired,
