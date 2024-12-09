@@ -22,7 +22,7 @@ const ConditionalDialog = ({
 
   const handleConfirm = async () => {
     try {
-      console.log("Document ID:", documentId);
+      console.log("Document ID In Effective :", documentId);
   
       // Create a FormData object and append documentId and status
       const formData = new FormData();

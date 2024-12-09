@@ -25,6 +25,7 @@ import {
   useGetTemplateQuery,
   useCreateDocumentMutation,
   useDocumentReviewStatusMutation,
+  useDocumentDocadminStatusMutation
 } from "api/auth/texteditorApi";
 import CommentDrawer from "./Comments/CommentsDrawer"; // Adjusted import for CommentDrawer
 import CommentModal from "./Comments/CommentDialog"; // Adjusted import for CommentModal
@@ -77,11 +78,12 @@ const DocumentView = () => {
   const navigate = useNavigate();
   const [documentApproveStatus] = useDocumentApproveStatusMutation();
   const [documentSendBackStatus] = useDocumentSendBackStatusMutation();
+  const [documentDocAdmin] = useDocumentDocadminStatusMutation();
   const searchParams = new URLSearchParams(location.search);
   const document_current_status = searchParams.get("status");
   const trainingRequired = searchParams.get("training_required");
   const approval_status = searchParams.get("approval_status");
-  const [dialogeffectiveOpen, setDialogeffectiveOpen] = useState(false);
+  // const [dialogeffectiveOpen, setDialogeffectiveOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(""); // State for Assigned To dropdown
   const [statusSendBack, setStatusSendBack] = useState(""); // State for Status Send Back dropdown
@@ -266,25 +268,25 @@ const DocumentView = () => {
       alert("An error occurred. Please try again.");
     }
   };
-  // const handleDoc = async () => {
-  //   console.log("Doc click button ");
-  //   try {
-  //     const response = await documentDocadminStatus({
-  //       document_id: id, // Replace with your actual document_id
-  //       status: "6", // Replace with your desired status
-  //     }).unwrap();
-  //     navigate("/document-listing");
-  //     console.log("API Response:", response);
-  //     if (response.status) {
-  //       alert(response.message); // Success message
-  //     } else {
-  //       alert("Action failed");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error calling API:", error);
-  //     alert("An error occurred. Please try again.");
-  //   }
-  // };
+  const handleDoc = async () => {
+    console.log("Doc click button ");
+    try {
+      const response = await documentDocAdmin({
+        document_id: id, // Replace with your actual document_id
+        status: "9", // Replace with your desired status
+      }).unwrap();
+      navigate("/document-listing");
+      console.log("API Response:", response);
+      if (response.status) {
+        alert(response.message); // Success message
+      } else {
+        alert("Action failed");
+      }
+    } catch (error) {
+      console.error("Error calling API:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
 
   const handleAddComment = () => {
     const quill = quillRef.current;
@@ -416,61 +418,61 @@ const DocumentView = () => {
   };
 
   // Handle dialog confirm
-  const handleConfirmDialog = async () => {
-    console.log("Send Back button clicked");
+  // const handleConfirmDialog = async () => {
+  //   console.log("Send Back button clicked");
 
-    try {
-      // Call the API using the mutation hook and pass the required data directly
-      const response = await documentSendBackStatus({
-        document_id: id, // Replace with your actual document_id
-        assigned_to: assignedTo, // Value from the dialog's state
-        status_sendback: "8", // The current status (replace with actual status if needed)
-      }).unwrap();
+  //   try {
+  //     // Call the API using the mutation hook and pass the required data directly
+  //     const response = await documentSendBackStatus({
+  //       document_id: id, // Replace with your actual document_id
+  //       assigned_to: assignedTo, // Value from the dialog's state
+  //       status_sendback: "8", // The current status (replace with actual status if needed)
+  //     }).unwrap();
 
-      console.log("API Response:", response);
-      if (response.status) {
-        alert(response.message); // Success message from the API response
-        setDialogOpen(false); // Close dialog on success
-        navigate("/document-listing"); // Navigate to document listing page
-      } else {
-        alert("Action failed. Please try again."); // Failure alert
-      }
-    } catch (error) {
-      console.error("Error calling API:", error);
-      alert("An error occurred. Please try again."); // General error handling
-    }
-  };
+  //     console.log("API Response:", response);
+  //     if (response.status) {
+  //       alert(response.message); // Success message from the API response
+  //       setDialogOpen(false); // Close dialog on success
+  //       navigate("/document-listing"); // Navigate to document listing page
+  //     } else {
+  //       alert("Action failed. Please try again."); // Failure alert
+  //     }
+  //   } catch (error) {
+  //     console.error("Error calling API:", error);
+  //     alert("An error occurred. Please try again."); // General error handling
+  //   }
+  // };
 
-  const handleDialogConfirm = async () => {
-    setDialogeffectiveOpen(false); // Close the dialog after confirmation
+  // const handleDialogConfirm = async () => {
+  //   setDialogeffectiveOpen(false); // Close the dialog after confirmation
 
-    console.log("Doc Admin Approve clicked - Confirmed");
-    try {
-      const response = await documentDocadminStatus({
-        document_id: id, // Replace with your actual document_id
-        status: "6", // Replace with your desired status
-      }).unwrap();
-      navigate("/document-listing");
-      console.log("API Response:", response);
-      if (response.status) {
-        alert(response.message); // Success message
-      } else {
-        alert("Action failed");
-      }
-    } catch (error) {
-      console.error("Error calling API:", error);
-      alert("An error occurred. Please try again.");
-    }
-  };
+  //   console.log("Doc Admin Approve clicked - Confirmed");
+  //   try {
+  //     const response = await documentDocadminStatus({
+  //       document_id: id, // Replace with your actual document_id
+  //       status: "6", // Replace with your desired status
+  //     }).unwrap();
+  //     navigate("/document-listing");
+  //     console.log("API Response:", response);
+  //     if (response.status) {
+  //       alert(response.message); // Success message
+  //     } else {
+  //       alert("Action failed");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error calling API:", error);
+  //     alert("An error occurred. Please try again.");
+  //   }
+  // };
 
   const handleDialogOpen = () => {
     console.log("Doc Admin Approve clicked - Confirmed");
     setDialogeffectiveOpen(true); // Open the dialog
   };
 
-  const handleDialogClose = () => {
-    setDialogeffectiveOpen(false); // Close the dialog
-  };
+  // const handleDialogClose = () => {
+  //   setDialogeffectiveOpen(false); // Close the dialog
+  // };
 
   const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
@@ -642,7 +644,7 @@ const DocumentView = () => {
             <MDButton
               variant="gradient"
               color="submit"
-              onClick={handleDialogOpen}
+              onClick={handleDoc}
               disabled={isLoading}
             >
               Doc Admin Approve
@@ -690,12 +692,13 @@ const DocumentView = () => {
         setStatusSendBack={setStatusSendBack}
         documentId={id}
       />
-      <ConditionalDialog
+      {/* <ConditionalDialog
         open={dialogeffectiveOpen}
         onClose={handleDialogClose} // Handle dialog close
         onConfirm={handleDialogConfirm} // Handle dialog confirmation
         trainingStatus={trainingRequired} // Pass trainingRequired as trainingStatus
-      />
+        documentId={id}
+      /> */}
     </Box>
   );
 };
