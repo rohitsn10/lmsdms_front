@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -18,10 +20,10 @@ import {
   FormControlLabel,
   FormLabel,
 } from "@mui/material";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog/index.js";
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useFetchDocumentDetailsQuery, useUpdateDocumentMutation } from "api/auth/editDocumentApi";
 import { useFetchDocumentTypesQuery } from "api/auth/documentApi";
-import { useFetchWorkflowsQuery } from "api/auth/workflowApi"; // Adjust import according to your file structure
+import { useFetchWorkflowsQuery } from "api/auth/workflowApi";
 
 function EditDocument() {
   const [title, setTitle] = useState("");
@@ -33,54 +35,73 @@ function EditDocument() {
   const [workflow, setWorkflow] = useState("");
   const [trainingRequired, setTrainingRequired] = useState("No");
   const [templateFile, setTemplateFile] = useState(null);
+  const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Fetch document details using API
-  const { data: documentDetails, isLoading: documentDetailsLoading } =
-    useFetchDocumentDetailsQuery(id);
+  // API calls
+  const { data: documentDetails, isLoading: documentDetailsLoading } = useFetchDocumentDetailsQuery(id);
   const [updateDocument] = useUpdateDocumentMutation();
-
-  // Fetch dropdown data using API
   const { data: documentTypesData, isLoading: documentTypesLoading } = useFetchDocumentTypesQuery();
-  const {
-    data: workflowsData,
-    isLoading: workflowsLoading,
-    error: workflowsError,
-  } = useFetchWorkflowsQuery();
+  const { data: workflowsData, isLoading: workflowsLoading } = useFetchWorkflowsQuery();
 
+  // Populate form with existing data
   useEffect(() => {
     if (documentDetails) {
-      setTitle(documentDetails.document_title || ""); 
-      setType(documentDetails.document_type || ""); 
-      setDocumentNumber(documentDetails.document_number || ""); 
-      setDescription(documentDetails.document_description || ""); 
-      setRevisionTime(documentDetails.revision_time || ""); 
-      setOperations(documentDetails.document_operation || ""); 
-      setWorkflow(documentDetails.workflow || ""); 
-      setTrainingRequired(documentDetails.trainingRequired || "No"); 
+      setTitle(documentDetails.document_title || "");
+      setType(documentDetails.document_type || "");
+      setDocumentNumber(documentDetails.document_number || "");
+      setDescription(documentDetails.document_description || "");
+      setRevisionTime(documentDetails.revision_time || "");
+      setOperations(documentDetails.document_operation || "Upload files");
+      setWorkflow(documentDetails.workflow || "");
+      setTrainingRequired(documentDetails.trainingRequired || "No");
     }
   }, [documentDetails]);
 
-  const handleSubmit = async (e) => {
+  // Validation
+  const validateInputs = () => {
+    const newErrors = {};
+    if (!title.trim()) newErrors.title = "Title is required.";
+    if (!type) newErrors.type = "Document type is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Form Submission
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateInputs()) return;
+    setOpenSignatureDialog(true);
+  };
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+
     try {
       await updateDocument({
         document_id: id,
-        document_title: title,
+        document_title: title.trim(),
         document_type: type,
-        document_number: documentNumber,
-        document_description: description,
-        revision_time: revisionTime,
+        document_number: documentNumber.trim(),
+        document_description: description.trim(),
+        revision_time: revisionTime.trim(),
         document_operation: operations,
-        select_template:templateFile,
+        select_template: templateFile,
         workflow,
         trainingRequired,
       });
-      setOpenSignatureDialog(true);
+      toast.success("Document updated successfully!");
+      setTimeout(() => navigate("/document-listing"), 1500);
     } catch (error) {
       console.error("Error updating document:", error);
+      toast.error("Failed to update document. Please try again.");
     }
   };
 
@@ -90,20 +111,17 @@ function EditDocument() {
     setDocumentNumber("");
     setDescription("");
     setRevisionTime("");
-    setOperations("");
+    setOperations("Upload files");
     setWorkflow("");
     setTrainingRequired("No");
     setTemplateFile(null);
+    setErrors({});
   };
 
   const handleFileChange = (e) => {
     setTemplateFile(e.target.files[0]);
   };
 
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/document-listing");
-  };
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
@@ -267,7 +285,15 @@ function EditDocument() {
         </MDBox>
       </Card>
 
-      <ESignatureDialog open={openSignatureDialog} onClose={handleCloseSignatureDialog} />
+      {/* E-Signature Dialog */}
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete}
+      />
+
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }
