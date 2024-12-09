@@ -1,3 +1,4 @@
+// src/components/DashboardNavbar.js
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -40,7 +41,6 @@ import {
   navbarIconButton,
   navbarMobileMenu,
 } from "examples/Navbars/DashboardNavbar/styles";
-import { useRequestUserGroupListQuery } from "api/auth/switchRoleApi";
 
 // Material Dashboard 2 React context
 import {
@@ -50,6 +50,9 @@ import {
   setOpenConfigurator,
 } from "context";
 import { useAuth } from "hooks/use-auth";
+
+// Import the API hook for switching roles
+import { useRequestUserGroupListQuery, useUserSwitchRoleMutation } from "api/auth/switchRoleApi";
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
@@ -62,10 +65,34 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [open, setOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [password, setPassword] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null); // State for settings dropdown
+  const [anchorEl, setAnchorEl] = useState(null); 
   const [showPassword, setShowPassword] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
-  const { data, status, error } = useRequestUserGroupListQuery();
+
+  // Fetch roles using the API hook
+  const { data: rolesData, isLoading, isError } = useRequestUserGroupListQuery();
+  
+  // Initialize the switch role mutation
+  const [userSwitchRole, { isLoading: isSwitchLoading, isError: isSwitchError, data: switchData, error: switchError }] = useUserSwitchRoleMutation();
+
+  useEffect(() => {
+    if (isLoading) {
+      console.log("Loading roles...");
+    }
+  
+    if (isError) {
+      console.error("Error loading roles!");
+    }
+  
+    if (rolesData && rolesData.data) {
+      console.log('Roles data:', rolesData); 
+      const fetchedRoles = rolesData.data.map((role) => ({
+        id: role.id, 
+        name: role.name,
+      }));
+      setRoles(fetchedRoles);
+    }
+  }, [rolesData, isLoading, isError]);
 
   useEffect(() => {
     if (fixedNavbar) {
@@ -75,26 +102,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
 
     function handleTransparentNavbar() {
-      setTransparentNavbar(dispatch, false); // Always set transparentNavbar to false
+      setTransparentNavbar(dispatch, false); 
     }
     window.addEventListener("scroll", handleTransparentNavbar);
     handleTransparentNavbar();
 
     return () => window.removeEventListener("scroll", handleTransparentNavbar);
   }, [dispatch, fixedNavbar]);
-
-  useEffect(() => {
-    if (status === "success" ) {
-      console.log("switch role =====================",data); 
-      if (data.status) {
-        setRoles(data.data); // Store roles from the API response if successful
-      } else {
-        setFeedbackMessage("Failed to load roles.");
-      }
-    } else if (error) {
-      setFeedbackMessage("Error fetching roles.");
-    }
-  }, [status, data, error]);
 
   const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
 
@@ -112,10 +126,18 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
   const handleSubmit = async () => {
     if (password && selectedRole) {
-      // Mock role switch logic
-      // const response = await switchUserRole({ group_name: selectedRole, password }).unwrap();
-      setFeedbackMessage("Role switched successfully!");
-      handleClose(); // Close the dialog immediately after submitting
+      try {
+        // Call the mutation to switch the role
+        const response = await userSwitchRole({ group_id: selectedRole, password });
+        if (response.data.status) {
+          setFeedbackMessage("Role switched successfully!");
+        } else {
+          setFeedbackMessage("Failed to switch role.");
+        }
+      } catch (err) {
+        setFeedbackMessage("Error switching role: " + err.message);
+      }
+      handleClose();
     } else {
       setFeedbackMessage("Please select a role and enter a password.");
     }
@@ -150,20 +172,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 variant="text"
                 size="large"
                 sx={navbarIconButton}
-                onClick={handleClickOpen} // Open dialog on button click
+                onClick={handleClickOpen}
               >
                 {role}
               </Button>
             </MDBox>
             <MDBox color={light ? "white" : "inherit"} display="flex" alignItems="center">
-              {/* <IconButton
-                sx={navbarIconButton}
-                size="small"
-                disableRipple
-                onClick={handleClickOpen}
-              >
-                <Icon sx={iconsStyle}>account_circle</Icon>
-              </IconButton> */}
               <Dialog
                 open={open}
                 onClose={handleClose}
@@ -189,10 +203,16 @@ function DashboardNavbar({ absolute, light, isMini }) {
                         },
                       }}
                     >
-                      {roles.length > 0 ? (
+                      {isLoading ? (
+                        <MenuItem disabled>
+                          <CircularProgress size={20} />
+                        </MenuItem>
+                      ) : isError ? (
+                        <MenuItem disabled>Error loading roles</MenuItem>
+                      ) : roles.length > 0 ? (
                         roles.map((role) => (
                           <MenuItem key={role.id} value={role.id}>
-                            {role.name} {/* Show 'name' from the API response */}
+                            {role.name}
                           </MenuItem>
                         ))
                       ) : (
@@ -234,9 +254,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
                       color="submit"
                       fullWidth
                       onClick={handleSubmit}
-                      disabled={false}
+                      disabled={isSwitchLoading}
                     >
-                      Submit
+                      {isSwitchLoading ? "Switching..." : "Submit"}
                     </MDButton>
                   </MDBox>
                 </DialogActions>
