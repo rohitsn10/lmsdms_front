@@ -168,7 +168,7 @@ function AddDocument() {
             </MDBox>
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
-                <InputLabel id="select-type-label">Document Type</InputLabel>
+                <InputLabel id="select-type-label">Type</InputLabel>
                 <Select
                   labelId="select-type-label"
                   id="select-type"
