@@ -126,6 +126,16 @@ export const documentApi = createApi({
       transformResponse: (response) => response,
       invalidatesTags: ["DocumentTypes"], // Invalidate document types data to trigger refetch
     }),
+    departmentWiseReviewer: builder.query({
+      query: () => ({
+        url: "user_profile/department_wise_reviewer",
+        method: "GET",
+      }),
+      transformResponse: (response) => response.data, // Extract the "data" field from the response
+      providesTags: ["Reviewers"], // Tag reviewers data for cache management
+      keepUnusedDataFor: 30, // Keep unused data for 30 seconds
+      refetchInterval: 30000, // Auto-refetch every 30 seconds
+    }),
   }),
 });
 
@@ -139,4 +149,5 @@ export const {
   useEditTemplateMutation,
   useUpdateTemplateMutation,
   useUpdateDocumentTypeMutation,
+  useDepartmentWiseReviewerQuery,
 } = documentApi;

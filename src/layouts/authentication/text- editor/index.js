@@ -418,30 +418,30 @@ const DocumentView = () => {
   };
 
   // Handle dialog confirm
-  // const handleConfirmDialog = async () => {
-  //   console.log("Send Back button clicked");
+  const handleConfirmDialog = async () => {
+    console.log("Send Back button clicked");
 
-  //   try {
-  //     // Call the API using the mutation hook and pass the required data directly
-  //     const response = await documentSendBackStatus({
-  //       document_id: id, // Replace with your actual document_id
-  //       assigned_to: assignedTo, // Value from the dialog's state
-  //       status_sendback: "8", // The current status (replace with actual status if needed)
-  //     }).unwrap();
+    try {
+      // Call the API using the mutation hook and pass the required data directly
+      const response = await documentSendBackStatus({
+        document_id: id, // Replace with your actual document_id
+        assigned_to: assignedTo, // Value from the dialog's state
+        status_sendback: "8", // The current status (replace with actual status if needed)
+      }).unwrap();
 
-  //     console.log("API Response:", response);
-  //     if (response.status) {
-  //       alert(response.message); // Success message from the API response
-  //       setDialogOpen(false); // Close dialog on success
-  //       navigate("/document-listing"); // Navigate to document listing page
-  //     } else {
-  //       alert("Action failed. Please try again."); // Failure alert
-  //     }
-  //   } catch (error) {
-  //     console.error("Error calling API:", error);
-  //     alert("An error occurred. Please try again."); // General error handling
-  //   }
-  // };
+      console.log("API Response:", response);
+      if (response.status) {
+        alert(response.message); // Success message from the API response
+        setDialogOpen(false); // Close dialog on success
+        navigate("/document-listing"); // Navigate to document listing page
+      } else {
+        alert("Action failed. Please try again."); // Failure alert
+      }
+    } catch (error) {
+      console.error("Error calling API:", error);
+      alert("An error occurred. Please try again."); // General error handling
+    }
+  };
 
   // const handleDialogConfirm = async () => {
   //   setDialogeffectiveOpen(false); // Close the dialog after confirmation

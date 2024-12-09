@@ -25,9 +25,9 @@ import {
   useCreateDocumentMutation,
   useFetchDocumentTypesQuery,
   useViewTemplateQuery,
+  useDepartmentWiseReviewerQuery,
 } from "api/auth/documentApi";
 import { useFetchWorkflowsQuery } from "api/auth/workflowApi";
-
 
 function AddDocument() {
   const [title, setTitle] = useState("");
@@ -41,13 +41,27 @@ function AddDocument() {
   const [operations, setOperations] = useState("Create online");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [errors, setErrors] = useState({});
+  const [selectedUser, setSelectedUser] = useState("");
   const [createDocument] = useCreateDocumentMutation();
   const navigate = useNavigate();
 
   const { data: documentTypesData } = useFetchDocumentTypesQuery();
   const { data: templateData } = useViewTemplateQuery();
-  const { data: workflowsData, isLoading: workflowsLoading, error: workflowsError } =
-    useFetchWorkflowsQuery();
+  const {
+    data: workflowsData,
+    isLoading: workflowsLoading,
+    error: workflowsError,
+  } = useFetchWorkflowsQuery();
+
+  const {
+    data : userdata
+  }=useDepartmentWiseReviewerQuery();
+  
+  const users = [
+    { id: 1, name: "John Doe" },
+    { id: 2, name: "Jane Smith" },
+    { id: 3, name: "Michael Brown" },
+  ];
 
   const validateInputs = () => {
     const newErrors = {};
@@ -76,6 +90,10 @@ function AddDocument() {
     e.preventDefault();
     if (!validateInputs()) return;
     setOpenSignatureDialog(true);
+  };
+  const handleChange = (e) => {
+    setSelectedUser(e.target.value);
+    setErrors({ ...errors, user: "" }); // Clear error if any
   };
 
   const handleClear = () => {
@@ -306,6 +324,34 @@ function AddDocument() {
                 {errors.template && (
                   <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
                     {errors.template}
+                  </p>
+                )}
+              </FormControl>
+            </MDBox>
+            <MDBox mb={3}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="select-user-label">Select User</InputLabel>
+                <Select
+                  labelId="select-user-label"
+                  id="select-user"
+                  value={selectedUser}
+                  onChange={handleChange}
+                  input={<OutlinedInput label="Select User" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem",
+                    ".MuiSelect-select": { padding: "0.45rem" },
+                  }}
+                >
+                  {users.map((userdata) => (
+                    <MenuItem key={userdata.id} value={userdata.id}>
+                      {userdata.first_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.user && (
+                  <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+                    {errors.user}
                   </p>
                 )}
               </FormControl>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import Card from "@mui/material/Card";
@@ -20,12 +20,22 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ConditionalDialog from "./effective";
 
 const DocumentListing = () => {
-  const { user, role } = useAuth();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { data, isLoading, isError } = useFetchDocumentsQuery();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [userGroupIds, setUserGroupIds] = useState([]);
+
+  
+  useEffect(() => {
+    if (data && data.user_group_ids) {
+      setUserGroupIds(data.user_group_ids); 
+      console.log("User Group IDs:", data.user_group_ids); 
+    }
+  }, [data]);
+
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
 
@@ -33,11 +43,9 @@ const DocumentListing = () => {
 
   const { data: userPermissions = [], isError: permissionError } =
     useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
-      skip: !groupId, // Ensure it skips if groupId is missing
+      skip: !groupId,
     });
 
-  // console.log("USER_PERMISSIONS", userPermissions);
-  // console.log("pERMISSON_ERROR", permissionError);
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
     setDialogOpen(true);
