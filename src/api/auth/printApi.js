@@ -17,10 +17,10 @@ export const printApi = createApi({
   }),
   endpoints: (builder) => ({
     printDocument: builder.mutation({
-      query: ({ sop_document_id, no_of_print, issue_type, reason_for_print }) => ({
+      query: ({ sop_document_id, no_of_print, issue_type, reason_for_print, printer_id }) => ({
         url: 'dms_module/print_request',
         method: 'POST',
-        body: { sop_document_id, no_of_print, issue_type, reason_for_print },
+        body: { sop_document_id, no_of_print, issue_type, reason_for_print, printer_id },
       }),
       transformResponse: (response) => response, // Handle raw response
     }),
