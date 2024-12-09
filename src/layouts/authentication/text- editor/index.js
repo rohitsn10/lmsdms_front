@@ -35,7 +35,7 @@ import { useNavigate } from "react-router-dom";
 import { useDraftDocumentMutation } from "api/auth/texteditorApi";
 import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
 import SendBackDialog from "./sendback";
-import ConditionalDialog from "./effective";
+import ConditionalDialog from "../document-listing/effective";
 import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 
