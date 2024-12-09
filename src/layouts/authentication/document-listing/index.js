@@ -17,13 +17,15 @@ import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 import { useAuth } from "hooks/use-auth";
 import moment from "moment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ConditionalDialog from "./effective";
 
 const DocumentListing = () => {
   const { user, role } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { data, isLoading, isError } = useFetchDocumentsQuery();
-
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
 
@@ -34,9 +36,17 @@ const DocumentListing = () => {
       skip: !groupId, // Ensure it skips if groupId is missing
     });
 
-  console.log("USER_PERMISSIONS", userPermissions);
-  console.log("pERMISSON_ERROR", permissionError);
+  // console.log("USER_PERMISSIONS", userPermissions);
+  // console.log("pERMISSON_ERROR", permissionError);
+  const handleDialogOpen = (row) => {
+    setSelectedRow(row);
+    setDialogOpen(true);
+  };
 
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+    setSelectedRow(null);
+  };
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -122,7 +132,7 @@ const DocumentListing = () => {
     {
       field: "version",
       headerName: "Version",
-      flex: 0.40,
+      flex: 0.4,
       headerAlign: "center",
     },
     {
@@ -134,7 +144,7 @@ const DocumentListing = () => {
     {
       field: "current_status_name",
       headerName: "Status",
-      flex: 0.60,
+      flex: 0.6,
       headerAlign: "center",
     },
     {
@@ -173,12 +183,7 @@ const DocumentListing = () => {
                   <EditCalendarIcon />
                 </IconButton>
               )}
-          <IconButton
-            color="success"
-            onClick={() => {
-              console.log("CheckCircleIcon clicked for row:", params.row);
-            }}
-          >
+          <IconButton color="success" onClick={() => handleDialogOpen(params.row)}>
             <CheckCircleIcon />
           </IconButton>
         </MDBox>
@@ -241,6 +246,13 @@ const DocumentListing = () => {
           </div>
         </MDBox>
       </Card>
+      <ConditionalDialog
+        open={dialogOpen}
+        onClose={handleDialogClose}
+        onConfirm={() => console.log("Confirmed for row:", selectedRow)}
+        trainingStatus={selectedRow?.training_required || "false"}
+        documentId={selectedRow?.id || ""}
+      />
     </MDBox>
   );
 };
