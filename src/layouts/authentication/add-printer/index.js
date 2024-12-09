@@ -10,17 +10,19 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useCreatePrinterMutation } from "api/auth/PrinterApi";  // Import the mutation hook
+import { useCreatePrinterMutation } from "api/auth/PrinterApi"; // Import the mutation hook
 
 function AddPrinter() {
   const [printerName, setPrinterName] = useState("");
   const [printerPath, setPrinterPath] = useState("");
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+  const [pendingData, setPendingData] = useState(null); // Store data temporarily for E-Signature
 
   const navigate = useNavigate();
-  const [createPrinter] = useCreatePrinterMutation();  // Initialize the mutation
+  const [createPrinter] = useCreatePrinterMutation(); // Initialize the mutation
 
+  // Validate input fields
   const validateInputs = () => {
     const newErrors = {};
     if (!printerName.trim()) newErrors.printerName = "Printer Name is required.";
@@ -29,30 +31,45 @@ function AddPrinter() {
     return Object.keys(newErrors).length === 0; // Valid if no errors
   };
 
-  const handleSubmit = async (e) => {
+  // Handle form submission
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return; // Stop submission if validation fails
 
-    try {
-      // Call the mutation to create the printer
-      await createPrinter({ printer_name: printerName, printer_location: printerPath }).unwrap();
-      toast.success("Printer added successfully!");
-      setOpenSignatureDialog(true);  // Show the signature dialog after successful creation
-    } catch (error) {
-      toast.error("Error adding printer. Please try again.");
-      console.error("Error adding printer:", error);
-    }
+    // Temporarily store the data and open the E-Signature dialog
+    setPendingData({ printer_name: printerName, printer_location: printerPath });
+    setOpenSignatureDialog(true);
   };
 
+  // Handle E-Signature confirmation
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+  
+    try {
+      // Call the mutation to create the printer
+      await createPrinter(pendingData).unwrap();
+      toast.success("Printer added successfully!");
+  
+      // Delay navigation to give time for the toast to be visible
+      setTimeout(() => {
+        navigate("/printer-listing"); // Redirect after success
+      }, 1500); // 3 seconds delay to match the toast auto-close duration
+    } catch (error) {
+      console.error("Error adding printer:", error);
+      toast.error("Error adding printer. Please try again.");
+    }
+  };
+  
+
+  // Clear form inputs
   const handleClear = () => {
     setPrinterName("");
     setPrinterPath("");
     setErrors({});
-  };
-
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/printer-listing"); // Navigate to the printer listing page
   };
 
   return (
@@ -118,7 +135,11 @@ function AddPrinter() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete}
+      />
 
       {/* Toast Container */}
       <ToastContainer position="top-right" autoClose={3000} />

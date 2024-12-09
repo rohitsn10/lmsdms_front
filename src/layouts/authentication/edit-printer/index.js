@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
@@ -10,17 +10,17 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useUpdatePrinterMutation } from 'api/auth/PrinterApi';
+import { useUpdatePrinterMutation } from "api/auth/PrinterApi";
 
 function EditPrinter() {
-  const { state } = useLocation(); // Access state passed via navigation
+  const { state } = useLocation();
   const [printerName, setPrinterName] = useState(state?.printer?.printer_name || "");
   const [printerPath, setPrinterPath] = useState(state?.printer?.printer_location || "");
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+  const [formData, setFormData] = useState(null);
 
   const navigate = useNavigate();
-  
   const [updatePrinter] = useUpdatePrinterMutation();
 
   const validateInputs = () => {
@@ -28,23 +28,43 @@ function EditPrinter() {
     if (!printerName.trim()) newErrors.printerName = "Printer Name is required.";
     if (!printerPath.trim()) newErrors.printerPath = "Printer Path is required.";
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Valid if no errors
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validateInputs()) return; // Stop submission if validation fails
-    
+    if (!validateInputs()) return;
+
+    // Open the signature dialog and store form data
+    setFormData({
+      printer_id: state?.printer?.id,
+      printer_name: printerName,
+      printer_location: printerPath,
+    });
+    setOpenSignatureDialog(true);
+  };
+
+  const handleSignatureComplete = async (password) => {
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      setOpenSignatureDialog(false);
+      return;
+    }
+
     try {
-      await updatePrinter({
-        printer_id: state?.printer?.id, // Using ID from state
-        printer_name: printerName,
-        printer_location: printerPath,
-    }).unwrap();
+      // Submit the form data after signature
+      await updatePrinter(formData).unwrap();
       toast.success("Printer updated successfully!");
-      setOpenSignatureDialog(true);
+      
+      // Delay navigation to allow toast visibility
+      setTimeout(() => {
+        navigate("/printer-listing");
+      }, 3000);
     } catch (error) {
-      toast.error("Failed to update printer.");
+      toast.error("Failed to update printer. Please try again.");
+      console.error("Error updating printer:", error);
+    } finally {
+      setOpenSignatureDialog(false);
     }
   };
 
@@ -52,11 +72,6 @@ function EditPrinter() {
     setPrinterName("");
     setPrinterPath("");
     setErrors({});
-  };
-
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/printer-listing");
   };
 
   return (
@@ -104,7 +119,7 @@ function EditPrinter() {
             </MDBox>
             <MDBox mb={3}>
               <MDInput
-                label="Printer location"
+                label="Printer Location"
                 fullWidth
                 value={printerPath}
                 onChange={(e) => setPrinterPath(e.target.value)}
@@ -122,7 +137,11 @@ function EditPrinter() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        handleClose={() => setOpenSignatureDialog(false)}
+        onComplete={handleSignatureComplete}
+      />
 
       {/* Toast Container */}
       <ToastContainer position="top-right" autoClose={3000} />
