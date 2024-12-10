@@ -40,8 +40,6 @@ function AddDocument() {
   const [template, setTemplate] = useState("");
   const [operations, setOperations] = useState("Create online");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [selectedUser, setSelectedUser] = useState("");
   const [createDocument] = useCreateDocumentMutation();
   const navigate = useNavigate();
 
@@ -53,15 +51,10 @@ function AddDocument() {
     error: workflowsError,
   } = useFetchWorkflowsQuery();
 
-  const {
-    data : userdata
-  }=useDepartmentWiseReviewerQuery();
-  
-  const users = [
-    { id: 1, name: "John Doe" },
-    { id: 2, name: "Jane Smith" },
-    { id: 3, name: "Michael Brown" },
-  ];
+  const { data: userdata } = useDepartmentWiseReviewerQuery(); //this Api user API 
+  const users = userdata?.users || [];
+  const [selectedUser, setSelectedUser] = useState("");
+  const [errors, setErrors] = useState({});
 
   const validateInputs = () => {
     const newErrors = {};
@@ -91,9 +84,11 @@ function AddDocument() {
     if (!validateInputs()) return;
     setOpenSignatureDialog(true);
   };
-  const handleChange = (e) => {
-    setSelectedUser(e.target.value);
-    setErrors({ ...errors, user: "" }); // Clear error if any
+  const handleChange = (event) => {
+    setSelectedUser(event.target.value);
+    if (errors.user) {
+      setErrors((prevErrors) => ({ ...prevErrors, user: null })); // Clear user error on selection
+    }
   };
 
   const handleClear = () => {
@@ -127,7 +122,7 @@ function AddDocument() {
         document_operation: operations,
         select_template: template,
         training_required: trainingRequired.toLowerCase() === "yes",
-        document_current_status_id: "1",
+        document_current_status_id: selectedUser,
       };
 
       const response = await createDocument(documentData).unwrap();
@@ -343,14 +338,20 @@ function AddDocument() {
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
                 >
-                  {users.map((userdata) => (
-                    <MenuItem key={userdata.id} value={userdata.id}>
-                      {userdata.first_name}
+                  {users.map((user) => (
+                    <MenuItem key={user.id} value={user.id}>
+                      {user.first_name}
                     </MenuItem>
                   ))}
                 </Select>
                 {errors.user && (
-                  <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+                  <p
+                    style={{
+                      color: "red",
+                      fontSize: "0.75rem",
+                      marginTop: "4px",
+                    }}
+                  >
                     {errors.user}
                   </p>
                 )}
