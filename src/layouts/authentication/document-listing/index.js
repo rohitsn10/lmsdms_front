@@ -27,14 +27,18 @@ const DocumentListing = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [userGroupIds, setUserGroupIds] = useState([]);
-
-  
+ 
   useEffect(() => {
-    if (data && data.user_group_ids) {
-      setUserGroupIds(data.user_group_ids); 
-      console.log("User Group IDs:", data.user_group_ids); 
+    if (data && data.userGroupIds) {
+      setUserGroupIds(data.userGroupIds);
+      console.log("User Group IDssss:", data.userGroupIds); // Corrected property name
     }
   }, [data]);
+  
+
+  console.log("Documents:", data?.documents || []);
+  console.log("User Group IDs:", data?.userGroupIds || []);
+  
 
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
@@ -191,9 +195,15 @@ const DocumentListing = () => {
                   <EditCalendarIcon />
                 </IconButton>
               )}
-          <IconButton color="success" onClick={() => handleDialogOpen(params.row)}>
-            <CheckCircleIcon />
-          </IconButton>
+          {data?.userGroupIds?.includes(5) && (
+        <IconButton
+          color="success"
+          onClick={() => handleDialogOpen(params.row)}
+          disabled={params.row.document_current_status !== 9} // Disable if condition not met
+        >
+          <CheckCircleIcon />
+        </IconButton>
+      )}
         </MDBox>
       ),
       sortable: false,

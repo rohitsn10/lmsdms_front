@@ -34,7 +34,7 @@ export const permissionApi = createApi({
         // New API to fetch permissions by group ID
         fetchPermissionsByGroupId: builder.query({
             query: (group_id) => {
-              console.log("Group ID:", group_id); // Log the group_id
+              console.log("Group ID From API :-----------------", group_id); // Log the group_id
               return `user_profile/group_id_wise_permission_list?group_id=${group_id}`;
             },
             transformResponse: (response) => {

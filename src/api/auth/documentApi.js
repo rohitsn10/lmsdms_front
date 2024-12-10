@@ -56,7 +56,7 @@ export const documentApi = createApi({
       },
       providesTags: ["Documents"], // Tag documents data for cache management
       keepUnusedDataFor: 30, // Keep unused data for 30 seconds
-      refetchInterval: 30000, // Auto-refetch every 30 seconds
+      refetchInterval: 2000, // Auto-refetch every 30 seconds
     }),
 
     createTemplate: builder.mutation({
