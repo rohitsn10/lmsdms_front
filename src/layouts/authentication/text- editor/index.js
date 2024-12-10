@@ -39,6 +39,8 @@ import ConditionalDialog from "../document-listing/effective";
 import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 
+
+
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
 
@@ -308,30 +310,51 @@ const DocumentView = () => {
   //   setOpencommentDialog(false); // Close modal after saving
   // };
 
-  const handleSaveComment = () => {
+  const handleSaveComment = async () => {
     if (currentComment.trim() === "") return;
-
+  
     const quill = quillRef.current;
-
+  
     // Extract the selected word based on the selected range
     const selectedText = quill.getText(selectedRange.index, selectedRange.length).trim();
-
+  
     // If no text is selected, return early
     if (!selectedText) return;
-
+  
     // Highlight the selected text (optional)
-    quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
-
-    // Add the selected word and comment to the comments array
-    setComments([
-      ...comments,
-      { id: Date.now(), selectedWord: selectedText, range: selectedRange, comment: currentComment },
-    ]);
-
-    // Clear the comment input and close the dialog
-    setCurrentComment("");
-    setOpencommentDialog(false); // Close modal after saving
+    quill.formatText(selectedRange.index, selectedRange.length, { background: "red" });
+  
+    // Prepare the payload for the API call
+    const newComment = {
+      document: id, // Pass the document ID
+      comment_description: currentComment, // Match the API's expected key
+    };
+  
+    try {
+      // Call the mutation to save the comment in the backend
+      const response = await createComment(newComment);
+  
+      if (response.status) {
+        // Update comments in state only after successful API response
+        setComments([...comments, { 
+          id: Date.now(),
+          selectedWord: selectedText,
+          comment: currentComment,
+          document: id,
+        }]);
+  
+        // Clear the comment input and close the dialog
+        setCurrentComment("");
+        setOpencommentDialog(false);
+      } else {
+        console.error("Failed to save comment:", response.message);
+      }
+    } catch (error) {
+      console.error("Error saving comment:", error);
+    }
   };
+  
+  
   const handlePrint = () => {
     console.log("Id passed:", id);
     navigate(`/print-document/${id}`);
@@ -553,6 +576,7 @@ const DocumentView = () => {
         onAddCommentClick={handleAddComment}
         onEditCommentClick={handleEditComment}
         handleSaveEdit={handleSaveEdit}
+        documentId={id}
       />
 
       <CommentModal

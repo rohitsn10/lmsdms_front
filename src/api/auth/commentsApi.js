@@ -26,9 +26,28 @@ export const commentApi = createApi({
         message: response.message,
       }),
     }),
+
+    // View comments
+    viewComments: builder.query({
+      query: (documentId) => ({
+        url: `dms_module/view_comment/${documentId}`, // Embed documentId in the path
+        method: "GET",
+      }),
+      transformResponse: (response) => ({
+        message: response.message,
+        data: response.data.map((comment) => ({
+          id: comment.id,
+          user: comment.user,
+          document: comment.document,
+          commentDescription: comment.Comment_description,
+          createdAt: comment.created_at,
+        })),
+      }),
+    }),
   }),
 });
 
 export const {
-  useCreateCommentMutation, // Export the mutation hook
+  useCreateCommentMutation, // Hook for creating a comment
+  useViewCommentsQuery,     // Hook for viewing comments
 } = commentApi;

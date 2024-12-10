@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Box, Button, Typography, List, ListItem, ListItemText, TextField } from "@mui/material";
+import { Box, Typography, List, ListItem, ListItemText, TextField } from "@mui/material";
+import { useViewCommentsQuery } from "api/auth/commentsApi";
 import MDButton from "components/MDButton";
 
-const CommentDrawer = ({ comments, onEditCommentClick, handleSaveEdit }) => {
+const CommentDrawer = ({ onEditCommentClick, handleSaveEdit, documentId }) => {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
 
+  // Fetch comments filtered by documentId
+  const { data, isLoading, isError } = useViewCommentsQuery(documentId);
+  console.log("Document id :---------------------",documentId);
   const startEditing = (id, currentText) => {
     setEditingId(id);
     setEditText(currentText);
@@ -17,6 +21,10 @@ const CommentDrawer = ({ comments, onEditCommentClick, handleSaveEdit }) => {
     setEditingId(null);
     setEditText("");
   };
+
+  // Parse comments from the API response
+  const comments = data?.data || [];
+  console.log("Fetched Comments:", data);
 
   return (
     <Box
@@ -35,85 +43,73 @@ const CommentDrawer = ({ comments, onEditCommentClick, handleSaveEdit }) => {
       <Typography variant="h6" gutterBottom>
         All Comments
       </Typography>
-      <List>
-        {comments.map(({ id, username, word, comment }) => (
-          <ListItem
-            key={id}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              borderBottom: "1px solid #ddd",
-              paddingBottom: 2,
-              marginBottom: 2,
-            }}
-          >
-            {editingId === id ? (
-              <>
-                <TextField
-                  value={editText}
-                  onChange={(e) => setEditText(e.target.value)}
-                  fullWidth
-                  margin="normal"
-                  sx={{ mb: 2 }}
-                />
-                <Box>
-                  <MDButton onClick={saveEdit} variant="gradient" color="submit" size="small" sx={{ mr: 1 }}>
-                    Save
+      {isLoading ? (
+        <Typography variant="body2">Loading comments...</Typography>
+      ) : isError ? (
+        <Typography variant="body2" color="error">
+          Failed to load comments.
+        </Typography>
+      ) : (
+        <List>
+          {comments.map(({ id, user_first_name, document, Comment_description }) => (
+            <ListItem
+              key={id}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                borderBottom: "1px solid #ddd",
+                paddingBottom: 2,
+                marginBottom: 2,
+              }}
+            >
+              {editingId === id ? (
+                <>
+                  <TextField
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                    sx={{ mb: 2 }}
+                  />
+                  <Box>
+                    <MDButton onClick={saveEdit} variant="gradient" color="submit" size="small" sx={{ mr: 1 }}>
+                      Save
+                    </MDButton>
+                    <MDButton onClick={() => setEditingId(null)} variant="gradient" color="error" size="small">
+                      Cancel
+                    </MDButton>
+                  </Box>
+                </>
+              ) : (
+                <>
+                  <Typography variant="body2" color="textSecondary" sx={{ fontWeight: "bold", mb: 1 }}>
+                    {user_first_name} commented on <span style={{ fontStyle: "italic" }}>Document {document}</span>
+                  </Typography>
+                  <ListItemText primary={Comment_description} sx={{ mb: 1 }} />
+                  <MDButton
+                    variant="gradient"
+                    color="submit"
+                    size="small"
+                    onClick={() => startEditing(id, Comment_description)}
+                    sx={{ mt: 1 }}
+                  >
+                    Edit
                   </MDButton>
-                  <MDButton onClick={() => setEditingId(null)} variant="gradient" color="error" size="small">
-                    Cancel
-                  </MDButton>
-                </Box>
-              </>
-            ) : (
-              <>
-                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: "bold", mb: 1 }}>
-                  {username} commented on <span style={{ fontStyle: "italic" }}>{word}</span>
-                </Typography>
-                <ListItemText primary={comment} sx={{ mb: 1 }} />
-                <MDButton
-                  variant="gradient"
-                  color="submit"
-                  size="small"
-                  onClick={() => startEditing(id, comment)}
-                  sx={{ mt: 1 }}
-                >
-                  Edit
-                </MDButton>
-              </>
-            )}
-          </ListItem>
-        ))}
-      </List>
-      <Button
-        variant="contained"
-        disabled
-        onClick={onEditCommentClick}
-        sx={{
-          mt: 2,
-          backgroundColor: "#E53471",
-          color: "344767",
-          width: "100%",
-        }}
-      >
-        All Comment
-      </Button>
+                </>
+              )}
+            </ListItem>
+          ))}
+        </List>
+      )}
     </Box>
   );
 };
 
 CommentDrawer.propTypes = {
-  comments: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      username: PropTypes.string.isRequired,
-      word: PropTypes.string.isRequired,
-      comment: PropTypes.string.isRequired,
-    })
-  ).isRequired,
   onEditCommentClick: PropTypes.func.isRequired,
   handleSaveEdit: PropTypes.func.isRequired,
+  documentId: PropTypes.string.isRequired, // Ensure documentId is passed
 };
 
 export default CommentDrawer;
