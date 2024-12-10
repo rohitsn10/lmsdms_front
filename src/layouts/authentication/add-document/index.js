@@ -51,8 +51,14 @@ function AddDocument() {
     error: workflowsError,
   } = useFetchWorkflowsQuery();
 
-  const { data: userdata } = useDepartmentWiseReviewerQuery(); //this Api user API 
-  const users = userdata?.users || [];
+  const { data: userdata, isLoading, error } = useDepartmentWiseReviewerQuery();
+  const users = userdata || [];
+
+  console.log("Full userdata object:", userdata);
+  console.log("userdata?.data:", userdata?.data);
+  console.log("Type of userdata?.data:", typeof userdata?.data);
+  console.log("Length of userdata?.data (if array):", Array.isArray(userdata?.data) ? userdata.data.length : "Not an array");
+
   const [selectedUser, setSelectedUser] = useState("");
   const [errors, setErrors] = useState({});
 
@@ -338,24 +344,20 @@ function AddDocument() {
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
                 >
-                  {users.map((user) => (
-                    <MenuItem key={user.id} value={user.id}>
-                      {user.first_name}
-                    </MenuItem>
-                  ))}
+                  {users.length > 0 ? (
+                    users.map((user) => (
+                      <MenuItem key={user.id} value={user.id}>
+                        {user.first_name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No users available</MenuItem>
+                  )}
                 </Select>
-                {errors.user && (
-                  <p
-                    style={{
-                      color: "red",
-                      fontSize: "0.75rem",
-                      marginTop: "4px",
-                    }}
-                  >
-                    {errors.user}
-                  </p>
-                )}
               </FormControl>
+
+
+
             </MDBox>
             <MDBox mb={3} display="flex" alignItems="center">
               <FormLabel
