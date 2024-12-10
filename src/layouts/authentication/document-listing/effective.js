@@ -28,7 +28,7 @@ const ConditionalDialog = ({
 
     try {
       // Call the mutation API with the documentId and status
-      await documentReleaseEffectiveStatus({ document_id: documentId, status });
+      await documentReleaseEffectiveStatus({ document_id: documentId, status_id: status });
       onConfirm(); // Trigger the onConfirm callback if needed
     } catch (error) {
       console.error("Error submitting the document release:", error);
