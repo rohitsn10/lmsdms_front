@@ -41,6 +41,7 @@ function AddDocument() {
   const [operations, setOperations] = useState("Create online");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [createDocument] = useCreateDocumentMutation();
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const navigate = useNavigate();
 
   const { data: documentTypesData } = useFetchDocumentTypesQuery();
@@ -57,7 +58,10 @@ function AddDocument() {
   console.log("Full userdata object:", userdata);
   console.log("userdata?.data:", userdata?.data);
   console.log("Type of userdata?.data:", typeof userdata?.data);
-  console.log("Length of userdata?.data (if array):", Array.isArray(userdata?.data) ? userdata.data.length : "Not an array");
+  console.log(
+    "Length of userdata?.data (if array):",
+    Array.isArray(userdata?.data) ? userdata.data.length : "Not an array"
+  );
 
   const [selectedUser, setSelectedUser] = useState("");
   const [errors, setErrors] = useState({});
@@ -71,8 +75,9 @@ function AddDocument() {
     }
     if (!documentNumber.trim()) newErrors.documentNumber = "Document number is required.";
     if (!description.trim()) newErrors.description = "Description is required.";
-    if (!revisionTime.trim() || isNaN(revisionTime) || parseInt(revisionTime, 10) <= 0) {
-      newErrors.revisionTime = "Valid revision time is required.";
+    if (!revisionTime) {
+      setErrors({ revisionTime: "Revision Time is required" });
+      return;
     }
     if (!workflow || (typeof workflow === "string" && workflow.trim() === "")) {
       newErrors.workflow = "Workflow is required.";
@@ -123,12 +128,13 @@ function AddDocument() {
         document_number: documentNumber.trim(),
         document_type: type,
         document_description: description.trim(),
-        revision_time: revisionTime.trim(),
+        revision_date: revisionTime.trim(),
         workflow,
         document_operation: operations,
         select_template: template,
         training_required: trainingRequired.toLowerCase() === "yes",
-        document_current_status_id: selectedUser,
+        document_current_status_id: "1",
+        visible_to_users:selectedUsers,
       };
 
       const response = await createDocument(documentData).unwrap();
@@ -238,16 +244,19 @@ function AddDocument() {
             </MDBox>
 
             <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Revision Time"
-                value={revisionTime}
-                onChange={(e) => setRevisionTime(e.target.value)}
-                error={Boolean(errors.revisionTime)}
-                helperText={errors.revisionTime}
-                fullWidth
-              />
-            </MDBox>
+  <MDInput
+    type="date"
+    value={revisionTime}
+    onChange={(e) => setRevisionTime(e.target.value)}
+    error={Boolean(errors.revisionTime)}
+    helperText={errors.revisionTime}
+    fullWidth
+    InputLabelProps={{
+      shrink: true, // Ensures the label stays at the top
+    }}
+    label="Revision Date"
+  />
+</MDBox>
 
             <MDBox mb={3} display="flex" alignItems="center">
               <FormLabel
@@ -331,18 +340,27 @@ function AddDocument() {
             </MDBox>
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
-                <InputLabel id="select-user-label">Select User</InputLabel>
+                <InputLabel id="select-user-label">Select Users</InputLabel>
                 <Select
                   labelId="select-user-label"
                   id="select-user"
-                  value={selectedUser}
-                  onChange={handleChange}
-                  input={<OutlinedInput label="Select User" />}
+                  multiple // Enable multiple selection
+                  value={selectedUsers} // Use an array to hold selected values
+                  onChange={(e) => setSelectedUsers(e.target.value)} // Update the handler for multiple selection
+                  input={<OutlinedInput label="Select Users" />}
                   sx={{
                     minWidth: 200,
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
+                  renderValue={(selected) =>
+                    selected
+                      .map((userId) => {
+                        const user = users.find((u) => u.id === userId);
+                        return user?.first_name || userId;
+                      })
+                      .join(", ")
+                  }
                 >
                   {users.length > 0 ? (
                     users.map((user) => (
@@ -355,10 +373,8 @@ function AddDocument() {
                   )}
                 </Select>
               </FormControl>
-
-
-
             </MDBox>
+
             <MDBox mb={3} display="flex" alignItems="center">
               <FormLabel
                 component="legend"
