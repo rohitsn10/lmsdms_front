@@ -55,6 +55,7 @@ import EditDocumentType from "layouts/edit-documenttype/index.js";
 import PrinterListing from "layouts/authentication/printer-listing/index.js";
 import AddPrinter from "layouts/authentication/add-printer/index.js";
 import EditPrinter from "layouts/authentication/edit-printer/index.js";
+import ResettPassword from "layouts/authentication/reset-passwordlog/index.js";
 //Lms components
 
 import AddArea from "dmscomponent/add-area/index.js";
@@ -262,6 +263,7 @@ export default function App() {
       <Route path="/printer-listing" element={<PrinterListing />} /> 
       <Route path="/add-printer" element={<AddPrinter />} /> 
       <Route path="/update-printer" element={<EditPrinter />} />
+      <Route path="/resett-password" element={<ResettPassword />} />
       {/* Lms components */}
       <Route path="/add-area" element={<AddArea />} />
       <Route path="/add-departments" element={<AddDepartments />} />
