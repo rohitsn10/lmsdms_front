@@ -87,10 +87,10 @@ export const texteditorApi = createApi({
       transformResponse: (response) => response.data,
     }),
     documentreleaseEffectiveStatus: builder.mutation({
-      query: ({ document_id, status }) => ({
+      query: ({ document_id, status_id }) => ({
         url: `dms_module/document_release_effective_status`,
         method: "POST",
-        body: { document_id, status },
+        body: { document_id, status_id },
       }),
       transformResponse: (response) => response,
     }),
