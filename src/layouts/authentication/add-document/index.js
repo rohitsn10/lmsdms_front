@@ -117,37 +117,45 @@ function AddDocument() {
 
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
+    
     if (!password) {
       toast.error("E-Signature is required to proceed.");
       return;
     }
-
+  
     try {
+      // Prepare the document data similar to the example you provided
       const documentData = {
         document_title: title.trim(),
         document_number: documentNumber.trim(),
-        document_type: type,
+        document_type: type, // Assuming `type` is already the correct value
         document_description: description.trim(),
         revision_date: revisionTime.trim(),
-        workflow,
-        document_operation: operations,
-        select_template: template,
-        training_required: trainingRequired.toLowerCase() === "yes",
-        document_current_status_id: "1",
-        visible_to_users:selectedUsers,
+        document_operation: operations, // Assuming `operations` is the right value
+        workflow: workflow, // Assuming `workflow` is the correct value
+        select_template: template, // Assuming `template` is the right value
+        document_current_status_id: 1, // Use the correct ID if needed
+        training_required: trainingRequired.toLowerCase() === "yes", // Convert to boolean
+        visible_to_users: selectedUsers, // Assuming selectedUsers is an array
       };
-
+  
+      // Make the API call to create the document
       const response = await createDocument(documentData).unwrap();
+      
       toast.success("Document added successfully!");
       console.log("API Response:", response);
+  
+      // Redirect to the document listing page after a delay
       setTimeout(() => {
         navigate("/document-listing");
       }, 1500);
+  
     } catch (error) {
       console.error("Error creating document:", error);
       toast.error("Failed to add document. Please try again.");
     }
   };
+  
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto", marginTop: 10, marginBottom: 10 }}>

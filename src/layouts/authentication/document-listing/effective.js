@@ -4,7 +4,7 @@ import { Dialog, DialogActions, DialogContent } from "@mui/material";
 import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import { useDocumentDocadminStatusMutation } from "api/auth/texteditorApi";
+import { useDocumentreleaseEffectiveStatusMutation } from "api/auth/texteditorApi"; // import the API hook
 
 const ConditionalDialog = ({ 
   open, 
@@ -13,32 +13,29 @@ const ConditionalDialog = ({
   trainingStatus, 
   documentId 
 }) => {
+  // Destructure the mutation hook
+  const [documentReleaseEffectiveStatus] = useDocumentreleaseEffectiveStatusMutation();
+
   const heading =
-    trainingStatus === "false"
+    trainingStatus === "true"
       ? "Are you sure effective?"
       : "Are you sure you want to release the document?";
 
-  const [documentDocadminStatus, { isLoading, isError, error }] = useDocumentDocadminStatusMutation();
-
   const handleConfirm = async () => {
+    const status = trainingStatus === "true" ? 6 : 7; // Use "6" if true, otherwise "7"
+    console.log("Document ID:----------------", documentId);
+    console.log("Training Status:-----------------", trainingStatus);
+
     try {
-      console.log("Document ID In Effective :", documentId);
-  
-      // Create a FormData object and append documentId and status
-      const formData = new FormData();
-      formData.append("document_id", documentId);
-      formData.append("status", "approved");  // or use the relevant status value
-  
-      // Call the mutation with FormData
-      await documentDocadminStatus(formData);
-      
-      onConfirm();
-      onClose(); 
-    } catch (err) {
-      console.error("Error updating document status:", err);
+      // Call the mutation API with the documentId and status
+      await documentReleaseEffectiveStatus({ document_id: documentId, status });
+      onConfirm(); // Trigger the onConfirm callback if needed
+    } catch (error) {
+      console.error("Error submitting the document release:", error);
     }
+
+    onClose(); // Close the dialog after submission
   };
-  
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -66,23 +63,13 @@ const ConditionalDialog = ({
               variant="gradient"
               color="submit"
               fullWidth
-              onClick={handleConfirm}
-              disabled={isLoading} 
+              onClick={handleConfirm} // Trigger handleConfirm on Submit
             >
-              {isLoading ? "Submitting..." : "Submit"}
+              Submit
             </MDButton>
           </MDBox>
         </DialogActions>
       </form>
-
-      {/* Optionally display error message if mutation fails */}
-      {isError && (
-        <MDBox sx={{ textAlign: "center", mt: 2 }}>
-          <MDTypography variant="body2" color="error">
-            Error: {error.message}
-          </MDTypography>
-        </MDBox>
-      )}
     </Dialog>
   );
 };

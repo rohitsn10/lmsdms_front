@@ -86,6 +86,14 @@ export const texteditorApi = createApi({
       }),
       transformResponse: (response) => response.data,
     }),
+    documentreleaseEffectiveStatus: builder.mutation({
+      query: ({ document_id, status }) => ({
+        url: `dms_module/document_release_effective_status`,
+        method: "POST",
+        body: { document_id, status },
+      }),
+      transformResponse: (response) => response,
+    }),
   }),
 });
 
@@ -99,4 +107,5 @@ export const {
   useDocumentDocadminStatusMutation,
   useDocumentSendBackStatusMutation,
   useGetApprovedStatusUsersQuery,
+  useDocumentreleaseEffectiveStatusMutation,
 } = texteditorApi;
