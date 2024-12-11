@@ -50,7 +50,7 @@ function AddUser() {
     if (!firstName.trim()) newErrors.firstName = "First Name is required.";
     if (!lastName.trim()) newErrors.lastName = "Last Name is required.";
     if (!email.trim()) newErrors.email = "Email is required.";
-    if (!phone.trim()) newErrors.phone = "Phone is required.";
+    // if (!phone.trim()) newErrors.phone = "Phone is required.";
     if (!username.trim()) newErrors.username = "Username is required.";
     if (!userRole.length) newErrors.userRole = "User Role is required.";
     if (!department) newErrors.department = "Department is required.";
@@ -82,7 +82,7 @@ function AddUser() {
       first_name: firstName,
       last_name: lastName,
       email,
-      phone,
+      // phone,
       username,
       user_role: userRole,
       department_id: department,
