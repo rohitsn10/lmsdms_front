@@ -12,32 +12,34 @@ import { useUserListQuery } from 'api/auth/userApi';
 import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi"; 
 import { useAuth } from "hooks/use-auth"; 
 import { hasPermission } from "utils/hasPermission"; 
+
 const UsersListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-  const { user, role } = useAuth(); 
+  const { user } = useAuth(); 
   const { data, error, isLoading } = useUserListQuery(); 
 
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
- 
-  
+
   const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
     skip: !groupId, // Ensure it skips if groupId is missing
   });
 
-  
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching users</div>;
 
-  const formattedData = data.data.map((item, index) => ({
-    id: item.id,
-    serial_number: index + 1,
-    email: item.email || "N/A", 
-    full_name: item.first_name ? `${item.first_name} ${item.last_name || ''}`.trim() : "N/A",
-    username: item.username || "N/A",
-    created_at: new Date(item.created_at).toLocaleDateString(), 
-  }));
+  const formattedData = Array.isArray(data?.data)
+    ? data.data.map((item, index) => ({
+        id: item.id,
+        serial_number: index + 1,
+        email: item.email || "N/A", 
+        full_name: item.first_name ? `${item.first_name} ${item.last_name || ''}`.trim() : "N/A",
+        username: item.username || "N/A",
+        created_at: new Date(item.created_at).toLocaleDateString(),
+        UserRole: item.groups_list?.map((group) => group.name).join(", ") || "N/A", // Join role names into a single string
+      }))
+    : [];
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -63,22 +65,21 @@ const UsersListing = () => {
     { field: "email", headerName: "Email", flex: 1, headerAlign: 'center' },
     { field: "full_name", headerName: "Full Name", flex: 1, headerAlign: 'center' },
     { field: "username", headerName: "Username", flex: 0.75, headerAlign: 'center' },
-    {field: "UserRole",headerName:"Role",flex:0.75,headerAlign:'center'},
+    { field: "UserRole", headerName: "Role", flex: 1, headerAlign: 'center' },
     { field: "created_at", headerName: "Date", flex: 0.75, headerAlign: 'center' },
-    // {
-    //   field: "action",
-    //   headerName: "Action",
-    //   flex: 0.5,
-    //   headerAlign: 'center',
-    //   renderCell: (params) => (
-    //     hasPermission(userPermissions, "customuser", "isChange") ? (
-    //       <IconButton color="primary" onClick={() => handleEditUser(params.row)}>
-    //         <EditIcon />
-    //       </IconButton>
-    //     ) : null
-    //   ),
-    // },
-   
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 0.5,
+      headerAlign: 'center',
+      renderCell: (params) => (
+        hasPermission(userPermissions, "customuser", "isChange") ? (
+          <IconButton color="primary" onClick={() => handleEditUser(params.row)}>
+            <EditIcon />
+          </IconButton>
+        ) : null
+      ),
+    },
   ];
 
   return (
