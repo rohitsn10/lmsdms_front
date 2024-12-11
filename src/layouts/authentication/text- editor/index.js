@@ -311,30 +311,22 @@ const DocumentView = () => {
 
   const handleSaveComment = async () => {
     if (currentComment.trim() === "") return;
-
+  
     const quill = quillRef.current;
-
-    // Extract the selected word based on the selected range
     const selectedText = quill.getText(selectedRange.index, selectedRange.length).trim();
-
-    // If no text is selected, return early
     if (!selectedText) return;
-
-    // Highlight the selected text (optional)
+  
     quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
-
-    // Prepare the payload for the API call
+  
     const newComment = {
-      document: id, // Pass the document ID
-      comment_description: currentComment, // Match the API's expected key
+      document: id,
+      comment_description: currentComment,
     };
-
+  
     try {
-      // Call the mutation to save the comment in the backend
       const response = await createComment(newComment);
-
+  
       if (response.status) {
-        // Update comments in state only after successful API response
         setComments([
           ...comments,
           {
@@ -344,12 +336,10 @@ const DocumentView = () => {
             document: id,
           },
         ]);
-
-        // Clear the comment input
-        setCurrentComment("");
-
-        // Close the dialog
-        setOpencommentDialog(false);
+  
+        setCurrentComment(""); // Clear the comment input
+        console.log("Closing dialog");
+        setOpencommentDialog(false); // Close the dialog
       } else {
         console.error("Failed to save comment:", response.message);
       }
@@ -357,6 +347,7 @@ const DocumentView = () => {
       console.error("Error saving comment:", error);
     }
   };
+  
 
   const handlePrint = () => {
     console.log("Id passed:", id);

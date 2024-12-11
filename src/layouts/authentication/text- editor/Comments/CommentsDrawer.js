@@ -10,9 +10,7 @@ const CommentDrawer = ({ onEditCommentClick, handleSaveEdit, documentId }) => {
   const [editText, setEditText] = useState("");
 
   // Fetch comments filtered by documentId
-  const { data, isLoading, isError } = useViewCommentsQuery(documentId, {
-    pollingInterval: 1000, // Fetch new data every 5 seconds (adjust this interval as needed)
-  });
+  const { data, isLoading, isError } = useViewCommentsQuery(documentId);
   console.log("Document id :---------------------",documentId);
   const startEditing = (id, currentText) => {
     setEditingId(id);
