@@ -186,11 +186,12 @@ const PrintApprovalListing = () => {
                 },
               }}
             />
-            {filteredData.length === 0 && !isLoading && (
-              <MDTypography align="center" color="textSecondary">
-                No print approvals found
-              </MDTypography>
-            )}
+            {/* {filteredData.length === 0 && !isLoading && (
+             <MDTypography align="center" color="textSecondary" sx={{ marginBottom: '200px' }}>
+             No print approvals found
+           </MDTypography>
+
+            )} */}
           </div>
         </MDBox>
       </Card>
