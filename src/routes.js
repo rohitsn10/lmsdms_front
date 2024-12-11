@@ -120,7 +120,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Printe Approvals",
+    name: "Print Approvals",
     key: "approval-listing",
     icon: <ApprovalIcon />,
     route: "/approval-listing",

@@ -180,7 +180,7 @@ function AddUser() {
                 helperText={errors.email}
               />
             </MDBox>
-            <MDBox mb={3}>
+            {/* <MDBox mb={3}>
               <MDInput
                 type="text"
                 label="Phone"
@@ -190,7 +190,7 @@ function AddUser() {
                 error={!!errors.phone}
                 helperText={errors.phone}
               />
-            </MDBox>
+            </MDBox> */}
             <MDBox mb={3}>
               <MDInput
                 type="text"

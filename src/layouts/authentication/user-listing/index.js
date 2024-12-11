@@ -63,20 +63,22 @@ const UsersListing = () => {
     { field: "email", headerName: "Email", flex: 1, headerAlign: 'center' },
     { field: "full_name", headerName: "Full Name", flex: 1, headerAlign: 'center' },
     { field: "username", headerName: "Username", flex: 0.75, headerAlign: 'center' },
+    {field: "UserRole",headerName:"Role",flex:0.75,headerAlign:'center'},
     { field: "created_at", headerName: "Date", flex: 0.75, headerAlign: 'center' },
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 0.5,
-      headerAlign: 'center',
-      renderCell: (params) => (
-        hasPermission(userPermissions, "customuser", "isChange") ? (
-          <IconButton color="primary" onClick={() => handleEditUser(params.row)}>
-            <EditIcon />
-          </IconButton>
-        ) : null
-      ),
-    },
+    // {
+    //   field: "action",
+    //   headerName: "Action",
+    //   flex: 0.5,
+    //   headerAlign: 'center',
+    //   renderCell: (params) => (
+    //     hasPermission(userPermissions, "customuser", "isChange") ? (
+    //       <IconButton color="primary" onClick={() => handleEditUser(params.row)}>
+    //         <EditIcon />
+    //       </IconButton>
+    //     ) : null
+    //   ),
+    // },
+   
   ];
 
   return (
