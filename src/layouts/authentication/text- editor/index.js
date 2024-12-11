@@ -36,9 +36,9 @@ import { useNavigate,useLocation } from "react-router-dom";
 import { useDraftDocumentMutation } from "api/auth/texteditorApi";
 import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
 import SendBackDialog from "./sendback";
-import ConditionalDialog from "../document-listing/effective";
 import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
+import { toast, ToastContainer } from "react-toastify";
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -206,11 +206,14 @@ const DocumentView = () => {
   const handleSaveDraft = async () => {
     try {
       await draftDocument({ document_id: id, status_id: 2 }).unwrap();
-      // Handle success (e.g., show success message)
-      navigate("/document-listing");
+      toast.success("Document Submit Successfully!");
+      setTimeout(() => {
+        navigate("/document-listing");
+      }, 2000);
     } catch (err) {
       // Handle error
       console.error(err);
+      toast.error("Failed to add document type. Please try again.");
     }
   };
 
@@ -222,12 +225,16 @@ const DocumentView = () => {
         // documentdetails_id: '1',
         status: "3",
       }).unwrap();
-      navigate("/document-listing");
+      toast.success("Document Submit Successfully!");
+      setTimeout(() => {
+        navigate("/document-listing");
+      }, 2000);
+      // navigate("/document-listing");
       // console.log('API Response:', response);
       // alert('Document approved successfully!');
     } catch (err) {
       console.error("API Error:", err);
-      alert("Failed to approve the document. Please try again.");
+      toast.error("Failed to submit. Please try again.");
     }
   };
   const handleReview = async () => {
@@ -237,28 +244,27 @@ const DocumentView = () => {
         document_id: id, // Replace with your actual document_id
         status: "4", // Replace with your desired status
       }).unwrap();
-      navigate("/document-listing");
-      console.log("API Response:", response);
-      if (response.status) {
-        alert(response.message); // Success message
-      } else {
-        alert("Action failed");
-      }
+      toast.success("Document Review Successfully!");
+      setTimeout(() => {
+        navigate("/document-listing");
+      }, 2000);
+      
     } catch (error) {
       console.error("Error calling API:", error);
-      alert("An error occurred. Please try again.");
+      toast.error("Failed to Review Document. Please try again.");
     }
   };
 
   const handleApprove = async () => {
-    console.log("Approve button clicked");
     try {
       const response = await documentApproveStatus({
         document_id: id, // Replace with your actual document_id
         status: "5", // Replace with your desired status
       }).unwrap();
-      navigate("/document-listing");
-      console.log("API Response:", response);
+      toast.success("Document Approve Successfully!");
+      setTimeout(() => {
+        navigate("/document-listing");
+      }, 2000);
       if (response.status) {
         alert(response.message); // Success message
       } else {
@@ -266,7 +272,7 @@ const DocumentView = () => {
       }
     } catch (error) {
       console.error("Error calling API:", error);
-      alert("An error occurred. Please try again.");
+      toast.error("Failed to Review Document. Please try again.");
     }
   };
   const handleDoc = async () => {
@@ -276,8 +282,10 @@ const DocumentView = () => {
         document_id: id, // Replace with your actual document_id
         status: "9", // Replace with your desired status
       }).unwrap();
-      navigate("/document-listing");
-      console.log("API Response:", response);
+      toast.success("Document Doc-Admin Approve Successfully!");
+      setTimeout(() => {
+        navigate("/document-listing");
+      }, 2000);
       if (response.status) {
         alert(response.message); // Success message
       } else {
@@ -285,7 +293,7 @@ const DocumentView = () => {
       }
     } catch (error) {
       console.error("Error calling API:", error);
-      alert("An error occurred. Please try again.");
+      toast.error("Failed to Review Document. Please try again.");
     }
   };
 
@@ -703,6 +711,7 @@ const DocumentView = () => {
         trainingStatus={trainingRequired} // Pass trainingRequired as trainingStatus
         documentId={id}
       /> */}
+       <ToastContainer position="top-right" autoClose={3000} />
     </Box>
   );
 };
