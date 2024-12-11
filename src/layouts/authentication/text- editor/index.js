@@ -9,6 +9,7 @@ import { useParams } from "react-router-dom";
 import ReactDOM from "react-dom";
 import CommentBankIcon from "@mui/icons-material/CommentBank";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
+
 import {
   Box,
   Button,
@@ -25,21 +26,19 @@ import {
   useGetTemplateQuery,
   useCreateDocumentMutation,
   useDocumentReviewStatusMutation,
-  useDocumentDocadminStatusMutation
+  useDocumentDocadminStatusMutation,
 } from "api/auth/texteditorApi";
 import CommentDrawer from "./Comments/CommentsDrawer"; // Adjusted import for CommentDrawer
 import CommentModal from "./Comments/CommentDialog"; // Adjusted import for CommentModal
 import { useCreateCommentMutation } from "api/auth/commentsApi";
 import AntiCopyPattern from "layouts/authentication/text- editor/anti-copy/AntiCopyPattern";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import { useDraftDocumentMutation } from "api/auth/texteditorApi";
 import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
 import SendBackDialog from "./sendback";
 import ConditionalDialog from "../document-listing/effective";
 import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
-
-
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -141,11 +140,11 @@ const DocumentView = () => {
         handlePrint2(); // Trigger the print function when Ctrl + P is pressed
       }
     };
-  
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
-  
+
   useEffect(() => {
     if (isLoaded && !quillRef.current) {
       const quill = new Quill("#editor-container", {
@@ -312,39 +311,44 @@ const DocumentView = () => {
 
   const handleSaveComment = async () => {
     if (currentComment.trim() === "") return;
-  
+
     const quill = quillRef.current;
-  
+
     // Extract the selected word based on the selected range
     const selectedText = quill.getText(selectedRange.index, selectedRange.length).trim();
-  
+
     // If no text is selected, return early
     if (!selectedText) return;
-  
+
     // Highlight the selected text (optional)
-    quill.formatText(selectedRange.index, selectedRange.length, { background: "red" });
-  
+    quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
+
     // Prepare the payload for the API call
     const newComment = {
       document: id, // Pass the document ID
       comment_description: currentComment, // Match the API's expected key
     };
-  
+
     try {
       // Call the mutation to save the comment in the backend
       const response = await createComment(newComment);
-  
+
       if (response.status) {
         // Update comments in state only after successful API response
-        setComments([...comments, { 
-          id: Date.now(),
-          selectedWord: selectedText,
-          comment: currentComment,
-          document: id,
-        }]);
-  
-        // Clear the comment input and close the dialog
+        setComments([
+          ...comments,
+          {
+            id: Date.now(),
+            selectedWord: selectedText,
+            comment: currentComment,
+            document: id,
+          },
+        ]);
+
+        // Clear the comment input
         setCurrentComment("");
+
+        // Close the dialog
         setOpencommentDialog(false);
       } else {
         console.error("Failed to save comment:", response.message);
@@ -353,8 +357,7 @@ const DocumentView = () => {
       console.error("Error saving comment:", error);
     }
   };
-  
-  
+
   const handlePrint = () => {
     console.log("Id passed:", id);
     navigate(`/print-document/${id}`);
@@ -366,7 +369,7 @@ const DocumentView = () => {
   const handlePrint2 = () => {
     const quill = quillRef.current; // Get the Quill instance
     const editorContent = quill.root.innerHTML; // Get the HTML content from the editor
-  
+
     // Create a temporary hidden iframe to load the content and trigger print
     const iframe = document.createElement("iframe");
     iframe.style.position = "absolute";
@@ -374,7 +377,7 @@ const DocumentView = () => {
     iframe.style.height = "0";
     iframe.style.border = "none";
     document.body.appendChild(iframe);
-  
+
     const iframeDocument = iframe.contentWindow.document;
     iframeDocument.open();
     iframeDocument.write(`
@@ -404,12 +407,11 @@ const DocumentView = () => {
       </html>
     `);
     iframeDocument.close();
-  
-   
+
     iframe.onload = () => {
-      iframe.contentWindow.focus(); 
-      iframe.contentWindow.print(); 
-      document.body.removeChild(iframe); 
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      document.body.removeChild(iframe);
     };
   };
 
@@ -585,10 +587,8 @@ const DocumentView = () => {
         currentComment={currentComment}
         setCurrentComment={setCurrentComment}
         handleSaveComment={handleSaveComment}
-        documentId={id}
       />
-
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+      {/* <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Save Document</DialogTitle>
         <DialogContent>
           <DialogContentText>Do you want to save this document & All comments ?</DialogContentText>
@@ -599,32 +599,31 @@ const DocumentView = () => {
             Save
           </Button>
         </DialogActions>
-      </Dialog>
-
+      </Dialog> */}
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
         {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-        {(document_current_status === "1" || document_current_status === "2") && isButtonVisible([2]) && (
-          <>
-            <MDButton
-              variant="gradient"
-              color="submit"
-              type="button" // Set to "button" to prevent default form submission
-              onClick={handleSubmit}
-              disabled={isLoading} // Disable the button while the API call is in progress
-            >
-              {isLoading ? "Submitting..." : "Submit"}
-            </MDButton>
-            <MDButton
-              variant="gradient"
-              color="submit"
-              onClick={handleSaveDraft}
-              disabled={isLoading} // Disable button when mutation is in progress
-            >
-              Save Draft
-            </MDButton>
-          </>
-        )}
-
+        {(document_current_status === "1" || document_current_status === "2") &&
+          isButtonVisible([2]) && (
+            <>
+              <MDButton
+                variant="gradient"
+                color="submit"
+                type="button" // Set to "button" to prevent default form submission
+                onClick={handleSubmit}
+                disabled={isLoading} // Disable the button while the API call is in progress
+              >
+                {isLoading ? "Submitting..." : "Submit"}
+              </MDButton>
+              <MDButton
+                variant="gradient"
+                color="submit"
+                onClick={handleSaveDraft}
+                disabled={isLoading} // Disable button when mutation is in progress
+              >
+                Save Draft
+              </MDButton>
+            </>
+          )}
         {/* Condition 2: Show Review button when status is "3" */}
         {document_current_status === "3" && isButtonVisible([3]) && (
           <>
@@ -642,7 +641,7 @@ const DocumentView = () => {
           </>
         )}
         {/* Condition 3: Show Approve button when status is "4" */}
-        {document_current_status === "4"  && isButtonVisible([4]) && (
+        {document_current_status === "4" && isButtonVisible([4]) && (
           <>
             <MDButton
               variant="gradient"
@@ -662,15 +661,10 @@ const DocumentView = () => {
             </MDButton>
           </>
         )}
-  {/* Condition 4 */}
-        {document_current_status === "5"  && isButtonVisible([5]) && (
+        {/* Condition 4 */}
+        {document_current_status === "5" && isButtonVisible([5]) && (
           <>
-            <MDButton
-              variant="gradient"
-              color="submit"
-              onClick={handleDoc}
-              disabled={isLoading}
-            >
+            <MDButton variant="gradient" color="submit" onClick={handleDoc} disabled={isLoading}>
               Doc Admin Approve
             </MDButton>
             <MDButton

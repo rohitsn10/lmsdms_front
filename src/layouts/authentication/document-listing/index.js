@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation  } from "react-router-dom";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -23,7 +23,8 @@ const DocumentListing = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useFetchDocumentsQuery();
+  const location = useLocation();
+  const { data,refetch, isLoading, isError } = useFetchDocumentsQuery();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [userGroupIds, setUserGroupIds] = useState([]);
@@ -35,6 +36,10 @@ const DocumentListing = () => {
     }
   }, [data]);
   
+  useEffect(() => {
+    // Refetch data when the component is rendered
+    refetch();
+  }, [location.key]);
 
   console.log("Documents:", data?.documents || []);
   console.log("User Group IDs:", data?.userGroupIds || []);

@@ -3,13 +3,16 @@ import PropTypes from "prop-types";
 import { Box, Typography, List, ListItem, ListItemText, TextField } from "@mui/material";
 import { useViewCommentsQuery } from "api/auth/commentsApi";
 import MDButton from "components/MDButton";
+import MDBox from "components/MDBox";
 
 const CommentDrawer = ({ onEditCommentClick, handleSaveEdit, documentId }) => {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
 
   // Fetch comments filtered by documentId
-  const { data, isLoading, isError } = useViewCommentsQuery(documentId);
+  const { data, isLoading, isError } = useViewCommentsQuery(documentId, {
+    pollingInterval: 1000, // Fetch new data every 5 seconds (adjust this interval as needed)
+  });
   console.log("Document id :---------------------",documentId);
   const startEditing = (id, currentText) => {
     setEditingId(id);
@@ -72,14 +75,14 @@ const CommentDrawer = ({ onEditCommentClick, handleSaveEdit, documentId }) => {
                     margin="normal"
                     sx={{ mb: 2 }}
                   />
-                  <Box>
+                  <MDBox>
                     <MDButton onClick={saveEdit} variant="gradient" color="submit" size="small" sx={{ mr: 1 }}>
                       Save
                     </MDButton>
                     <MDButton onClick={() => setEditingId(null)} variant="gradient" color="error" size="small">
                       Cancel
                     </MDButton>
-                  </Box>
+                  </MDBox>
                 </>
               ) : (
                 <>

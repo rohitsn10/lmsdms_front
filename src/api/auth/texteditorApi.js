@@ -85,6 +85,7 @@ export const texteditorApi = createApi({
         method: "GET",
       }),
       transformResponse: (response) => response.data,
+      refetchInterval: 3000,
     }),
     documentreleaseEffectiveStatus: builder.mutation({
       query: ({ document_id, status_id }) => ({
