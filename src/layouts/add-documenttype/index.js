@@ -21,7 +21,7 @@ function AddDocumentType() {
 
   const validateInputs = () => {
     const newErrors = {};
-    if (!documentName.trim()) newErrors.documentName = "Document Name is required.";
+    if (!documentName.trim()) newErrors.documentName = "Document Type Name is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

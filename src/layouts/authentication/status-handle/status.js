@@ -12,9 +12,12 @@ function AddStatusDialog({ open, handleClose }) {
   const [createStatus, { isLoading, isSuccess, isError, error }] = useCreateStatusMutation();
 
   const handleStatusChange = (event) => {
-    setStatus(event.target.value);
+    const value = event.target.value;
+    if (/^[A-Za-z]*$/.test(value)) {
+      setStatus(value); 
+    }
   };
-
+  
   const handleSubmit = async () => {
     if (status) {
       try {

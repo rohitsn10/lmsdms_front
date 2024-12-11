@@ -42,6 +42,7 @@ function AddDocument() {
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [createDocument] = useCreateDocumentMutation();
   const [selectedUsers, setSelectedUsers] = useState([]);
+
   const navigate = useNavigate();
 
   const { data: documentTypesData } = useFetchDocumentTypesQuery();
@@ -55,13 +56,13 @@ function AddDocument() {
   const { data: userdata, isLoading, error } = useDepartmentWiseReviewerQuery();
   const users = userdata || [];
 
-  console.log("Full userdata object:", userdata);
-  console.log("userdata?.data:", userdata?.data);
-  console.log("Type of userdata?.data:", typeof userdata?.data);
-  console.log(
-    "Length of userdata?.data (if array):",
-    Array.isArray(userdata?.data) ? userdata.data.length : "Not an array"
-  );
+  // console.log("Full userdata object:", userdata);
+  // console.log("userdata?.data:", userdata?.data);
+  // console.log("Type of userdata?.data:", typeof userdata?.data);
+  // console.log(
+  //   "Length of userdata?.data (if array):",
+  //   Array.isArray(userdata?.data) ? userdata.data.length : "Not an array"
+  // );
 
   const [selectedUser, setSelectedUser] = useState("");
   const [errors, setErrors] = useState({});
@@ -76,7 +77,7 @@ function AddDocument() {
     if (!documentNumber.trim()) newErrors.documentNumber = "Document number is required.";
     if (!description.trim()) newErrors.description = "Description is required.";
     if (!revisionTime) {
-      setErrors({ revisionTime: "Revision Time is required" });
+      setErrors({ revisionTime: "Revision Date  is required" });
       return;
     }
     if (!workflow || (typeof workflow === "string" && workflow.trim() === "")) {
@@ -88,6 +89,21 @@ function AddDocument() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleDateChange = (e) => {
+    const selectedDate = new Date(e.target.value);
+    const today = new Date();
+
+    // Set today's time to midnight for accurate comparison
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      setErrors({ revisionTime: "You can't revise in the past" });
+    } else {
+      setErrors((prevErrors) => ({ ...prevErrors, revisionTime: undefined }));
+      setRevisionTime(e.target.value);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -117,12 +133,12 @@ function AddDocument() {
 
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
-    
+
     if (!password) {
       toast.error("E-Signature is required to proceed.");
       return;
     }
-  
+
     try {
       // Prepare the document data similar to the example you provided
       const documentData = {
@@ -138,24 +154,23 @@ function AddDocument() {
         training_required: trainingRequired.toLowerCase() === "yes", // Convert to boolean
         visible_to_users: selectedUsers, // Assuming selectedUsers is an array
       };
-  
+
       // Make the API call to create the document
       const response = await createDocument(documentData).unwrap();
-      
+
       toast.success("Document added successfully!");
       console.log("API Response:", response);
-  
+
       // Redirect to the document listing page after a delay
       setTimeout(() => {
         navigate("/document-listing");
       }, 1500);
-  
     } catch (error) {
       console.error("Error creating document:", error);
       toast.error("Failed to add document. Please try again.");
     }
   };
-  
+
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto", marginTop: 10, marginBottom: 10 }}>
@@ -251,20 +266,18 @@ function AddDocument() {
               />
             </MDBox>
 
-            <MDBox mb={3}>
-  <MDInput
-    type="date"
-    value={revisionTime}
-    onChange={(e) => setRevisionTime(e.target.value)}
-    error={Boolean(errors.revisionTime)}
-    helperText={errors.revisionTime}
-    fullWidth
-    InputLabelProps={{
-      shrink: true, // Ensures the label stays at the top
-    }}
-    label="Revision Date"
-  />
-</MDBox>
+            <MDInput
+              type="date"
+              value={revisionTime}
+              onChange={handleDateChange}
+              error={Boolean(errors.revisionTime)}
+              helperText={errors.revisionTime}
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+              label="Revision Date"
+            />
 
             <MDBox mb={3} display="flex" alignItems="center">
               <FormLabel

@@ -37,7 +37,6 @@ const DocumentListing = () => {
   }, [data]);
   
   useEffect(() => {
-    // Refetch data when the component is rendered
     refetch();
   }, [location.key]);
 

@@ -681,15 +681,10 @@ const DocumentView = () => {
               handlePrint(); // Call handlePrint otherwise
             }
           }}
-          sx={{
-            float: "right",
-            mt: 1,
-            mr: 20,
-          }}
         >
           Print
         </MDButton>
-        ;
+        
       </MDBox>
       <SendBackDialog
         open={dialogOpen}

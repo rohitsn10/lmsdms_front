@@ -138,35 +138,37 @@ function PrintDocument() {
             </MDBox>
 
             {/* Select Printer */}
-            <FormControl fullWidth margin="dense" disabled={isFetchingPrinters}>
-              <InputLabel id="select-printer-label">Select Printer</InputLabel>
-              <Select
-                labelId="select-printer-label"
-                id="select-printer"
-                value={selectedPrinter}
-                onChange={(e) => setSelectedPrinter(e.target.value)}
-                input={<OutlinedInput label="Select Printer" />}
-                sx={{
-                  minWidth: 200,
-                  height: "3rem",
-                  ".MuiSelect-select": {
-                    padding: "0.45rem",
-                  },
-                }}
-              >
-                {isFetchingPrinters ? (
-                  <MenuItem disabled>Loading printers...</MenuItem>
-                ) : printersResponse?.length > 0 ? (
-                  printersResponse.map((printer) => (
-                    <MenuItem key={printer.id} value={printer.id}>
-                      {printer.printer_name}
-                    </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem disabled>No printers available</MenuItem>
-                )}
-              </Select>
-            </FormControl>
+            <MDBox mb={3}>
+              <FormControl fullWidth margin="dense" disabled={isFetchingPrinters}>
+                <InputLabel id="select-printer-label">Select Printer</InputLabel>
+                <Select
+                  labelId="select-printer-label"
+                  id="select-printer"
+                  value={selectedPrinter}
+                  onChange={(e) => setSelectedPrinter(e.target.value)}
+                  input={<OutlinedInput label="Select Printer" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem",
+                    ".MuiSelect-select": {
+                      padding: "0.45rem",
+                    },
+                  }}
+                >
+                  {isFetchingPrinters ? (
+                    <MenuItem disabled>Loading printers...</MenuItem>
+                  ) : printersResponse?.length > 0 ? (
+                    printersResponse.map((printer) => (
+                      <MenuItem key={printer.id} value={printer.id}>
+                        {printer.printer_name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No printers available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </MDBox>
 
             {/* Reason for Print */}
             <MDBox mb={3}>
