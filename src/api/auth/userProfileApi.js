@@ -27,7 +27,7 @@ export const userProfileApi = createApi({
         }),
         otpResetPassword: builder.mutation({
             query: ({ otp, password, confirmPassword }) => ({
-                url: 'user_profile/Otp_ResetPassword',
+                url: 'user_profile/otp_resetpassword',
                 method: 'PUT',
                 body: {
                     otp,

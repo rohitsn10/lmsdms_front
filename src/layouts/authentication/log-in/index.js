@@ -95,20 +95,32 @@ function Login() {
         group_id,
       });
   
-      if (response && response.data && response.data.status === true) {
-        const token = response.data.data?.token;
-        const userFirstName = response.data.data?.first_name || "User"; // Default to "User" if null.
+      if (response && response.data) {
+        const { status, data } = response.data;
   
-        if (token) {
-          sessionStorage.setItem("token", token);
-          updateUser(response.data.data, token);
-          updateRole(selectedRole);
-          setFirstName(userFirstName); // This will default to "User" if first_name is null.
-          setDialogOpen(false);
-          setError(""); 
-          navigate("/dashboard"); 
+        if (status === true) {
+          const { token, is_password_expired } = data;
+          const userFirstName = data.first_name || "User";
+  
+          if (is_password_expired) {
+            setError("Your password has expired. Please reset it.");
+            navigate("/reset-password"); 
+            return;
+          }
+  
+          if (token) {
+            sessionStorage.setItem("token", token);
+            updateUser(data, token);
+            updateRole(selectedRole);
+            setFirstName(userFirstName);
+            setDialogOpen(false);
+            setError("");
+            navigate("/dashboard"); 
+          } else {
+            setError("Login successful, but missing required information.");
+          }
         } else {
-          setError("Login successful, but missing required information.");
+          setError("Failed to login. Please try again.");
         }
       } else {
         setError("Failed to login. Please try again.");
@@ -118,6 +130,7 @@ function Login() {
       setError("Failed to login. Please try again.");
     }
   };
+  
   
   const handleCloseDialog = () => {
     setDialogOpen(false);
