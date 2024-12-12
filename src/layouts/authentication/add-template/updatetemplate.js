@@ -10,6 +10,7 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
+import { useUpdateTemplateMutation } from "api/auth/documentApi"; 
 
 function UpdateTemplate() {
   const navigate = useNavigate();
@@ -20,6 +21,9 @@ function UpdateTemplate() {
   const [templateFile, setTemplateFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+
+  // Use the updateTemplate mutation hook
+  const [updateTemplate] = useUpdateTemplateMutation();
 
   useEffect(() => {
     if (!templateData) {
@@ -35,7 +39,7 @@ function UpdateTemplate() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
     setOpenSignatureDialog(true); // Open e-signature dialog
@@ -50,21 +54,27 @@ function UpdateTemplate() {
     }
 
     try {
-      // Simulate API request payload
+      // Prepare the data for submission
       const formData = new FormData();
       formData.append("template_name", templateName.trim());
       if (templateFile) {
         formData.append("template_doc", templateFile);
       }
 
-      console.log("Payload Submitted: ", { templateName, templateFile });
+      // Call the updateTemplate mutation
+      const response = await updateTemplate({
+        temp_id: templateData.id, // Assuming the template has an id field
+        template_name: templateName.trim(),
+        template_doc: templateFile,
+      }).unwrap();
 
-      // Simulate API success
+      // Handle success
       toast.success("Template updated successfully!");
       setTimeout(() => {
         navigate("/template-listing");
       }, 1500);
     } catch (error) {
+      // Handle error
       console.error("Error updating template:", error);
       toast.error("Failed to update template. Please try again.");
     }
