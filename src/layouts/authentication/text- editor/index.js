@@ -225,7 +225,7 @@ const DocumentView = () => {
         // documentdetails_id: '1',
         status: "3",
       }).unwrap();
-      toast.success("Document Submit Successfully!");
+      toast.success("Document Submitted Successfully!");
       setTimeout(() => {
         navigate("/document-listing");
       }, 2000);
@@ -244,7 +244,7 @@ const DocumentView = () => {
         document_id: id, // Replace with your actual document_id
         status: "4", // Replace with your desired status
       }).unwrap();
-      toast.success("Document Review Successfully!");
+      toast.success("Document Reviewed Successfully!");
       setTimeout(() => {
         navigate("/document-listing");
       }, 2000);
@@ -261,7 +261,7 @@ const DocumentView = () => {
         document_id: id, // Replace with your actual document_id
         status: "5", // Replace with your desired status
       }).unwrap();
-      toast.success("Document Approve Successfully!");
+      toast.success("Document Approved Successfully!");
       setTimeout(() => {
         navigate("/document-listing");
       }, 2000);
@@ -282,7 +282,7 @@ const DocumentView = () => {
         document_id: id, // Replace with your actual document_id
         status: "9", // Replace with your desired status
       }).unwrap();
-      toast.success("Document Doc-Admin Approve Successfully!");
+      toast.success("Document Doc-Admin Approved Successfully!");
       setTimeout(() => {
         navigate("/document-listing");
       }, 2000);

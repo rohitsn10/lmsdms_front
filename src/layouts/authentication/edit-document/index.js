@@ -42,6 +42,7 @@ function EditDocument() {
   const { id } = useParams();
   const navigate = useNavigate();
   console.log("Document Id in edit ------------",id);
+
   // API calls
   const { data: documentDetails, isLoading: documentDetailsLoading } = useFetchDocumentsQuery(id);
   const [updateDocument] = useUpdateDocumentMutation();
@@ -97,7 +98,8 @@ function EditDocument() {
         select_template: templateFile,
         workflow,
         trainingRequired,
-      });
+      }).unwrap(); // Use unwrap() to catch errors in the mutation
+
       toast.success("Document updated successfully!");
       setTimeout(() => navigate("/document-listing"), 1500);
     } catch (error) {
@@ -122,7 +124,6 @@ function EditDocument() {
   const handleFileChange = (e) => {
     setTemplateFile(e.target.files[0]);
   };
-
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
