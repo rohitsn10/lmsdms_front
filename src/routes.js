@@ -19,7 +19,7 @@ import RolesPermissionsListing from "layouts/authentication/roles-listing";
 import PrintApprovalListing from "layouts/authentication/approval-lisitng";
 import PrinterListing from "layouts/authentication/printer-listing";
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
-
+import ReviseApprovalList from "layouts/authentication/revise-Listing";
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
@@ -28,6 +28,8 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ApprovalIcon from '@mui/icons-material/ThumbUp';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
+import ImportContactsTwoToneIcon from '@mui/icons-material/ImportContactsTwoTone';
+import icon from "assets/theme/components/icon";
 
 const routes = [
   {
@@ -133,6 +135,14 @@ const routes = [
     icon: <LocalPrintshopIcon/>,
     route: "printer-listing",
     component: <PrinterListing />,
+  },
+  {
+    type: "collapse",
+    name: "Revise Approvals",
+    key: "revise-listing",
+    icon: <ImportContactsTwoToneIcon />,
+    route: "/revise-listing",
+    component: <ReviseApprovalList />,
   },
 ];
 

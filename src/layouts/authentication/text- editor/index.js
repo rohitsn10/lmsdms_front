@@ -610,7 +610,7 @@ const DocumentView = () => {
       </Dialog> */}
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
         {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-        {(document_current_status === "1" || document_current_status === "2") &&
+        {(document_current_status === "1" || document_current_status === "2" || document_current_status ==="8" ) &&
           isButtonVisible([2]) && (
             <>
               <MDButton

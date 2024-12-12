@@ -9,6 +9,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import {
   FormControl,
   InputLabel,
@@ -40,9 +41,9 @@ function EditDocument() {
 
   const { id } = useParams();
   const navigate = useNavigate();
-
+  console.log("Document Id in edit ------------",id);
   // API calls
-  const { data: documentDetails, isLoading: documentDetailsLoading } = useFetchDocumentDetailsQuery(id);
+  const { data: documentDetails, isLoading: documentDetailsLoading } = useFetchDocumentsQuery(id);
   const [updateDocument] = useUpdateDocumentMutation();
   const { data: documentTypesData, isLoading: documentTypesLoading } = useFetchDocumentTypesQuery();
   const { data: workflowsData, isLoading: workflowsLoading } = useFetchWorkflowsQuery();
@@ -212,9 +213,12 @@ function EditDocument() {
             </MDBox>
             <MDBox mb={3}>
               <MDInput
-                type="text"
-                label="Revision Time"
+                type="Date"
+                label="Revision Date"
                 value={revisionTime}
+                InputLabelProps={{
+                  shrink: true,
+                }}
                 onChange={(e) => setRevisionTime(e.target.value)}
                 fullWidth
               />
