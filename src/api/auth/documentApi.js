@@ -136,6 +136,14 @@ export const documentApi = createApi({
       keepUnusedDataFor: 30, // Keep unused data for 30 seconds
       refetchInterval: 30000, // Auto-refetch every 30 seconds
     }),
+    reviseRequest: builder.mutation({
+      query: ({ document_id, revise_description }) => ({
+        url: "dms_module/revise_request",
+        method: "POST",
+        body: { document_id, revise_description },
+      }),
+      transformResponse: (response) => response.data, // Handle the response
+    }),
   }),
 });
 
@@ -150,4 +158,5 @@ export const {
   useUpdateTemplateMutation,
   useUpdateDocumentTypeMutation,
   useDepartmentWiseReviewerQuery,
+  useReviseRequestMutation,
 } = documentApi;

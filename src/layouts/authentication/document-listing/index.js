@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate,useLocation  } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -18,31 +18,34 @@ import { useAuth } from "hooks/use-auth";
 import moment from "moment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ConditionalDialog from "./effective";
+import ReviseDialog from "./Revise";
+import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
 
 const DocumentListing = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const { data,refetch, isLoading, isError } = useFetchDocumentsQuery();
+  const { data, refetch, isLoading, isError } = useFetchDocumentsQuery();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [userGroupIds, setUserGroupIds] = useState([]);
- 
+  const [isReviseDialogOpen, setReviseDialogOpen] = useState(false); // Unique state for ReviseDialog
+  const [reviseDocument, setReviseDocument] = useState(null); // Unique state for selected document
+
   useEffect(() => {
     if (data && data.userGroupIds) {
       setUserGroupIds(data.userGroupIds);
       console.log("User Group IDssss:", data.userGroupIds); // Corrected property name
     }
   }, [data]);
-  
+
   useEffect(() => {
     refetch();
   }, [location.key]);
 
-  console.log("Documents:", data?.documents || []);
-  console.log("User Group IDs:", data?.userGroupIds || []);
-  
+  // console.log("Documents:", data?.documents || []);
+  // console.log("User Group IDs:", data?.userGroupIds || []);
 
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
@@ -92,12 +95,27 @@ const DocumentListing = () => {
     navigate(
       `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}`
     );
-    console.log("Navigated with:", {
-      id,
-      document_current_status,
-      training_required,
-      approval_status,
-    });
+    // console.log("Navigated with:", {
+    //   id,
+    //   document_current_status,
+    //   training_required,
+    //   approval_status,
+    // });
+  };
+  const handleReviseDialogOpen = (row) => {
+    setSelectedRow(row);
+    setReviseDialogOpen(true);
+  };
+
+  const handleReviseDialogClose = () => {
+    setReviseDialogOpen(false);
+    setReviseDocument(null);
+  };
+
+  const handleReviseConfirm = () => {
+    console.log("Revise confirmed for document:", reviseDocument);
+    // Add any additional logic here
+    handleReviseDialogClose();
   };
 
   const handleEditClick = (id) => {
@@ -199,15 +217,25 @@ const DocumentListing = () => {
                   <EditCalendarIcon />
                 </IconButton>
               )}
-          {data?.userGroupIds?.includes(5) && (
-        <IconButton
-          color="success"
-          onClick={() => handleDialogOpen(params.row)}
-          disabled={params.row.document_current_status !== 9} // Disable if condition not met
-        >
-          <CheckCircleIcon />
-        </IconButton>
-      )}
+          {data?.userGroupIds?.includes(5) &&
+            params.row.document_current_status !== 7 && ( // Hide CheckCircleIcon when status is 7
+              <IconButton
+                color="success"
+                onClick={() => handleDialogOpen(params.row)}
+                disabled={params.row.document_current_status !== 9} // Disable if condition not met
+              >
+                <CheckCircleIcon />
+              </IconButton>
+            )}
+
+          {params.row.document_current_status === 7 && ( // Show ImportContactsTwoToneIcon when status is 7
+            <IconButton
+              color="warning"
+              onClick={() => handleReviseDialogOpen(params.row)}
+            >
+              <ImportContactsTwoToneIcon />
+            </IconButton>
+          )}
         </MDBox>
       ),
       sortable: false,
@@ -275,6 +303,13 @@ const DocumentListing = () => {
         trainingStatus={selectedRow?.training_required || "false"}
         documentId={selectedRow?.id || ""}
       />
+      <ReviseDialog
+  open={isReviseDialogOpen}
+  onClose={() => setReviseDialogOpen(false)}
+  onConfirm={handleReviseConfirm}
+  documentId={selectedRow?.id|| ""} // pass the documentId from the selected row
+  // You can pass more fields like selectedRow or row as needed
+/>
     </MDBox>
   );
 };
