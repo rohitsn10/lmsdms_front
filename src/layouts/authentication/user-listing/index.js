@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
+// import IconButton from "@mui/material/IconButton";
+// import EditIcon from "@mui/icons-material/Edit";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
@@ -49,9 +49,9 @@ const UsersListing = () => {
     navigate("/add-user");
   };
 
-  const handleEditUser = (user) => {
-    navigate("/edit-user", { state: { user } });
-  };
+  // const handleEditUser = (user) => {
+  //   navigate("/edit-user", { state: { user } });
+  // };
 
   const filteredData = formattedData.filter(
     (user) =>
@@ -67,19 +67,19 @@ const UsersListing = () => {
     { field: "username", headerName: "Username", flex: 0.75, headerAlign: 'center' },
     { field: "UserRole", headerName: "Role", flex: 1, headerAlign: 'center' },
     { field: "created_at", headerName: "Date", flex: 0.75, headerAlign: 'center' },
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 0.5,
-      headerAlign: 'center',
-      renderCell: (params) => (
-        hasPermission(userPermissions, "customuser", "isChange") ? (
-          <IconButton color="primary" onClick={() => handleEditUser(params.row)}>
-            <EditIcon />
-          </IconButton>
-        ) : null
-      ),
-    },
+    // {
+    //   field: "action",
+    //   headerName: "Action",
+    //   flex: 0.5,
+    //   headerAlign: 'center',
+    //   renderCell: (params) => (
+    //     hasPermission(userPermissions, "customuser", "isChange") ? (
+    //       <IconButton color="primary" onClick={() => handleEditUser(params.row)}>
+    //         <EditIcon />
+    //       </IconButton>
+    //     ) : null
+    //   ),
+    // },
   ];
 
   return (

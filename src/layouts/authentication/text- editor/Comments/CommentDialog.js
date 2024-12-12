@@ -10,6 +10,11 @@ const CommentModal = ({
   setCurrentComment,
   handleSaveComment,
 }) => {
+  const handleSave = () => {
+    handleSaveComment();
+    onClose(); // Close the modal after saving
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogContent>
@@ -24,10 +29,10 @@ const CommentModal = ({
             variant="outlined"
             margin="normal"
           />
-         <MDButton
+          <MDButton
             variant="gradient"
             color="submit"
-            onClick={handleSaveComment}
+            onClick={handleSave} 
             sx={{ marginBottom: 2, backgroundColor: "#E53471", color: "white" }}
           >
             Save Comment

@@ -316,45 +316,53 @@ const DocumentView = () => {
   //   setCurrentComment("");
   //   setOpencommentDialog(false); // Close modal after saving
   // };
-
   const handleSaveComment = async () => {
     if (currentComment.trim() === "") return;
-  
+
     const quill = quillRef.current;
     const selectedText = quill.getText(selectedRange.index, selectedRange.length).trim();
     if (!selectedText) return;
-  
+
+    // Highlight the selected text
     quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
-  
-    const newComment = {
-      document: id,
-      comment_description: currentComment,
-    };
-  
-    try {
-      const response = await createComment(newComment);
-  
-      if (response.status) {
-        setComments([
-          ...comments,
-          {
-            id: Date.now(),
-            selectedWord: selectedText,
-            comment: currentComment,
-            document: id,
-          },
-        ]);
-  
-        setCurrentComment(""); // Clear the comment input
-        console.log("Closing dialog");
-        setOpencommentDialog(false); // Close the dialog
-      } else {
-        console.error("Failed to save comment:", response.message);
-      }
-    } catch (error) {
-      console.error("Error saving comment:", error);
+
+    // Make sure documentId is available
+    if (!id) {
+        console.error("Document ID is missing!");
+        return;
     }
+
+    const newComment = {
+      document: id,  // Make sure document ID is passed correctly
+      selected_word: selectedText,  // Store the selected text
+      comment_description: currentComment,  // Store the added comment
   };
+  
+
+    try {
+        const response = await createComment(newComment);
+
+        if (response.status) {
+            setComments([
+                ...comments,
+                {
+                    id: Date.now(),
+                    selectedWord: selectedText,
+                    comment: currentComment,
+                    document: id,
+                },
+            ]);
+            setCurrentComment(""); // Clear the comment input
+            setOpencommentDialog(false); // Close the dialog
+        } else {
+            console.error("Failed to save comment:", response.message);
+        }
+    } catch (error) {
+        console.error("Error saving comment:", error);
+    }
+};
+
+  
   
 
   const handlePrint = () => {
@@ -520,6 +528,7 @@ const DocumentView = () => {
     console.log("Edit comment clicked");
   };
 
+  
   const handleSaveEdit = (id, newComment) => {
     // Check if the new comment is not empty
     if (newComment.trim() === "") return;
@@ -601,7 +610,7 @@ const DocumentView = () => {
       </Dialog> */}
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
         {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-        {(document_current_status === "1" || document_current_status === "2") &&
+        {(document_current_status === "1" || document_current_status === "2" || document_current_status ==="8" ) &&
           isButtonVisible([2]) && (
             <>
               <MDButton

@@ -11,7 +11,8 @@ const CommentDrawer = ({ onEditCommentClick, handleSaveEdit, documentId }) => {
 
   // Fetch comments filtered by documentId
   const { data, isLoading, isError } = useViewCommentsQuery(documentId);
-  console.log("Document id :---------------------",documentId);
+  console.log("Document id:", documentId);
+
   const startEditing = (id, currentText) => {
     setEditingId(id);
     setEditText(currentText);
@@ -52,7 +53,7 @@ const CommentDrawer = ({ onEditCommentClick, handleSaveEdit, documentId }) => {
         </Typography>
       ) : (
         <List>
-          {comments.map(({ id, user_first_name, document, Comment_description }) => (
+          {comments.map(({ id, user_first_name, selected_word, Comment_description }) => (
             <ListItem
               key={id}
               sx={{
@@ -85,7 +86,7 @@ const CommentDrawer = ({ onEditCommentClick, handleSaveEdit, documentId }) => {
               ) : (
                 <>
                   <Typography variant="body2" color="textSecondary" sx={{ fontWeight: "bold", mb: 1 }}>
-                    {user_first_name} commented on <span style={{ fontStyle: "italic" }}>Document {document}</span>
+                    {user_first_name ? user_first_name : "Anonymous"} commented on Document {selected_word ? `"${selected_word}"` : "an unknown text"}
                   </Typography>
                   <ListItemText primary={Comment_description} sx={{ mb: 1 }} />
                   <MDButton
