@@ -4,7 +4,7 @@ import { Dialog, DialogActions, DialogContent, TextField } from "@mui/material";
 import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import { useReviseRequestMutation } from "api/auth/documentApi"; // Import the API hook
+import { useReviseRequestMutation } from "api/auth/reviseApi"; // Import the API hook
 
 const ReviseDialog = ({
   open,
