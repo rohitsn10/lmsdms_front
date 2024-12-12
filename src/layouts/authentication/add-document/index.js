@@ -12,6 +12,7 @@ import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import {
   FormControl,
+  FormHelperText,
   InputLabel,
   Select,
   MenuItem,
@@ -55,14 +56,6 @@ function AddDocument() {
 
   const { data: userdata, isLoading, error } = useDepartmentWiseReviewerQuery();
   const users = userdata || [];
-
-  // console.log("Full userdata object:", userdata);
-  // console.log("userdata?.data:", userdata?.data);
-  // console.log("Type of userdata?.data:", typeof userdata?.data);
-  // console.log(
-  //   "Length of userdata?.data (if array):",
-  //   Array.isArray(userdata?.data) ? userdata.data.length : "Not an array"
-  // );
 
   const [selectedUser, setSelectedUser] = useState("");
   const [errors, setErrors] = useState({});
@@ -266,18 +259,42 @@ function AddDocument() {
               />
             </MDBox>
 
-            <MDInput
-              type="date"
-              value={revisionTime}
-              onChange={handleDateChange}
-              error={Boolean(errors.revisionTime)}
-              helperText={errors.revisionTime}
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-              label="Revision Date"
-            />
+            <MDBox mb={3}>
+  <FormControl fullWidth margin="dense" error={Boolean(errors.revisionTime)}>
+    <MDInput
+      type="date"
+      value={revisionTime}
+      onChange={handleDateChange}
+      error={Boolean(errors.revisionTime)}
+      fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
+      label="Revision Date"
+      sx={{
+        "& .MuiInputAdornment-root": {
+          position: "relative", 
+          display: "flex",
+          alignItems: "center", 
+        },
+        "& .MuiInputAdornment-root.Mui-error": {
+          marginLeft: "8px", 
+          zIndex: 10,
+        },
+        "& .MuiInputAdornment-root.MuiInputAdornment-positionEnd": {
+          zIndex: 1, 
+        },
+        "& input": {
+          paddingRight: "40px", 
+        },
+      }}
+    />
+    {errors.revisionTime && (
+      <FormHelperText>{errors.revisionTime}</FormHelperText>
+    )}
+  </FormControl>
+</MDBox>
+
 
             <MDBox mb={3} display="flex" alignItems="center">
               <FormLabel

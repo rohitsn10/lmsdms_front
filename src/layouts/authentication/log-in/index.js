@@ -211,12 +211,12 @@ function Login() {
               />
             </MDBox>
 
-            <MDBox display="flex" alignItems="center" mb={3}>
+            {/* <MDBox display="flex" alignItems="center" mb={3}>
               <Switch checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
               <MDTypography variant="button" fontWeight="regular" ml={1}>
                 Remember Me
               </MDTypography>
-            </MDBox>
+            </MDBox> */}
 
             <MDTypography
               variant="button"
