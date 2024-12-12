@@ -33,8 +33,8 @@ const UsersListing = () => {
     ? data.data.map((item, index) => ({
         id: item.id,
         serial_number: index + 1,
-        email: item.email || "N/A", 
         full_name: item.first_name ? `${item.first_name} ${item.last_name || ''}`.trim() : "N/A",
+        email: item.email || "N/A", 
         username: item.username || "N/A",
         created_at: new Date(item.created_at).toLocaleDateString(),
         UserRole: item.groups_list?.map((group) => group.name).join(", ") || "N/A", // Join role names into a single string
@@ -62,8 +62,8 @@ const UsersListing = () => {
 
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: 'center' },
-    { field: "email", headerName: "Email", flex: 1, headerAlign: 'center' },
     { field: "full_name", headerName: "Full Name", flex: 1, headerAlign: 'center' },
+    { field: "email", headerName: "Email", flex: 1, headerAlign: 'center' },
     { field: "username", headerName: "Username", flex: 0.75, headerAlign: 'center' },
     { field: "UserRole", headerName: "Role", flex: 1, headerAlign: 'center' },
     { field: "created_at", headerName: "Date", flex: 0.75, headerAlign: 'center' },
