@@ -7,56 +7,81 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
-import BackHandSharpIcon from '@mui/icons-material/BackHandSharp';
+import BackHandSharpIcon from "@mui/icons-material/BackHandSharp";
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useReviseRequestGetQuery } from "api/auth/reviseApi";
+import ReviseDialog from "./Revise";
+import ReviseApproveDialog from "./Approve";
 
 const ReviseApprovalList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const [isReviseDialogOpen, setReviseDialogOpen] = useState(false);
+  const [isApproveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [reviseDocument, setReviseDocument] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
 
-  // Sample data (replace with actual data if needed)
-  const reviseRequests = [
-    {
-      id: 1,
-      documentTitle: "Document A",
-      documentType: "Report",
-      requestedUser: "John Doe",
-      requestedDate: "2024-12-12 14:30",
-      reviseStatus: "-",
-    },
-    {
-      id: 2,
-      documentTitle: "Document B",
-      documentType: "Policy",
-      requestedUser: "Jane Smith",
-      requestedDate: "2024-12-11 16:00",
-      reviseStatus: "Pending",
-    },
-    {
-      id: 3,
-      documentTitle: "Document C",
-      documentType: "Guideline",
-      requestedUser: "Alex Johnson",
-      requestedDate: "2024-12-10 10:15",
-      reviseStatus: "Approved",
-    },
-  ];
+  // Fetch data from the API
+  const { data: apiData, isLoading, isError } = useReviseRequestGetQuery();
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleEditRequest = (request) => {
-    navigate("/update-revise-request", { state: { request } });
+  const handleReviseDialogOpen = (row) => {
+    setSelectedRow(row);
+    setReviseDialogOpen(true);
   };
 
-  // Filter the requests based on search term
-  const filteredData = reviseRequests.filter(
+  const handleReviseDialogClose = () => {
+    setReviseDialogOpen(false);
+    setReviseDocument(null);
+  };
+
+  const handleReviseConfirm = () => {
+    console.log("Revise confirmed for document:", reviseDocument);
+    handleReviseDialogClose();
+  };
+
+  const handleApproveDialogOpen = (row) => {
+    setSelectedRow(row);
+    
+    console.log("Row data passed to dialog:", row);
+    setApproveDialogOpen(true);
+  };
+
+  const handleApproveDialogClose = () => {
+    setApproveDialogOpen(false);
+  };
+
+  const handleApprove = (reason) => {
+    console.log("Approved with reason:", reason, "for document:", selectedRow);
+    handleApproveDialogClose();
+  };
+
+  const handleReject = (reason) => {
+    console.log("Rejected with reason:", reason, "for document:", selectedRow);
+    handleApproveDialogClose();
+  };
+
+  // Transform API data for DataGrid
+  const filteredData =
+    apiData?.map((item, index) => ({
+      id: item.document_id,
+      serial_number: index + 1,
+      documentTitle: item.document_title || "N/A",
+      documentType: item.document_type || "N/A",
+      requestedUser: ` ${item.user}` || "N/A",
+      requestedDate: item.revision_created_at, // Replace with actual date if available in API
+      reviseStatus: item.status || "N/A",
+    })) || [];
+
+  const displayedData = filteredData.filter(
     (request) =>
       request.requestedUser.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.documentTitle.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "documentTitle", headerName: "Document Title", flex: 1, headerAlign: "center" },
@@ -71,28 +96,15 @@ const ReviseApprovalList = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <MDBox display="flex" justifyContent="center" alignItems="center" gap={1}>
-          <IconButton
-            color="warning"
-            onClick={() => handleEditRequest(params.row)}
-          >
+          <IconButton color="warning" onClick={() => handleReviseDialogOpen(params.row)}>
+            <BackHandSharpIcon />
+          </IconButton>
+          <IconButton color="primary" onClick={() => handleApproveDialogOpen(params.row)}>
             <ImportContactsTwoToneIcon />
-          </IconButton>
-          <IconButton
-            color="primary"
-            onClick={() => console.log("Secondary Action", params.row)}
-          >
-            <BackHandSharpIcon/>
-          </IconButton>
-          <IconButton
-            color="success"
-            onClick={() => console.log("Tertiary Action", params.row)}
-          >
-            <VisibilityIcon />
           </IconButton>
         </MDBox>
       ),
     },
-    
   ];
 
   return (
@@ -110,43 +122,53 @@ const ReviseApprovalList = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Revise Approval List
           </MDTypography>
-          <MDButton
-            variant="contained"
-            color="primary"
-            onClick={() => navigate("/add-revise-request")}
-            sx={{ ml: 2 }}
-          >
-            Add Request
-          </MDButton>
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
-          <div style={{ height: 500, width: "100%" }}>
-            <DataGrid
-              rows={filteredData.map((request, index) => ({
-                ...request,
-                serial_number: index + 1, // Add serial_number based on the index
-              }))}
-              columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5, 10, 20]}
-              disableSelectionOnClick
-              sx={{
-                border: "1px solid #ddd",
-                borderRadius: "4px",
-                "& .MuiDataGrid-columnHeaders": {
-                  display: "flex",
-                  justifyContent: "center",
-                  backgroundColor: "#f5f5f5",
-                  fontWeight: "bold",
-                },
-                "& .MuiDataGrid-cell": {
-                  textAlign: "center",
-                },
-              }}
-            />
-          </div>
+          {isLoading ? (
+            <MDTypography>Loading...</MDTypography>
+          ) : isError ? (
+            <MDTypography>Error loading data</MDTypography>
+          ) : (
+            <div style={{ height: 500, width: "100%" }}>
+              <DataGrid
+                rows={displayedData}
+                columns={columns}
+                pageSize={5}
+                rowsPerPageOptions={[5, 10, 20]}
+                disableSelectionOnClick
+                sx={{
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                  "& .MuiDataGrid-columnHeaders": {
+                    display: "flex",
+                    justifyContent: "center",
+                    backgroundColor: "#f5f5f5",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiDataGrid-cell": {
+                    textAlign: "center",
+                  },
+                }}
+              />
+            </div>
+          )}
         </MDBox>
       </Card>
+
+      <ReviseDialog
+        open={isReviseDialogOpen}
+        onClose={handleReviseDialogClose}
+        onConfirm={handleReviseConfirm}
+        documentId={selectedRow?.id || ""}
+      />
+
+      <ReviseApproveDialog
+        open={isApproveDialogOpen}
+        onClose={handleApproveDialogClose}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        reason={selectedRow?.revise_description || ""}
+      />
     </MDBox>
   );
 };
