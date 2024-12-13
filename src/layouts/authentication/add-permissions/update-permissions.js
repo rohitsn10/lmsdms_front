@@ -9,7 +9,7 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
-const PermissionsTable = () => {
+const UpdatePermissionsTable = () => {
   const { data: permissions = [], isLoading, error } = useFetchPermissionsQuery();
 
   const [permissionState, setPermissionState] = useState({});
@@ -214,4 +214,4 @@ const PermissionsTable = () => {
   );
 };
 
-export default PermissionsTable;
+export default UpdatePermissionsTable;
