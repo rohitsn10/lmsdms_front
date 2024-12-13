@@ -35,6 +35,7 @@ function AddDocument() {
   const [type, setType] = useState("");
   const [documentNumber, setDocumentNumber] = useState("");
   const [description, setDescription] = useState("");
+  const [revisionMonth, setRevisionMonth] = useState("");
   const [revisionTime, setRevisionTime] = useState("");
   const [workflow, setWorkflow] = useState("");
   const [trainingRequired, setTrainingRequired] = useState("No");
@@ -69,6 +70,10 @@ function AddDocument() {
     }
     if (!documentNumber.trim()) newErrors.documentNumber = "Document number is required.";
     if (!description.trim()) newErrors.description = "Description is required.";
+    if (!revisionMonth || revisionMonth <= 0) {
+      newErrors.revisionMonth = "Revision month must be a positive number.";
+    }
+    
     if (!revisionTime) {
       setErrors({ revisionTime: "Revision Date  is required" });
       return;
@@ -88,7 +93,6 @@ function AddDocument() {
     const selectedDate = new Date(e.target.value);
     const today = new Date();
 
-    // Set today's time to midnight for accurate comparison
     today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
@@ -98,7 +102,28 @@ function AddDocument() {
       setRevisionTime(e.target.value);
     }
   };
-
+  const handleRevisionMonthChange = (e) => {
+    const monthsToAdd = parseInt(e.target.value, 10);
+  
+    if (isNaN(monthsToAdd) || monthsToAdd <= 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        revisionMonth: "Please enter a valid positive number.",
+      }));
+      return;
+    }
+  
+    setErrors((prevErrors) => ({ ...prevErrors, revisionMonth: undefined }));
+  
+    const currentDate = new Date();
+    currentDate.setMonth(currentDate.getMonth() + monthsToAdd); 
+  
+    const formattedDate = currentDate.toISOString().split("T")[0];
+  
+    setRevisionMonth(monthsToAdd); 
+    setRevisionTime(formattedDate); 
+  };
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
@@ -107,7 +132,7 @@ function AddDocument() {
   const handleChange = (event) => {
     setSelectedUser(event.target.value);
     if (errors.user) {
-      setErrors((prevErrors) => ({ ...prevErrors, user: null })); // Clear user error on selection
+      setErrors((prevErrors) => ({ ...prevErrors, user: null })); 
     }
   };
 
@@ -139,6 +164,7 @@ function AddDocument() {
         document_number: documentNumber.trim(),
         document_type: type, // Assuming `type` is already the correct value
         document_description: description.trim(),
+        revision_month: revisionMonth,
         revision_date: revisionTime.trim(),
         document_operation: operations, // Assuming `operations` is the right value
         workflow: workflow, // Assuming `workflow` is the correct value
@@ -260,39 +286,35 @@ function AddDocument() {
             </MDBox>
 
             <MDBox mb={3}>
-  <FormControl fullWidth margin="dense" error={Boolean(errors.revisionTime)}>
-    <MDInput
-      type="date"
-      value={revisionTime}
-      onChange={handleDateChange}
-      error={Boolean(errors.revisionTime)}
-      fullWidth
-      InputLabelProps={{
-        shrink: true,
-      }}
-      label="Revision Date"
-      sx={{
-        "& .MuiInputAdornment-root": {
-          position: "relative", 
-          display: "flex",
-          alignItems: "center", 
-        },
-        "& .MuiInputAdornment-root.Mui-error": {
-          marginLeft: "8px", 
-          zIndex: 10,
-        },
-        "& .MuiInputAdornment-root.MuiInputAdornment-positionEnd": {
-          zIndex: 1, 
-        },
-        "& input": {
-          paddingRight: "40px", 
-        },
-      }}
-    />
-    {errors.revisionTime && (
-      <FormHelperText>{errors.revisionTime}</FormHelperText>
-    )}
-  </FormControl>
+  <MDInput
+    type="number"
+    label="Revision Month"
+    value={revisionMonth}
+    onChange={handleRevisionMonthChange} // Use the new handler
+    error={Boolean(errors.revisionMonth)}
+    helperText={errors.revisionMonth}
+    fullWidth
+    inputProps={{
+      min: 1,  
+    }}
+  />
+</MDBox>
+<MDBox mb={3}>
+  <MDInput
+    type="date"
+    value={revisionTime}
+    onChange={handleDateChange}
+    error={Boolean(errors.revisionTime)}
+    fullWidth
+    InputLabelProps={{
+      shrink: true,
+    }}
+    label="Revision Date"
+    disabled 
+  />
+  {errors.revisionTime && (
+    <FormHelperText>{errors.revisionTime}</FormHelperText>
+  )}
 </MDBox>
 
 
