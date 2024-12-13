@@ -12,16 +12,14 @@ import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useUpdatePrinterMutation } from "api/auth/PrinterApi";
 
-function EditPrinter() {
+const EditPrinter = () => {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const [printerName, setPrinterName] = useState(state?.printer?.printer_name || "");
   const [printerPath, setPrinterPath] = useState(state?.printer?.printer_location || "");
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const [formData, setFormData] = useState(null);
-
-  const navigate = useNavigate();
-  const [updatePrinter] = useUpdatePrinterMutation();
+  const [updatePrinter, { isLoading }] = useUpdatePrinterMutation();
 
   const validateInputs = () => {
     const newErrors = {};
@@ -34,44 +32,42 @@ function EditPrinter() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
-
-    // Open the signature dialog and store form data
-    setFormData({
-      printer_id: state?.printer?.id,
-      printer_name: printerName,
-      printer_location: printerPath,
-    });
     setOpenSignatureDialog(true);
-  };
-
-  const handleSignatureComplete = async (password) => {
-    if (!password) {
-      toast.error("E-Signature is required to proceed.");
-      setOpenSignatureDialog(false);
-      return;
-    }
-
-    try {
-      // Submit the form data after signature
-      await updatePrinter(formData).unwrap();
-      toast.success("Printer updated successfully!");
-      
-      // Delay navigation to allow toast visibility
-      setTimeout(() => {
-        navigate("/printer-listing");
-      }, 3000);
-    } catch (error) {
-      toast.error("Failed to update printer. Please try again.");
-      console.error("Error updating printer:", error);
-    } finally {
-      setOpenSignatureDialog(false);
-    }
   };
 
   const handleClear = () => {
     setPrinterName("");
     setPrinterPath("");
     setErrors({});
+  };
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+
+    try {
+      const response = await updatePrinter({
+        printer_id: state?.printer?.id,
+        printer_name: printerName.trim(),
+        printer_location: printerPath.trim(),
+      }).unwrap();
+
+      if (response.status) {
+        toast.success("Printer updated successfully!");
+
+        setTimeout(() => {
+          navigate("/printer-listing");
+        }, 1500);
+      } else {
+        toast.error(response.message || "Failed to update printer. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error updating printer:", error);
+      toast.error("An error occurred while updating the printer.");
+    }
   };
 
   return (
@@ -93,6 +89,7 @@ function EditPrinter() {
             Edit Printer
           </MDTypography>
         </MDBox>
+
         <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
           <MDButton
             variant="outlined"
@@ -104,12 +101,13 @@ function EditPrinter() {
             Clear
           </MDButton>
         </MDBox>
+
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Printer Name"
+                label={<><span style={{ color: "red" }}>*</span> Printer Name</>}
                 fullWidth
                 value={printerName}
                 onChange={(e) => setPrinterName(e.target.value)}
@@ -119,7 +117,7 @@ function EditPrinter() {
             </MDBox>
             <MDBox mb={3}>
               <MDInput
-                label="Printer Location"
+                label={<><span style={{ color: "red" }}>*</span> Printer Path</>}
                 fullWidth
                 value={printerPath}
                 onChange={(e) => setPrinterPath(e.target.value)}
@@ -128,25 +126,23 @@ function EditPrinter() {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit">
-                Save Changes
+              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
+                {isLoading ? "Updating..." : "Save Changes"}
               </MDButton>
             </MDBox>
           </MDBox>
         </MDBox>
       </Card>
 
-      {/* E-Signature Dialog */}
       <ESignatureDialog
         open={openSignatureDialog}
-        handleClose={() => setOpenSignatureDialog(false)}
-        onComplete={handleSignatureComplete}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete}
       />
 
-      {/* Toast Container */}
       <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
-}
+};
 
 export default EditPrinter;
