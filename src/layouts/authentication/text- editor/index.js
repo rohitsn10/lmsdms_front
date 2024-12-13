@@ -206,14 +206,14 @@ const DocumentView = () => {
   const handleSaveDraft = async () => {
     try {
       await draftDocument({ document_id: id, status_id: 2 }).unwrap();
-      toast.success("Document Submit Successfully!");
+      toast.success("Save As a Draft!");
       setTimeout(() => {
         navigate("/document-listing");
       }, 2000);
     } catch (err) {
       // Handle error
       console.error(err);
-      toast.error("Failed to add document type. Please try again.");
+      toast.error("Failed to Save Draft. Please try again.");
     }
   };
 
@@ -293,7 +293,7 @@ const DocumentView = () => {
       }
     } catch (error) {
       console.error("Error calling API:", error);
-      toast.error("Failed to Review Document. Please try again.");
+      toast.error("Failed to Approve Document. Please try again.");
     }
   };
 
