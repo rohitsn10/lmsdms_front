@@ -18,7 +18,7 @@ import { useAuth } from "hooks/use-auth";
 import moment from "moment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ConditionalDialog from "./effective";
-import ReviseDialog from "./Revise";
+// import ReviseDialog from "./Revise";
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
 
 const DocumentListing = () => {
@@ -218,7 +218,7 @@ const DocumentListing = () => {
                 </IconButton>
               )}
           {data?.userGroupIds?.includes(5) &&
-            params.row.document_current_status !== 7 && ( // Hide CheckCircleIcon when status is 7
+           ( // Hide CheckCircleIcon when status is 7
               <IconButton
                 color="success"
                 onClick={() => handleDialogOpen(params.row)}
@@ -228,14 +228,14 @@ const DocumentListing = () => {
               </IconButton>
             )}
 
-          {params.row.document_current_status === 7 && ( // Show ImportContactsTwoToneIcon when status is 7
+          {/* {params.row.document_current_status === 7 && ( // Show ImportContactsTwoToneIcon when status is 7
             <IconButton
               color="warning"
               onClick={() => handleReviseDialogOpen(params.row)}
             >
               <ImportContactsTwoToneIcon />
             </IconButton>
-          )}
+          )} */}
         </MDBox>
       ),
       sortable: false,
@@ -303,13 +303,13 @@ const DocumentListing = () => {
         trainingStatus={selectedRow?.training_required || "false"}
         documentId={selectedRow?.id || ""}
       />
-      <ReviseDialog
+      {/* <ReviseDialog
   open={isReviseDialogOpen}
   onClose={() => setReviseDialogOpen(false)}
   onConfirm={handleReviseConfirm}
-  documentId={selectedRow?.id|| ""} // pass the documentId from the selected row
+  documentId={selectedRow?.id|| ""} 
   // You can pass more fields like selectedRow or row as needed
-/>
+/> */}
     </MDBox>
   );
 };

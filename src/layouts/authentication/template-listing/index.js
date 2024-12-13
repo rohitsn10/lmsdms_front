@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState,useEffect } from "react";
+import { useNavigate,useLocation } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
@@ -19,9 +19,14 @@ const TemplateListing = () => {
   const { user, role } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Fetch templates data
-  const { data, error, isLoading } = useViewTemplateQuery();
+  const { data, refetch,error, isLoading } = useViewTemplateQuery();
+
+  useEffect(() => {
+    refetch();
+  }, [location.key]);
 
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;

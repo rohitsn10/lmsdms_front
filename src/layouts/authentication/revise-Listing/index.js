@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
+import BackHandSharpIcon from '@mui/icons-material/BackHandSharp';
+import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const ReviseApprovalList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,10 +17,30 @@ const ReviseApprovalList = () => {
 
   // Sample data (replace with actual data if needed)
   const reviseRequests = [
-    { id: 1, requestedUser: "John Doe", time: "2024-12-12 14:30", documentName: "Document A" },
-    { id: 2, requestedUser: "Jane Smith", time: "2024-12-11 16:00", documentName: "Document B" },
-    { id: 3, requestedUser: "Alex Johnson", time: "2024-12-10 10:15", documentName: "Document C" },
-    // Add more sample data or fetch from an API
+    {
+      id: 1,
+      documentTitle: "Document A",
+      documentType: "Report",
+      requestedUser: "John Doe",
+      requestedDate: "2024-12-12 14:30",
+      reviseStatus: "-",
+    },
+    {
+      id: 2,
+      documentTitle: "Document B",
+      documentType: "Policy",
+      requestedUser: "Jane Smith",
+      requestedDate: "2024-12-11 16:00",
+      reviseStatus: "Pending",
+    },
+    {
+      id: 3,
+      documentTitle: "Document C",
+      documentType: "Guideline",
+      requestedUser: "Alex Johnson",
+      requestedDate: "2024-12-10 10:15",
+      reviseStatus: "Approved",
+    },
   ];
 
   const handleSearch = (event) => {
@@ -33,26 +55,44 @@ const ReviseApprovalList = () => {
   const filteredData = reviseRequests.filter(
     (request) =>
       request.requestedUser.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.documentName.toLowerCase().includes(searchTerm.toLowerCase())
+      request.documentTitle.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
+    { field: "documentTitle", headerName: "Document Title", flex: 1, headerAlign: "center" },
+    { field: "documentType", headerName: "Document Type", flex: 1, headerAlign: "center" },
     { field: "requestedUser", headerName: "Requested User", flex: 1, headerAlign: "center" },
-    { field: "time", headerName: "Time", flex: 1, headerAlign: "center" },
-    { field: "documentName", headerName: "Document Name", flex: 1, headerAlign: "center" },
+    { field: "requestedDate", headerName: "Requested Date", flex: 1, headerAlign: "center" },
+    { field: "reviseStatus", headerName: "Revise Status", flex: 1, headerAlign: "center" },
     {
       field: "action",
       headerName: "Action",
-      flex: 0.5,
+      flex: 1,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => handleEditRequest(params.row)}>
-          <EditIcon />
-        </IconButton>
+        <MDBox display="flex" justifyContent="center" alignItems="center" gap={1}>
+          <IconButton
+            color="warning"
+            onClick={() => handleEditRequest(params.row)}
+          >
+            <ImportContactsTwoToneIcon />
+          </IconButton>
+          <IconButton
+            color="primary"
+            onClick={() => console.log("Secondary Action", params.row)}
+          >
+            <BackHandSharpIcon/>
+          </IconButton>
+          <IconButton
+            color="success"
+            onClick={() => console.log("Tertiary Action", params.row)}
+          >
+            <VisibilityIcon />
+          </IconButton>
+        </MDBox>
       ),
-      
     },
+    
   ];
 
   return (
