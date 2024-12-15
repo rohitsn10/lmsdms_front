@@ -57,6 +57,7 @@ import AddPrinter from "layouts/authentication/add-printer/index.js";
 import EditPrinter from "layouts/authentication/edit-printer/index.js";
 import ResettPassword from "layouts/authentication/reset-passwordlog/index.js";
 import ReviseApprovalList from "layouts/authentication/revise-Listing/index.js";
+import PrintRetrievalListing from "layouts/retrieval-listing/index.js";
 //Lms components
 
 import AddArea from "dmscomponent/add-area/index.js";
@@ -266,6 +267,8 @@ export default function App() {
       <Route path="/update-printer" element={<EditPrinter />} />
       <Route path="/resett-password" element={<ResettPassword />} />
       <Route path="/revise-listing" element={<ReviseApprovalList/>}/>
+      <Route path="/retrieval-listing" element={<PrintRetrievalListing/>}/>
+
       {/* Lms components */}
       <Route path="/add-area" element={<AddArea />} />
       <Route path="/add-departments" element={<AddDepartments />} />

@@ -128,7 +128,7 @@ export const documentApi = createApi({
     }),
     departmentWiseReviewer: builder.query({
       query: () => ({
-        url: "user_profile/department_wise_reviewer",
+        url: "user_profile/all_reviewer",
         method: "GET",
       }),
       transformResponse: (response) => response.data, // Extract the "data" field from the response
