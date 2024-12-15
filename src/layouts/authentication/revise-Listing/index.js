@@ -20,6 +20,7 @@ const ReviseApprovalList = () => {
   const [isApproveDialogOpen, setApproveDialogOpen] = useState(false);
   const [reviseDocument, setReviseDocument] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
+  
 
   // Fetch data from the API
   const { data: apiData, isLoading, isError } = useReviseRequestGetQuery();
@@ -44,9 +45,8 @@ const ReviseApprovalList = () => {
   };
 
   const handleApproveDialogOpen = (row) => {
-    setSelectedRow(row);
-    
-    console.log("Row data passed to dialog:", row);
+    setSelectedRow(row); // Store the entire row in the state
+    console.log("Row data passed to dialog:", row); // Optional: Log the row data for debugging
     setApproveDialogOpen(true);
   };
 
@@ -74,6 +74,7 @@ const ReviseApprovalList = () => {
       requestedUser: ` ${item.user}` || "N/A",
       requestedDate: item.revision_created_at, // Replace with actual date if available in API
       reviseStatus: item.status || "N/A",
+      revisereason: item.revise_description,
     })) || [];
 
   const displayedData = filteredData.filter(
@@ -167,7 +168,7 @@ const ReviseApprovalList = () => {
         onClose={handleApproveDialogClose}
         onApprove={handleApprove}
         onReject={handleReject}
-        reason={selectedRow?.revise_description || ""}
+        row={selectedRow}
       />
     </MDBox>
   );
