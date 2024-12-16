@@ -265,11 +265,6 @@ const DocumentView = () => {
       setTimeout(() => {
         navigate("/document-listing");
       }, 2000);
-      if (response.status) {
-        alert(response.message); // Success message
-      } else {
-        alert("Action failed");
-      }
     } catch (error) {
       console.error("Error calling API:", error);
       toast.error("Failed to Review Document. Please try again.");
@@ -286,11 +281,6 @@ const DocumentView = () => {
       setTimeout(() => {
         navigate("/document-listing");
       }, 2000);
-      if (response.status) {
-        alert(response.message); // Success message
-      } else {
-        alert("Action failed");
-      }
     } catch (error) {
       console.error("Error calling API:", error);
       toast.error("Failed to Approve Document. Please try again.");
