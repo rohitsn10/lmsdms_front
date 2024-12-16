@@ -38,10 +38,20 @@ const ApprovalDialog = ({ open, onClose, maxCopies, requestId }) => {
   };
 
   const handleReject = () => {
-    // Implement reject logic
-    console.log("Request rejected:", requestId);
-    onClose();
+    printApprovals({
+      print_request_id: requestId,
+      no_of_request_by_admin: numberOfCopies,
+      status: "11", // Status for reject
+    })
+      .then((response) => {
+        console.log("Print reject response:", response);
+        onClose();
+      })
+      .catch((err) => {
+        console.error("Error in print reject:", err);
+      });
   };
+  
 
   const handleClear = () => {
     setNumberOfCopies("");

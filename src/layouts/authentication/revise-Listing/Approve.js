@@ -31,7 +31,7 @@ const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
         try {
             await approveRevise({
                 document_id: row?.id,
-                status_id: 1, // Assuming 1 is the 'approved' status, adjust as needed
+                status_id: 10, // Assuming 1 is the 'approved' status, adjust as needed
                 request_action_id: row?.id, // Assuming you have a request action ID to send
                 action_status: "approved",
             }).unwrap(); // `unwrap` to handle response or error directly
@@ -47,7 +47,7 @@ const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
         try {
             await approveRevise({
                 document_id: row?.id,
-                status_id: 2, // Assuming 2 is the 'rejected' status, adjust as needed
+                status_id: 7, // Assuming 2 is the 'rejected' status, adjust as needed
                 request_action_id: row?.id, // Same assumption for action ID
                 action_status: "rejected",
             }).unwrap(); // `unwrap` to handle response or error directly

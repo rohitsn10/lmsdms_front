@@ -564,20 +564,21 @@ const DocumentView = () => {
       <AntiCopyPattern />
 
       <Paper
-        id="editor-container"
-        sx={{
-          position: "relative", // Ensure editor is on top of the pattern
-          width: "210mm",
-          height: "297mm",
-          border: "1px solid #ccc",
-          // backgroundColor: "#fff",
-          padding: 2,
-          borderRadius: 1,
-          overflowY: "auto",
-          margin: "20px auto",
-          boxShadow: 2,
-        }}
-      />
+  id="editor-container"
+  sx={{
+    position: "relative", // Ensure editor is on top of the pattern
+    width: "210mm",
+    height: "297mm",
+    border: "1px solid #ccc",
+    backgroundColor: "transparent", // Set background to transparent
+    padding: 2,
+    borderRadius: 1,
+    overflowY: "auto",
+    margin: "20px auto",
+    boxShadow: "none", // Remove shadow if it interferes with transparency
+  }}
+/>
+
 
       <CommentDrawer
         open={openDrawer}

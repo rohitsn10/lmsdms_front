@@ -6,49 +6,17 @@ import AssignmentReturnIcon from "@mui/icons-material/AssignmentReturn";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
-import moment from "moment";
+import { useGetApprovedPrintListQuery } from "api/auth/retrievalApi"; // Import the API hook
 import PrintRetrievalDialog from "./retrievaldialog";
-
-const mockData = [
-  {
-    id: 1,
-    document_title: "Project Report",
-    no_of_print: 10,
-    issue_type: "Urgent",
-    created_at: "2024-12-12T10:30:00",
-    no_of_request_by_admin: 5,
-    status: "Pending",
-    Approve: "-",
-    first_name: "John",
-  },
-  {
-    id: 2,
-    document_title: "Invoice",
-    no_of_print: 20,
-    issue_type: "Regular",
-    created_at: "2024-12-10T12:00:00",
-    no_of_request_by_admin: 15,
-    status: "Approved",
-    Approve: "2024-12-10",
-    first_name: "Jane",
-  },
-  {
-    id: 3,
-    document_title: "Meeting Agenda",
-    no_of_print: 5,
-    issue_type: "Urgent",
-    created_at: "2024-12-11T09:00:00",
-    no_of_request_by_admin: 5,
-    status: "Rejected",
-    Approve: "-",
-    first_name: "Alice",
-  },
-];
+import moment from "moment";
 
 const PrintRetrievalListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRetrieval, setSelectedRetrieval] = useState(null);
+
+  // Fetch data using the API hook
+  const { data, error, isLoading } = useGetApprovedPrintListQuery();
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -68,17 +36,19 @@ const PrintRetrievalListing = () => {
     console.log(`Retrieving document: ${retrievalNumber}`);
   };
 
-  const filteredData = mockData
-    .filter(
-      (item) =>
-        item.document_title &&
-        item.document_title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .reverse()
-    .map((item, index) => ({
-      ...item,
-      serial_number: index + 1,
-    }));
+  // Filter data based on search term
+  const filteredData = data
+    ? data
+        .filter(
+          (item) =>
+            item.document_title &&
+            item.document_title.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .map((item, index) => ({
+          ...item,
+          serial_number: index + 1,
+        }))
+    : [];
 
   const columns = [
     {
@@ -103,25 +73,6 @@ const PrintRetrievalListing = () => {
       renderCell: (params) => params.row.no_of_print ?? "-",
     },
     {
-      field: "issue_type",
-      headerName: "Issue Type",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => params.row.issue_type ?? "-",
-    },
-    {
-      field: "created_at",
-      headerName: "Date",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => {
-        const date = params.row.created_at
-          ? moment(params.row.created_at).format("DD-MM-YY HH:mm")
-          : "-";
-        return date;
-      },
-    },
-    {
       field: "no_of_request_by_admin",
       headerName: "Copies Approved",
       flex: 0.5,
@@ -140,14 +91,7 @@ const PrintRetrievalListing = () => {
       headerName: "Approve Date",
       flex: 1,
       headerAlign: "center",
-      renderCell: (params) => params.row.Approve ?? "-",
-    },
-    {
-      field: "first_name",
-      headerName: "User",
-      flex: 0.5,
-      headerAlign: "center",
-      renderCell: (params) => params.row.first_name ?? "-",
+      renderCell: (params) => moment(params.row.created_at).format("YYYY-MM-DD") ?? "-",
     },
     {
       field: "action",
@@ -167,9 +111,7 @@ const PrintRetrievalListing = () => {
 
   return (
     <MDBox p={3}>
-      <Card
-        sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}
-      >
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search Document"
@@ -179,34 +121,40 @@ const PrintRetrievalListing = () => {
             value={searchTerm}
             onChange={handleSearch}
           />
-          <MDTypography
-            variant="h4"
-            fontWeight="medium"
-            sx={{ flexGrow: 1, textAlign: "center" }}
-          >
+          <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Print Retrieval Listing
           </MDTypography>
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>
-            <DataGrid
-              rows={filteredData}
-              columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5, 10, 20]}
-              disableSelectionOnClick
-              sx={{
-                border: "1px solid #ddd",
-                borderRadius: "4px",
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: "#f5f5f5",
-                  fontWeight: "bold",
-                },
-                "& .MuiDataGrid-cell": {
-                  textAlign: "center",
-                },
-              }}
-            />
+            {isLoading ? (
+              <MDTypography variant="body1" sx={{ textAlign: "center" }}>
+                Loading...
+              </MDTypography>
+            ) : error ? (
+              <MDTypography variant="body1" sx={{ textAlign: "center", color: "red" }}>
+                Error fetching data
+              </MDTypography>
+            ) : (
+              <DataGrid
+                rows={filteredData}
+                columns={columns}
+                pageSize={5}
+                rowsPerPageOptions={[5, 10, 20]}
+                disableSelectionOnClick
+                sx={{
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                  "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: "#f5f5f5",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiDataGrid-cell": {
+                    textAlign: "center",
+                  },
+                }}
+              />
+            )}
           </div>
         </MDBox>
       </Card>

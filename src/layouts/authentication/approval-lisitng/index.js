@@ -122,7 +122,7 @@ const PrintApprovalListing = () => {
       } else if (status === "Reject") {
         color = "error"; // Red color for rejected
       } else {
-        color = "primary"; // Default color (blue) for null or other statuses
+        color = "success"; // Default color (blue) for null or other statuses
       }
   
       return (
