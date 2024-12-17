@@ -38,6 +38,13 @@ export const retrievalApi = createApi({
         },
       }),
     }),
+    getPrintRetrival: builder.query({
+      query: (print_request_approval_id) => ({
+        url: `dms_module/print_retrival/${print_request_approval_id}`, // Dynamic URL with ID
+        method: "GET",
+      }),
+      transformResponse: (response) => response, // Return the full response as needed
+    }),
   }),
 });
 
@@ -45,4 +52,5 @@ export const {
   useGetApprovedPrintListQuery,
   useGetPrintApprovalDetailsQuery,
   useAddRetrivalNumbersMutation,
+  useGetPrintRetrivalQuery, 
 } = retrievalApi;

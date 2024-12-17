@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { Dialog, DialogActions, DialogContent, IconButton } from "@mui/material";
 import MDBox from "components/MDBox";
@@ -7,8 +7,16 @@ import MDButton from "components/MDButton";
 import { DataGrid } from "@mui/x-data-grid";
 import moment from "moment";
 import CloseIcon from "@mui/icons-material/Close";
+import { useGetPrintRetrivalQuery } from "api/auth/retrievalApi"; // Import the API hook
 
-const ApprovedRetrievalListingDialog = ({ open, handleClose, approvedRetrievals = [] }) => {
+const ApprovedRetrievalListingDialog = ({ open, handleClose, selectedId }) => {
+  // Local state to store retrieved data
+  const [approvedRetrievals, setApprovedRetrievals] = useState([]);
+
+  // Use the API hook to fetch the print retrieval data
+  const { data, error, isLoading } = useGetPrintRetrivalQuery(selectedId);
+
+  console.log("==========================in Approveal :::::",selectedId);
 
   // Columns for DataGrid
   const columns = [
@@ -35,6 +43,19 @@ const ApprovedRetrievalListingDialog = ({ open, handleClose, approvedRetrievals 
     },
   ];
 
+  useEffect(() => {
+    if (data && data.retrival_numbers) {
+      const formattedRetrievals = data.retrival_numbers.map((item, index) => ({
+        id: item.id,  // Ensure each row has a unique 'id'
+        serial_number: index + 1,
+        unit_no: item.retrival_number, // Assuming `retrival_number` is the unit number
+        approved_date: item.created_at, // Using `created_at` for the approved date
+      }));
+      setApprovedRetrievals(formattedRetrievals);
+    }
+  }, [data]);
+  
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <MDBox sx={{ textAlign: "center" }}>
@@ -44,16 +65,17 @@ const ApprovedRetrievalListingDialog = ({ open, handleClose, approvedRetrievals 
       </MDBox>
 
       <DialogContent>
-        {approvedRetrievals.length === 0 ? (
+        {isLoading ? (
+          <MDTypography>Loading...</MDTypography>
+        ) : error ? (
+          <MDTypography>Error loading data.</MDTypography>
+        ) : approvedRetrievals.length === 0 ? (
           <MDTypography>No approved retrievals available.</MDTypography>
         ) : (
           <MDBox p={2}>
             <div style={{ height: 400, width: "100%" }}>
               <DataGrid
-                rows={approvedRetrievals.map((item, index) => ({
-                  ...item,
-                  serial_number: index + 1,
-                }))}
+                rows={approvedRetrievals}
                 columns={columns}
                 pageSize={5}
                 rowsPerPageOptions={[5, 10, 20]}
@@ -87,7 +109,8 @@ const ApprovedRetrievalListingDialog = ({ open, handleClose, approvedRetrievals 
 ApprovedRetrievalListingDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
-  approvedRetrievals: PropTypes.array.isRequired,
+  printRequestId: PropTypes.number.isRequired, // Assuming printRequestId is passed as a prop
+  selectedId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default ApprovedRetrievalListingDialog;

@@ -21,6 +21,7 @@ import PrinterListing from "layouts/authentication/printer-listing";
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import ReviseApprovalList from "layouts/authentication/revise-Listing";
 import PrintRetrievalListing from "layouts/retrieval-listing";
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
@@ -143,7 +144,7 @@ const routes = [
     type: "collapse",
     name: "Print Retrieval",
     key: "retrieval-listing",
-    icon: <AssignmentReturnIcon />,
+    icon: <GetAppOutlinedIcon />,
     route: "/retrieval-listing",
     component: <PrintRetrievalListing />,
   },

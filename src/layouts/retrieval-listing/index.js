@@ -38,12 +38,14 @@ const PrintRetrievalListing = () => {
   };
 
   const handleApprovedDialogOpen = (row) => {
-    // Function to open ApprovedRetrievalListingDialog
-    setSelectedApprovedRetrieval(row); // Store selected row for the approved dialog
+    setSelectedApprovedRetrieval({ id: row.id });
     setApprovedDialogOpen(true);
+    console.log("Selected Retrieval-----------------------------------:", {
+      document_title: row.document_title,
+      id: row.id,
+    });
   };
   const handleApprovedDialogClose = () => {
-    // Function to close ApprovedRetrievalListingDialog
     setApprovedDialogOpen(false);
     setSelectedApprovedRetrieval(null);
   };
@@ -185,7 +187,7 @@ const PrintRetrievalListing = () => {
       <ApprovedRetrievalListingDialog
         open={approvedDialogOpen}
         handleClose={handleApprovedDialogClose}
-        selectedId={selectedRetrieval?.id} // Ensure `selectedRetrieval` is not undefined
+        selectedId={selectedApprovedRetrieval?.id} // Pass the correct `id`
         onRetrieve={handleRetrieve}
         data={selectedRetrieval?.data || []} // Ensure `data` is always an array
       />
