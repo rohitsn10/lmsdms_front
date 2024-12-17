@@ -32,7 +32,7 @@ import CommentDrawer from "./Comments/CommentsDrawer"; // Adjusted import for Co
 import CommentModal from "./Comments/CommentDialog"; // Adjusted import for CommentModal
 import { useCreateCommentMutation } from "api/auth/commentsApi";
 import AntiCopyPattern from "layouts/authentication/text- editor/anti-copy/AntiCopyPattern";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useDraftDocumentMutation } from "api/auth/texteditorApi";
 import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
 import SendBackDialog from "./sendback";
@@ -91,6 +91,7 @@ const DocumentView = () => {
   // console.log("Navigated with data in text Editor :", { id, document_current_status});
   // console.log("Training Required:", trainingRequired)
   const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
+  const [randomNumber] = useState(Math.floor(Math.random() * 100000));
 
   // Log the documentsData structure
   console.log("Documents Data:", documentsData);
@@ -248,7 +249,6 @@ const DocumentView = () => {
       setTimeout(() => {
         navigate("/document-listing");
       }, 2000);
-      
     } catch (error) {
       console.error("Error calling API:", error);
       toast.error("Failed to Review Document. Please try again.");
@@ -318,42 +318,38 @@ const DocumentView = () => {
 
     // Make sure documentId is available
     if (!id) {
-        console.error("Document ID is missing!");
-        return;
+      console.error("Document ID is missing!");
+      return;
     }
 
     const newComment = {
-      document: id,  // Make sure document ID is passed correctly
-      selected_word: selectedText,  // Store the selected text
-      comment_description: currentComment,  // Store the added comment
-  };
-  
+      document: id, // Make sure document ID is passed correctly
+      selected_word: selectedText, // Store the selected text
+      comment_description: currentComment, // Store the added comment
+    };
 
     try {
-        const response = await createComment(newComment);
+      const response = await createComment(newComment);
 
-        if (response.status) {
-            setComments([
-                ...comments,
-                {
-                    id: Date.now(),
-                    selectedWord: selectedText,
-                    comment: currentComment,
-                    document: id,
-                },
-            ]);
-            setCurrentComment(""); // Clear the comment input
-            setOpencommentDialog(false); // Close the dialog
-        } else {
-            console.error("Failed to save comment:", response.message);
-        }
+      if (response.status) {
+        setComments([
+          ...comments,
+          {
+            id: Date.now(),
+            selectedWord: selectedText,
+            comment: currentComment,
+            document: id,
+          },
+        ]);
+        setCurrentComment(""); // Clear the comment input
+        setOpencommentDialog(false); // Close the dialog
+      } else {
+        console.error("Failed to save comment:", response.message);
+      }
     } catch (error) {
-        console.error("Error saving comment:", error);
+      console.error("Error saving comment:", error);
     }
-};
-
-  
-  
+  };
 
   const handlePrint = () => {
     console.log("Id passed:", id);
@@ -518,7 +514,6 @@ const DocumentView = () => {
     console.log("Edit comment clicked");
   };
 
-  
   const handleSaveEdit = (id, newComment) => {
     // Check if the new comment is not empty
     if (newComment.trim() === "") return;
@@ -542,33 +537,51 @@ const DocumentView = () => {
 
   return (
     <Box
-      sx={{
-        fontFamily: "Arial, sans-serif",
-        padding: 2,
-        backgroundColor: "#f4f4f4",
-        minHeight: "100vh",
-        position: "relative", // Ensure this container has a relative position
-      }}
+    sx={{
+      fontFamily: "Arial, sans-serif",
+      padding: 2,
+      backgroundColor: "#f4f4f4",
+      minHeight: "100vh",
+      position: "relative",
+    }}
     >
       {/* Insert AntiCopyPattern as the background */}
       <AntiCopyPattern />
 
-      <Paper
-  id="editor-container"
-  sx={{
-    position: "relative", // Ensure editor is on top of the pattern
-    width: "210mm",
-    height: "297mm",
-    border: "1px solid #ccc",
-    backgroundColor: "transparent", // Set background to transparent
-    padding: 2,
-    borderRadius: 1,
-    overflowY: "auto",
-    margin: "20px auto",
-    boxShadow: "none", // Remove shadow if it interferes with transparency
-  }}
-/>
-
+      <div
+        id="editor-container"
+        style={{
+          width: "210mm",
+          height: "297mm",
+          margin: "20px auto",
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
+          padding: "10px",
+          border: "1px solid #ccc",
+          borderRadius: "5px",
+          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+          position: "relative", // Allow child div positioning
+          overflow: "hidden",
+        }}
+      >
+        {/* Random Number (Inside editor-container, Top Right Corner) */}
+        <div
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            fontSize: "16px",
+            fontWeight: "bold",
+            color: "#333",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            padding: "6px 12px",
+            borderRadius: "5px",
+            zIndex: 10, // Ensures it stays on top
+            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+          }}
+        >
+          #{randomNumber}
+        </div>
+      </div>
 
       <CommentDrawer
         open={openDrawer}
@@ -587,21 +600,12 @@ const DocumentView = () => {
         setCurrentComment={setCurrentComment}
         handleSaveComment={handleSaveComment}
       />
-      {/* <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Save Document</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Do you want to save this document & All comments ?</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleConfirmSave} color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog> */}
+      
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
         {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-        {(document_current_status === "1" || document_current_status === "2" || document_current_status ==="8" ) &&
+        {(document_current_status === "1" ||
+          document_current_status === "2" ||
+          document_current_status === "8") &&
           isButtonVisible([2]) && (
             <>
               <MDButton
@@ -692,7 +696,6 @@ const DocumentView = () => {
         >
           Print
         </MDButton>
-        
       </MDBox>
       <SendBackDialog
         open={dialogOpen}
@@ -711,7 +714,7 @@ const DocumentView = () => {
         trainingStatus={trainingRequired} // Pass trainingRequired as trainingStatus
         documentId={id}
       /> */}
-       <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} />
     </Box>
   );
 };

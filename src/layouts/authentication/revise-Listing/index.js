@@ -24,6 +24,8 @@ const ReviseApprovalList = () => {
 
   // Fetch data from the API
   const { data: apiData, isLoading, isError } = useReviseRequestGetQuery();
+  const user_group_id = apiResponse?.user_group_id || null;
+  
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
