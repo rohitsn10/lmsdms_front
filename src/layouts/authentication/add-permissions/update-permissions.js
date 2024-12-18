@@ -16,10 +16,13 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
 const UpdatePermissionsTable = ({ groupId }) => {
-  const { data: permissions = [], isLoading: isPermissionsLoading, error } = useFetchPermissionsQuery();
-  const { data: groupPermissions, isLoading: isGroupLoading } = useFetchPermissionsByGroupIdQuery(groupId);
-  const [updateGroupPermissions] = useUpdateGroupPermissionsMutation();
   const location = useLocation();
+  const { role } = location.state || {}; // Destructure the role from location state
+  console.log("Received Role:", role);
+  const { data: permissions = [], isLoading: isPermissionsLoading, error } = useFetchPermissionsQuery();
+  const { data: groupPermissions, isLoading: isGroupLoading } = useFetchPermissionsByGroupIdQuery(role?.id);
+  const [updateGroupPermissions] = useUpdateGroupPermissionsMutation();
+  
   const [permissionState, setPermissionState] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [groupName, setGroupName] = useState("");
@@ -27,10 +30,9 @@ const UpdatePermissionsTable = ({ groupId }) => {
   
 
 
-  const { role } = location.state || {}; // Destructure the role from location state
-  console.log("Received Role:", role);
+ 
 
-  
+      
   // Initialize permissions state
   useEffect(() => {
     if (permissions.length > 0) {
