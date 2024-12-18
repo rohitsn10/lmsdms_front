@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import PropTypes from "prop-types"; // Import PropTypes
 import {
   useFetchPermissionsQuery,
@@ -18,13 +19,18 @@ const UpdatePermissionsTable = ({ groupId }) => {
   const { data: permissions = [], isLoading: isPermissionsLoading, error } = useFetchPermissionsQuery();
   const { data: groupPermissions, isLoading: isGroupLoading } = useFetchPermissionsByGroupIdQuery(groupId);
   const [updateGroupPermissions] = useUpdateGroupPermissionsMutation();
-
+  const location = useLocation();
   const [permissionState, setPermissionState] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [groupName, setGroupName] = useState("");
   const [selectAll, setSelectAll] = useState(false);
-  console.log("group id:", groupId)
+  
 
+
+  const { role } = location.state || {}; // Destructure the role from location state
+  console.log("Received Role:", role);
+
+  
   // Initialize permissions state
   useEffect(() => {
     if (permissions.length > 0) {
