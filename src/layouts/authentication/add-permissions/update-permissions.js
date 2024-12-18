@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useFetchPermissionsQuery } from "api/auth/permissionApi";
+import PropTypes from "prop-types"; // Import PropTypes
+import {
+  useFetchPermissionsQuery,
+  useFetchPermissionsByGroupIdQuery,
+  useUpdateGroupPermissionsMutation,
+} from "api/auth/permissionApi"; // Assuming these APIs are exported here
 import { Card, Checkbox } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { toast, ToastContainer } from "react-toastify";
@@ -9,14 +14,18 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
-const UpdatePermissionsTable = () => {
-  const { data: permissions = [], isLoading, error } = useFetchPermissionsQuery();
+const UpdatePermissionsTable = ({ groupId }) => {
+  const { data: permissions = [], isLoading: isPermissionsLoading, error } = useFetchPermissionsQuery();
+  const { data: groupPermissions, isLoading: isGroupLoading } = useFetchPermissionsByGroupIdQuery(groupId);
+  const [updateGroupPermissions] = useUpdateGroupPermissionsMutation();
 
   const [permissionState, setPermissionState] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [groupName, setGroupName] = useState("");
   const [selectAll, setSelectAll] = useState(false);
+  console.log("group id:", groupId)
 
+  // Initialize permissions state
   useEffect(() => {
     if (permissions.length > 0) {
       const initialState = {};
@@ -31,6 +40,22 @@ const UpdatePermissionsTable = () => {
       setPermissionState(initialState);
     }
   }, [permissions]);
+
+  // Prepopulate permissions state if groupPermissions is available
+  useEffect(() => {
+    if (groupPermissions) {
+      const updatedState = {};
+      groupPermissions.forEach((perm) => {
+        updatedState[perm.name] = {
+          isAdd: perm.isAdd,
+          isView: perm.isView,
+          isChange: perm.isChange,
+          isDelete: perm.isDelete,
+        };
+      });
+      setPermissionState(updatedState);
+    }
+  }, [groupPermissions]);
 
   const handleCheckboxChange = (role, action) => {
     setPermissionState((prevState) => ({
@@ -60,22 +85,23 @@ const UpdatePermissionsTable = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!groupName.trim()) {
       toast.error("Group name is required.");
       return;
     }
 
-    const hasSelectedPermissions = Object.values(permissionState).some(
-      (perm) => perm.isAdd || perm.isView || perm.isChange || perm.isDelete
-    );
+    const permissionsPayload = Object.keys(permissionState).map((role) => ({
+      name: role,
+      ...permissionState[role],
+    }));
 
-    if (!hasSelectedPermissions) {
-      toast.error("At least one permission must be selected.");
-      return;
+    try {
+      const message = await updateGroupPermissions({ group_id: groupId, permissions: permissionsPayload }).unwrap();
+      toast.success(message);
+    } catch (err) {
+      toast.error(err.message || "Failed to update group permissions.");
     }
-
-    toast.success("Group created successfully!");
   };
 
   const handleSearch = (event) => {
@@ -149,12 +175,12 @@ const UpdatePermissionsTable = () => {
     role: permission.name,
   }));
 
-  if (isLoading) return <div>Loading permissions...</div>;
+  if (isPermissionsLoading || isGroupLoading) return <div>Loading permissions...</div>;
   if (error) return <div>Error loading permissions: {error.message}</div>;
 
   return (
     <MDBox p={3}>
-           <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search Permissions"
@@ -165,7 +191,7 @@ const UpdatePermissionsTable = () => {
             onChange={handleSearch}
           />
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
-           Update Roles & Permissions
+            Update Roles & Permissions
           </MDTypography>
           <MDButton variant="contained" color="primary" onClick={handleSelectAll} sx={{ ml: 2 }}>
             {selectAll ? "Deselect All" : "Select All"}
@@ -212,6 +238,11 @@ const UpdatePermissionsTable = () => {
       <ToastContainer position="top-right" autoClose={3000} />
     </MDBox>
   );
+};
+
+// Define PropTypes
+UpdatePermissionsTable.propTypes = {
+  groupId: PropTypes.string.isRequired,
 };
 
 export default UpdatePermissionsTable;
