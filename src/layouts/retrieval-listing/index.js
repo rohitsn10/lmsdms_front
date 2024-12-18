@@ -3,16 +3,20 @@ import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import AssignmentReturnIcon from "@mui/icons-material/AssignmentReturn";
+import ArticleRoundedIcon from "@mui/icons-material/ArticleRounded";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import { useGetApprovedPrintListQuery } from "api/auth/retrievalApi"; // Import the API hook
 import PrintRetrievalDialog from "./retrievaldialog";
+import ApprovedRetrievalListingDialog from "./approve-list";
 import moment from "moment";
 
 const PrintRetrievalListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [approvedDialogOpen, setApprovedDialogOpen] = useState(false);
+  const [selectedApprovedRetrieval, setSelectedApprovedRetrieval] = useState(null);
   const [selectedRetrieval, setSelectedRetrieval] = useState(null);
 
   // Fetch data using the API hook
@@ -23,13 +27,27 @@ const PrintRetrievalListing = () => {
   };
 
   const handleDialogOpen = (row) => {
-    setSelectedRetrieval(row.document_title);
+    setSelectedRetrieval({ document_title: row.document_title, id: row.id });
     setDialogOpen(true);
+    console.log("Selected Retrieval:", { document_title: row.document_title, id: row.id });
   };
 
   const handleDialogClose = () => {
     setDialogOpen(false);
     setSelectedRetrieval(null);
+  };
+
+  const handleApprovedDialogOpen = (row) => {
+    setSelectedApprovedRetrieval({ id: row.id });
+    setApprovedDialogOpen(true);
+    console.log("Selected Retrieval-----------------------------------:", {
+      document_title: row.document_title,
+      id: row.id,
+    });
+  };
+  const handleApprovedDialogClose = () => {
+    setApprovedDialogOpen(false);
+    setSelectedApprovedRetrieval(null);
   };
 
   const handleRetrieve = (retrievalNumber) => {
@@ -99,12 +117,14 @@ const PrintRetrievalListing = () => {
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton
-          color="primary"
-          onClick={() => handleDialogOpen(params.row)}
-        >
-          <AssignmentReturnIcon />
-        </IconButton>
+        <>
+          <IconButton color="primary" onClick={() => handleDialogOpen(params.row)}>
+            <AssignmentReturnIcon />
+          </IconButton>
+          <IconButton color="info" onClick={() => handleApprovedDialogOpen(params.row)}>
+            <ArticleRoundedIcon />
+          </IconButton>
+        </>
       ),
     },
   ];
@@ -161,8 +181,15 @@ const PrintRetrievalListing = () => {
       <PrintRetrievalDialog
         open={dialogOpen}
         handleClose={handleDialogClose}
-        retrievalOptions={["12345", "67890", "11223"]} // Example options
+        selectedId={selectedRetrieval?.id}
         onRetrieve={handleRetrieve}
+      />
+      <ApprovedRetrievalListingDialog
+        open={approvedDialogOpen}
+        handleClose={handleApprovedDialogClose}
+        selectedId={selectedApprovedRetrieval?.id} // Pass the correct `id`
+        onRetrieve={handleRetrieve}
+        data={selectedRetrieval?.data || []} // Ensure `data` is always an array
       />
     </MDBox>
   );

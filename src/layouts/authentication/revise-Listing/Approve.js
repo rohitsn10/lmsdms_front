@@ -14,7 +14,7 @@ const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
 
     // Log the entire row to ensure it's passed correctly
     useEffect(() => {
-        console.log("Row data passed to dialog:", row);
+        // console.log("Row data passed to dialog:", row);
 
         if (row) {
             const document_id = row?.id; // Assuming id is the document_id

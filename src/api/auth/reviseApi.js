@@ -27,7 +27,7 @@ export const reviseApi = createApi({
         url: "dms_module/revise_request_get",
         method: "GET",
       }),
-      transformResponse: (response) => response.data, // Extract the data from the API response
+      transformResponse: (response) => response, // Extract the data from the API response
     }),
     approveRevise: builder.mutation({
       query: ({ document_id, status_id, request_action_id, action_status }) => ({

@@ -25,6 +25,7 @@ import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useFetchDocumentDetailsQuery, useUpdateDocumentMutation } from "api/auth/editDocumentApi";
 import { useFetchDocumentTypesQuery } from "api/auth/documentApi";
 import { useFetchWorkflowsQuery } from "api/auth/workflowApi";
+import { useDepartmentWiseReviewerQuery } from "api/auth/documentApi";
 
 function EditDocument() {
   const [title, setTitle] = useState("");
@@ -38,6 +39,7 @@ function EditDocument() {
   const [templateFile, setTemplateFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -49,7 +51,10 @@ function EditDocument() {
   const { data: documentTypesData, isLoading: documentTypesLoading } = useFetchDocumentTypesQuery();
   const { data: workflowsData, isLoading: workflowsLoading } = useFetchWorkflowsQuery();
 
+  const { data: userdata, isLoading: isUsersLoading } = useDepartmentWiseReviewerQuery();
+  const users = userdata || [];
   // Populate form with existing data
+  
   useEffect(() => {
     if (documentDetails) {
       setTitle(documentDetails.document_title || "");
@@ -60,6 +65,7 @@ function EditDocument() {
       setOperations(documentDetails.document_operation || "Upload files");
       setWorkflow(documentDetails.workflow || "");
       setTrainingRequired(documentDetails.trainingRequired || "No");
+      setSelectedUsers(documentDetails.visible_to_users || []);
     }
   }, [documentDetails]);
 
@@ -98,6 +104,7 @@ function EditDocument() {
         select_template: templateFile,
         workflow,
         trainingRequired,
+        visible_to_users: selectedUsers,
       }).unwrap(); // Use unwrap() to catch errors in the mutation
 
       toast.success("Document updated successfully!");
@@ -107,6 +114,7 @@ function EditDocument() {
       toast.error("Failed to update document. Please try again.");
     }
   };
+  
 
   const handleClear = () => {
     setTitle("");
@@ -124,6 +132,7 @@ function EditDocument() {
   const handleFileChange = (e) => {
     setTemplateFile(e.target.files[0]);
   };
+  
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
@@ -276,6 +285,42 @@ function EditDocument() {
                         {flow.workflow_name}
                       </MenuItem>
                     ))
+                  )}
+                </Select>
+              </FormControl>
+            </MDBox>
+            <MDBox mb={3}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="select-user-label">Update Users</InputLabel>
+                <Select
+                  labelId="select-user-label"
+                  id="select-user"
+                  multiple // Enable multiple selection
+                  value={selectedUsers} // Use state to hold selected users
+                  onChange={(e) => setSelectedUsers(e.target.value)} // Update the selected users
+                  input={<OutlinedInput label="Update Users" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem",
+                    ".MuiSelect-select": { padding: "0.45rem" },
+                  }}
+                  renderValue={(selected) =>
+                    selected
+                      .map((userId) => {
+                        const user = users.find((u) => u.id === userId);
+                        return user?.first_name || userId;
+                      })
+                      .join(", ")
+                  }
+                >
+                  {users.length > 0 ? (
+                    users.map((user) => (
+                      <MenuItem key={user.id} value={user.id}>
+                        {user.first_name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No users available</MenuItem>
                   )}
                 </Select>
               </FormControl>

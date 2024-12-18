@@ -9,21 +9,37 @@ import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import BackHandSharpIcon from "@mui/icons-material/BackHandSharp";
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
-import { useReviseRequestGetQuery } from "api/auth/reviseApi";
 import ReviseDialog from "./Revise";
 import ReviseApproveDialog from "./Approve";
+import { useReviseRequestGetQuery } from "api/auth/reviseApi"; // Adjust import as per your API slice location
 
 const ReviseApprovalList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const [isReviseDialogOpen, setReviseDialogOpen] = useState(false);
   const [isApproveDialogOpen, setApproveDialogOpen] = useState(false);
-  const [reviseDocument, setReviseDocument] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
-  
 
-  // Fetch data from the API
-  const { data: apiData, isLoading, isError } = useReviseRequestGetQuery();
+  // API call to fetch data
+  const { data: apiData, isLoading } = useReviseRequestGetQuery();
+
+  // Extract data and user_group_id from API response
+  const userGroupId = apiData?.user_group_id || null;
+  const apiDocuments = apiData?.data || [];
+
+  //console.log("User Group ID:", userGroupId); // Log user_group_id
+
+  // Format data for DataGrid
+  const formattedData = apiDocuments.map((doc, index) => ({
+    id: doc.document_id,
+    serial_number: index + 1,
+    documentTitle: doc.document_title,
+    documentType: doc.document_type,
+    requestedUser: `${doc.user}`,
+    requestedDate: new Date(doc.revision_created_at).toLocaleDateString(),
+    reviseStatus: doc.status,
+    revisereason: doc.revise_description,
+  }));
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -36,17 +52,10 @@ const ReviseApprovalList = () => {
 
   const handleReviseDialogClose = () => {
     setReviseDialogOpen(false);
-    setReviseDocument(null);
-  };
-
-  const handleReviseConfirm = () => {
-    console.log("Revise confirmed for document:", reviseDocument);
-    handleReviseDialogClose();
   };
 
   const handleApproveDialogOpen = (row) => {
-    setSelectedRow(row); // Store the entire row in the state
-    console.log("Row data passed to dialog:", row); // Optional: Log the row data for debugging
+    setSelectedRow(row);
     setApproveDialogOpen(true);
   };
 
@@ -64,20 +73,8 @@ const ReviseApprovalList = () => {
     handleApproveDialogClose();
   };
 
-  // Transform API data for DataGrid
-  const filteredData =
-    apiData?.map((item, index) => ({
-      id: item.document_id,
-      serial_number: index + 1,
-      documentTitle: item.document_title || "N/A",
-      documentType: item.document_type || "N/A",
-      requestedUser: ` ${item.user}` || "N/A",
-      requestedDate: item.revision_created_at, // Replace with actual date if available in API
-      reviseStatus: item.status || "N/A",
-      revisereason: item.revise_description,
-    })) || [];
-
-  const displayedData = filteredData.filter(
+  // Filter data based on the search term
+  const displayedData = formattedData.filter(
     (request) =>
       request.requestedUser.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.documentTitle.toLowerCase().includes(searchTerm.toLowerCase())
@@ -95,17 +92,29 @@ const ReviseApprovalList = () => {
       headerName: "Action",
       flex: 1,
       headerAlign: "center",
-      renderCell: (params) => (
-        <MDBox display="flex" justifyContent="center" alignItems="center" gap={1}>
-          <IconButton color="warning" onClick={() => handleReviseDialogOpen(params.row)}>
-            <BackHandSharpIcon />
-          </IconButton>
-          <IconButton color="primary" onClick={() => handleApproveDialogOpen(params.row)}>
-            <ImportContactsTwoToneIcon />
-          </IconButton>
-        </MDBox>
-      ),
-    },
+      renderCell: (params) => {
+        // Directly compare userGroupId with the value you want (e.g., 5)
+        const showApproveButton = userGroupId === 5 && params.row.reviseRequestId !== null;
+        const showReviseButton = params.row.reviseRequestId === null;
+    
+        return (
+          <MDBox display="flex" justifyContent="center" alignItems="center" gap={1}>
+            {showReviseButton && (
+              <IconButton color="warning" onClick={() => handleReviseDialogOpen(params.row)}>
+                <BackHandSharpIcon />
+              </IconButton>
+            )}
+    
+            {showApproveButton && (
+              <IconButton color="primary" onClick={() => handleApproveDialogOpen(params.row)}>
+                <ImportContactsTwoToneIcon />
+              </IconButton>
+            )}
+          </MDBox>
+        );
+      },
+    }
+    
   ];
 
   return (
@@ -126,9 +135,9 @@ const ReviseApprovalList = () => {
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           {isLoading ? (
-            <MDTypography>Loading...</MDTypography>
-          ) : isError ? (
-            <MDTypography>Error loading data</MDTypography>
+            <MDTypography variant="h6" textAlign="center">
+              Loading...
+            </MDTypography>
           ) : (
             <div style={{ height: 500, width: "100%" }}>
               <DataGrid
@@ -159,7 +168,6 @@ const ReviseApprovalList = () => {
       <ReviseDialog
         open={isReviseDialogOpen}
         onClose={handleReviseDialogClose}
-        onConfirm={handleReviseConfirm}
         documentId={selectedRow?.id || ""}
       />
 
