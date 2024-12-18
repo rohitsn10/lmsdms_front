@@ -363,9 +363,12 @@ const DocumentView = () => {
   // const handleNewPrint = () => {
   //   console.log("New Print Function Triggered for ID:", id);
   // };
-  const handlePrint2 = () => {
+  const handlePrint2 = (copies = 2) => {
     const quill = quillRef.current; // Get the Quill instance
     const editorContent = quill.root.innerHTML; // Get the HTML content from the editor
+
+    // Function to generate a unique number (you can customize this logic)
+    const generateUniqueNumber = (index) => `Print No: ${Date.now()}-${index + 1}`;
 
     // Create a temporary hidden iframe to load the content and trigger print
     const iframe = document.createElement("iframe");
@@ -376,6 +379,7 @@ const DocumentView = () => {
     document.body.appendChild(iframe);
 
     const iframeDocument = iframe.contentWindow.document;
+
     iframeDocument.open();
     iframeDocument.write(`
       <html>
@@ -388,6 +392,12 @@ const DocumentView = () => {
               margin: 0;
               font-size: 12px;
             }
+            .copy-container {
+              page-break-after: always; /* Ensures each copy starts on a new page */
+            }
+            .copy-container:last-child {
+              page-break-after: auto; /* Prevents a page break after the last copy */
+            }
             #editor-container {
               width: 100%;
               max-width: 210mm;
@@ -396,21 +406,37 @@ const DocumentView = () => {
               background-color: #fff;
               border: 1px solid #ccc;
             }
+            .print-header {
+              text-align: center;
+              margin-bottom: 20px;
+              font-size: 14px;
+              font-weight: bold;
+            }
           </style>
         </head>
         <body>
-          <div id="editor-container">${editorContent}</div>
+          ${Array.from({ length: copies })
+            .map((_, index) => `
+              <div class="copy-container">
+                <div class="print-header">${generateUniqueNumber(index)}</div>
+                <div id="editor-container">${editorContent}</div>
+              </div>
+            `)
+            .join("")}
         </body>
       </html>
     `);
     iframeDocument.close();
 
     iframe.onload = () => {
+      // Wait for iframe to load, then focus and trigger the print dialog
       iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-      document.body.removeChild(iframe);
+      iframe.contentWindow.print(); // Trigger print dialog
+      document.body.removeChild(iframe); // Clean up iframe after printing
     };
-  };
+};
+
+
 
   const handleSaveAsDocx = async () => {
     const quill = quillRef.current;
