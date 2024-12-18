@@ -70,66 +70,73 @@ const ApprovalDialog = ({ open, onClose, maxCopies, requestId }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <MDBox sx={{ textAlign: "center" }}>
-        <MDTypography variant="h4" fontWeight="medium" color="#344767" mt={1}>
-          Add Approval
-        </MDTypography>
-      </MDBox>
+  <MDBox sx={{ textAlign: "center" }}>
+    <MDTypography variant="h4" fontWeight="medium" color="#344767" mt={1}>
+      Add Approval
+    </MDTypography>
+  </MDBox>
 
-      <form onSubmit={handleSubmit}>
-        <DialogContent>
-          <MDBox display="flex" justifyContent="flex-end">
-            <MDButton
-              variant="outlined"
-              color="error"
-              size="small"
-              onClick={handleClear}
-              sx={{ marginRight: "20px" }}
-            >
-              Clear
-            </MDButton>
-          </MDBox>
-          <FormControl fullWidth margin="normal">
-            <TextField
-              label="Number of Copies"
-              type="number"
-              value={numberOfCopies}
-              onChange={handleChange}
-              helperText={
-                isInvalid
-                  ? `Value cannot exceed ${maxCopies}`
-                  : `Maximum copies allowed: ${maxCopies}`
-              }
-              error={isInvalid} // Highlight the field in red if invalid
-              fullWidth
-            />
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <MDButton onClick={onClose} color="error" sx={{ marginRight: "10px" }}>
-            Cancel
-          </MDButton>
-          <MDButton
-            variant="gradient"
-            color="error"
-            fullWidth
-            disabled={isInvalid || isSubmitting} // Disable if invalid
-            onClick={handleReject}
-          >
-            Reject
-          </MDButton>
-          <MDButton
-            variant="gradient"
-            color="success"
-            fullWidth
-            type="submit"
-            disabled={isInvalid || isSubmitting} // Disable if invalid
-          >
-            {isSubmitting ? "Submitting..." : "Approve"}
-          </MDButton>
-        </DialogActions>
-      </form>
-    </Dialog>
+  <form onSubmit={handleSubmit}>
+    <DialogContent>
+      <MDBox display="flex" justifyContent="flex-end">
+        <MDButton
+          variant="outlined"
+          color="error"
+          size="small"
+          onClick={handleClear}
+          sx={{ marginRight: "20px", width: "120px" }} // Ensure consistent width
+        >
+          Clear
+        </MDButton>
+      </MDBox>
+      <FormControl fullWidth margin="normal">
+        <TextField
+          label="Number of Copies"
+          type="number"
+          value={numberOfCopies}
+          onChange={handleChange}
+          helperText={
+            isInvalid
+              ? `Value cannot exceed ${maxCopies}`
+              : `Maximum copies allowed: ${maxCopies}`
+          }
+          error={isInvalid} // Highlight the field in red if invalid
+          fullWidth
+        />
+      </FormControl>
+    </DialogContent>
+    <DialogActions sx={{ display: "flex", justifyContent: "space" }}>
+      <MDButton
+        onClick={onClose}
+        color="error"
+        sx={{ marginRight: "10px", width: "120px" }} // Same width as others
+      >
+        Cancel
+      </MDButton>
+      <MDButton
+        variant="gradient"
+        color="error"
+        fullWidth
+        disabled={isInvalid || isSubmitting} // Disable if invalid
+        onClick={handleReject}
+        sx={{ width: "120px" }} // Ensure consistent width
+      >
+        Reject
+      </MDButton>
+      <MDButton
+        variant="gradient"
+        color="success"
+        fullWidth
+        type="submit"
+        disabled={isInvalid || isSubmitting} // Disable if invalid
+        sx={{ width: "120px" }} // Ensure consistent width
+      >
+        {isSubmitting ? "Submitting..." : "Approve"}
+      </MDButton>
+    </DialogActions>
+  </form>
+</Dialog>
+
   );
 };
 
