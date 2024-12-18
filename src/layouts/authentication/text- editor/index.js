@@ -475,15 +475,16 @@ const DocumentView = () => {
 
       console.log("API Response:", response);
       if (response.status) {
-        alert(response.message); // Success message from the API response
-        setDialogOpen(false); // Close dialog on success
-        navigate("/document-listing"); // Navigate to document listing page
+        toast.success("Document Send Back Successfully!");
+      setTimeout(() => {
+        navigate("/document-listing");
+      }, 2000);
       } else {
         alert("Action failed. Please try again."); // Failure alert
       }
     } catch (error) {
       console.error("Error calling API:", error);
-      alert("An error occurred. Please try again."); // General error handling
+      toast.error("Failed to Sendback. Please try again.");
     }
   };
 
@@ -562,7 +563,7 @@ const DocumentView = () => {
   }
 
   return (
-    <Box
+    <MDBox
     sx={{
       fontFamily: "Arial, sans-serif",
       padding: 2,
@@ -712,13 +713,7 @@ const DocumentView = () => {
         <MDButton
           variant="gradient"
           color="submit"
-          onClick={() => {
-            if (approval_status === "Approve") {
-              handlePrint2(); // Call handleNewPrint if approval_status is "Approve"
-            } else {
-              handlePrint(); // Call handlePrint otherwise
-            }
-          }}
+          onClick={() => {handlePrint(); }}
         >
           Print
         </MDButton>
@@ -741,7 +736,7 @@ const DocumentView = () => {
         documentId={id}
       /> */}
       <ToastContainer position="top-right" autoClose={3000} />
-    </Box>
+    </MDBox>
   );
 };
 

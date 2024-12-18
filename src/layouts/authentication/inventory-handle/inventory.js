@@ -85,7 +85,7 @@ function AddinventoryDialog({ open, handleClose }) {
                 variant="outlined"
                 value={inventory_name}
                 onChange={handleInventoryChange}
-                helperText="Enter the inventory name"
+                // helperText="Enter the inventory name"
                 fullWidth
               />
             </FormControl>

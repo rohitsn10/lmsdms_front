@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
@@ -19,9 +20,9 @@ const ReviseApprovalList = () => {
   const [isReviseDialogOpen, setReviseDialogOpen] = useState(false);
   const [isApproveDialogOpen, setApproveDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-
+  const authState = useSelector((state) => state.auth);
   // API call to fetch data
-  const { data: apiData, isLoading } = useReviseRequestGetQuery();
+  const { data: apiData, isLoading,refetch  } = useReviseRequestGetQuery();
 
   // Extract data and user_group_id from API response
   const userGroupId = apiData?.user_group_id || null;
@@ -40,7 +41,9 @@ const ReviseApprovalList = () => {
     reviseStatus: doc.status,
     revisereason: doc.revise_description,
   }));
-
+ useEffect(() => {
+     refetch();
+   }, [location.key]);
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
