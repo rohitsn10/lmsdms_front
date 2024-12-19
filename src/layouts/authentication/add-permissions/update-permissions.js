@@ -21,14 +21,23 @@ const UpdatePermissionsTable = ({ groupId }) => {
   const { role } = location.state || {};
   console.log("Received Role:", role);
 
-  const { data: permissions = [], isLoading: isPermissionsLoading, error } = useFetchPermissionsQuery();
-  const { data: groupPermissions, isLoading: isGroupLoading } = useFetchPermissionsByGroupIdQuery(role?.id);
+  const { data: permissions = [], isLoading: isPermissionsLoading, error,refetch: refetchPermissions } = useFetchPermissionsQuery();
+  const { data: groupPermissions, isLoading: isGroupLoading,refetch: refetchGroupPermissions } = useFetchPermissionsByGroupIdQuery(role?.id);
   const [updateGroupPermissions] = useUpdateGroupPermissionsMutation();
 
   const [permissionState, setPermissionState] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [groupName, setGroupName] = useState(role?.role || "");
   const [selectAll, setSelectAll] = useState(false);
+
+  const refetchAllData = () => {
+    refetchPermissions();
+    refetchGroupPermissions();
+  };
+  
+  useEffect(() => {
+    refetchAllData();
+  }, [location.key]);
 
   // Initialize permissions state
   useEffect(() => {
