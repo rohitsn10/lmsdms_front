@@ -15,34 +15,20 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
-const UpdatePermissionsTable = ({}) => {
+const UpdatePermissionsTable = ({ groupId }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { role } = location.state || {};
   console.log("Received Role:", role);
 
-  // API hooks
-  const { data: permissions = [], isLoading: isPermissionsLoading, error, refetch: refetchPermissions } =
-    useFetchPermissionsQuery();
-  const { data: groupPermissions, isLoading: isGroupLoading, refetch: refetchGroupPermissions } =
-    useFetchPermissionsByGroupIdQuery(role?.id);
+  const { data: permissions = [], isLoading: isPermissionsLoading, error } = useFetchPermissionsQuery();
+  const { data: groupPermissions, isLoading: isGroupLoading } = useFetchPermissionsByGroupIdQuery(role?.id);
   const [updateGroupPermissions] = useUpdateGroupPermissionsMutation();
 
   const [permissionState, setPermissionState] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [groupName, setGroupName] = useState(role?.role || "");
   const [selectAll, setSelectAll] = useState(false);
-
-  // Refetch all APIs
-  const refetchAllData = () => {
-    refetchPermissions();
-    refetchGroupPermissions();
-  };
-
-  // Trigger refetch on location change
-  useEffect(() => {
-    refetchAllData();
-  }, [location.key]);
 
   // Initialize permissions state
   useEffect(() => {
@@ -125,27 +111,24 @@ const UpdatePermissionsTable = ({}) => {
     }
 
     const permissionsPayload = Object.entries(permissionState).flatMap(([role, actions]) => {
-      const permissionDetails = groupPermissions.find((perm) => perm.name === role);
+      const permissionDetails = permissions.find((perm) => perm.name === role);
 
-      // Return only the IDs where the permission value is true
       return [
-        actions.isAdd && permissionDetails?.add ? permissionDetails.add : null,
-        actions.isView && permissionDetails?.view ? permissionDetails.view : null,
-        actions.isChange && permissionDetails?.change ? permissionDetails.change : null,
-        actions.isDelete && permissionDetails?.delete ? permissionDetails.delete : null,
+        actions.isAdd ? permissionDetails?.add : null,
+        actions.isView ? permissionDetails?.view : null,
+        actions.isChange ? permissionDetails?.change : null,
+        actions.isDelete ? permissionDetails?.delete : null,
       ].filter(Boolean); // Remove null or undefined values
     });
 
     try {
       const message = await updateGroupPermissions({
         name: groupName,
-        group_id: role?.id, // Ensure `role?.id` is available
-        permissions: permissionsPayload, // Pass only the valid IDs
+        group_id: role?.id,
+        permissions: permissionsPayload,
       }).unwrap();
 
-      toast.success(message);
-      refetchAllData(); // Refetch data after successful update
-      navigate("/roles-listing"); // Navigate to roles listing
+      toast.success(message, { onClose: () => navigate("/roles-listing") });
     } catch (err) {
       toast.error(err.message || "Failed to update group permissions.");
     }
@@ -261,26 +244,38 @@ const UpdatePermissionsTable = ({}) => {
             disabled
           />
         </MDBox>
-        <MDBox sx={{ height: 600, width: "100%", margin: "auto" }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            pageSize={10}
-            checkboxSelection={false}
-            disableSelectionOnClick
-          />
+        <MDBox display="flex" justifyContent="center" p={2}>
+          <div style={{ height: 500, width: "100%" }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pageSize={5}
+              rowsPerPageOptions={[5, 10, 20]}
+              disableSelectionOnClick
+              sx={{
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: "#f5f5f5",
+                  fontWeight: "bold",
+                },
+                "& .MuiDataGrid-cell": {
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+              }}
+            />
+          </div>
         </MDBox>
       </Card>
-      <ToastContainer position="top-right" autoClose={2000} />
+      <ToastContainer position="top-right" autoClose={3000} />
     </MDBox>
   );
 };
 
 UpdatePermissionsTable.propTypes = {
-  role: PropTypes.shape({
-    id: PropTypes.number,
-    role: PropTypes.string,
-  }),
+  groupId: PropTypes.string.isRequired,
 };
 
 export default UpdatePermissionsTable;
