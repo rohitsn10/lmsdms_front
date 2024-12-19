@@ -4,7 +4,7 @@ import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import LocalPrintshopTwoToneIcon from '@mui/icons-material/LocalPrintshopTwoTone';
+import LocalPrintshopTwoToneIcon from "@mui/icons-material/LocalPrintshopTwoTone";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
@@ -48,7 +48,7 @@ const PrintApprovalListing = () => {
 
   const handleOpenPrintDialog = (documentId) => {
     setSelectedDocumentId(documentId); // Store the document id
-    console.log("document id in dialog : ------------------------------------",documentId);
+    console.log("document id in dialog : ------------------------------------", documentId);
     setOpenPrintDialog(true); // Open the print document dialog
   };
 
@@ -58,33 +58,33 @@ const PrintApprovalListing = () => {
   };
 
   const columns = [
-    { 
-      field: "serial_number", 
-      headerName: "Sr. No.", 
-      flex: 0.5, 
-      headerAlign: "center", 
-      renderCell: (params) => params.row.serial_number ?? "-"
+    {
+      field: "serial_number",
+      headerName: "Sr. No.",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => params.row.serial_number ?? "-",
     },
-    { 
-      field: "document_title", 
-      headerName: "Document", 
-      flex: 1, 
-      headerAlign: "center", 
-      renderCell: (params) => params.row.document_title ?? "-"
+    {
+      field: "document_title",
+      headerName: "Document",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => params.row.document_title ?? "-",
     },
-    { 
-      field: "no_of_print", 
-      headerName: "Requested", 
-      flex: 1, 
-      headerAlign: "center", 
-      renderCell: (params) => params.row.no_of_print ?? "-"
+    {
+      field: "no_of_print",
+      headerName: "Requested",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => params.row.no_of_print ?? "-",
     },
-    { 
-      field: "sop_document_id", 
-      headerName: "Issue Type", 
-      flex: 0.75, 
-      headerAlign: "center", 
-      renderCell: (params) => params.row.issue_type ?? "-"
+    {
+      field: "sop_document_id",
+      headerName: "Issue Type",
+      flex: 0.75,
+      headerAlign: "center",
+      renderCell: (params) => params.row.issue_type ?? "-",
     },
     {
       field: "created_at",
@@ -92,37 +92,39 @@ const PrintApprovalListing = () => {
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => {
-        const date = params.row.created_at ? moment(params.row.created_at).format("DD-MM-YY HH:mm") : "-";
+        const date = params.row.created_at
+          ? moment(params.row.created_at).format("DD-MM-YY HH:mm")
+          : "-";
         return date;
       },
     },
-    { 
-      field: "no_of_request_by_admin", 
-      headerName: "Approved", 
-      flex: 0.75, 
-      headerAlign: "center", 
-      renderCell: (params) => params.row.no_of_request_by_admin ?? "-"
+    {
+      field: "no_of_request_by_admin",
+      headerName: "Approved",
+      flex: 0.75,
+      headerAlign: "center",
+      renderCell: (params) => params.row.no_of_request_by_admin ?? "-",
     },
-    { 
-      field: "status", 
-      headerName: "Status", 
-      flex: 1, 
-      headerAlign: "center", 
-      renderCell: (params) => params.row.status ?? "-"
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => params.row.status ?? "-",
     },
-    { 
-      field: "Approve", 
-      headerName: "Approve Date", 
-      flex: 0.75, 
-      headerAlign: "center", 
-      renderCell: (params) => params.row.Approve ?? "-"
+    {
+      field: "Approve",
+      headerName: "Approve Date",
+      flex: 0.75,
+      headerAlign: "center",
+      renderCell: (params) => params.row.Approve ?? "-",
     },
-    { 
-      field: "first_name", 
-      headerName: "User", 
-      flex: 0.75, 
-      headerAlign: "center", 
-      renderCell: (params) => params.row.first_name ?? "-"
+    {
+      field: "first_name",
+      headerName: "User",
+      flex: 0.75,
+      headerAlign: "center",
+      renderCell: (params) => params.row.first_name ?? "-",
     },
     {
       field: "action",
@@ -143,7 +145,7 @@ const PrintApprovalListing = () => {
         }
 
         return (
-          <MDBox  display="flex" gap={1} justifyContent="center" alignItems="center">
+          <MDBox display="flex" gap={1} justifyContent="center" alignItems="center">
             {/* Action Button */}
             <IconButton
               color={color} // Set the color dynamically based on status
@@ -153,17 +155,17 @@ const PrintApprovalListing = () => {
               <CheckCircleIcon />
             </IconButton>
 
-            {/* Print Button */}
             <IconButton
               color="primary" // Static color for the print icon
               onClick={() => handleOpenPrintDialog(params.row.sop_document_id)} // Open PrintDialog with document id
+              disabled={params.row.status !== "Approve"} // Disable button if status is not "Approve"
             >
               <LocalPrintshopTwoToneIcon />
             </IconButton>
           </MDBox>
         );
       },
-    }
+    },
   ];
 
   return (
@@ -178,7 +180,11 @@ const PrintApprovalListing = () => {
             value={searchTerm}
             onChange={handleSearch}
           />
-          <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center", mr:20 }}>
+          <MDTypography
+            variant="h4"
+            fontWeight="medium"
+            sx={{ flexGrow: 1, textAlign: "center", mr: 20 }}
+          >
             Print Approval Listing
           </MDTypography>
         </MDBox>
@@ -227,7 +233,7 @@ const PrintApprovalListing = () => {
       )}
 
       {/* Render PrintDocumentDialog */}
-        {openPrintDialog && (
+      {openPrintDialog && (
         <PrintDocumentDialog
           open={openPrintDialog}
           onClose={handleClosePrintDialog}

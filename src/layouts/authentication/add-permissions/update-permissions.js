@@ -15,7 +15,7 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
-const UpdatePermissionsTable = ({ groupId }) => {
+const UpdatePermissionsTable = ({}) => {
   const location = useLocation();
   const { role } = location.state || {};
   console.log("Received Role:", role);
@@ -99,38 +99,42 @@ const UpdatePermissionsTable = ({ groupId }) => {
       return updatedState;
     });
   };
-
   const handleSubmit = async () => {
     if (!groupName.trim()) {
       toast.error("Group name is required.");
       return;
     }
-
+  
+    // Create permissionsPayload with only IDs where the permission is true
     const permissionsPayload = Object.keys(permissionState).flatMap((role) => {
       const permissionDetails = groupPermissions.find((perm) => perm.name === role);
-
+      
+      // Return only the IDs where the permission value is true
       return [
-        permissionDetails?.isAdd ? permissionDetails?.add : null,
-        permissionDetails?.isChange ? permissionDetails?.change : null,
-        permissionDetails?.isDelete ? permissionDetails?.delete : null,
-        permissionDetails?.isView ? permissionDetails?.view : null,
-      ].filter((id) => id !== null && id !== false && id !== undefined);
+        permissionDetails?.isAdd ? permissionDetails?.add : null,  // Include `add` ID if `isAdd` is true
+        permissionDetails?.isChange ? permissionDetails?.change : null, // Include `change` ID if `isChange` is true
+        permissionDetails?.isDelete ? permissionDetails?.delete : null, // Include `delete` ID if `isDelete` is true
+        permissionDetails?.isView ? permissionDetails?.view : null, // Include `view` ID if `isView` is true
+      ]
+      .filter((id) => id !== null && id !== false && id !== undefined); // Filter out `null`, `false`, and `undefined`
     });
-
+  
+    // Log the permissionsPayload to inspect the values before sending
     console.log("permissionsPayload: ", permissionsPayload);
-
+  
     try {
       const message = await updateGroupPermissions({
         name: groupName,
-        group_id: role?.id,
-        permissions: permissionsPayload,
+        group_id: role?.id, // Ensure `role?.id` is available
+        permissions: permissionsPayload, // Pass only the valid IDs
       }).unwrap();
-
+  
       toast.success(message);
     } catch (err) {
       toast.error(err.message || "Failed to update group permissions.");
     }
   };
+
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
