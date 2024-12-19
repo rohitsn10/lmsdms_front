@@ -26,12 +26,7 @@ const UpdatePermissionsTable = ({ groupId }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [groupName, setGroupName] = useState(role?.role || "");
   const [selectAll, setSelectAll] = useState(false);
-  
-
-
- 
-
-      
+    
   // Initialize permissions state
   useEffect(() => {
     if (permissions.length > 0) {
