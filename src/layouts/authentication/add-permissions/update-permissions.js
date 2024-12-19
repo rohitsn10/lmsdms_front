@@ -63,6 +63,7 @@ const UpdatePermissionsTable = ({ groupId }) => {
     }
   }, [groupPermissions]);
 
+  // Handle checkbox changes
   const handleCheckboxChange = (role, action) => {
     setPermissionState((prevState) => {
       const rolePermissions = prevState[role] || {
@@ -82,6 +83,7 @@ const UpdatePermissionsTable = ({ groupId }) => {
     });
   };
 
+  // Handle select all toggle
   const handleSelectAll = () => {
     const newSelectAllState = !selectAll;
     setSelectAll(newSelectAllState);
@@ -100,24 +102,23 @@ const UpdatePermissionsTable = ({ groupId }) => {
     });
   };
 
+  // Handle form submission
   const handleSubmit = async () => {
     if (!groupName.trim()) {
       toast.error("Group name is required.");
       return;
     }
 
-    const permissionsPayload = Object.keys(permissionState).flatMap((role) => {
+    const permissionsPayload = Object.entries(permissionState).flatMap(([role, actions]) => {
       const permissionDetails = groupPermissions.find((perm) => perm.name === role);
 
       return [
-        permissionDetails?.isAdd ? permissionDetails?.add : null,
-        permissionDetails?.isChange ? permissionDetails?.change : null,
-        permissionDetails?.isDelete ? permissionDetails?.delete : null,
-        permissionDetails?.isView ? permissionDetails?.view : null,
-      ].filter((id) => id !== null && id !== false && id !== undefined);
+        actions.isAdd && permissionDetails?.add ? permissionDetails.add : null,
+        actions.isView && permissionDetails?.view ? permissionDetails.view : null,
+        actions.isChange && permissionDetails?.change ? permissionDetails.change : null,
+        actions.isDelete && permissionDetails?.delete ? permissionDetails.delete : null,
+      ].filter(Boolean); // Remove null or undefined values
     });
-
-    console.log("permissionsPayload: ", permissionsPayload);
 
     try {
       const message = await updateGroupPermissions({
@@ -132,14 +133,17 @@ const UpdatePermissionsTable = ({ groupId }) => {
     }
   };
 
+  // Handle search input
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
+  // Filter permissions based on search term
   const filteredPermissions = permissions.filter((perm) =>
     perm.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Define columns for DataGrid
   const columns = [
     { field: "srNo", headerName: "Sr. No.", flex: 0.5, headerAlign: "center", align: "center" },
     { field: "role", headerName: "Role", flex: 1, headerAlign: "center", align: "center" },
@@ -197,6 +201,7 @@ const UpdatePermissionsTable = ({ groupId }) => {
     },
   ];
 
+  // Define rows for DataGrid
   const rows = filteredPermissions.map((permission, index) => ({
     id: index,
     srNo: index + 1,
@@ -208,7 +213,7 @@ const UpdatePermissionsTable = ({ groupId }) => {
 
   return (
     <MDBox p={3}>
-    <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
+     <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search Permissions"
@@ -268,7 +273,6 @@ const UpdatePermissionsTable = ({ groupId }) => {
   );
 };
 
-// Define PropTypes
 UpdatePermissionsTable.propTypes = {
   groupId: PropTypes.string.isRequired,
 };
