@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import {
   useFetchPermissionsQuery,
@@ -17,17 +17,32 @@ import MDButton from "components/MDButton";
 
 const UpdatePermissionsTable = ({}) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { role } = location.state || {};
   console.log("Received Role:", role);
 
-  const { data: permissions = [], isLoading: isPermissionsLoading, error } = useFetchPermissionsQuery();
-  const { data: groupPermissions, isLoading: isGroupLoading } = useFetchPermissionsByGroupIdQuery(role?.id);
+  // API hooks
+  const { data: permissions = [], isLoading: isPermissionsLoading, error, refetch: refetchPermissions } =
+    useFetchPermissionsQuery();
+  const { data: groupPermissions, isLoading: isGroupLoading, refetch: refetchGroupPermissions } =
+    useFetchPermissionsByGroupIdQuery(role?.id);
   const [updateGroupPermissions] = useUpdateGroupPermissionsMutation();
 
   const [permissionState, setPermissionState] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [groupName, setGroupName] = useState(role?.role || "");
   const [selectAll, setSelectAll] = useState(false);
+
+  // Refetch all APIs
+  const refetchAllData = () => {
+    refetchPermissions();
+    refetchGroupPermissions();
+  };
+
+  // Trigger refetch on location change
+  useEffect(() => {
+    refetchAllData();
+  }, [location.key]);
 
   // Initialize permissions state
   useEffect(() => {
@@ -111,7 +126,7 @@ const UpdatePermissionsTable = ({}) => {
 
     const permissionsPayload = Object.entries(permissionState).flatMap(([role, actions]) => {
       const permissionDetails = groupPermissions.find((perm) => perm.name === role);
-      
+
       // Return only the IDs where the permission value is true
       return [
         actions.isAdd && permissionDetails?.add ? permissionDetails.add : null,
@@ -127,8 +142,10 @@ const UpdatePermissionsTable = ({}) => {
         group_id: role?.id, // Ensure `role?.id` is available
         permissions: permissionsPayload, // Pass only the valid IDs
       }).unwrap();
-  
+
       toast.success(message);
+      refetchAllData(); // Refetch data after successful update
+      navigate("/roles-listing"); // Navigate to roles listing
     } catch (err) {
       toast.error(err.message || "Failed to update group permissions.");
     }
@@ -214,7 +231,7 @@ const UpdatePermissionsTable = ({}) => {
 
   return (
     <MDBox p={3}>
-     <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search Permissions"
@@ -244,38 +261,26 @@ const UpdatePermissionsTable = ({}) => {
             disabled
           />
         </MDBox>
-        <MDBox display="flex" justifyContent="center" p={2}>
-          <div style={{ height: 500, width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5, 10, 20]}
-              disableSelectionOnClick
-              sx={{
-                border: "1px solid #ddd",
-                borderRadius: "4px",
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: "#f5f5f5",
-                  fontWeight: "bold",
-                },
-                "& .MuiDataGrid-cell": {
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                },
-              }}
-            />
-          </div>
+        <MDBox sx={{ height: 600, width: "100%", margin: "auto" }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={10}
+            checkboxSelection={false}
+            disableSelectionOnClick
+          />
         </MDBox>
       </Card>
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={2000} />
     </MDBox>
   );
 };
 
 UpdatePermissionsTable.propTypes = {
-  groupId: PropTypes.string.isRequired,
+  role: PropTypes.shape({
+    id: PropTypes.number,
+    role: PropTypes.string,
+  }),
 };
 
 export default UpdatePermissionsTable;
