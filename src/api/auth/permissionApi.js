@@ -34,7 +34,7 @@ export const permissionApi = createApi({
         // New API to fetch permissions by group ID
         fetchPermissionsByGroupId: builder.query({
             query: (group_id) => {
-              console.log("Group ID From API :-----------------", group_id); // Log the group_id
+              console.log("Group ID From API :-----------------=============", group_id); // Log the group_id
               return `user_profile/group_id_wise_permission_list?group_id=${group_id}`;
             },
             transformResponse: (response) => {
@@ -47,10 +47,10 @@ export const permissionApi = createApi({
           
        
         updateGroupPermissions: builder.mutation({
-            query: ({ group_id, permissions }) => ({
-                url: 'user_profile/group_update_with_permissions',
+            query: ({ group_id, permissions,name }) => ({
+                url: `user_profile/group_update_with_permissions/${group_id}`,
                 method: 'PUT',
-                body: { name ,permissions , group_id },
+                body: { name ,permissions},
             }),
             transformResponse: (response) => {
                 if (response.status) {

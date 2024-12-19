@@ -19,13 +19,12 @@ const UpdatePermissionsTable = ({ groupId }) => {
   const location = useLocation();
   const { role } = location.state || {}; // Destructure the role from location state
   console.log("Received Role:", role);
-  const { data: permissions = [], isLoading: isPermissionsLoading, error } = useFetchPermissionsQuery();
+  const {data: permissions = [],isLoading: isPermissionsLoading,error,} = useFetchPermissionsQuery();
   const { data: groupPermissions, isLoading: isGroupLoading } = useFetchPermissionsByGroupIdQuery(role?.id);
-  const [updateGroupPermissions] = useUpdateGroupPermissionsMutation();
-  
+  const [updateGroupPermissions] = useUpdateGroupPermissionsMutation(role?.id);
   const [permissionState, setPermissionState] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
-  const [groupName, setGroupName] = useState("");
+  const [groupName, setGroupName] = useState(role?.role || "");
   const [selectAll, setSelectAll] = useState(false);
   
 
@@ -70,11 +69,11 @@ const UpdatePermissionsTable = ({ groupId }) => {
       ...prevState,
       [role]: {
         ...prevState[role],
-        [action]: !prevState[role][action],
+        [action]: !prevState[role][action], // Toggle the action (isAdd, isView, etc.)
       },
     }));
   };
-
+  
   const handleSelectAll = () => {
     const newSelectAllState = !selectAll;
     setSelectAll(newSelectAllState);
@@ -98,19 +97,38 @@ const UpdatePermissionsTable = ({ groupId }) => {
       toast.error("Group name is required.");
       return;
     }
-
-    const permissionsPayload = Object.keys(permissionState).map((role) => ({
-      name: role,
-      ...permissionState[role],
-    }));
-
+  
+    // Create permissionsPayload with only IDs where the permission is true
+    const permissionsPayload = Object.keys(permissionState).flatMap((role) => {
+      const permissionDetails = groupPermissions.find((perm) => perm.name === role);
+      
+      // Return only the IDs where the permission value is true
+      return [
+        permissionDetails?.isAdd ? permissionDetails?.add : null,  // Include `add` ID if `isAdd` is true
+        permissionDetails?.isChange ? permissionDetails?.change : null, // Include `change` ID if `isChange` is true
+        permissionDetails?.isDelete ? permissionDetails?.delete : null, // Include `delete` ID if `isDelete` is true
+        permissionDetails?.isView ? permissionDetails?.view : null, // Include `view` ID if `isView` is true
+      ]
+      .filter((id) => id !== null && id !== false && id !== undefined); // Filter out `null`, `false`, and `undefined`
+    });
+  
+    // Log the permissionsPayload to inspect the values before sending
+    console.log("permissionsPayload: ", permissionsPayload);
+  
     try {
-      const message = await updateGroupPermissions({ group_id: groupId, permissions: permissionsPayload }).unwrap();
+      const message = await updateGroupPermissions({
+        name: groupName,
+        group_id: role?.id, // Ensure `role?.id` is available
+        permissions: permissionsPayload, // Pass only the valid IDs
+      }).unwrap();
+  
       toast.success(message);
     } catch (err) {
       toast.error(err.message || "Failed to update group permissions.");
     }
   };
+  
+  
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -215,7 +233,7 @@ const UpdatePermissionsTable = ({ groupId }) => {
             size="small"
             sx={{ width: "250px" }}
             value={groupName}
-            onChange={(e) => setGroupName(e.target.value)}
+            disabled={true}
           />
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
