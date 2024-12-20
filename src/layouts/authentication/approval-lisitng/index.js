@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -9,6 +9,9 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import { useGetPrintRequestsQuery } from "api/auth/printApi";
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { hasPermission } from "utils/hasPermission";
+import { useAuth } from "hooks/use-auth";
 import ApprovalDialog from "./add-approval/index"; // Import the dialog component
 import PrintDocumentDialog from "./print-window/index"; // Import the new dialog component
 import moment from "moment";
@@ -20,6 +23,14 @@ const PrintApprovalListing = () => {
   const [openPrintDialog, setOpenPrintDialog] = useState(false); // State for Print Document Dialog
   const [selectedDocumentId, setSelectedDocumentId] = useState(null); // Store document id for printing
   const { data: printRequests, error, isLoading } = useGetPrintRequestsQuery();
+
+  const { user } = useAuth();
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
+
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+    skip: !groupId, // Ensure it skips if groupId is missing
+  });
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -146,22 +157,25 @@ const PrintApprovalListing = () => {
 
         return (
           <MDBox display="flex" gap={1} justifyContent="center" alignItems="center">
-            {/* Action Button */}
-            <IconButton
-              color={color} // Set the color dynamically based on status
-              onClick={() => handleOpenDialog(params.row)}
-              disabled={status === "Approve"} // Disable button if status is "Approve"
-            >
-              <CheckCircleIcon />
-            </IconButton>
+            {hasPermission(userPermissions, "printrequest", "isChange") && (
+              <IconButton
+                color={color} // Set the color dynamically based on status
+                onClick={() => handleOpenDialog(params.row)}
+                disabled={status === "Approve"} // Disable button if status is "Approve"
+              >
+                <CheckCircleIcon />
+              </IconButton>
+            )}
 
-            <IconButton
-              color="primary" // Static color for the print icon
-              onClick={() => handleOpenPrintDialog(params.row.sop_document_id)} // Open PrintDialog with document id
-              disabled={params.row.status !== "Approve"} // Disable button if status is not "Approve"
-            >
-              <LocalPrintshopTwoToneIcon />
-            </IconButton>
+            {hasPermission(userPermissions, "printrequest", "isPrint") && (
+              <IconButton
+                color="primary" // Static color for the print icon
+                onClick={() => handleOpenPrintDialog(params.row.sop_document_id)} // Open PrintDialog with document id
+                disabled={params.row.status !== "Approve"} // Disable button if status is not "Approve"
+              >
+                <LocalPrintshopTwoToneIcon />
+              </IconButton>
+            )}
           </MDBox>
         );
       },

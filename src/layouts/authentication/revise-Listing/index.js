@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Card from "@mui/material/Card";
@@ -6,44 +6,43 @@ import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import BackHandSharpIcon from "@mui/icons-material/BackHandSharp";
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
 import ReviseDialog from "./Revise";
 import ReviseApproveDialog from "./Approve";
 import { useReviseRequestGetQuery } from "api/auth/reviseApi"; // Adjust import as per your API slice location
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { hasPermission } from "utils/hasPermission";
+import { useAuth } from "hooks/use-auth";
 
 const ReviseApprovalList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate();
   const [isReviseDialogOpen, setReviseDialogOpen] = useState(false);
   const [isApproveDialogOpen, setApproveDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-  const authState = useSelector((state) => state.auth);
+
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Fetch permissions
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
+  const { data: userPermissions = [] } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+    skip: !groupId,
+  });
+
   // API call to fetch data
-  const { data: apiData, isLoading,refetch  } = useReviseRequestGetQuery();
+  const { data: apiData, isLoading, refetch } = useReviseRequestGetQuery();
 
   // Extract data and user_group_id from API response
   const userGroupId = apiData?.user_group_id || null;
   const apiDocuments = apiData?.data || [];
 
-  //console.log("User Group ID:", userGroupId); // Log user_group_id
+  useEffect(() => {
+    refetch();
+  }, [location.key]);
 
-  // Format data for DataGrid
-  const formattedData = apiDocuments.map((doc, index) => ({
-    id: doc.document_id,
-    serial_number: index + 1,
-    documentTitle: doc.document_title,
-    documentType: doc.document_type,
-    requestedUser: `${doc.user}`,
-    requestedDate: new Date(doc.revision_created_at).toLocaleDateString(),
-    reviseStatus: doc.status,
-    revisereason: doc.revise_description,
-  }));
- useEffect(() => {
-     refetch();
-   }, [location.key]);
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -76,6 +75,18 @@ const ReviseApprovalList = () => {
     handleApproveDialogClose();
   };
 
+  // Format data for DataGrid
+  const formattedData = apiDocuments.map((doc, index) => ({
+    id: doc.document_id,
+    serial_number: index + 1,
+    documentTitle: doc.document_title,
+    documentType: doc.document_type,
+    requestedUser: `${doc.user}`,
+    requestedDate: new Date(doc.revision_created_at).toLocaleDateString(),
+    reviseStatus: doc.status,
+    revisereason: doc.revise_description,
+  }));
+
   // Filter data based on the search term
   const displayedData = formattedData.filter(
     (request) =>
@@ -96,10 +107,13 @@ const ReviseApprovalList = () => {
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => {
-        // Directly compare userGroupId with the value you want (e.g., 5)
-        const showApproveButton = userGroupId === 5 && params.row.reviseRequestId !== null;
-        const showReviseButton = params.row.reviseRequestId === null;
-    
+        const showApproveButton = 
+          hasPermission(userPermissions, "revise", "isApprove") && 
+          params.row.reviseRequestId !== null;
+        const showReviseButton = 
+          hasPermission(userPermissions, "revise", "isChange") && 
+          params.row.reviseRequestId === null;
+
         return (
           <MDBox display="flex" justifyContent="center" alignItems="center" gap={1}>
             {showReviseButton && (
@@ -107,7 +121,7 @@ const ReviseApprovalList = () => {
                 <BackHandSharpIcon />
               </IconButton>
             )}
-    
+
             {showApproveButton && (
               <IconButton color="primary" onClick={() => handleApproveDialogOpen(params.row)}>
                 <ImportContactsTwoToneIcon />
@@ -116,8 +130,7 @@ const ReviseApprovalList = () => {
           </MDBox>
         );
       },
-    }
-    
+    },
   ];
 
   return (
