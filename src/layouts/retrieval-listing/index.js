@@ -7,7 +7,10 @@ import ArticleRoundedIcon from "@mui/icons-material/ArticleRounded";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
-import { useGetApprovedPrintListQuery } from "api/auth/retrievalApi"; // Import the API hook
+import { useGetApprovedPrintListQuery } from "api/auth/retrievalApi";
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { hasPermission } from "utils/hasPermission";
+import { useAuth } from "hooks/use-auth";
 import PrintRetrievalDialog from "./retrievaldialog";
 import ApprovedRetrievalListingDialog from "./approve-list";
 import moment from "moment";
@@ -19,17 +22,21 @@ const PrintRetrievalListing = () => {
   const [selectedApprovedRetrieval, setSelectedApprovedRetrieval] = useState(null);
   const [selectedRetrieval, setSelectedRetrieval] = useState(null);
 
-  // Fetch data using the API hook
-  const { data, error, isLoading } = useGetApprovedPrintListQuery();
+  const { user } = useAuth();
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
+  // Fetch permissions and data
+  const { data, error, isLoading } = useGetApprovedPrintListQuery();
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+    skip: !groupId,
+  });
+
+  const handleSearch = (event) => setSearchTerm(event.target.value);
 
   const handleDialogOpen = (row) => {
     setSelectedRetrieval({ document_title: row.document_title, id: row.id });
     setDialogOpen(true);
-    console.log("Selected Retrieval:", { document_title: row.document_title, id: row.id });
   };
 
   const handleDialogClose = () => {
@@ -40,11 +47,8 @@ const PrintRetrievalListing = () => {
   const handleApprovedDialogOpen = (row) => {
     setSelectedApprovedRetrieval({ id: row.id });
     setApprovedDialogOpen(true);
-    console.log("Selected Retrieval-----------------------------------:", {
-      document_title: row.document_title,
-      id: row.id,
-    });
   };
+
   const handleApprovedDialogClose = () => {
     setApprovedDialogOpen(false);
     setSelectedApprovedRetrieval(null);
@@ -54,7 +58,6 @@ const PrintRetrievalListing = () => {
     console.log(`Retrieving document: ${retrievalNumber}`);
   };
 
-  // Filter data based on search term
   const filteredData = data
     ? data
         .filter(
@@ -69,41 +72,11 @@ const PrintRetrievalListing = () => {
     : [];
 
   const columns = [
-    {
-      field: "serial_number",
-      headerName: "Sr. No.",
-      flex: 0.5,
-      headerAlign: "center",
-      renderCell: (params) => params.row.serial_number ?? "-",
-    },
-    {
-      field: "document_title",
-      headerName: "Document Title",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => params.row.document_title ?? "-",
-    },
-    {
-      field: "no_of_print",
-      headerName: "Copies Requested",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => params.row.no_of_print ?? "-",
-    },
-    {
-      field: "no_of_request_by_admin",
-      headerName: "Copies Approved",
-      flex: 0.5,
-      headerAlign: "center",
-      renderCell: (params) => params.row.no_of_request_by_admin ?? "-",
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => params.row.status ?? "-",
-    },
+    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
+    { field: "document_title", headerName: "Document Title", flex: 1, headerAlign: "center" },
+    { field: "no_of_print", headerName: "Copies Requested", flex: 1, headerAlign: "center" },
+    { field: "no_of_request_by_admin", headerName: "Copies Approved", flex: 0.5, headerAlign: "center" },
+    { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
     {
       field: "Approve",
       headerName: "Approve Date",
@@ -117,21 +90,28 @@ const PrintRetrievalListing = () => {
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <>
-          <IconButton color="primary" onClick={() => handleDialogOpen(params.row)}>
-            <AssignmentReturnIcon />
-          </IconButton>
-          <IconButton color="info" onClick={() => handleApprovedDialogOpen(params.row)}>
-            <ArticleRoundedIcon />
-          </IconButton>
-        </>
+        <MDBox display="flex" gap={1}>
+          {hasPermission(userPermissions, "retrieval", "isChange") && (
+            <IconButton color="primary" onClick={() => handleDialogOpen(params.row)}>
+              <AssignmentReturnIcon />
+            </IconButton>
+          )}
+          {hasPermission(userPermissions, "retrieval", "isView") && (
+            <IconButton color="info" onClick={() => handleApprovedDialogOpen(params.row)}>
+              <ArticleRoundedIcon />
+            </IconButton>
+          )}
+        </MDBox>
       ),
     },
   ];
 
+  if (isLoading) return <div>Loading...</div>;
+  if (error || permissionError) return <div>Error loading data or permissions.</div>;
+
   return (
     <MDBox p={3}>
-      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
+           <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search Document"
@@ -147,34 +127,24 @@ const PrintRetrievalListing = () => {
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>
-            {isLoading ? (
-              <MDTypography variant="body1" sx={{ textAlign: "center" }}>
-                Loading...
-              </MDTypography>
-            ) : error ? (
-              <MDTypography variant="body1" sx={{ textAlign: "center", color: "red" }}>
-                Error fetching data
-              </MDTypography>
-            ) : (
-              <DataGrid
-                rows={filteredData}
-                columns={columns}
-                pageSize={5}
-                rowsPerPageOptions={[5, 10, 20]}
-                disableSelectionOnClick
-                sx={{
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  "& .MuiDataGrid-columnHeaders": {
-                    backgroundColor: "#f5f5f5",
-                    fontWeight: "bold",
-                  },
-                  "& .MuiDataGrid-cell": {
-                    textAlign: "center",
-                  },
-                }}
-              />
-            )}
+            <DataGrid
+              rows={filteredData}
+              columns={columns}
+              pageSize={5}
+              rowsPerPageOptions={[5, 10, 20]}
+              disableSelectionOnClick
+              sx={{
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: "#f5f5f5",
+                  fontWeight: "bold",
+                },
+                "& .MuiDataGrid-cell": {
+                  textAlign: "center",
+                },
+              }}
+            />
           </div>
         </MDBox>
       </Card>
@@ -187,9 +157,8 @@ const PrintRetrievalListing = () => {
       <ApprovedRetrievalListingDialog
         open={approvedDialogOpen}
         handleClose={handleApprovedDialogClose}
-        selectedId={selectedApprovedRetrieval?.id} // Pass the correct `id`
+        selectedId={selectedApprovedRetrieval?.id}
         onRetrieve={handleRetrieve}
-        data={selectedRetrieval?.data || []} // Ensure `data` is always an array
       />
     </MDBox>
   );

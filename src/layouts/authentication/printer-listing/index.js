@@ -9,13 +9,24 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { useGetPrintersQuery } from "api/auth/PrinterApi"; // Import the API hook
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { hasPermission } from "utils/hasPermission";
+import { useAuth } from "hooks/use-auth";
 
 const PrinterListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
 
-  // Use the useViewPrintersQuery hook to fetch printers
   const { data: printers, isLoading, isError } = useGetPrintersQuery();
+  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(
+    groupId?.toString(),
+    {
+      skip: !groupId, // Ensure it skips if groupId is missing
+    }
+  );
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -25,46 +36,50 @@ const PrinterListing = () => {
     navigate("/update-printer", { state: { printer } });
   };
 
+  const handleAddPrinter = () => {
+    navigate("/add-printer");
+  };
+
   // Filter printers based on search term
   const filteredData = printers
-  ? printers
-      .filter(
-        (printer) =>
-          printer.printer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          printer.printer_description.toLowerCase().includes(searchTerm.toLowerCase()) // Use printer_description for location
-      )
-      .map((printer, index) => ({
-        ...printer,
-        serial_number: index + 1, // Add serial_number after filtering
-      }))
-  : [];
-
+    ? printers
+        .filter(
+          (printer) =>
+            printer.printer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            printer.printer_description.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .map((printer, index) => ({
+          ...printer,
+          serial_number: index + 1, // Add serial_number after filtering
+        }))
+    : [];
 
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "printer_name", headerName: "Printer Name", flex: 1, headerAlign: "center" },
-    { field: "printer_description", headerName: "Printer Location", flex: 1.5, headerAlign: "center" }, // Changed to printer_description
+    { field: "printer_description", headerName: "Printer Location", flex: 1.5, headerAlign: "center" },
     {
       field: "action",
       headerName: "Action",
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => handleEditPrinter(params.row)}>
-          <EditIcon />
-        </IconButton>
+        <MDBox display="flex" gap={1}>
+          {hasPermission(userPermissions, "printer", "isChange") && (
+            <IconButton color="primary" onClick={() => handleEditPrinter(params.row)}>
+              <EditIcon />
+            </IconButton>
+          )}
+        </MDBox>
       ),
+      sortable: false,
+      filterable: false,
     },
   ];
 
   // Handle loading and error states
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
-    return <div>Error loading printers.</div>;
-  }
+  if (isLoading) return <div>Loading...</div>;
+  if (isError || permissionError) return <div>Error loading data or permissions.</div>;
 
   return (
     <MDBox p={3}>
@@ -81,14 +96,11 @@ const PrinterListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Printer Listing
           </MDTypography>
-          <MDButton
-            variant="contained"
-            color="primary"
-            onClick={() => navigate("/add-printer")}
-            sx={{ ml: 2 }}
-          >
-            Add Printer
-          </MDButton>
+          {hasPermission(userPermissions, "printer", "isAdd") && (
+            <MDButton variant="contained" color="primary" onClick={handleAddPrinter} sx={{ ml: 2 }}>
+              Add Printer
+            </MDButton>
+          )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>
@@ -109,6 +121,9 @@ const PrinterListing = () => {
                 },
                 "& .MuiDataGrid-cell": {
                   textAlign: "center",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 },
               }}
             />
