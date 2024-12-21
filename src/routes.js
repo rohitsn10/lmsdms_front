@@ -22,7 +22,7 @@ import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import ReviseApprovalList from "layouts/authentication/revise-Listing";
 import PrintRetrievalListing from "layouts/retrieval-listing";
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-
+import FactoryTwoToneIcon from '@mui/icons-material/FactoryTwoTone';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import WorkspacesIcon from '@mui/icons-material/Workspaces';
@@ -34,6 +34,8 @@ import AssignmentReturnIcon from '@mui/icons-material/Inventory2';
 import ImportContactsTwoToneIcon from '@mui/icons-material/ImportContactsTwoTone';
 import icon from "assets/theme/components/icon";
 import PlantListing from "dmscomponent/plant-listing";
+import AreaListing from "dmscomponent/area-listing";
+import HomeMiniRoundedIcon from '@mui/icons-material/HomeMiniRounded';
 
 
 const routes = [
@@ -161,10 +163,19 @@ const routes = [
     type: "collapse",
     name: "Plants",
     key: "plant-listing",
-    icon: <ImportContactsTwoToneIcon />,
+    icon: <FactoryTwoToneIcon />,
     route: "/plant-listing",
     component: <PlantListing />,
   },
+  {
+    type: "collapse",
+    name: "Area",
+    key: "area-listing",
+    icon: <HomeMiniRoundedIcon />,
+    route: "/area-listing",
+    component: <AreaListing />,
+  },
+  
 ];
 
 export default routes;

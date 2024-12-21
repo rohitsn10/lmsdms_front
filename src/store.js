@@ -18,6 +18,7 @@ import { printerApi } from "api/auth/PrinterApi";
 import { reviseApi } from "api/auth/reviseApi";
 import { retrievalApi } from "api/auth/retrievalApi";
 import { plantApi } from "apilms/plantApi";
+import { areaApi } from "apilms/AreaApi";
 
 const store = configureStore({
   reducer: {
@@ -40,6 +41,7 @@ const store = configureStore({
     [reviseApi.reducerPath]:reviseApi.reducer,
     [retrievalApi.reducerPath]:retrievalApi.reducer,
     [plantApi.reducerPath]: plantApi.reducer,
+    [areaApi.reducerPath]: areaApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -62,6 +64,7 @@ const store = configureStore({
       reviseApi.middleware,
       retrievalApi.middleware,
       plantApi.middleware,
+      areaApi.middleware,
     ),
 });
 
