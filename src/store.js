@@ -17,6 +17,7 @@ import { switchRoleApi } from "api/auth/switchRoleApi";
 import { printerApi } from "api/auth/PrinterApi";
 import { reviseApi } from "api/auth/reviseApi";
 import { retrievalApi } from "api/auth/retrievalApi";
+import { plantApi } from "apilms/plantApi";
 
 const store = configureStore({
   reducer: {
@@ -38,6 +39,7 @@ const store = configureStore({
     [printerApi.reducerPath]: printerApi.reducer,
     [reviseApi.reducerPath]:reviseApi.reducer,
     [retrievalApi.reducerPath]:retrievalApi.reducer,
+    [plantApi.reducerPath]: plantApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -59,6 +61,7 @@ const store = configureStore({
       printerApi.middleware,
       reviseApi.middleware,
       retrievalApi.middleware,
+      plantApi.middleware,
     ),
 });
 

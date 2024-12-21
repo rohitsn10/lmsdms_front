@@ -75,6 +75,8 @@ import ClassroomTraining from "dmscomponent/classroom-training/index.js";
 import TrainingMatrix from "dmscomponent/training-matrix/index.js";
 import TrainingProgressReport from "dmscomponent/training-progressreport/index.js";
 import ExamResultsReport from "dmscomponent/exam-result/index.js";
+import PlantListing from "dmscomponent/plant-listing/index.js";
+import EditPlant from "dmscomponent/plant-listing/edit-plant/index.js";
 
 
 export default function App() {
@@ -285,7 +287,8 @@ export default function App() {
       <Route path="/training-matrix" element={<TrainingMatrix />} />
       <Route path="/exam-result" element={<ExamResultsReport />} />
       <Route path="/training-progressreport" element={<TrainingProgressReport />} />
-      
+      <Route path="/plant-listing " element={<PlantListing />} />
+      <Route path="/edit-plant" element={<EditPlant />} />
 
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>

@@ -33,6 +33,7 @@ import Inventory2Icon from '@mui/icons-material/Inventory2';
 import AssignmentReturnIcon from '@mui/icons-material/Inventory2';
 import ImportContactsTwoToneIcon from '@mui/icons-material/ImportContactsTwoTone';
 import icon from "assets/theme/components/icon";
+import PlantListing from "dmscomponent/plant-listing";
 
 
 const routes = [
@@ -155,6 +156,14 @@ const routes = [
     icon: <ImportContactsTwoToneIcon />,
     route: "/revise-listing",
     component: <ReviseApprovalList />,
+  },
+  {
+    type: "collapse",
+    name: "Plants",
+    key: "plant-listing",
+    icon: <ImportContactsTwoToneIcon />,
+    route: "/plant-listing",
+    component: <PlantListing />,
   },
 ];
 

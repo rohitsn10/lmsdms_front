@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
@@ -10,67 +10,68 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useCreateGetPlantMutation } from "apilms/plantApi"; // Adjust the path to where your API slice is located
+import { useUpdateDeletePlantMutation } from "apilms/plantApi"; // Adjust import for the mutation
 
-const AddPlant = () => {
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
-  const [description, setDescription] = useState("");
+const EditPlant = () => {
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  const [plantName, setPlantName] = useState(state?.plant?.plant_name || "");
+  const [plantLocation, setPlantLocation] = useState(state?.plant?.plant_location || "");
+  const [plantDescription, setPlantDescription] = useState(state?.plant?.plant_description || "");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [errors, setErrors] = useState({});
-  const [createPlant, { isLoading }] = useCreateGetPlantMutation();
-  const navigate = useNavigate();
+  
+  const [updateDeletePlant, { isLoading }] = useUpdateDeletePlantMutation();
 
-  // Validation function
   const validateInputs = () => {
     const newErrors = {};
-    if (!name.trim()) newErrors.name = "Plant Name is required.";
-    if (!location.trim()) newErrors.location = "Plant Location is required.";
-    if (!description.trim()) newErrors.description = "Plant Description is required.";
+    if (!plantName.trim()) newErrors.plantName = "Plant Name is required.";
+    if (!plantLocation.trim()) newErrors.plantLocation = "Plant Location is required.";
+    if (!plantDescription.trim()) newErrors.plantDescription = "Plant Description is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return; // If validation fails, do not open signature dialog
-
     setOpenSignatureDialog(true); // Open signature dialog
   };
 
   const handleClear = () => {
-    setName("");
-    setLocation("");
-    setDescription("");
+    setPlantName("");
+    setPlantLocation("");
+    setPlantDescription("");
     setErrors({});
   };
 
   const handleSignatureComplete = async (password) => {
-    setOpenSignatureDialog(false); // Close signature dialog
-
+    setOpenSignatureDialog(false); // Close the signature dialog
+    
     if (!password) {
       toast.error("E-Signature is required to proceed.");
       return;
     }
 
     try {
-      const response = await createPlant({
-        plant_name: name.trim(),
-        plant_location: location.trim(),
-        plant_description: description.trim(),
+      const response = await updateDeletePlant({
+        plant_id: state?.plant?.id, // Get plant ID from location state
+        plant_name: plantName.trim(),
+        plant_location: plantLocation.trim(),
+        plant_description: plantDescription.trim(),
       }).unwrap();
 
       if (response.status) {
-        toast.success("Plant added successfully!");
+        toast.success("Plant updated successfully!");
         setTimeout(() => {
-          navigate("/plant-listing "); // Navigate after successful submission
+          navigate("/plant-listing"); // Navigate to plant listing page
         }, 1500);
       } else {
-        toast.error(response.message || "Failed to add plant. Please try again.");
+        toast.error(response.message || "Failed to update plant. Please try again.");
       }
     } catch (error) {
-      console.error("Error adding plant:", error);
-      toast.error("An error occurred while adding the plant.");
+      console.error("Error updating plant:", error);
+      toast.error("An error occurred while updating the plant.");
     }
   };
 
@@ -90,7 +91,7 @@ const AddPlant = () => {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Add Plant
+            Edit Plant
           </MDTypography>
         </MDBox>
 
@@ -113,10 +114,10 @@ const AddPlant = () => {
                 type="text"
                 label={<><span style={{ color: "red" }}>*</span> Plant Name</>}
                 fullWidth
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                error={!!errors.name}
-                helperText={errors.name}
+                value={plantName}
+                onChange={(e) => setPlantName(e.target.value)}
+                error={!!errors.plantName}
+                helperText={errors.plantName}
               />
             </MDBox>
             <MDBox mb={3}>
@@ -124,10 +125,10 @@ const AddPlant = () => {
                 type="text"
                 label={<><span style={{ color: "red" }}>*</span> Plant Location</>}
                 fullWidth
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                error={!!errors.location}
-                helperText={errors.location}
+                value={plantLocation}
+                onChange={(e) => setPlantLocation(e.target.value)}
+                error={!!errors.plantLocation}
+                helperText={errors.plantLocation}
               />
             </MDBox>
             <MDBox mb={3}>
@@ -136,22 +137,21 @@ const AddPlant = () => {
                 multiline
                 rows={4}
                 fullWidth
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                error={!!errors.description}
-                helperText={errors.description}
+                value={plantDescription}
+                onChange={(e) => setPlantDescription(e.target.value)}
+                error={!!errors.plantDescription}
+                helperText={errors.plantDescription}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
-                {isLoading ? "Submitting..." : "Submit"}
+                {isLoading ? "Updating..." : "Save Changes"}
               </MDButton>
             </MDBox>
           </MDBox>
         </MDBox>
       </Card>
 
-      {/* E-Signature Dialog */}
       <ESignatureDialog
         open={openSignatureDialog}
         onClose={() => setOpenSignatureDialog(false)}
@@ -163,4 +163,4 @@ const AddPlant = () => {
   );
 };
 
-export default AddPlant;
+export default EditPlant;
