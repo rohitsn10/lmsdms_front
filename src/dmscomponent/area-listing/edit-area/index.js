@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Card from "@mui/material/Card";
 import MenuItem from "@mui/material/MenuItem";
 import MDBox from "components/MDBox";
@@ -13,33 +13,42 @@ import { FormControl, InputLabel, Select, OutlinedInput } from "@mui/material";
 import { useCreateGetAreaMutation } from "apilms/AreaApi"; // Assuming this is the correct path for your query and mutation
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 
-function AddArea() {
+function EditArea() {
   const [areaName, setAreaName] = useState("");
   const [departmentName, setDepartmentName] = useState("");
   const [description, setDescription] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
   const navigate = useNavigate();
+  const { state } = useLocation();  // Access the state passed through navigate
   const { data: departments, isLoading, isError } = useFetchDepartmentsQuery();
-  const [createArea, { isLoading: isCreating, isSuccess, isError: isCreateError }] =
-    useCreateGetAreaMutation();
-  console.log("departments:-----------------", departments);
+  const [updateArea, { isLoading: isUpdating, isSuccess, isError: isUpdateError }] =
+    useCreateGetAreaMutation();  // Assuming this mutation can be used to update area
+
+  useEffect(() => {
+    if (state) {
+      const { area_name, department_id, area_description } = state.area;
+      setAreaName(area_name);
+      setDepartmentName(department_id);
+      setDescription(area_description);
+    }
+  }, [state]);  // Only run this when state changes
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Trigger the mutation to create the area
+    // Trigger the mutation to update the area
     try {
-      await createArea({
+      await updateArea({
         area_name: areaName,
         department_id: departmentName, // Assuming departmentName holds the department ID
         area_description: description,
       }).unwrap();
 
       setOpenSignatureDialog(true);
-      console.log("Area Details Submitted:", { areaName, departmentName, description });
+      console.log("Area Details Updated:", { areaName, departmentName, description });
     } catch (error) {
-      console.error("Error submitting area:", error);
+      console.error("Error updating area:", error);
     }
   };
 
@@ -51,7 +60,7 @@ function AddArea() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/dashboard");
+    navigate("/area-listing");
   };
 
   const handleDepartmentChange = (event) => {
@@ -77,7 +86,7 @@ function AddArea() {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Add Area
+            Edit Area
           </MDTypography>
         </MDBox>
         <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
@@ -118,9 +127,7 @@ function AddArea() {
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
                 >
-                  {isLoading ? (
-                    <MenuItem disabled>Loading departments...</MenuItem>
-                  ) : Array.isArray(departments?.data) && departments.data.length > 0 ? (
+                  {departments && departments.data && departments.data.length > 0 ? (
                     departments.data.map((dept) => (
                       <MenuItem key={dept.id} value={dept.id}>
                         {dept.department_name}
@@ -149,9 +156,9 @@ function AddArea() {
                 color="submit"
                 fullWidth
                 type="submit"
-                disabled={isCreating}
+                disabled={isUpdating}
               >
-                {isCreating ? "Submitting..." : "Submit"}
+                {isUpdating ? "Updating..." : "Update"}
               </MDButton>
             </MDBox>
           </MDBox>
@@ -164,4 +171,4 @@ function AddArea() {
   );
 }
 
-export default AddArea;
+export default EditArea;

@@ -77,8 +77,8 @@ import TrainingProgressReport from "dmscomponent/training-progressreport/index.j
 import ExamResultsReport from "dmscomponent/exam-result/index.js";
 import PlantListing from "dmscomponent/plant-listing/index.js";
 import EditPlant from "dmscomponent/plant-listing/edit-plant/index.js";
-
-
+import AreaListing from "dmscomponent/area-listing/index.js";
+import EditArea from "dmscomponent/area-listing/edit-area/index.js";
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -289,6 +289,8 @@ export default function App() {
       <Route path="/training-progressreport" element={<TrainingProgressReport />} />
       <Route path="/plant-listing " element={<PlantListing />} />
       <Route path="/edit-plant" element={<EditPlant />} />
+      <Route path="/area-listing" element={<AreaListing />} />
+      <Route path="/edit-area" element={<EditArea />} />
 
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
