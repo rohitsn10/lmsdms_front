@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import MenuItem from "@mui/material/MenuItem";
@@ -10,7 +10,7 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { FormControl, InputLabel, Select, OutlinedInput } from "@mui/material";
-import { useCreateGetAreaMutation } from "apilms/AreaApi"; // Assuming this is the correct path for your query and mutation
+import { useCreateGetAreaMutation } from "apilms/AreaApi";
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 
 function AddArea() {
@@ -18,21 +18,18 @@ function AddArea() {
   const [departmentName, setDepartmentName] = useState("");
   const [description, setDescription] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { data: departments, isLoading, isError } = useFetchDepartmentsQuery();
-  const [createArea, { isLoading: isCreating, isSuccess, isError: isCreateError }] =
-    useCreateGetAreaMutation();
-  console.log("departments:-----------------", departments);
+  const [createArea, { isLoading: isCreating }] = useCreateGetAreaMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Trigger the mutation to create the area
     try {
       await createArea({
         area_name: areaName,
-        department_id: departmentName, // Assuming departmentName holds the department ID
+        department_id: departmentName,
         area_description: description,
       }).unwrap();
 
@@ -51,7 +48,7 @@ function AddArea() {
 
   const handleCloseSignatureDialog = () => {
     setOpenSignatureDialog(false);
-    navigate("/dashboard");
+    navigate("/area-listing");
   };
 
   const handleDepartmentChange = (event) => {
@@ -119,17 +116,22 @@ function AddArea() {
                   }}
                 >
                   {isLoading ? (
-                    <MenuItem disabled>Loading departments...</MenuItem>
-                  ) : Array.isArray(departments?.data) && departments.data.length > 0 ? (
-                    departments.data.map((dept) => (
+                    <MenuItem disabled>Loading...</MenuItem>
+                  ) : isError ? (
+                    <MenuItem disabled>Error loading departments</MenuItem>
+                  ) : (
+                    departments?.data?.map((dept) => (
                       <MenuItem key={dept.id} value={dept.id}>
                         {dept.department_name}
                       </MenuItem>
                     ))
-                  ) : (
-                    <MenuItem disabled>No departments available</MenuItem>
                   )}
                 </Select>
+                {errors?.department && (
+                  <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+                    {errors.department}
+                  </p>
+                )}
               </FormControl>
             </MDBox>
 

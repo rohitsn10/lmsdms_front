@@ -64,7 +64,7 @@ import AddArea from "dmscomponent/add-area/index.js";
 import AddDepartments from "dmscomponent/add-departments/index.js";
 import AddPlant from "dmscomponent/add-plant/index.js";
 import AddJobRole from "dmscomponent/add-jobrole/index.js";
-import AddTrainingType from "dmscomponent/training-type/index.js";
+import AddTrainingType from "dmscomponent/trainingType-Listing/addTraining-type/index.js";
 import AddInductionTraining from "dmscomponent/induction-training/index.js";
 import AddTraining from "dmscomponent/add-training/index.js";
 import AddMaterial from "dmscomponent/add-material/index.js";
@@ -79,6 +79,12 @@ import PlantListing from "dmscomponent/plant-listing/index.js";
 import EditPlant from "dmscomponent/plant-listing/edit-plant/index.js";
 import AreaListing from "dmscomponent/area-listing/index.js";
 import EditArea from "dmscomponent/area-listing/edit-area/index.js";
+import MethodologyListing from "dmscomponent/methodology-listing/index.js";
+import EditMethodology from "dmscomponent/methodology-listing/edit-methodology/index.js";
+import AddMethodology from "dmscomponent/methodology-listing/add-methodology/index.js";
+import TrainingTypeListing from "dmscomponent/trainingType-Listing/index.js";
+
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -291,7 +297,10 @@ export default function App() {
       <Route path="/edit-plant" element={<EditPlant />} />
       <Route path="/area-listing" element={<AreaListing />} />
       <Route path="/edit-area" element={<EditArea />} />
-
+      <Route path="/methodology-listing" element={<MethodologyListing />} />
+      <Route path="/edit-methodology" element={<EditMethodology />} />
+      <Route path="/add-methodology" element={<AddMethodology />} />
+      <Route path="/trainingType-Listing" element={<TrainingTypeListing />} />
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   </div>

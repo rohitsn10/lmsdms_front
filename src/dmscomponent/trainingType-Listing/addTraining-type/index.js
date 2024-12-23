@@ -1,4 +1,3 @@
-// AddTrainingType.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
@@ -8,24 +7,30 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog"; // Ensure correct import
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
+import { useCreateTrainingTypeMutation } from "apilms/trainingtypeApi"; // Ensure correct import path for your API service
 
 function AddTrainingType() {
   const [sop, setSOP] = useState("");
-  const [protocol, setProtocol] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+  const [createTrainingType, { isLoading }] = useCreateTrainingTypeMutation();
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setOpenSignatureDialog(true); // Open dialog on form submission
-    console.log("Training Type Details Submitted:", { sop, protocol });
+
+    try {
+      const response = await createTrainingType({ training_type_name: sop }).unwrap();
+      console.log("Training Type Created:", response);
+      setOpenSignatureDialog(true); // Open dialog on successful submission
+    } catch (error) {
+      console.error("Error creating training type:", error);
+    }
   };
 
   const handleClear = () => {
     setSOP("");
-    setProtocol("");
   };
 
   const handleCloseSignatureDialog = () => {
@@ -69,24 +74,21 @@ function AddTrainingType() {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="SOP"
+                label="Training Type Name"
                 fullWidth
                 value={sop}
                 onChange={(e) => setSOP(e.target.value)}
               />
             </MDBox>
-            <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Protocol"
-                fullWidth
-                value={protocol}
-                onChange={(e) => setProtocol(e.target.value)}
-              />
-            </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit">
-                Submit
+              <MDButton
+                variant="gradient"
+                color="submit"
+                fullWidth
+                type="submit"
+                disabled={isLoading} // Disable button while loading
+              >
+                {isLoading ? "Submitting..." : "Submit"}
               </MDButton>
             </MDBox>
           </MDBox>

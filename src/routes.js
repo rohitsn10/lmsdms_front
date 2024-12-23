@@ -36,8 +36,9 @@ import icon from "assets/theme/components/icon";
 import PlantListing from "dmscomponent/plant-listing";
 import AreaListing from "dmscomponent/area-listing";
 import HomeMiniRoundedIcon from '@mui/icons-material/HomeMiniRounded';
-
-
+import MethodologyListing from "dmscomponent/methodology-listing";
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import TrainingTypeListing from "dmscomponent/trainingType-Listing";
 const routes = [
   {
     type: "collapse",
@@ -174,6 +175,22 @@ const routes = [
     icon: <HomeMiniRoundedIcon />,
     route: "/area-listing",
     component: <AreaListing />,
+  },
+  {
+    type: "collapse",
+    name: "Methodology",
+    key: "methodology-listing",
+    icon: <AccountTreeIcon />,
+    route: "/methodology-listing",
+    component: <MethodologyListing />,
+  },
+  {
+    type: "collapse",
+    name: "Training Type",
+    key: "trainingType-Listing",
+    icon: <AccountTreeIcon />,
+    route: "/trainingType-Listing",
+    component: <TrainingTypeListing />,
   },
   
 ];

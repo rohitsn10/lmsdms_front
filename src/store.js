@@ -19,6 +19,8 @@ import { reviseApi } from "api/auth/reviseApi";
 import { retrievalApi } from "api/auth/retrievalApi";
 import { plantApi } from "apilms/plantApi";
 import { areaApi } from "apilms/AreaApi";
+import { methodologyApi } from "apilms/MethodologyApi";
+import { trainingTypeApi } from "apilms/trainingtypeApi";
 
 const store = configureStore({
   reducer: {
@@ -42,6 +44,8 @@ const store = configureStore({
     [retrievalApi.reducerPath]:retrievalApi.reducer,
     [plantApi.reducerPath]: plantApi.reducer,
     [areaApi.reducerPath]: areaApi.reducer,
+    [methodologyApi.reducerPath]:methodologyApi.reducer,
+    [trainingTypeApi.reducerPath]: trainingTypeApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -65,6 +69,8 @@ const store = configureStore({
       retrievalApi.middleware,
       plantApi.middleware,
       areaApi.middleware,
+      methodologyApi.middleware,
+      trainingTypeApi.middleware,
     ),
 });
 
