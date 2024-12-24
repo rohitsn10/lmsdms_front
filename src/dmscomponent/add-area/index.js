@@ -25,6 +25,18 @@ function AddArea() {
   const { data: departments, isLoading, isError } = useFetchDepartmentsQuery();
   const [createArea, { isLoading: isCreating }] = useCreateGetAreaMutation();
 
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await createArea({
+        area_name: areaName,
+        department_id: departmentName,
+        area_description: description,
+      }).unwrap();
+
   const validateInputs = () => {
     const newErrors = {};
     if (!areaName.trim()) newErrors.areaName = "Area Name is required.";
@@ -32,6 +44,7 @@ function AddArea() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -120,6 +133,7 @@ function AddArea() {
                 helperText={errors.areaName}
               />
             </MDBox>
+
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-department-label">
@@ -152,6 +166,7 @@ function AddArea() {
                 )}
               </FormControl>
             </MDBox>
+
             <MDBox mb={3}>
               <MDInput
                 label="Description"

@@ -39,6 +39,9 @@ import HomeMiniRoundedIcon from '@mui/icons-material/HomeMiniRounded';
 import MethodologyListing from "dmscomponent/methodology-listing";
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import TrainingTypeListing from "dmscomponent/trainingType-Listing";
+import DevicesFoldTwoToneIcon from '@mui/icons-material/DevicesFoldTwoTone';
+import ModelTrainingTwoToneIcon from '@mui/icons-material/ModelTrainingTwoTone';
+import TrainingListing from "dmscomponent/Training-listing";
 const routes = [
   {
     type: "collapse",
@@ -188,9 +191,17 @@ const routes = [
     type: "collapse",
     name: "Training Type",
     key: "trainingType-Listing",
-    icon: <AccountTreeIcon />,
+    icon: <DevicesFoldTwoToneIcon />,
     route: "/trainingType-Listing",
     component: <TrainingTypeListing />,
+  },
+  {
+    type: "collapse",
+    name: "Training Activity",
+    key: "trainingListing",
+    icon: <ModelTrainingTwoToneIcon />,
+    route: "/trainingListing",
+    component: <TrainingListing />,
   },
   
 ];

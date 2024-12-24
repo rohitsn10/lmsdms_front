@@ -47,7 +47,7 @@ const AreaListing = () => {
     .map((area, index) => ({
       ...area,
       serial_number: index + 1,
-      date: moment(area.area_created_at).format("DD-MM-YY HH:mm"),  // Use moment for formatting
+      date: moment(area.area_created_at).format("DD/MM/YY"),  // Use moment for formatting
     }));
 
   const columns = [

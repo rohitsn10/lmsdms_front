@@ -46,7 +46,7 @@ const DocumentTypesListing = () => {
     .map((item, index) => ({
       ...item,
       serial_number: index + 1,  // Add serial number based on the index
-      created_at: moment(item.created_at).format("DD-MM-YY HH:mm"), 
+      created_at: moment(item.created_at).format("DD/MM/YY"), 
       
     })) : [];
 

@@ -31,10 +31,19 @@ export const trainingTypeApi = createApi({
         }),
         transformResponse: (response) => response, // Handle raw response
       }),
+      updateTrainingType: builder.mutation({
+        query: ({ id, training_type_name }) => ({
+          url: `lms_module/update_training_type/${id}`,
+          method: 'PUT',
+          body: { training_type_name },
+        }),
+        transformResponse: (response) => response,
+      }),
   }),
 });
 
 export const { 
   useCreateTrainingTypeMutation,
   useFetchTrainingTypesQuery,
+  useUpdateTrainingTypeMutation,
 } = trainingTypeApi;

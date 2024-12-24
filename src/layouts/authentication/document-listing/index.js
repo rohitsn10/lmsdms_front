@@ -133,7 +133,7 @@ const DocumentListing = () => {
   const rows = filteredData.map((doc, index) => ({
     ...doc,
     index,
-    created_at: moment(doc.created_at).format("DD-MM-YY HH:mm"),
+    created_at: moment(doc.created_at).format("DD/MM/YY"),
   }));
   const columns = [
     {
