@@ -82,7 +82,7 @@ const PrintRetrievalListing = () => {
       headerName: "Approve Date",
       flex: 1,
       headerAlign: "center",
-      renderCell: (params) => moment(params.row.created_at).format("YYYY-MM-DD") ?? "-",
+      renderCell: (params) => moment(params.row.created_at).format("DD/MM/YYYY") ?? "-",
     },
     {
       field: "action",

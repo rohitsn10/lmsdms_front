@@ -9,6 +9,8 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { useGetPlantQuery } from "apilms/plantApi";
+import moment from "moment";
+import { date } from "yup";
 
 const PlantListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,7 +46,9 @@ const PlantListing = () => {
     .map((plant, index) => ({
       ...plant,
       serial_number: index + 1,
-      date: new Date(plant.plant_created_at).toLocaleDateString(),
+      // date: new Date(plant.plant_created_at).toLocaleDateString(),
+      date: moment(plant.plant_created_at).format("DD/MM/YY"),
+      
     }));
 
   const columns = [

@@ -112,7 +112,7 @@ const InventoryListing = () => {
     headerAlign: "center",
     renderCell: (params) => {
       // Format the date using moment
-      return moment(params.row.created_at).format("DD-MM-YY HH:mm");
+      return moment(params.row.created_at).format("DD/MM/YY");
     },
   },
     {

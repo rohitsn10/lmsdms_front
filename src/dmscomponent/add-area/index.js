@@ -23,6 +23,8 @@ function AddArea() {
   const { data: departments, isLoading, isError } = useFetchDepartmentsQuery();
   const [createArea, { isLoading: isCreating }] = useCreateGetAreaMutation();
 
+  console.log("+---------------------+-+-+-+--+-+-+-+-+",departments);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -100,40 +102,38 @@ function AddArea() {
                 onChange={(e) => setAreaName(e.target.value)}
               />
             </MDBox>
-            <MDBox mb={3}>
-              <FormControl fullWidth margin="dense">
-                <InputLabel id="select-department-label">Department Name</InputLabel>
-                <Select
-                  labelId="select-department-label"
-                  id="select-department"
-                  value={departmentName}
-                  onChange={handleDepartmentChange}
-                  input={<OutlinedInput label="Department Name" />}
-                  sx={{
-                    minWidth: 200,
-                    height: "3rem",
-                    ".MuiSelect-select": { padding: "0.45rem" },
-                  }}
-                >
-                  {isLoading ? (
-                    <MenuItem disabled>Loading...</MenuItem>
-                  ) : isError ? (
-                    <MenuItem disabled>Error loading departments</MenuItem>
-                  ) : (
-                    departments?.data?.map((dept) => (
-                      <MenuItem key={dept.id} value={dept.id}>
-                        {dept.department_name}
-                      </MenuItem>
-                    ))
-                  )}
-                </Select>
-                {errors?.department && (
-                  <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
-                    {errors.department}
-                  </p>
+            <FormControl fullWidth margin="dense">
+              <InputLabel id="select-department-label">Department Name</InputLabel>
+              <Select
+                labelId="select-department-label"
+                id="select-department"
+                value={departmentName}
+                onChange={handleDepartmentChange}
+                input={<OutlinedInput label="Department Name" />}
+                sx={{
+                  minWidth: 200,
+                  height: "3rem",
+                  ".MuiSelect-select": { padding: "0.45rem" },
+                }}
+              >
+                {isLoading ? (
+                  <MenuItem disabled>Loading...</MenuItem>
+                ) : isError ? (
+                  <MenuItem disabled>Error loading departments</MenuItem>
+                ) : (
+                  departments?.data?.map((dept) => (
+                    <MenuItem key={dept.id} value={dept.id}>
+                      {dept.department_name || "No name available"}
+                    </MenuItem>
+                  ))
                 )}
-              </FormControl>
-            </MDBox>
+              </Select>
+              {errors?.department && (
+                <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+                  {errors.department}
+                </p>
+              )}
+            </FormControl>
 
             <MDBox mb={3}>
               <MDInput

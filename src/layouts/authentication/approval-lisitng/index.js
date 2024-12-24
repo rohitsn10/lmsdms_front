@@ -104,7 +104,7 @@ const PrintApprovalListing = () => {
       headerAlign: "center",
       renderCell: (params) => {
         const date = params.row.created_at
-          ? moment(params.row.created_at).format("DD-MM-YY HH:mm")
+          ? moment(params.row.created_at).format("DD/MM/YY")
           : "-";
         return date;
       },

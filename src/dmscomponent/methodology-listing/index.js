@@ -16,8 +16,12 @@ const MethodologyListing = () => {
   const navigate = useNavigate();
 
   // Using the API hook to fetch methodologies
-  const { data, error, isLoading } = useFetchMethodologiesQuery();
+  const { data, error, isLoading,refetch } = useFetchMethodologiesQuery();
 
+   useEffect(() => {
+            refetch();
+          }, [location.key]);
+          
   const handleAddMethodology = () => {
     navigate("/add-methodology");
   };
@@ -39,7 +43,7 @@ const MethodologyListing = () => {
         .map((item, index) => ({
           ...item,
           serial_number: index + 1,
-          created_at: moment(item.methodology_created_at).format("DD-MM-YY HH:mm"),
+          created_at: moment(item.methodology_created_at).format("DD/MM/YY"),
         }))
     : [];
 

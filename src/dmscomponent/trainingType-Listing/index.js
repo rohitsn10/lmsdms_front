@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -16,8 +16,12 @@ const TrainingTypeListing = () => {
   const navigate = useNavigate();
 
   // Fetch training types data using the API
-  const { data, isLoading, isError } = useFetchTrainingTypesQuery();
+  const { data, isLoading, isError,refetch } = useFetchTrainingTypesQuery();
 
+  useEffect(() => {
+      refetch();
+    }, [location.key]);
+  
   const handleAddTrainingType = () => {
     navigate("/training-type");
   };
@@ -27,7 +31,7 @@ const TrainingTypeListing = () => {
   };
 
   const handleEditTrainingType = (item) => {
-    navigate("/edit-training-type", { state: { item } });
+    navigate("/edit-trainingtype", { state: { item } });
   };
 
   // Process fetched data and apply search filter
@@ -40,7 +44,7 @@ const TrainingTypeListing = () => {
       serial_number: index + 1,
       training_type_name: item.training_type_name,
       created_by: `${item.created_by_first_name} ${item.created_by_last_name}`,
-      created_at: moment(item.training_type_created_at).format("DD-MM-YY HH:mm"),
+      created_at: moment(item.training_type_created_at).format("DD/MM/YY"),
     }));
 
   const columns = [

@@ -66,7 +66,7 @@ import AddPlant from "dmscomponent/add-plant/index.js";
 import AddJobRole from "dmscomponent/add-jobrole/index.js";
 import AddTrainingType from "dmscomponent/trainingType-Listing/addTraining-type/index.js";
 import AddInductionTraining from "dmscomponent/induction-training/index.js";
-import AddTraining from "dmscomponent/add-training/index.js";
+import AddTraining from "dmscomponent/Training-listing/add-training/index.js";
 import AddMaterial from "dmscomponent/add-material/index.js";
 import AddQuestion from "dmscomponent/add-question/index.js";
 import CreateQuiz from "dmscomponent/add-quiz/index.js";
@@ -83,7 +83,10 @@ import MethodologyListing from "dmscomponent/methodology-listing/index.js";
 import EditMethodology from "dmscomponent/methodology-listing/edit-methodology/index.js";
 import AddMethodology from "dmscomponent/methodology-listing/add-methodology/index.js";
 import TrainingTypeListing from "dmscomponent/trainingType-Listing/index.js";
-
+import EditTrainingType from "dmscomponent/trainingType-Listing/editTraining-Type/index.js";
+import TrainingListing from "dmscomponent/Training-listing/index.js";
+import EditTraining from "dmscomponent/Training-listing/edit-training/index.js";
+import LMSDocument from "dmscomponent/Training-listing/document-view/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -301,6 +304,11 @@ export default function App() {
       <Route path="/edit-methodology" element={<EditMethodology />} />
       <Route path="/add-methodology" element={<AddMethodology />} />
       <Route path="/trainingType-Listing" element={<TrainingTypeListing />} />
+      <Route path="/edit-trainingtype" element={<EditTrainingType />} />
+      <Route path="/trainingListing" element={<TrainingListing />} />
+      <Route path="/edit-training" element={<EditTraining />} />
+      <Route path="/LMS-Document" element={<LMSDocument />} />
+
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   </div>
