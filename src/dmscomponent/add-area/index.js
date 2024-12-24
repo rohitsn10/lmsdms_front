@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
 import MenuItem from "@mui/material/MenuItem";
 import MDBox from "components/MDBox";
@@ -23,7 +25,7 @@ function AddArea() {
   const { data: departments, isLoading, isError } = useFetchDepartmentsQuery();
   const [createArea, { isLoading: isCreating }] = useCreateGetAreaMutation();
 
-  console.log("+---------------------+-+-+-+--+-+-+-+-+",departments);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,22 +37,50 @@ function AddArea() {
         area_description: description,
       }).unwrap();
 
-      setOpenSignatureDialog(true);
-      console.log("Area Details Submitted:", { areaName, departmentName, description });
-    } catch (error) {
-      console.error("Error submitting area:", error);
-    }
+  const validateInputs = () => {
+    const newErrors = {};
+    if (!areaName.trim()) newErrors.areaName = "Area Name is required.";
+    if (!departmentName) newErrors.departmentName = "Department Name is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!validateInputs()) return;
+    setOpenSignatureDialog(true);
   };
 
   const handleClear = () => {
     setAreaName("");
     setDepartmentName("");
     setDescription("");
+    setErrors({});
   };
 
-  const handleCloseSignatureDialog = () => {
+  const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
-    navigate("/area-listing");
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+
+    try {
+      await createArea({
+        area_name: areaName.trim(),
+        department_id: departmentName,
+        area_description: description.trim(),
+      }).unwrap();
+
+      toast.success("Area added successfully!");
+      setTimeout(() => {
+        navigate("/area-listing");
+      }, 1500);
+    } catch (error) {
+      console.error("Error submitting area:", error);
+      toast.error("Failed to add area. Please try again.");
+    }
   };
 
   const handleDepartmentChange = (event) => {
@@ -90,50 +120,52 @@ function AddArea() {
             Clear
           </MDButton>
         </MDBox>
-
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Area Name"
+                label={<><span style={{ color: "red" }}>*</span>Area Name</>}
                 fullWidth
                 value={areaName}
                 onChange={(e) => setAreaName(e.target.value)}
+                error={!!errors.areaName}
+                helperText={errors.areaName}
               />
             </MDBox>
-            <FormControl fullWidth margin="dense">
-              <InputLabel id="select-department-label">Department Name</InputLabel>
-              <Select
-                labelId="select-department-label"
-                id="select-department"
-                value={departmentName}
-                onChange={handleDepartmentChange}
-                input={<OutlinedInput label="Department Name" />}
-                sx={{
-                  minWidth: 200,
-                  height: "3rem",
-                  ".MuiSelect-select": { padding: "0.45rem" },
-                }}
-              >
-                {isLoading ? (
-                  <MenuItem disabled>Loading...</MenuItem>
-                ) : isError ? (
-                  <MenuItem disabled>Error loading departments</MenuItem>
-                ) : (
-                  departments?.data?.map((dept) => (
-                    <MenuItem key={dept.id} value={dept.id}>
-                      {dept.department_name || "No name available"}
-                    </MenuItem>
-                  ))
+
+            <MDBox mb={3}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="select-department-label">
+                  <><span style={{ color: "red" }}>*</span>Department Name</>
+                </InputLabel>
+                <Select
+                  labelId="select-department-label"
+                  id="select-department"
+                  value={departmentName}
+                  onChange={handleDepartmentChange}
+                  input={<OutlinedInput label="Department Name" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem",
+                    ".MuiSelect-select": { padding: "0.45rem" },
+                  }}
+                >
+                  {departments?.length > 0
+                    ? departments.map((dept) => (
+                        <MenuItem key={dept.id} value={dept.id}>
+                          {dept.department_name}
+                        </MenuItem>
+                      ))
+                    : <MenuItem disabled>No Departments Available</MenuItem>}
+                </Select>
+                {errors.departmentName && (
+                  <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+                    {errors.departmentName}
+                  </p>
                 )}
-              </Select>
-              {errors?.department && (
-                <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
-                  {errors.department}
-                </p>
-              )}
-            </FormControl>
+              </FormControl>
+            </MDBox>
 
             <MDBox mb={3}>
               <MDInput
@@ -161,7 +193,14 @@ function AddArea() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete}
+      />
+
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }
