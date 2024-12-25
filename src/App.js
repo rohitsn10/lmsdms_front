@@ -68,7 +68,7 @@ import AddTrainingType from "dmscomponent/trainingType-Listing/addTraining-type/
 import AddInductionTraining from "dmscomponent/induction-training/index.js";
 import AddTraining from "dmscomponent/Training-listing/add-training/index.js";
 import AddMaterial from "dmscomponent/add-material/index.js";
-import AddQuestion from "dmscomponent/add-question/index.js";
+import AddQuestion from "dmscomponent/question-listing/add-questions/index.js";
 import CreateQuiz from "dmscomponent/add-quiz/index.js";
 import TrainingMapping from "dmscomponent/training-mappping/index.js";
 import ClassroomTraining from "dmscomponent/classroom-training/index.js";
@@ -87,6 +87,8 @@ import EditTrainingType from "dmscomponent/trainingType-Listing/editTraining-Typ
 import TrainingListing from "dmscomponent/Training-listing/index.js";
 import EditTraining from "dmscomponent/Training-listing/edit-training/index.js";
 import LMSDocument from "dmscomponent/Training-listing/document-view/index.js";
+import QuestionListing from "dmscomponent/question-listing/index.js";
+import EditQuestion from "dmscomponent/question-listing/edit-question/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -308,6 +310,8 @@ export default function App() {
       <Route path="/trainingListing" element={<TrainingListing />} />
       <Route path="/edit-training" element={<EditTraining />} />
       <Route path="/LMS-Document" element={<LMSDocument />} />
+      <Route path="/questions" element={<QuestionListing />} />
+      <Route path="/edit-question" element={<EditQuestion />} />
 
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>

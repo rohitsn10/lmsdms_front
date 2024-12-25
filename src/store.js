@@ -22,6 +22,7 @@ import { areaApi } from "apilms/AreaApi";
 import { methodologyApi } from "apilms/MethodologyApi";
 import { trainingTypeApi } from "apilms/trainingtypeApi";
 import { trainingApi } from "apilms/trainingApi";
+import { questionApi } from "apilms/questionApi";
 
 const store = configureStore({
   reducer: {
@@ -48,6 +49,7 @@ const store = configureStore({
     [methodologyApi.reducerPath]:methodologyApi.reducer,
     [trainingTypeApi.reducerPath]: trainingTypeApi.reducer,
     [trainingApi.reducerPath]: trainingApi.reducer,
+    [questionApi.reducerPath]: questionApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -73,7 +75,8 @@ const store = configureStore({
       areaApi.middleware,
       methodologyApi.middleware,
       trainingTypeApi.middleware,
-      trainingApi.middleware
+      trainingApi.middleware,
+      questionApi.middleware
     ),
 });
 

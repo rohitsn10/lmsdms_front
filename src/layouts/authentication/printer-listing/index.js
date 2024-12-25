@@ -65,7 +65,7 @@ const PrinterListing = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
-          {hasPermission(userPermissions, "printer", "isChange") && (
+          {hasPermission(userPermissions, "printermachinesmodel", "isChange") && (
             <IconButton color="primary" onClick={() => handleEditPrinter(params.row)}>
               <EditIcon />
             </IconButton>

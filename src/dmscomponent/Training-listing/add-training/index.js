@@ -141,7 +141,7 @@ function AddTraining() {
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
-      <Card sx={{ width: 600, mx: "auto" }}>
+      <Card sx={{ width: 600, mx: "auto", mt:5, mb:5 }}>
         <MDBox
           borderRadius="lg"
           sx={{
