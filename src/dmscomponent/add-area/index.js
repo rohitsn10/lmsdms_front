@@ -26,17 +26,6 @@ function AddArea() {
   const [createArea, { isLoading: isCreating }] = useCreateGetAreaMutation();
 
 
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      await createArea({
-        area_name: areaName,
-        department_id: departmentName,
-        area_description: description,
-      }).unwrap();
-
   const validateInputs = () => {
     const newErrors = {};
     if (!areaName.trim()) newErrors.areaName = "Area Name is required.";
@@ -92,7 +81,7 @@ function AddArea() {
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
-      <Card sx={{ width: 600, mx: "auto" }}>
+      <Card sx={{ width: 600, mx: "auto" , mt:5 , mb:5}}>
         <MDBox
           borderRadius="lg"
           sx={{

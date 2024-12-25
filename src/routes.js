@@ -42,6 +42,8 @@ import TrainingTypeListing from "dmscomponent/trainingType-Listing";
 import DevicesFoldTwoToneIcon from '@mui/icons-material/DevicesFoldTwoTone';
 import ModelTrainingTwoToneIcon from '@mui/icons-material/ModelTrainingTwoTone';
 import TrainingListing from "dmscomponent/Training-listing";
+import QuestionListing from "dmscomponent/question-listing";
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 const routes = [
   {
     type: "collapse",
@@ -202,6 +204,14 @@ const routes = [
     icon: <ModelTrainingTwoToneIcon />,
     route: "/trainingListing",
     component: <TrainingListing />,
+  },
+  {
+    type: "collapse",
+    name: "Manage Question",
+    key: "questions",
+    icon: <ManageSearchIcon />,
+    route: "/questions",
+    component: <QuestionListing />,
   },
   
 ];
