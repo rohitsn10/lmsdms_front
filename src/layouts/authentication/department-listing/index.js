@@ -32,7 +32,7 @@ const DepartmentListing = () => {
 
   // Use moment.js to format the date
   const formatDate = (dateString) => {
-    return moment(dateString).format('DD-MM-YY HH:mm');
+    return moment(dateString).format('DD/MM/YY');
   };
 
   const formattedData = departments.map((item, index) => ({

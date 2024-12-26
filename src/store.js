@@ -21,7 +21,12 @@ import { plantApi } from "apilms/plantApi";
 import { areaApi } from "apilms/AreaApi";
 import { methodologyApi } from "apilms/MethodologyApi";
 import { trainingTypeApi } from "apilms/trainingtypeApi";
+
 import { inductionApi } from "apilms/InductionApi";
+
+import { trainingApi } from "apilms/trainingApi";
+import { questionApi } from "apilms/questionApi";
+
 
 const store = configureStore({
   reducer: {
@@ -47,7 +52,12 @@ const store = configureStore({
     [areaApi.reducerPath]: areaApi.reducer,
     [methodologyApi.reducerPath]:methodologyApi.reducer,
     [trainingTypeApi.reducerPath]: trainingTypeApi.reducer,
+
     [inductionApi.reducerPath]:inductionApi.reducer,
+
+    [trainingApi.reducerPath]: trainingApi.reducer,
+    [questionApi.reducerPath]: questionApi.reducer,
+
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -73,7 +83,12 @@ const store = configureStore({
       areaApi.middleware,
       methodologyApi.middleware,
       trainingTypeApi.middleware,
+
       inductionApi.middleware
+
+      trainingApi.middleware,
+      questionApi.middleware
+
     ),
 });
 

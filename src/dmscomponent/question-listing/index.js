@@ -4,86 +4,100 @@ import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-import { useGetAreaQuery } from "apilms/AreaApi";  // Import the correct hook
+import moment from "moment";
+import { useFetchTrainingQuestionsQuery } from "apilms/questionApi"; // Import the API hook
 
-import moment from "moment"; // To format the date
-
-const AreaListing = () => {
+const QuestionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // Fetching area data
-  const { data: response, isLoading, isError, refetch } = useGetAreaQuery();
+  // Fetch question data using the API
+  const { data, isLoading, isError, refetch } = useFetchTrainingQuestionsQuery();
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [location.key]);
 
-  // Debug the API response (if needed)
-  // console.log("API Response:", response);
-
-  // Extract the `data` array from the response
-  const areas = response?.data || [];
+  const handleAddQuestion = () => {
+    navigate("/add-question");
+  };
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleEditArea = (area) => {
-    navigate("/edit-area", { state: { area } });
+  const handleEditQuestion = (item) => {
+    navigate("/edit-question", { state: { item } });
   };
 
-  // Filter the area data based on search term
-  const filteredData = areas
-    .filter(
-      (area) =>
-        area.area_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        area.area_description.toLowerCase().includes(searchTerm.toLowerCase())
+  const handleDeleteQuestion = (id) => {
+    // Implement the delete logic here
+    console.log(`Delete question with ID: ${id}`);
+  };
+
+  // Process fetched data and apply search filter
+  const filteredData = (data?.data || [])
+    .filter((item) =>
+      item.question_text.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    .map((area, index) => ({
-      ...area,
+    .map((item, index) => ({
+      id: item.id,
       serial_number: index + 1,
-      date: moment(area.area_created_at).format("DD/MM/YY"),  // Use moment for formatting
+      question: item.question_text,
+      question_type: item.question_type,
+      created_at: moment(item.question_created_at).format("DD/MM/YY"), // Adjust the field name
     }));
 
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-    { field: "area_name", headerName: "Area Name", flex: 1, headerAlign: "center" },
-    { field: "department", headerName: "Department", flex: 1, headerAlign: "center" },
-    { field: "area_description", headerName: "Area Description", flex: 1.5, headerAlign: "center" },
-    { field: "date", headerName: "Date", flex: 1, headerAlign: "center" },
+    { field: "question", headerName: "Question", flex: 1, headerAlign: "center" },
+    { field: "question_type", headerName: "Question Type", flex: 1, headerAlign: "center" },
+    { field: "created_at", headerName: "Created Date", flex: 1, headerAlign: "center" },
     {
       field: "action",
       headerName: "Action",
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => handleEditArea(params.row)}>
-          <EditIcon />
-        </IconButton>
+        <MDBox display="flex" gap={1}>
+          <IconButton
+            color="primary"
+            onClick={() => handleEditQuestion(params.row)} // Pass the question details
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteQuestion(params.row.id)} // Pass the question ID
+          >
+            <DeleteIcon />
+          </IconButton>
+        </MDBox>
       ),
+      sortable: false,
+      filterable: false,
     },
   ];
 
-  // Handle loading and error states
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <MDTypography variant="h6">Loading...</MDTypography>;
   }
 
   if (isError) {
-    return <div>Error loading areas.</div>;
+    return <MDTypography variant="h6" color="error">Failed to fetch data.</MDTypography>;
   }
 
   return (
     <MDBox p={3}>
-      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
-            label="Search"
+            label="Search Question"
             variant="outlined"
             size="small"
             sx={{ width: "250px", mr: 2 }}
@@ -91,15 +105,15 @@ const AreaListing = () => {
             onChange={handleSearch}
           />
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
-            Area Listing
+            Question Listing
           </MDTypography>
           <MDButton
             variant="contained"
             color="primary"
-            onClick={() => navigate("/add-area")}
+            onClick={handleAddQuestion}
             sx={{ ml: 2 }}
           >
-            Add Area
+            Add Question
           </MDButton>
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
@@ -121,6 +135,9 @@ const AreaListing = () => {
                 },
                 "& .MuiDataGrid-cell": {
                   textAlign: "center",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 },
               }}
             />
@@ -131,4 +148,4 @@ const AreaListing = () => {
   );
 };
 
-export default AreaListing;
+export default QuestionListing;

@@ -87,12 +87,6 @@ const RolesPermissionsListing = () => {
                     >
                         <EditIcon />
                     </IconButton>
-                    <IconButton
-                        color="secondary"
-                        onClick={() => handleViewId(params.row.id)}
-                    >
-                        <InfoIcon />
-                    </IconButton>
                 </>
             ),
         },
@@ -159,19 +153,6 @@ const RolesPermissionsListing = () => {
                     </div>
                 </MDBox>
             </Card>
-            <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
-                <DialogTitle>Role ID</DialogTitle>
-                <DialogContent>
-                    <MDTypography variant="body1">
-                        The selected ID is: <strong>{selectedId}</strong>
-                    </MDTypography>
-                </DialogContent>
-                <DialogActions>
-                    <MDButton onClick={handleCloseDialog} color="secondary">
-                        Close
-                    </MDButton>
-                </DialogActions>
-            </Dialog>
         </MDBox>
     );
 };

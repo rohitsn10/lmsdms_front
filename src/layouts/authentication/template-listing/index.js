@@ -58,7 +58,7 @@ const TemplateListing = () => {
     .map((item, index) => ({
       ...item,
       serial_number: index + 1,
-      created_at: moment(item.created_at).format("DD-MM-YY HH:mm"),
+      created_at: moment(item.created_at).format("DD/MM/YYYY"),
     }));
 
   const columns = [

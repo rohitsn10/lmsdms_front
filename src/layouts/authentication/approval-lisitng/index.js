@@ -104,7 +104,7 @@ const PrintApprovalListing = () => {
       headerAlign: "center",
       renderCell: (params) => {
         const date = params.row.created_at
-          ? moment(params.row.created_at).format("DD-MM-YY HH:mm")
+          ? moment(params.row.created_at).format("DD/MM/YY")
           : "-";
         return date;
       },
@@ -157,7 +157,7 @@ const PrintApprovalListing = () => {
 
         return (
           <MDBox display="flex" gap={1} justifyContent="center" alignItems="center">
-            {hasPermission(userPermissions, "printrequest", "isChange") && (
+            {hasPermission(userPermissions, "printrequestapproval", "isChange") && (
               <IconButton
                 color={color} // Set the color dynamically based on status
                 onClick={() => handleOpenDialog(params.row)}
@@ -167,7 +167,7 @@ const PrintApprovalListing = () => {
               </IconButton>
             )}
 
-            {hasPermission(userPermissions, "printrequest", "isPrint") && (
+            {hasPermission(userPermissions, "printrequestapproval", "isPrint") && (
               <IconButton
                 color="primary" // Static color for the print icon
                 onClick={() => handleOpenPrintDialog(params.row.sop_document_id)} // Open PrintDialog with document id

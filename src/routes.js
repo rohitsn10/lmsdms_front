@@ -39,7 +39,15 @@ import HomeMiniRoundedIcon from '@mui/icons-material/HomeMiniRounded';
 import MethodologyListing from "dmscomponent/methodology-listing";
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import TrainingTypeListing from "dmscomponent/trainingType-Listing";
+
 import InductionListing from "dmscomponent/induction-training/induction-listing";
+
+import DevicesFoldTwoToneIcon from '@mui/icons-material/DevicesFoldTwoTone';
+import ModelTrainingTwoToneIcon from '@mui/icons-material/ModelTrainingTwoTone';
+import TrainingListing from "dmscomponent/Training-listing";
+import QuestionListing from "dmscomponent/question-listing";
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+
 const routes = [
   {
     type: "collapse",
@@ -189,18 +197,35 @@ const routes = [
     type: "collapse",
     name: "Training Type",
     key: "trainingType-Listing",
-    icon: <AccountTreeIcon />,
+    icon: <DevicesFoldTwoToneIcon />,
     route: "/trainingType-Listing",
     component: <TrainingTypeListing />,
   },
   {
     type: "collapse",
+
     name: "Induction Set",
     key: "Induction-Listing",
     icon: <AccountTreeIcon />,
     route: "/induction-Listing",
     component: <InductionListing />,
+  
+    name: "Training Activity",
+    key: "trainingListing",
+    icon: <ModelTrainingTwoToneIcon />,
+    route: "/trainingListing",
+    component: <TrainingListing />,
   },
+  {
+    type: "collapse",
+    name: "Manage Question",
+    key: "questions",
+    icon: <ManageSearchIcon />,
+    route: "/questions",
+    component: <QuestionListing />,
+  },
+  
+
 ];
 
 export default routes;

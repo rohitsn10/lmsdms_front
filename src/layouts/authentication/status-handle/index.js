@@ -95,7 +95,7 @@ const StatusListing = () => {
   const rowsWithSerial = filteredData?.map((status, index) => ({
     ...status,
     srNo: index + 1,
-    created_at: moment(status.created_at).format("DD-MM-YY HH:mm"), 
+    created_at: moment(status.created_at).format("DD/MM/YY"), 
   }));
 
   const columns = [

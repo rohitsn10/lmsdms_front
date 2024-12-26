@@ -38,7 +38,7 @@ const WorkflowListing = () => {
         serial_number: index + 1,
         workflow_name: item.workflow_name || "N/A",
         workflow_description: item.workflow_description || "N/A",
-        created_at: moment(item.created_at).format("DD-MM-YY HH:mm"),
+        created_at: moment(item.created_at).format("DD/MM/YY"),
     }));
 
     const handleSearch = (event) => {
