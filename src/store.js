@@ -84,10 +84,10 @@ const store = configureStore({
       methodologyApi.middleware,
       trainingTypeApi.middleware,
 
-      inductionApi.middleware
+      inductionApi.middleware,
 
       trainingApi.middleware,
-      questionApi.middleware
+      questionApi.middleware,
 
     ),
 });
