@@ -1,0 +1,127 @@
+import React, { useState,useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Card from "@mui/material/Card";
+import { DataGrid } from "@mui/x-data-grid";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import MDInput from "components/MDInput";
+import MDButton from "components/MDButton";
+import { useGetInductionQuery } from "apilms/InductionApi";
+
+const InductionListing = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+
+  // Fetching plant data
+  const { data: response, isLoading, isError,refetch } = useGetInductionQuery();
+
+  useEffect(() => {
+      refetch();
+    }, [location.key]);
+  // Debug the API response
+//   console.log("API Response:", response);
+
+  // Extract the `data` array from the response
+  const inductions = response?.data || [];
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleEditInduction = (induction) => {
+    navigate("/edit-induction", { state: { induction } });
+  };
+
+  const filteredData = inductions
+    .filter(
+      (induction) =>
+        induction.induction_name.toLowerCase().includes(searchTerm.toLowerCase()) 
+    )
+    .map((induction, index) => ({
+      ...induction,
+      serial_number: index + 1,
+      date: new Date(induction.induction_created_at).toLocaleDateString(),
+    }));
+
+  const columns = [
+    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
+    { field: "induction_name", headerName: "Induction Name", flex: 1, headerAlign: "center" },
+    { field: "date", headerName: "Date", flex: 1, headerAlign: "center" },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <IconButton color="primary" onClick={() => handleEditInduction(params.row)}>
+          <EditIcon />
+        </IconButton>
+      ),
+    },
+  ];
+
+  // Handle loading and error states
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error loading induction set.</div>;
+  }
+
+  return (
+    <MDBox p={3}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0}}>
+        <MDBox p={3} display="flex" alignItems="center">
+          <MDInput
+            label="Search"
+            variant="outlined"
+            size="small"
+            sx={{ width: "250px", mr: 2 }}
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+          <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
+            Induction Set Listing
+          </MDTypography>
+          <MDButton
+            variant="contained"
+            color="primary"
+            onClick={() => navigate("/induction-training")}
+            sx={{ ml: 2 }}
+          >
+            Add Induction Set
+          </MDButton>
+        </MDBox>
+        <MDBox display="flex" justifyContent="center" p={2}>
+          <div style={{ height: 500, width: "100%" }}>
+            <DataGrid
+              rows={filteredData}
+              columns={columns}
+              pageSize={5}
+              rowsPerPageOptions={[5, 10, 20]}
+              disableSelectionOnClick
+              sx={{
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                "& .MuiDataGrid-columnHeaders": {
+                  display: "flex",
+                  justifyContent: "center",
+                  backgroundColor: "#f5f5f5",
+                  fontWeight: "bold",
+                },
+                "& .MuiDataGrid-cell": {
+                  textAlign: "center",
+                },
+              }}
+            />
+          </div>
+        </MDBox>
+      </Card>
+    </MDBox>
+  );
+};
+
+export default InductionListing;

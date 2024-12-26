@@ -1,25 +1,27 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, MenuItem } from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useCreateGetInductionMutation } from "apilms/InductionApi"; // Adjust the path to your API slice
+import { useUpdateDeleteInductionMutation } from "apilms/inductionApi"; // Adjust import for your mutation
 
-const AddInductionTraining = () => {
-  const [inductionTitle, setInductionTitle] = useState("");
-  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [createInduction, { isLoading }] = useCreateGetInductionMutation();
+const EditInduction = () => {
+  const { state } = useLocation();
   const navigate = useNavigate();
 
-  // Validation function
+  const [inductionTitle, setInductionTitle] = useState(state?.induction?.induction_name || "");
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const [updateInduction, { isLoading }] = useUpdateDeleteInductionMutation();
+
   const validateInputs = () => {
     const newErrors = {};
     if (!inductionTitle.trim()) newErrors.inductionTitle = "Induction Title is required.";
@@ -27,23 +29,19 @@ const AddInductionTraining = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleFileChange = (e) => {
-    setDocument(e.target.files[0]);
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
-
-    setOpenSignatureDialog(true); // Open signature dialog
+    setOpenSignatureDialog(true);
   };
 
   const handleClear = () => {
     setInductionTitle("");
+    setErrors({});
   };
 
   const handleSignatureComplete = async (password) => {
-    setOpenSignatureDialog(false); // Close signature dialog
+    setOpenSignatureDialog(false);
 
     if (!password) {
       toast.error("E-Signature is required to proceed.");
@@ -51,21 +49,22 @@ const AddInductionTraining = () => {
     }
 
     try {
-      const response = await createInduction({
+      const response = await updateInduction({
+        induction_id: state?.induction?.id,
         induction_name: inductionTitle.trim(),
       }).unwrap();
 
       if (response.status) {
-        toast.success("Induction Training added successfully!");
+        toast.success("Induction updated successfully!");
         setTimeout(() => {
-          navigate("/induction-listing"); // Navigate after successful submission
+          navigate("/induction-listing");
         }, 1500);
       } else {
-        toast.error(response.message || "Failed to add Induction Training. Please try again.");
+        toast.error(response.message || "Failed to update induction. Please try again.");
       }
     } catch (error) {
-      console.error("Error adding induction training:", error);
-      toast.error("An error occurred while adding the Induction Training.");
+      console.error("Error updating induction:", error);
+      toast.error("An error occurred while updating the induction.");
     }
   };
 
@@ -85,7 +84,7 @@ const AddInductionTraining = () => {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Add Induction Set Name
+            Edit Induction Set
           </MDTypography>
         </MDBox>
 
@@ -115,24 +114,25 @@ const AddInductionTraining = () => {
               />
             </MDBox>
             
+
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
-                {isLoading ? "Submitting..." : "Submit"}
+                {isLoading ? "Updating..." : "Save Changes"}
               </MDButton>
             </MDBox>
           </MDBox>
         </MDBox>
       </Card>
 
-      {/* E-Signature Dialog */}
       <ESignatureDialog
         open={openSignatureDialog}
         onClose={() => setOpenSignatureDialog(false)}
         onConfirm={handleSignatureComplete}
       />
+
       <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 };
 
-export default AddInductionTraining;
+export default EditInduction;

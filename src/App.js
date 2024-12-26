@@ -83,12 +83,18 @@ import MethodologyListing from "dmscomponent/methodology-listing/index.js";
 import EditMethodology from "dmscomponent/methodology-listing/edit-methodology/index.js";
 import AddMethodology from "dmscomponent/methodology-listing/add-methodology/index.js";
 import TrainingTypeListing from "dmscomponent/trainingType-Listing/index.js";
+
+import InductionListing from "dmscomponent/induction-training/induction-listing/index.js";
+import AddInductionDesignation from 'dmscomponent/induction-designation/index.js';
+
+
 import EditTrainingType from "dmscomponent/trainingType-Listing/editTraining-Type/index.js";
 import TrainingListing from "dmscomponent/Training-listing/index.js";
 import EditTraining from "dmscomponent/Training-listing/edit-training/index.js";
 import LMSDocument from "dmscomponent/Training-listing/document-view/index.js";
 import QuestionListing from "dmscomponent/question-listing/index.js";
 import EditQuestion from "dmscomponent/question-listing/edit-question/index.js";
+
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -306,6 +312,10 @@ export default function App() {
       <Route path="/edit-methodology" element={<EditMethodology />} />
       <Route path="/add-methodology" element={<AddMethodology />} />
       <Route path="/trainingType-Listing" element={<TrainingTypeListing />} />
+
+      <Route path= "/induction-listing" element ={<InductionListing/>}/>
+      <Route path="/induction-designation" element ={<AddInductionDesignation/>}/>
+
       <Route path="/edit-trainingtype" element={<EditTrainingType />} />
       <Route path="/trainingListing" element={<TrainingListing />} />
       <Route path="/edit-training" element={<EditTraining />} />
