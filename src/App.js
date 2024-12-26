@@ -83,6 +83,8 @@ import MethodologyListing from "dmscomponent/methodology-listing/index.js";
 import EditMethodology from "dmscomponent/methodology-listing/edit-methodology/index.js";
 import AddMethodology from "dmscomponent/methodology-listing/add-methodology/index.js";
 import TrainingTypeListing from "dmscomponent/trainingType-Listing/index.js";
+import InductionListing from "dmscomponent/induction-training/induction-listing/index.js";
+import AddInductionDesignation from 'dmscomponent/induction-designation/index.js';
 
 
 export default function App() {
@@ -301,6 +303,8 @@ export default function App() {
       <Route path="/edit-methodology" element={<EditMethodology />} />
       <Route path="/add-methodology" element={<AddMethodology />} />
       <Route path="/trainingType-Listing" element={<TrainingTypeListing />} />
+      <Route path= "/induction-listing" element ={<InductionListing/>}/>
+      <Route path="/induction-designation" element ={<AddInductionDesignation/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   </div>
