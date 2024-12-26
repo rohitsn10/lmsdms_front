@@ -57,9 +57,10 @@ const PrintApprovalListing = () => {
     setSelectedRequest(null); // Clear selected data
   };
 
-  const handleOpenPrintDialog = (documentId) => {
+  const handleOpenPrintDialog = (documentId,noOfRequestByAdmin) => {
     setSelectedDocumentId(documentId); // Store the document id
-    console.log("document id in dialog : ------------------------------------", documentId);
+    setSelectedRequest({ ...selectedRequest, no_of_request_by_admin: noOfRequestByAdmin }); // Store no_of_request_by_admin
+    // console.log("document id in dialog : ------------------------------------", documentId);
     setOpenPrintDialog(true); // Open the print document dialog
   };
 
@@ -167,15 +168,15 @@ const PrintApprovalListing = () => {
               </IconButton>
             )}
 
-            {hasPermission(userPermissions, "printrequestapproval", "isPrint") && (
+            {/* {hasPermission(userPermissions, "printrequestapproval", "isPrint") && ( */}
               <IconButton
                 color="primary" // Static color for the print icon
-                onClick={() => handleOpenPrintDialog(params.row.sop_document_id)} // Open PrintDialog with document id
+                onClick={() => handleOpenPrintDialog(params.row.sop_document_id, params.row.no_of_request_by_admin)} // Open PrintDialog with document id
                 disabled={params.row.status !== "Approve"} // Disable button if status is not "Approve"
               >
                 <LocalPrintshopTwoToneIcon />
               </IconButton>
-            )}
+            {/* )} */}
           </MDBox>
         );
       },
@@ -252,6 +253,7 @@ const PrintApprovalListing = () => {
           open={openPrintDialog}
           onClose={handleClosePrintDialog}
           id={selectedDocumentId} // Pass the document id to fetch and print the document
+          noOfRequestByAdmin={selectedRequest?.no_of_request_by_admin}
         />
       )}
     </MDBox>

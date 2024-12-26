@@ -159,7 +159,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Revise Approvals",
+    name: "Doc  Revision Request",
     key: "revise-listing",
     icon: <ImportContactsTwoToneIcon />,
     route: "/revise-listing",

@@ -54,14 +54,14 @@ function AddArea() {
       toast.error("E-Signature is required to proceed.");
       return;
     }
-
+  
     try {
       await createArea({
         area_name: areaName.trim(),
         department_id: departmentName,
         area_description: description.trim(),
       }).unwrap();
-
+  
       toast.success("Area added successfully!");
       setTimeout(() => {
         navigate("/area-listing");
@@ -71,6 +71,7 @@ function AddArea() {
       toast.error("Failed to add area. Please try again.");
     }
   };
+  
 
   const handleDepartmentChange = (event) => {
     setDepartmentName(event.target.value);

@@ -28,6 +28,7 @@ import {
   useDocumentReviewStatusMutation,
   useDocumentDocadminStatusMutation,
 } from "api/auth/texteditorApi";
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import CommentDrawer from "./Comments/CommentsDrawer"; // Adjusted import for CommentDrawer
 import CommentModal from "./Comments/CommentDialog"; // Adjusted import for CommentModal
 import { useCreateCommentMutation } from "api/auth/commentsApi";
@@ -92,7 +93,8 @@ const DocumentView = () => {
   // console.log("Training Required:", trainingRequired)
   const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
   const [randomNumber] = useState(Math.floor(Math.random() * 100000));
-
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+  const [action, setAction] = useState("");
   // Log the documentsData structure
   console.log("Documents Data:", documentsData);
 
@@ -204,87 +206,74 @@ const DocumentView = () => {
     setOpenDrawer(true);
   };
 
-  const handleSaveDraft = async () => {
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+
     try {
-      await draftDocument({ document_id: id, status_id: 2 }).unwrap();
-      toast.success("Save As a Draft!");
+      let response;
+      switch (action) {
+        case "saveDraft":
+          response = await draftDocument({ document_id: id, status_id: 2 }).unwrap();
+          toast.success("Saved as Draft!");
+          break;
+        case "submit":
+          response = await documentApproveStatus({ document_id: id, status: "3" }).unwrap();
+          toast.success("Document Submitted!");
+          break;
+        case "review":
+          response = await documentReviewStatus({ document_id: id, status: "4" }).unwrap();
+          toast.success("Document Reviewed!");
+          break;
+        case "approve":
+          response = await documentApproveStatus({ document_id: id, status: "5" }).unwrap();
+          toast.success("Document Approved!");
+          break;
+        case "docAdminApprove":
+          response = await documentDocAdmin({ document_id: id, status: "9" }).unwrap();
+          toast.success("Document Doc-Admin Approved!");
+          break;
+        default:
+          throw new Error("Invalid action");
+      }
+      
+      // Navigate after success
       setTimeout(() => {
         navigate("/document-listing");
       }, 2000);
-    } catch (err) {
-      // Handle error
-      console.error(err);
-      toast.error("Failed to Save Draft. Please try again.");
+    } catch (error) {
+      console.error("API Error:", error);
+      toast.error("Failed to process the action. Please try again.");
     }
   };
 
-  // Function to handle Submit (you can add your submit logic here)
-  const handleSubmit = async () => {
-    try {
-      const response = await documentApproveStatus({
-        document_id: id,
-        // documentdetails_id: '1',
-        status: "3",
-      }).unwrap();
-      toast.success("Document Submitted Successfully!");
-      setTimeout(() => {
-        navigate("/document-listing");
-      }, 2000);
-      // navigate("/document-listing");
-      // console.log('API Response:', response);
-      // alert('Document approved successfully!');
-    } catch (err) {
-      console.error("API Error:", err);
-      toast.error("Failed to submit. Please try again.");
-    }
+  const handleSaveDraft = () => {
+    setAction("saveDraft");
+    setOpenSignatureDialog(true);
   };
-  const handleReview = async () => {
-    console.log("Review button clicked");
-    try {
-      const response = await documentReviewStatus({
-        document_id: id, // Replace with your actual document_id
-        status: "4", // Replace with your desired status
-      }).unwrap();
-      toast.success("Document Reviewed Successfully!");
-      setTimeout(() => {
-        navigate("/document-listing");
-      }, 2000);
-    } catch (error) {
-      console.error("Error calling API:", error);
-      toast.error("Failed to Review Document. Please try again.");
-    }
+  
+  const handleSubmit = () => {
+    setAction("submit");
+    setOpenSignatureDialog(true);
   };
 
-  const handleApprove = async () => {
-    try {
-      const response = await documentApproveStatus({
-        document_id: id, // Replace with your actual document_id
-        status: "5", // Replace with your desired status
-      }).unwrap();
-      toast.success("Document Approved Successfully!");
-      setTimeout(() => {
-        navigate("/document-listing");
-      }, 2000);
-    } catch (error) {
-      console.error("Error calling API:", error);
-      toast.error("Failed to Review Document. Please try again.");
-    }
+  const handleReview = () => {
+    setAction("review");
+    setOpenSignatureDialog(true);
   };
-  const handleDoc = async () => {
-    console.log("Doc click button ");
-    try {
-      const response = await documentDocAdmin({
-        document_id: id, // Replace with your actual document_id
-        status: "9", // Replace with your desired status
-      }).unwrap();
-      toast.success("Document Doc-Admin Approved Successfully!");
-      setTimeout(() => {
-        navigate("/document-listing");
-      }, 2000);
-    } catch (error) {
-      console.error("Error calling API:", error);
-      toast.error("Failed to Approve Document. Please try again.");
-    }
+
+  const handleApprove = () => {
+    setAction("approve");
+    setOpenSignatureDialog(true);
+  };
+
+  const handleDoc = () => {
+    setAction("docAdminApprove");
+    setOpenSignatureDialog(true);
   };
 
   const handleAddComment = () => {
@@ -412,12 +401,14 @@ const DocumentView = () => {
         </head>
         <body>
           ${Array.from({ length: copies })
-            .map((_, index) => `
+            .map(
+              (_, index) => `
               <div class="copy-container">
                 <div class="print-header">${generateUniqueNumber(index)}</div>
                 <div id="editor-container">${editorContent}</div>
               </div>
-            `)
+            `
+            )
             .join("")}
         </body>
       </html>
@@ -430,9 +421,7 @@ const DocumentView = () => {
       iframe.contentWindow.print(); // Trigger print dialog
       document.body.removeChild(iframe); // Clean up iframe after printing
     };
-};
-
-
+  };
 
   const handleSaveAsDocx = async () => {
     const quill = quillRef.current;
@@ -476,9 +465,9 @@ const DocumentView = () => {
       console.log("API Response:", response);
       if (response.status) {
         toast.success("Document Send Back Successfully!");
-      setTimeout(() => {
-        navigate("/document-listing");
-      }, 2000);
+        setTimeout(() => {
+          navigate("/document-listing");
+        }, 2000);
       } else {
         alert("Action failed. Please try again."); // Failure alert
       }
@@ -564,13 +553,13 @@ const DocumentView = () => {
 
   return (
     <MDBox
-    sx={{
-      fontFamily: "Arial, sans-serif",
-      padding: 2,
-      backgroundColor: "#f4f4f4",
-      minHeight: "100vh",
-      position: "relative",
-    }}
+      sx={{
+        fontFamily: "Arial, sans-serif",
+        padding: 2,
+        backgroundColor: "#f4f4f4",
+        minHeight: "100vh",
+        position: "relative",
+      }}
     >
       {/* Insert AntiCopyPattern as the background */}
       <AntiCopyPattern />
@@ -627,7 +616,7 @@ const DocumentView = () => {
         setCurrentComment={setCurrentComment}
         handleSaveComment={handleSaveComment}
       />
-      
+
       <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
         {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
         {(document_current_status === "1" ||
@@ -643,14 +632,6 @@ const DocumentView = () => {
                 disabled={isLoading} // Disable the button while the API call is in progress
               >
                 {isLoading ? "Submitting..." : "Submit"}
-              </MDButton>
-              <MDButton
-                variant="gradient"
-                color="submit"
-                onClick={handleSaveDraft}
-                disabled={isLoading} // Disable button when mutation is in progress
-              >
-                Save Draft
               </MDButton>
             </>
           )}
@@ -713,7 +694,17 @@ const DocumentView = () => {
         <MDButton
           variant="gradient"
           color="submit"
-          onClick={() => {handlePrint(); }}
+          onClick={handleSaveDraft}
+          disabled={isLoading} // Disable button when mutation is in progress
+        >
+          Save Draft
+        </MDButton>
+        <MDButton
+          variant="gradient"
+          color="submit"
+          onClick={() => {
+            handlePrint();
+          }}
         >
           Print
         </MDButton>
@@ -728,6 +719,12 @@ const DocumentView = () => {
         setStatusSendBack={setStatusSendBack}
         documentId={id}
       />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete} // Only one action is passed here
+      />
+
       {/* <ConditionalDialog
         open={dialogeffectiveOpen}
         onClose={handleDialogClose} // Handle dialog close

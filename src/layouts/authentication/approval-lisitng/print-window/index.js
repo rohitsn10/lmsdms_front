@@ -1,62 +1,52 @@
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
-import React, { useState, useEffect } from "react";
 import MDTypography from "components/MDTypography";
-import { useGetTemplateQuery } from "api/auth/texteditorApi"; 
-import mammoth from "mammoth"; 
+import { useGetTemplateQuery } from "api/auth/texteditorApi";
+import mammoth from "mammoth";
 
 const PrintDocumentDialog = ({ open, onClose, id }) => {
   const [documentUrl, setDocumentUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { data, error, isLoading: apiLoading } = useGetTemplateQuery(id); 
+  const { data, error, isLoading: apiLoading } = useGetTemplateQuery(id);
+  const [printSuccess, setPrintSuccess] = useState(null);
+  const [customPrintWindow, setCustomPrintWindow] = useState(null);
 
-  console.log("Id get in dialog : ==============", id);
+  const updatePrintStatus = (status) => {
+    console.log("Print Status:", status);
+    // Update print status via API or any custom logic
+  };
 
   useEffect(() => {
     if (open && !apiLoading) {
       setIsLoading(true);
       if (data) {
-        console.log("Fetched data:", data); // Debugging line to inspect data
         setDocumentUrl(data?.template_url); // Assuming the response contains documentUrl
       }
       setIsLoading(false);
     }
   }, [open, apiLoading, data]);
 
-  // Print handler
   const handlePrint = async () => {
+    let success = true;
+
     try {
-      // Create a temporary hidden iframe to load the document content and trigger print
-      const iframe = document.createElement("iframe");
-      iframe.style.position = "absolute";
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-      iframe.style.border = "none";
-      document.body.appendChild(iframe);
-
-      const iframeDocument = iframe.contentWindow.document;
-      iframeDocument.open();
-
-      // Check if the document is a .docx file (we already know the URL points to a .docx file)
       if (documentUrl && documentUrl.endsWith(".docx")) {
-        // Fetch the .docx file
         const response = await fetch(documentUrl);
         const arrayBuffer = await response.arrayBuffer();
 
-        // Convert the .docx file to HTML using Mammoth
-        mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+        mammoth.convertToHtml({ arrayBuffer })
           .then((result) => {
-            const htmlContent = result.value; // HTML content of the .docx file
+            const htmlContent = result.value;
 
-            // Inject the HTML content into the iframe
-            iframeDocument.write(`
+            // Create a new window for custom print controls
+            const newWindow = window.open("", "_blank", "width=800,height=600");
+            setCustomPrintWindow(newWindow); // Store reference to the custom window
+
+            // Add the document content to the new window
+            newWindow.document.write(`
               <html>
                 <head>
                   <style>
@@ -76,27 +66,35 @@ const PrintDocumentDialog = ({ open, onClose, id }) => {
                   </style>
                 </head>
                 <body>
-                  <div id="document-container">
-                    ${htmlContent} <!-- Injected HTML content -->
-                  </div>
+                  <div id="document-container">${htmlContent}</div>
                 </body>
               </html>
             `);
-            iframeDocument.close();
+            newWindow.document.close();
 
-            iframe.onload = () => {
-              iframe.contentWindow.focus();
-              iframe.contentWindow.print();
-              document.body.removeChild(iframe);
-            };
+            // Trigger the print action directly
+            if (newWindow) {
+              newWindow.focus();
+              newWindow.print(); // This will show the print dialog for the document
+            }
           })
           .catch((error) => {
             console.error("Error converting DOCX to HTML:", error);
+            success = false;
           });
+      } else {
+        success = false;
       }
     } catch (error) {
       console.error("Error fetching the DOCX file:", error);
+      success = false;
     }
+
+    if (updatePrintStatus) {
+      updatePrintStatus(success);
+    }
+
+    setPrintSuccess(success);
   };
 
   return (
@@ -145,7 +143,6 @@ PrintDocumentDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired, // The document ID passed here
-  requestId: PropTypes.number.isRequired,
 };
 
 export default PrintDocumentDialog;
