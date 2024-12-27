@@ -342,7 +342,7 @@ function AddDocument() {
                 }}
               />
             </MDBox>
-            <MDBox mb={3}>
+            {/* <MDBox mb={3}>
               <MDInput
                 type="date"
                 value={revisionTime}
@@ -356,7 +356,7 @@ function AddDocument() {
                 disabled
               />
               {errors.revisionTime && <FormHelperText>{errors.revisionTime}</FormHelperText>}
-            </MDBox>
+            </MDBox> */}
 
             <MDBox mb={3} display="flex" alignItems="center">
               <FormLabel

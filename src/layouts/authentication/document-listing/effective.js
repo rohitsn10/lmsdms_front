@@ -11,29 +11,63 @@ const ConditionalDialog = ({
   onClose, 
   onConfirm, 
   trainingStatus, 
-  documentId 
+  documentId,
+  revisionMonth,
 }) => {
   // Destructure the mutation hook
   const [documentReleaseEffectiveStatus] = useDocumentreleaseEffectiveStatusMutation();
 
   const heading =
-    trainingStatus === "true"
-      ? "Are you sure effective?"
-      : "Are you sure you want to release the document?";
+    trainingStatus === true
+      ? "Are you sure you want to release the document?"
+      : "Are you sure you want to effective the document?" ;
 
   const handleConfirm = async () => {
-    const status = trainingStatus === "true" ? 6 : 7; // Use "6" if true, otherwise "7"
-    console.log("Document ID:----------------", documentId);
-    console.log("Training Status:-----------------", trainingStatus);
+    const status = trainingStatus === true ? 6 : 7; // Use "6" if true, otherwise "7"
+     // Get the current date and format it as DD-MM-YYYY
+    const currentDate = new Date();
+    const effectiveDate = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1)
+    .toString()
+    .padStart(2, '0')}-${currentDate.getFullYear()}`;
+    // console.log("Document ID:----------------", documentId);
+    // console.log("Training Status:-----------------", trainingStatus);
+    // console.log("Effective Date:-----------------", effectiveDate);
+    console.log("Revision Month:-----------------", revisionMonth);
+    // Calculate the revision_date
+    let revisionDate = ""; // Default to blank
+    if (revisionMonth && revisionMonth !== "0") {
+      const [day, month, year] = effectiveDate.split("-").map(Number);
+      const effectiveDateObj = new Date(year, month - 1, day);
 
+      // Set the revision date to one year later and update the month
+      const revisionYear = effectiveDateObj.getFullYear() + 1;
+      const revisionDateObj = new Date(revisionYear, parseInt(revisionMonth, 10) - 1, day);
+
+      // Handle invalid dates (e.g., February 30)
+      if (revisionDateObj.getMonth() !== parseInt(revisionMonth, 10) - 1) {
+        revisionDateObj.setDate(0); // Move to the last valid day of the month
+      }
+
+      revisionDate = `${revisionDateObj.getDate().toString().padStart(2, '0')}-${(revisionDateObj.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${revisionDateObj.getFullYear()}`;
+    }
+
+    
+    
     try {
-      // Call the mutation API with the documentId and status
-      await documentReleaseEffectiveStatus({ document_id: documentId, status_id: status });
+      // Call the mutation API with the documentId, status, and effectiveDate
+      await documentReleaseEffectiveStatus({
+        document_id: documentId,
+        status_id: status,
+        ...(status === 7 && { effective_date: effectiveDate }), // Include effective_date only if status_id is 7 
+        ...(status === 7 && effectiveDate && { revision_date: revisionDate }), // Include revision_date only if effective_date is present
+      });
       onConfirm(); // Trigger the onConfirm callback if needed
     } catch (error) {
       console.error("Error submitting the document release:", error);
     }
-
+  
     onClose(); // Close the dialog after submission
   };
 
@@ -80,6 +114,7 @@ ConditionalDialog.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   trainingStatus: PropTypes.string.isRequired, 
   documentId: PropTypes.string.isRequired, 
+  revisionMonth: PropTypes.string, // Update PropTypes to include revisionMonth
 };
 
 export default ConditionalDialog;
