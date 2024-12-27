@@ -27,6 +27,7 @@ import {
   useFetchDocumentTypesQuery,
   useViewTemplateQuery,
   useDepartmentWiseReviewerQuery,
+  useFetchAllDocumentsQuery,
 } from "api/auth/documentApi";
 import { useFetchWorkflowsQuery } from "api/auth/workflowApi";
 
@@ -44,10 +45,11 @@ function AddDocument() {
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [createDocument] = useCreateDocumentMutation();
   const [selectedUsers, setSelectedUsers] = useState([]);
-
+  const [parentDocument, setParentDocument] = useState("");
   const navigate = useNavigate();
-
+  const isSopSelected = type === 1;
   const { data: documentTypesData } = useFetchDocumentTypesQuery();
+  const { data: alldocument } = useFetchAllDocumentsQuery();
   const { data: templateData } = useViewTemplateQuery();
   const {
     data: workflowsData,
@@ -172,6 +174,7 @@ function AddDocument() {
         document_current_status_id: 1, // Use the correct ID if needed
         training_required: trainingRequired.toLowerCase() === "yes", // Convert to boolean
         visible_to_users: selectedUsers, // Assuming selectedUsers is an array
+        parent_document: parentDocument,
       };
 
       // Make the API call to create the document
@@ -240,7 +243,15 @@ function AddDocument() {
                   labelId="select-type-label"
                   id="select-type"
                   value={type}
-                  onChange={(e) => setType(e.target.value)}
+                  onChange={(e) => {
+                    const selectedType = e.target.value;
+                    setType(selectedType); // Update the type when selected
+
+                    // If the type is set to 1, clear the parent document value
+                    if (selectedType === 1) {
+                      setParentDocument(""); // Reset parent document when Type is 1
+                    }
+                  }}
                   input={<OutlinedInput label="Type" />}
                   sx={{
                     minWidth: 200,
@@ -261,6 +272,38 @@ function AddDocument() {
                 )}
               </FormControl>
             </MDBox>
+            <MDBox mb={3}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="select-parent-doc-label">Parent Document</InputLabel>
+                <Select
+                  labelId="select-parent-doc-label"
+                  id="select-parent-doc"
+                  value={parentDocument}
+                  onChange={(e) => setParentDocument(e.target.value)} // Update parent document when selected
+                  input={<OutlinedInput label="Parent Document" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem",
+                    ".MuiSelect-select": { padding: "0.45rem" },
+                  }}
+                  disabled={type === 1} // Disable Parent Document dropdown if Type is 1
+                >
+                  {alldocument?.map((doc) => (
+                    <MenuItem key={doc.id} value={doc.id}>
+                      {doc.document_title} {/* Display document title */}
+                    </MenuItem>
+                  ))}
+                </Select>
+
+                {/* Show message when Parent Document is not required */}
+                {type === 1 && (
+                  <p style={{ color: "gray", fontSize: "0.75rem", marginTop: "4px" }}>
+                    Parent Document is not required for this type.
+                  </p>
+                )}
+              </FormControl>
+            </MDBox>
+
             <MDBox mb={3}>
               <MDInput
                 type="text"

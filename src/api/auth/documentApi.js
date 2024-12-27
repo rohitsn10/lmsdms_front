@@ -136,6 +136,11 @@ export const documentApi = createApi({
       keepUnusedDataFor: 30, // Keep unused data for 30 seconds
       refetchInterval: 30000, // Auto-refetch every 30 seconds
     }),
+    fetchAllDocuments: builder.query({
+      query: () => "dms_module/all_document",
+      transformResponse: (response) => response.data,
+      providesTags: ["Documents"], // Tag documents data for cache management
+    }),
    
   }),
 });
@@ -151,5 +156,6 @@ export const {
   useUpdateTemplateMutation,
   useUpdateDocumentTypeMutation,
   useDepartmentWiseReviewerQuery,
+  useFetchAllDocumentsQuery,
  
 } = documentApi;
