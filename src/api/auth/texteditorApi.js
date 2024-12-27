@@ -88,10 +88,10 @@ export const texteditorApi = createApi({
       refetchInterval: 3000,
     }),
     documentreleaseEffectiveStatus: builder.mutation({
-      query: ({ document_id, status_id }) => ({
+      query: ({ document_id, status_id,effective_date,revision_date}) => ({
         url: `dms_module/document_release_effective_status`,
         method: "POST",
-        body: { document_id, status_id },
+        body: { document_id, status_id ,effective_date,revision_date},
       }),
       transformResponse: (response) => response,
     }),

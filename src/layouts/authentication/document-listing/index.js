@@ -44,6 +44,9 @@ const DocumentListing = () => {
     refetch();
   }, [location.key]);
 
+  // Extract revision_month from data
+  const revisionMonth = data?.revision_month;
+
   // console.log("Documents:", data?.documents || []);
   // console.log("User Group IDs:", data?.userGroupIds || []);
 
@@ -302,6 +305,7 @@ const DocumentListing = () => {
         onConfirm={() => console.log("Confirmed for row:", selectedRow)}
         trainingStatus={selectedRow?.training_required || "false"}
         documentId={selectedRow?.id || ""}
+        revisionMonth={selectedRow?.revision_month} // Pass revisionMonth as a prop
       />
       {/* <ReviseDialog
   open={isReviseDialogOpen}
