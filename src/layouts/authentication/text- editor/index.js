@@ -230,13 +230,13 @@ const DocumentView = () => {
           toast.success("Document Reviewed!");
           break;
         case "approve":
-          response = await documentApproveStatus({ document_id: id, status: "5" }).unwrap();
+          response = await documentApproveStatus({ document_id: id, status: "9" }).unwrap();
           toast.success("Document Approved!");
           break;
-        case "docAdminApprove":
-          response = await documentDocAdmin({ document_id: id, status: "9" }).unwrap();
-          toast.success("Document Doc-Admin Approved!");
-          break;
+        // case "docAdminApprove":
+        //   response = await documentDocAdmin({ document_id: id, status: "9" }).unwrap();
+        //   toast.success("Document Doc-Admin Approved!");
+        //   break;
         default:
           throw new Error("Invalid action");
       }
@@ -675,9 +675,9 @@ const DocumentView = () => {
         {/* Condition 4 */}
         {document_current_status === "5" && isButtonVisible([5]) && (
           <>
-            <MDButton variant="gradient" color="submit" onClick={handleDoc} disabled={isLoading}>
+            {/* <MDButton variant="gradient" color="submit" onClick={handleDoc} disabled={isLoading}>
               Doc Admin Approve
-            </MDButton>
+            </MDButton> */}
             <MDButton
               variant="gradient"
               color="error"

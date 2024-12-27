@@ -1,4 +1,3 @@
-// Login.js
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import Card from "@mui/material/Card";
@@ -131,7 +130,6 @@ function Login() {
     }
   };
   
-  
   const handleCloseDialog = () => {
     setDialogOpen(false);
   };
@@ -142,6 +140,13 @@ function Login() {
 
   const handleForgotPassword = () => {
     navigate("/forgotpassword");
+  };
+
+  // Handle 'Enter' key press to trigger login
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
   };
 
   return (
@@ -177,7 +182,7 @@ function Login() {
           </MDTypography>
         </MDBox>
         <MDBox pb={3} px={3}>
-          <MDBox component="form" role="form" sx={{ padding: 3 }}>
+          <MDBox component="form" role="form" sx={{ padding: 3 }} onKeyDown={handleKeyDown}>
             {error && (
               <Alert severity="error" sx={{ mb: 2 }}>
                 {error}
@@ -210,13 +215,6 @@ function Login() {
                 }}
               />
             </MDBox>
-
-            {/* <MDBox display="flex" alignItems="center" mb={3}>
-              <Switch checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
-              <MDTypography variant="button" fontWeight="regular" ml={1}>
-                Remember Me
-              </MDTypography>
-            </MDBox> */}
 
             <MDTypography
               variant="button"

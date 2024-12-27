@@ -25,9 +25,12 @@ export const printApi = createApi({
       transformResponse: (response) => response, // Handle raw response
     }),
     getPrintRequests: builder.query({
-      query: () => ({
-        url: 'dms_module/get_print_request',
+      query: (status_id) => ({
+        url: `dms_module/get_print_request`,
         method: 'GET',
+        params: {
+          status_id, // Send the selected status as a query parameter
+        },
       }),
       transformResponse: (response) => response.data, // Extract only the data part from the response
     }),
@@ -40,11 +43,21 @@ export const printApi = createApi({
       }),
       transformResponse: (response) => response, // Handle raw response
     }),
+     // New print_request_excel_report API integration
+     printRequestExcelReport: builder.query({
+      query: (status_id) => ({
+        url: `dms_module/print_request_excel_report`,
+        method: 'GET',
+        params: { status_id }, // Send the status_id as a query parameter
+      }),
+      transformResponse: (response) => response, // Handle raw response
+    }),
   }),
 });
 
 export const { 
   usePrintDocumentMutation, 
   useGetPrintRequestsQuery,
-  usePrintApprovalsMutation // New hook for print_approvals
+  usePrintApprovalsMutation, // New hook for print_approvals
+  usePrintRequestExcelReportQuery 
 } = printApi;
