@@ -18,6 +18,8 @@ import { useAuth } from "hooks/use-auth";
 import moment from "moment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ConditionalDialog from "./effective";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+
 // import ReviseDialog from "./Revise";
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
 
@@ -120,6 +122,9 @@ const DocumentListing = () => {
     // Add any additional logic here
     handleReviseDialogClose();
   };
+  const handleViewFile = (url) => {
+    navigate("/PreView", { state: { templateDoc: url } }); // Pass the URL as state
+  };
 
   const handleEditClick = (id) => {
     navigate(`/edit-document/${id}`);
@@ -196,7 +201,9 @@ const DocumentListing = () => {
               <EditIcon />
             </IconButton>
           )}
-
+          <IconButton color="primary" onClick={() => handleViewFile(params.row.selected_template_url)}>
+            <VisibilityIcon />
+          </IconButton>
           {params.row.form_status === "save_draft"
             ? hasPermission(userPermissions, "document", "isView") && (
                 <IconButton
@@ -220,16 +227,15 @@ const DocumentListing = () => {
                   <EditCalendarIcon />
                 </IconButton>
               )}
-          {data?.userGroupIds?.includes(5) &&
-           ( // Hide CheckCircleIcon when status is 7
-              <IconButton
-                color="success"
-                onClick={() => handleDialogOpen(params.row)}
-                disabled={params.row.document_current_status !== 9} // Disable if condition not met
-              >
-                <CheckCircleIcon />
-              </IconButton>
-            )}
+          {data?.userGroupIds?.includes(5) && ( // Hide CheckCircleIcon when status is 7
+            <IconButton
+              color="success"
+              onClick={() => handleDialogOpen(params.row)}
+              disabled={params.row.document_current_status !== 9} // Disable if condition not met
+            >
+              <CheckCircleIcon />
+            </IconButton>
+          )}
 
           {/* {params.row.document_current_status === 7 && ( // Show ImportContactsTwoToneIcon when status is 7
             <IconButton
