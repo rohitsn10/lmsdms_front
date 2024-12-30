@@ -86,7 +86,7 @@ import TrainingTypeListing from "dmscomponent/trainingType-Listing/index.js";
 
 import InductionListing from "dmscomponent/induction-training/induction-listing/index.js";
 import AddInductionDesignation from 'dmscomponent/induction-designation/index.js';
-
+import DocView from "layouts/authentication/document-listing/doc-view/index.js";
 
 import EditTrainingType from "dmscomponent/trainingType-Listing/editTraining-Type/index.js";
 import TrainingListing from "dmscomponent/Training-listing/index.js";
@@ -287,6 +287,7 @@ export default function App() {
       <Route path="/resett-password" element={<ResettPassword />} />
       <Route path="/revise-listing" element={<ReviseApprovalList/>}/>
       <Route path="/retrieval-listing" element={<PrintRetrievalListing/>}/>
+      <Route path="/PreView" element={<DocView/>}/>
 
       {/* Lms components */}
       <Route path="/add-area" element={<AddArea />} />

@@ -6,7 +6,7 @@ function timelineItem(theme, ownerState) {
 
   return {
     "&:after": {
-      content: !lastItem && "''",
+      // content: !lastItem && "''",
       position: "absolute",
       top: "2rem",
       left: "17px",

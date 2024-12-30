@@ -237,6 +237,7 @@ useEffect(() => {
                   ".MuiSelect-select": { padding: "0.45rem" },
                 }}
               >
+                <MenuItem value="all">All</MenuItem>  
                 {status?.map((status) => (
                   <MenuItem key={status.id} value={status.id}>
                     {status.status}

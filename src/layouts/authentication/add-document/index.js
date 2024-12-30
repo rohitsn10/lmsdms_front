@@ -70,7 +70,7 @@ function AddDocument() {
     if (!type || (typeof type === "string" && type.trim() === "")) {
       newErrors.type = "Type is required.";
     }
-    if (!documentNumber.trim()) newErrors.documentNumber = "Document number is required.";
+    // if (!documentNumber.trim()) newErrors.documentNumber = "Document number is required.";
     if (!description.trim()) newErrors.description = "Description is required.";
     if (!revisionMonth || revisionMonth <= 0) {
       newErrors.revisionMonth = "Revision month must be a positive number.";
@@ -141,7 +141,7 @@ function AddDocument() {
   const handleClear = () => {
     setTitle("");
     setType("");
-    setDocumentNumber("");
+    // setDocumentNumber("");
     setDescription("");
     setRevisionTime("");
     setWorkflow("");
@@ -163,7 +163,7 @@ function AddDocument() {
       // Prepare the document data similar to the example you provided
       const documentData = {
         document_title: title.trim(),
-        document_number: documentNumber.trim(),
+        // document_number: documentNumber.trim(),
         document_type: type, // Assuming `type` is already the correct value
         document_description: description.trim(),
         revision_month: revisionMonth,
@@ -304,7 +304,7 @@ function AddDocument() {
               </FormControl>
             </MDBox>
 
-            <MDBox mb={3}>
+            {/* <MDBox mb={3}>
               <MDInput
                 type="text"
                 label="Document Number"
@@ -314,7 +314,7 @@ function AddDocument() {
                 helperText={errors.documentNumber}
                 fullWidth
               />
-            </MDBox>
+            </MDBox> */}
 
             <MDBox mb={3}>
               <MDInput

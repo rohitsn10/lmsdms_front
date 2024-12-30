@@ -21,11 +21,10 @@ import { plantApi } from "apilms/plantApi";
 import { areaApi } from "apilms/AreaApi";
 import { methodologyApi } from "apilms/MethodologyApi";
 import { trainingTypeApi } from "apilms/trainingtypeApi";
-
 import { inductionApi } from "apilms/InductionApi";
-
 import { trainingApi } from "apilms/trainingApi";
 import { questionApi } from "apilms/questionApi";
+import { timeLineApi } from "api/auth/timeLineApi";
 
 
 const store = configureStore({
@@ -57,6 +56,7 @@ const store = configureStore({
 
     [trainingApi.reducerPath]: trainingApi.reducer,
     [questionApi.reducerPath]: questionApi.reducer,
+    [timeLineApi.reducerPath]: timeLineApi.reducer,
 
   },
   middleware: (getDefaultMiddleware) =>
@@ -88,6 +88,7 @@ const store = configureStore({
 
       trainingApi.middleware,
       questionApi.middleware,
+      timeLineApi.middleware
 
     ),
 });

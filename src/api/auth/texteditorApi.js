@@ -40,26 +40,26 @@ export const texteditorApi = createApi({
       transformResponse: (response) => response,
     }),
     documentApproveStatus: builder.mutation({
-      query: ({ document_id, documentdetails_id, status }) => ({
+      query: ({ document_id, documentdetails_id, status,remark }) => ({
         url: `dms_module/document_approve_status`,
         method: "POST",
-        body: { document_id, documentdetails_id, status },
+        body: { document_id, documentdetails_id, status, remark },
       }),
       transformResponse: (response) => response,
     }),
     documentReviewStatus: builder.mutation({
-      query: ({ document_id, status }) => ({
+      query: ({ document_id, status,remark }) => ({
         url: `dms_module/document_review_status`,
         method: "POST",
-        body: { document_id, status },
+        body: { document_id, status,remark },
       }),
       transformResponse: (response) => response,
     }),
     documentApproverStatus: builder.mutation({
-      query: ({ document_id, status }) => ({
+      query: ({ document_id, status,remark }) => ({
         url: `dms_module/document_approver_status`,
         method: "POST",
-        body: { document_id, status },
+        body: { document_id, status, remark },
       }),
       transformResponse: (response) => response,
     }),
@@ -72,10 +72,10 @@ export const texteditorApi = createApi({
       transformResponse: (response) => response,
     }),
     documentSendBackStatus: builder.mutation({
-      query: ({ document_id , assigned_to,status_sendback }) => ({
+      query: ({ document_id , assigned_to,status_sendback,remark }) => ({
         url: `dms_module/document_send_back_status`,
         method: "POST",
-        body: { document_id , assigned_to,status_sendback },
+        body: { document_id , assigned_to,status_sendback,remark },
       }),
       transformResponse: (response) => response,
     }),

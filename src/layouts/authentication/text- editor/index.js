@@ -9,18 +9,10 @@ import { useParams } from "react-router-dom";
 import ReactDOM from "react-dom";
 import CommentBankIcon from "@mui/icons-material/CommentBank";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
-
-import {
-  Box,
-  Button,
-  Paper,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from "@mui/material";
+import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
+import { Box } from "@mui/material";
 import MDBox from "components/MDBox";
+import Grid from "@mui/material/Grid";
 import MDButton from "components/MDButton";
 import {
   useGetTemplateQuery,
@@ -40,6 +32,7 @@ import SendBackDialog from "./sendback";
 import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import { toast, ToastContainer } from "react-toastify";
+import RemarkDialog from "./remark";
 
 // Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
@@ -89,14 +82,15 @@ const DocumentView = () => {
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(""); // State for Assigned To dropdown
   const [statusSendBack, setStatusSendBack] = useState(""); // State for Status Send Back dropdown
-  // console.log("Navigated with data in text Editor :", { id, document_current_status});
+  console.log("Navigated with data in text Editor :", { id, document_current_status });
   // console.log("Training Required:", trainingRequired)
   const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
   const [randomNumber] = useState(Math.floor(Math.random() * 100000));
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [action, setAction] = useState("");
-  // Log the documentsData structure
-  console.log("Documents Data:", documentsData);
+  const [openRemarkDialog, setOpenRemarkDialog] = useState(false);
+  const [remark, setRemark] = useState(""); // Store entered remark
+  // const [action, setAction] = useState(""); // To store the action like "submit", "approve", etc.
 
   // Extract userGroupIds directly from documentsData
   const userGroupIds = documentsData?.userGroupIds || [];
@@ -206,6 +200,15 @@ const DocumentView = () => {
     setOpenDrawer(true);
   };
 
+  const handleRemarkConfirm = async (remark) => {
+    // Close RemarkDialog and open E-Signature dialog
+    setOpenRemarkDialog(false);
+    setRemark(remark);
+    console.log("-+-+-+-+-+-+-+-+-++-+-+-+--+-+",remark)
+    // Now proceed to E-Signature dialog
+    setOpenSignatureDialog(true);
+  };
+
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
 
@@ -218,29 +221,25 @@ const DocumentView = () => {
       let response;
       switch (action) {
         case "saveDraft":
-          response = await draftDocument({ document_id: id, status_id: 2 }).unwrap();
+          response = await draftDocument({ document_id: id, status_id: 2, remark }).unwrap();
           toast.success("Saved as Draft!");
           break;
         case "submit":
-          response = await documentApproveStatus({ document_id: id, status: "3" }).unwrap();
+          response = await documentApproveStatus({ document_id: id, status: "3", remark }).unwrap();
           toast.success("Document Submitted!");
           break;
         case "review":
-          response = await documentReviewStatus({ document_id: id, status: "4" }).unwrap();
+          response = await documentReviewStatus({ document_id: id, status: "4", remark }).unwrap();
           toast.success("Document Reviewed!");
           break;
         case "approve":
-          response = await documentApproveStatus({ document_id: id, status: "9" }).unwrap();
+          response = await documentApproveStatus({ document_id: id, status: "9", remark }).unwrap();
           toast.success("Document Approved!");
           break;
-        // case "docAdminApprove":
-        //   response = await documentDocAdmin({ document_id: id, status: "9" }).unwrap();
-        //   toast.success("Document Doc-Admin Approved!");
-        //   break;
         default:
           throw new Error("Invalid action");
       }
-      
+
       // Navigate after success
       setTimeout(() => {
         navigate("/document-listing");
@@ -255,20 +254,20 @@ const DocumentView = () => {
     setAction("saveDraft");
     setOpenSignatureDialog(true);
   };
-  
+
   const handleSubmit = () => {
     setAction("submit");
-    setOpenSignatureDialog(true);
+    setOpenRemarkDialog(true);
   };
 
   const handleReview = () => {
     setAction("review");
-    setOpenSignatureDialog(true);
+    setOpenRemarkDialog(true);
   };
 
   const handleApprove = () => {
     setAction("approve");
-    setOpenSignatureDialog(true);
+    setOpenRemarkDialog(true);
   };
 
   const handleDoc = () => {
@@ -709,6 +708,15 @@ const DocumentView = () => {
           Print
         </MDButton>
       </MDBox>
+      <MDBox
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
+      >
+        <Grid container spacing={3} justifyContent="center" alignItems="center">
+          <Grid item xs={12} md={6} lg={4}>
+            <OrdersOverview docId={id} />
+          </Grid>
+        </Grid>
+      </MDBox>
       <SendBackDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
@@ -723,6 +731,11 @@ const DocumentView = () => {
         open={openSignatureDialog}
         onClose={() => setOpenSignatureDialog(false)}
         onConfirm={handleSignatureComplete} // Only one action is passed here
+      />
+      <RemarkDialog
+        open={openRemarkDialog}
+        onClose={() => setOpenRemarkDialog(false)} // Close the RemarkDialog
+        onConfirm={handleRemarkConfirm} // Handle the remark confirmation and proceed to E-Signature
       />
 
       {/* <ConditionalDialog
