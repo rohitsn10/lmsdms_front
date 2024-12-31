@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 import {
   Card,
   MenuItem,
@@ -24,6 +25,7 @@ import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TinyMCEEditorDialog from "./question-dialog/index.js"; // Import the new dialog component
+import { useCreateTrainingQuestionMutation } from 'apilms/questionApi.js';
 
 function AddQuestion() {
   const [questions, setQuestions] = useState([]);
@@ -40,35 +42,13 @@ function AddQuestion() {
   const [openAnswerDialog, setOpenAnswerDialog] = useState(false);
   const [currentAnswerIndex, setCurrentAnswerIndex] = useState(null);
   const [mediaFile, setMediaFile] = useState(null);
-
+  const location = useLocation();
+  const id = location?.state?.id || null;
   const navigate = useNavigate();
-
-  const handleAddQuestion = (e) => {
-    e.preventDefault();
-    const newQuestion = {
-      text: questionText,
-      type: questionType,
-      answers: answers,
-      marks: questionMarks,
-      language: questionLanguage,
-      status: status,
-      createdAt: createdAt,
-      createdBy: createdBy,
-      mediaFile: mediaFile, // Add media file to the question
-    };
-    setQuestions([...questions, newQuestion]);
-    // Reset fields
-    setQuestionText("");
-    setQuestionType("MCQ");
-    setAnswers([{ text: "", isCorrect: false }]);
-    setQuestionMarks("");
-    setQuestionLanguage("");
-    setStatus("Active");
-    setMediaFile(null); // Reset media file
-  };
-
+  const [createTrainingQuestion, { isLoading }] = useCreateTrainingQuestionMutation();
+  
   const handleAddAnswer = () => {
-    if (answers.length < 6) {
+    if (answers.length < 6 && questionType !== "True/False") {
       setAnswers([...answers, { text: "", isCorrect: false }]);
     }
   };
@@ -93,13 +73,41 @@ function AddQuestion() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Questions Submitted:", questions);
     setOpenSignatureDialog(true);
   };
 
-  const handleCloseSignatureDialog = () => {
+  const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
-    navigate("/questions"); // Redirect to dashboard or any other route
+    
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append("training_id", id);
+    formData.append("question_text", questionText);
+    formData.append("question_type", questionType);
+    formData.append("marks", questionMarks);
+    formData.append("status", status);
+    formData.append("createdAt", createdAt);
+    formData.append("createdBy", createdBy);
+    formData.append("correct_answer", JSON.stringify(answers)); // Convert answers to JSON string
+    if (mediaFile) {
+      formData.append("mediaFile", mediaFile); // Append media file if available
+    }
+  
+    try {
+      const response = await createTrainingQuestion(formData).unwrap();
+      toast.success("Question created successfully!");
+      setTimeout(() => {
+        navigate("/trainingListing");
+      }, 1500);
+    } catch (error) {
+      toast.error("Failed to create question. Please try again.");
+    } finally {
+      setOpenSignatureDialog(false);
+    }
   };
 
   const handleOpenQuestionDialog = () => {
@@ -189,34 +197,79 @@ function AddQuestion() {
               </FormControl>
             </MDBox>
 
+            {/* Add Answers Section */}
             <MDBox mb={3}>
               <MDTypography variant="h6" fontWeight="medium">
                 Add Answers
               </MDTypography>
-              <List>
-                {answers.map((answer, index) => (
-                  <ListItem key={index}>
-                    <MDInput
-                      type="text"
-                      placeholder={`Answer ${index + 1}`}
-                      value={answer.text}
-                      onClick={() => handleOpenAnswerDialog(index)}
-                      onChange={(e) => handleAnswerChange(index, e.target.value)}
-                      sx={{ flex: 1, marginRight: 1 }}
-                    />
-                    <FormControlLabel
-                      control={<Checkbox checked={answer.isCorrect} onChange={() => handleCorrectAnswerChange(index)} />}
-                      label="Correct Answer"
-                    />
-                    <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveAnswer(index)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItem>
-                ))}
-              </List>
-              <MDButton variant="outlined" color="success" onClick={handleAddAnswer}>
-                Add Answer
-              </MDButton>
+
+              {questionType === "Fill in the blank" && (
+                <MDInput
+                  type="text"
+                  placeholder="Answer"
+                  value={answers[0]?.text}
+                  onChange={(e) => handleAnswerChange(0, e.target.value)}
+                  fullWidth
+                />
+              )}
+
+              {questionType === "MCQ" && (
+                <List>
+                  {answers.map((answer, index) => (
+                    <ListItem key={index}>
+                      <MDInput
+                        type="text"
+                        placeholder={`Answer ${index + 1}`}
+                        value={answer.text}
+                        onClick={() => handleOpenAnswerDialog(index)}
+                        onChange={(e) => handleAnswerChange(index, e.target.value)}
+                        sx={{ flex: 1, marginRight: 1 }}
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={answer.isCorrect}
+                            onChange={() => handleCorrectAnswerChange(index)}
+                          />
+                        }
+                        label="Correct Answer"
+                      />
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => handleRemoveAnswer(index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+
+              {questionType === "True/False" && (
+                <RadioGroup>
+                  <FormControlLabel
+                    value="True"
+                    control={<Radio />}
+                    label="True"
+                    checked={answers[0]?.text === "True"}
+                    onChange={() => handleAnswerChange(0, "True")}
+                  />
+                  <FormControlLabel
+                    value="False"
+                    control={<Radio />}
+                    label="False"
+                    checked={answers[0]?.text === "False"}
+                    onChange={() => handleAnswerChange(0, "False")}
+                  />
+                </RadioGroup>
+              )}
+
+              {questionType !== "True/False" && (
+                <MDButton variant="outlined" color="success" onClick={handleAddAnswer}>
+                  Add Answer
+                </MDButton>
+              )}
             </MDBox>
 
             <MDBox mb={3}>
@@ -279,7 +332,11 @@ function AddQuestion() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete}
+      />
 
       {/* Question Edit Dialog */}
       <TinyMCEEditorDialog
@@ -298,9 +355,10 @@ function AddQuestion() {
         content={answers[currentAnswerIndex]?.text || ""}
         onSave={handleSaveAnswer}
       />
+
+      <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }
 
 export default AddQuestion;
-      

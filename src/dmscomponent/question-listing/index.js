@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
@@ -10,30 +10,38 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import moment from "moment";
-import { useFetchTrainingQuestionsQuery } from "apilms/questionApi"; // Import the API hook
+import { useFetchTrainingWiseQuestionsQuery } from "apilms/questionApi"; // Import the API hook
 
 const QuestionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
-  // Fetch question data using the API
-  const { data, isLoading, isError, refetch } = useFetchTrainingQuestionsQuery();
+  const location = useLocation();
+  const id = location?.state?.rowData || null; 
+  const { data, isLoading, isError, refetch } = useFetchTrainingWiseQuestionsQuery(id);
+  useEffect(() => {
+    if (id) {
+      refetch();
+    }
+  }, [id]);
 
   useEffect(() => {
     refetch();
   }, [location.key]);
 
   const handleAddQuestion = () => {
-    navigate("/add-question");
+    navigate("/add-question", { state: { id } });
+    console.log("travell with id in add question", id);
   };
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleEditQuestion = (item) => {
-    navigate("/edit-question", { state: { item } });
+  const handleEditQuestion = (row) => {
+    navigate("/edit-question", { state: { item: row.fullData } });
+    console.log("navigate with this data in edit: -+-+-+-+", row.fullData);
   };
+  
 
   const handleDeleteQuestion = (id) => {
     // Implement the delete logic here
@@ -51,6 +59,7 @@ const QuestionListing = () => {
       question: item.question_text,
       question_type: item.question_type,
       created_at: moment(item.question_created_at).format("DD/MM/YY"), // Adjust the field name
+      fullData: item
     }));
 
   const columns = [

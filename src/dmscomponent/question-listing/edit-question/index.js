@@ -23,27 +23,31 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
-import QuillEditorDialog from "../add-questions/question-dialog/index";
-
+import TinyMCEEditorDialog from "../add-questions/question-dialog/index";
+import { useUpdateTrainingQuestionMutation } from "apilms/questionApi";
 function EditQuestion() {
   const { state } = useLocation(); // Get the passed state from location
   const navigate = useNavigate();
+  const [questionText, setQuestionText] = useState(state?.item?.question_text || "");
+  // console.log("-++++++++++++-+-+-+",questionText)
+  const [questionType, setQuestionType] = useState(state?.item?.question_type || "MCQ");
+  const [answers, setAnswers] = useState(state?.item?.options || [{ text: "", isCorrect: false }]);
+  const [questionMarks, setQuestionMarks] = useState(state?.item?.marks || "");
+  const [questionLanguage, setQuestionLanguage] = useState(state?.item?.language || "English");
+  const [status, setStatus] = useState(state?.item?.status ? "Active" : "Inactive");
+  const [createdAt, setCreatedAt] = useState(
+    state?.question_created_at ? state.question_created_at : new Date().toISOString().slice(0, 10)
+  );
+  const [updateTrainingQuestion] = useUpdateTrainingQuestionMutation();
 
-  // Initialize the state with data from the passed location or set default values
-  const [questions, setQuestions] = useState(state ? [state] : []); 
-  const [questionText, setQuestionText] = useState(state?.text || "");
-  const [questionType, setQuestionType] = useState(state?.type || "MCQ");
-  const [answers, setAnswers] = useState(state?.answers || [{ text: "", isCorrect: false }]);
-  const [questionMarks, setQuestionMarks] = useState(state?.marks || "");
-  const [questionLanguage, setQuestionLanguage] = useState(state?.language || "");
-  const [status, setStatus] = useState(state?.status || "Active");
-  const [createdAt, setCreatedAt] = useState(state?.createdAt || new Date().toISOString().slice(0, 10));
-  const [createdBy, setCreatedBy] = useState(state?.createdBy || "");
+  const [createdBy, setCreatedBy] = useState(state?.item?.created_by || "");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [openQuestionDialog, setOpenQuestionDialog] = useState(false);
   const [openAnswerDialog, setOpenAnswerDialog] = useState(false);
   const [currentAnswerIndex, setCurrentAnswerIndex] = useState(null);
-  const [mediaFile, setMediaFile] = useState(state?.mediaFile || null);
+  const [mediaFile, setMediaFile] = useState(
+    state?.item?.image_file_url || state?.item?.video_file_url || state?.item?.audio_file_url || null
+  );
 
   const handleEditQuestion = (e) => {
     e.preventDefault();
@@ -53,13 +57,13 @@ function EditQuestion() {
       answers: answers,
       marks: questionMarks,
       language: questionLanguage,
-      status: status,
+      status: status === "Active" ? true : false,
       createdAt: createdAt,
       createdBy: createdBy,
       mediaFile: mediaFile, // Update media file if changed
     };
     // Update the questions state with the edited question
-    setQuestions([updatedQuestion]);
+    console.log("Updated Question: ", updatedQuestion);
   };
 
   const handleAddAnswer = () => {
@@ -88,7 +92,15 @@ function EditQuestion() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Edited Question Submitted:", questions);
+    console.log("Edited Question Submitted:", {
+      questionText,
+      questionType,
+      answers,
+      questionMarks,
+      questionLanguage,
+      status,
+      mediaFile,
+    });
     setOpenSignatureDialog(true);
   };
 
@@ -132,7 +144,7 @@ function EditQuestion() {
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
-      <Card sx={{ width: 600, mx: "auto",mt:5,mb:5 }}>
+      <Card sx={{ width: 600, mx: "auto", mt: 5, mb: 5 }}>
         <MDBox
           borderRadius="lg"
           sx={{
@@ -186,32 +198,76 @@ function EditQuestion() {
 
             <MDBox mb={3}>
               <MDTypography variant="h6" fontWeight="medium">
-                Edit Answers
+                Add Answers
               </MDTypography>
-              <List>
-                {answers.map((answer, index) => (
-                  <ListItem key={index}>
-                    <MDInput
-                      type="text"
-                      placeholder={`Answer ${index + 1}`}
-                      value={answer.text}
-                      onClick={() => handleOpenAnswerDialog(index)}
-                      onChange={(e) => handleAnswerChange(index, e.target.value)}
-                      sx={{ flex: 1, marginRight: 1 }}
-                    />
-                    <FormControlLabel
-                      control={<Checkbox checked={answer.isCorrect} onChange={() => handleCorrectAnswerChange(index)} />}
-                      label="Correct Answer"
-                    />
-                    <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveAnswer(index)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItem>
-                ))}
-              </List>
-              <MDButton variant="outlined" color="success" onClick={handleAddAnswer}>
-                Add Answer
-              </MDButton>
+
+              {questionType === "Fill in the blank" && (
+                <MDInput
+                  type="text"
+                  placeholder="Answer"
+                  value={answers[0]?.text}
+                  onChange={(e) => handleAnswerChange(0, e.target.value)}
+                  fullWidth
+                />
+              )}
+
+              {questionType === "MCQ" && (
+                <List>
+                  {answers.map((answer, index) => (
+                    <ListItem key={index}>
+                      <MDInput
+                        type="text"
+                        placeholder={`Answer ${index + 1}`}
+                        value={answer.text}
+                        onClick={() => handleOpenAnswerDialog(index)}
+                        onChange={(e) => handleAnswerChange(index, e.target.value)}
+                        sx={{ flex: 1, marginRight: 1 }}
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={answer.isCorrect}
+                            onChange={() => handleCorrectAnswerChange(index)}
+                          />
+                        }
+                        label="Correct Answer"
+                      />
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => handleRemoveAnswer(index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+
+              {questionType === "True/False" && (
+                <RadioGroup>
+                  <FormControlLabel
+                    value="True"
+                    control={<Radio />}
+                    label="True"
+                    checked={answers[0]?.text === "True"}
+                    onChange={() => handleAnswerChange(0, "True")}
+                  />
+                  <FormControlLabel
+                    value="False"
+                    control={<Radio />}
+                    label="False"
+                    checked={answers[0]?.text === "False"}
+                    onChange={() => handleAnswerChange(0, "False")}
+                  />
+                </RadioGroup>
+              )}
+
+              {questionType !== "True/False" && (
+                <MDButton variant="outlined" color="success" onClick={handleAddAnswer}>
+                  Add Answer
+                </MDButton>
+              )}
             </MDBox>
 
             <MDBox mb={3}>
@@ -274,25 +330,27 @@ function EditQuestion() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
-
+     <ESignatureDialog
+             open={openSignatureDialog}
+             onClose={() => setOpenSignatureDialog(false)}
+             onConfirm={handleEditQuestion}
+           />
       {/* Question Edit Dialog */}
-      <QuillEditorDialog
-        open={openQuestionDialog}
-        onClose={handleCloseQuestionDialog}
-        title="Edit Question"
-        content={questionText}
-        onSave={handleSaveQuestion}
-      />
+       <TinyMCEEditorDialog
+              open={openQuestionDialog}
+              onClose={handleCloseQuestionDialog}
+              title="Edit Question"
+              content={questionText}
+              onSave={handleSaveQuestion}
+            />
 
-      {/* Answer Edit Dialog */}
-      <QuillEditorDialog
-        open={openAnswerDialog}
-        onClose={handleCloseAnswerDialog}
-        title="Edit Answer"
-        content={answers[currentAnswerIndex]?.text || ""}
-        onSave={handleSaveAnswer}
-      />
+      <TinyMCEEditorDialog
+              open={openAnswerDialog}
+              onClose={handleCloseAnswerDialog}
+              title="Edit Answer"
+              content={answers[currentAnswerIndex]?.text || ""}
+              onSave={handleSaveAnswer}
+            />
     </BasicLayout>
   );
 }
