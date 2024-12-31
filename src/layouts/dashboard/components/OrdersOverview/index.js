@@ -1,28 +1,59 @@
 import React, { useEffect, useState } from "react";
 import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import TimelineItem from "examples/Timeline/TimelineItem";
+import LinearProgress from "@mui/material/LinearProgress";
+import { useDocTimeLineQuery } from "api/auth/timeLineApi";
+import PropTypes from "prop-types";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
-import LinearProgress from "@mui/material/LinearProgress";
-import { useDocTimeLineQuery } from "api/auth/timeLineApi";  // Assuming this hook is defined
-import PropTypes from 'prop-types';  // Ensure PropTypes is imported
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { styled } from "@mui/system";
+
+const TimelineItem = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "flex-start",
+  position: "relative",
+  marginBottom: theme.spacing(4),
+  "&:before": {
+    content: '""',
+    position: "absolute",
+    left: 12,
+    top: 0,
+    bottom: 0,
+    width: 2,
+    backgroundColor: theme.palette.grey[300],
+  },
+}));
+
+const TimelineDot = styled("div")(({ theme, color }) => ({
+  width: 24,
+  height: 24,
+  backgroundColor: theme.palette[color]?.main || theme.palette.grey[300],
+  borderRadius: "50%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: theme.palette.common.white,
+  zIndex: 1,
+  position: "relative",
+}));
 
 const OrdersOverview = ({ docId }) => {
-  const { data, isLoading, error } = useDocTimeLineQuery(docId); // Fetching timeline data
+  const { data, isLoading, error } = useDocTimeLineQuery(docId);
   const [timelineData, setTimelineData] = useState([]);
 
   useEffect(() => {
     if (data) {
       const timelineItems = [];
-      
-      // Check each action in the response and push relevant data to timelineItems
+
       const addItem = (actions, title, icon, color) => {
         if (actions.length > 0) {
-          actions.forEach(action => {
+          actions.forEach((action) => {
             timelineItems.push({
               title,
+              notes: action.notes || "No notes available",
               dateTime: action.date || "Unknown",
               icon,
               color,
@@ -31,23 +62,22 @@ const OrdersOverview = ({ docId }) => {
         }
       };
 
-      // Add different actions to the timeline dynamically
       addItem(data.author_approvals, "Author Approval", <CheckCircleOutlineIcon />, "success");
-      addItem(data.reviewer_actions, "Reviewer Actions", <CheckCircleOutlineIcon />, "success");
-      addItem(data.approver_actions, "Approver Actions", <CheckCircleOutlineIcon />, "success");
-      addItem(data.doc_admin_actions, "Document Admin Actions", <CheckCircleOutlineIcon />, "success");
+      addItem(data.reviewer_actions, "Reviewer Actions", <CheckCircleOutlineIcon />, "info");
+      addItem(data.approver_actions, "Approver Actions", <CheckCircleOutlineIcon />, "primary");
+      addItem(data.doc_admin_actions, "Document Admin Actions", <CheckCircleOutlineIcon />, "secondary");
       addItem(data.release_actions, "Release Actions", <CheckCircleOutlineIcon />, "success");
       addItem(data.effective_actions, "Effective Actions", <CheckCircleOutlineIcon />, "success");
-      addItem(data.revision_actions, "Revision Actions", <CheckCircleOutlineIcon />, "success");
-      addItem(data.revision_requests, "Revision Requests", <CheckCircleOutlineIcon />, "success");
+      addItem(data.revision_actions, "Revision Actions", <CheckCircleOutlineIcon />, "warning");
+      addItem(data.revision_requests, "Revision Requests", <ErrorOutlineIcon />, "error");
 
-      // Add items based on 'send_back_actions'
       data.send_back_actions.forEach(() => {
         timelineItems.push({
           title: "Send Back Actions",
+          notes: "This action was sent back for review.",
           dateTime: "Unknown",
           icon: <HourglassTopIcon />,
-          color: "error", // For 'send_back_actions', set color as error
+          color: "error",
         });
       });
 
@@ -59,7 +89,7 @@ const OrdersOverview = ({ docId }) => {
     return (
       <Card sx={{ height: "100%" }}>
         <MDBox pt={3} px={3}>
-          <MDTypography variant="h4" fontWeight="big">
+          <MDTypography variant="h4" fontWeight="medium">
             Loading Timeline...
           </MDTypography>
           <LinearProgress sx={{ marginTop: 2 }} />
@@ -72,7 +102,7 @@ const OrdersOverview = ({ docId }) => {
     return (
       <Card sx={{ height: "100%" }}>
         <MDBox pt={3} px={3}>
-          <MDTypography variant="h4" fontWeight="big">
+          <MDTypography variant="h4" fontWeight="medium">
             Error loading timeline.
           </MDTypography>
         </MDBox>
@@ -81,23 +111,31 @@ const OrdersOverview = ({ docId }) => {
   }
 
   return (
-    <Card sx={{ height: "100%" }}>
+    <Card sx={{ height: "100%", overflow: "auto" }}>
       <MDBox pt={3} px={3}>
-        <MDTypography variant="h4" fontWeight="big">
+        <MDTypography variant="h4" fontWeight="medium">
           Document Timeline
         </MDTypography>
       </MDBox>
-      <MDBox p={2}>
+      <MDBox p={2} display="flex" flexDirection="column" gap={2}>
         {timelineData.length > 0 ? (
           timelineData.map((item, index) => (
-            <TimelineItem
-              key={index}
-              color={item.color}
-              icon={item.icon}
-              title={item.title}
-              dateTime={item.dateTime}
-              lastItem={index === timelineData.length - 1}
-            />
+            <TimelineItem key={index}>
+              <TimelineDot color={item.color}>{item.icon}</TimelineDot>
+              <Card sx={{ flexGrow: 1, ml: 3, backgroundColor: "#f9f9f9" }}>
+                <CardContent>
+                  <MDTypography variant="h6" fontWeight="bold">
+                    {item.title}
+                  </MDTypography>
+                  <MDTypography variant="body2" color="textSecondary">
+                    {item.notes}
+                  </MDTypography>
+                  <MDTypography variant="caption" color="textSecondary">
+                    {item.dateTime}
+                  </MDTypography>
+                </CardContent>
+              </Card>
+            </TimelineItem>
           ))
         ) : (
           <MDTypography variant="h6" color="textSecondary">
@@ -108,8 +146,9 @@ const OrdersOverview = ({ docId }) => {
     </Card>
   );
 };
+
 OrdersOverview.propTypes = {
-  docId: PropTypes.string.isRequired,  // Ensure docId is a required string
+  docId: PropTypes.string.isRequired,
 };
 
 export default OrdersOverview;
