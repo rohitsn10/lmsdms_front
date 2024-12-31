@@ -216,14 +216,14 @@ const routes = [
     route: "/trainingListing",
     component: <TrainingListing />,
   },
-  {
-    type: "collapse",
-    name: "Manage Question",
-    key: "questions",
-    icon: <ManageSearchIcon />,
-    route: "/questions",
-    component: <QuestionListing />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Manage Question",
+  //   key: "questions",
+  //   icon: <ManageSearchIcon />,
+  //   route: "/questions",
+  //   component: <QuestionListing />,
+  // },
   
 
 ];
