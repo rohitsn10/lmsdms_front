@@ -10,19 +10,18 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import moment from "moment";
-import { useFetchTrainingWiseQuestionsQuery } from "apilms/questionApi"; // Import the API hook
-
+import { useFetchTrainingWiseQuestionsQuery, useDeleteTrainingQuestionMutation } from "apilms/questionApi";
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
+import { toast, ToastContainer } from "react-toastify";
 const QuestionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false); 
+  const [pendingQuestionId, setPendingQuestionId] = useState(null); 
   const navigate = useNavigate();
   const location = useLocation();
-  const id = location?.state?.rowData || null; 
+  const id = location?.state?.rowData || null;
   const { data, isLoading, isError, refetch } = useFetchTrainingWiseQuestionsQuery(id);
-  useEffect(() => {
-    if (id) {
-      refetch();
-    }
-  }, [id]);
+  const [deleteTrainingQuestion] = useDeleteTrainingQuestionMutation(id); 
 
   useEffect(() => {
     refetch();
@@ -41,12 +40,33 @@ const QuestionListing = () => {
     navigate("/edit-question", { state: { item: row.fullData } });
     console.log("navigate with this data in edit: -+-+-+-+", row.fullData);
   };
-  
 
-  const handleDeleteQuestion = (id) => {
-    // Implement the delete logic here
-    console.log(`Delete question with ID: ${id}`);
-  };
+  const handleDeleteQuestion = (row) => {
+    setPendingQuestionId(row);
+     console.log("id to delete:",row) 
+    setOpenSignatureDialog(true); // Open the ESignatureDialog
+};
+
+const handleSignatureComplete = async (password) => {
+  setOpenSignatureDialog(false); // Close the dialog
+
+  if (!password) {
+    toast.error("E-Signature is required to proceed.");
+    return;
+  }
+
+  try {
+    // Proceed with the delete action after successful signature
+    const response = await deleteTrainingQuestion({ id: pendingQuestionId }).unwrap(); // Only pass the `id`
+    toast.success("Question updated successfully!");
+          setTimeout(() => {
+            navigate("/trainingListing");
+          }, 1500);
+  } catch (error) {
+    console.error("Error deleting question:", error);
+    toast.error("Error deleting question. Please try again.");
+  }
+};
 
   // Process fetched data and apply search filter
   const filteredData = (data?.data || [])
@@ -153,6 +173,14 @@ const QuestionListing = () => {
           </div>
         </MDBox>
       </Card>
+
+      {/* E-Signature Dialog */}
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete} // Pass the handler for signature completion
+      />
+       <ToastContainer position="top-right" autoClose={3000} />
     </MDBox>
   );
 };

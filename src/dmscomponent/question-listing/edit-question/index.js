@@ -25,11 +25,12 @@ import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TinyMCEEditorDialog from "../add-questions/question-dialog/index";
 import { useUpdateTrainingQuestionMutation } from "apilms/questionApi";
+import { toast, ToastContainer } from "react-toastify";
+
 function EditQuestion() {
   const { state } = useLocation(); // Get the passed state from location
   const navigate = useNavigate();
   const [questionText, setQuestionText] = useState(state?.item?.question_text || "");
-  // console.log("-++++++++++++-+-+-+",questionText)
   const [questionType, setQuestionType] = useState(state?.item?.question_type || "MCQ");
   const [answers, setAnswers] = useState(state?.item?.options || [{ text: "", isCorrect: false }]);
   const [questionMarks, setQuestionMarks] = useState(state?.item?.marks || "");
@@ -49,21 +50,54 @@ function EditQuestion() {
     state?.item?.image_file_url || state?.item?.video_file_url || state?.item?.audio_file_url || null
   );
 
-  const handleEditQuestion = (e) => {
+  useEffect(() => {
+    // Automatically set answers based on the question type
+    if (questionType === "True/False") {
+      setAnswers([{ text: "True", isCorrect: false }, { text: "False", isCorrect: false }]);
+    } else if (questionType === "MCQ") {
+      setAnswers([{ text: questionText, isCorrect: false }]);
+    } else if (questionType === "Fill in the blank") {
+      setAnswers([{ text: questionText, isCorrect: false }]);
+    }
+  }, [questionType]); // Trigger when questionType changes
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+    
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("training_id", state?.item?.training_id || "1"); // Adjust this based on your state data
+    formData.append("question_text", questionText);
+    formData.append("question_type", questionType);
+    formData.append("marks", questionMarks);
+    formData.append("status", status);
+    formData.append("createdAt", createdAt);
+    formData.append("createdBy", createdBy);
+    formData.append("correct_answer", JSON.stringify(answers)); // Convert answers to JSON string
+    if (mediaFile) {
+      formData.append("mediaFile", mediaFile); // Append media file if available
+    }
+
+    try {
+      const response = await updateTrainingQuestion({ id: state?.item?.id, formData }).unwrap();
+      toast.success("Question updated successfully!");
+      setTimeout(() => {
+        navigate("/trainingListing");
+      }, 1500);
+    } catch (error) {
+      toast.error("Failed to update question. Please try again.");
+    } finally {
+      setOpenSignatureDialog(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const updatedQuestion = {
-      text: questionText,
-      type: questionType,
-      answers: answers,
-      marks: questionMarks,
-      language: questionLanguage,
-      status: status === "Active" ? true : false,
-      createdAt: createdAt,
-      createdBy: createdBy,
-      mediaFile: mediaFile, // Update media file if changed
-    };
-    // Update the questions state with the edited question
-    console.log("Updated Question: ", updatedQuestion);
+    setOpenSignatureDialog(true); // Open signature dialog when submitting the form
   };
 
   const handleAddAnswer = () => {
@@ -90,24 +124,12 @@ function EditQuestion() {
     setAnswers(updatedAnswers);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Edited Question Submitted:", {
-      questionText,
-      questionType,
-      answers,
-      questionMarks,
-      questionLanguage,
-      status,
-      mediaFile,
-    });
-    setOpenSignatureDialog(true);
-  };
+  
 
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/questions"); // Redirect to dashboard or any other route
-  };
+  // const handleCloseSignatureDialog = () => {
+  //   setOpenSignatureDialog(false);
+  //   navigate("/questions"); 
+  // };
 
   const handleOpenQuestionDialog = () => {
     setOpenQuestionDialog(true);
@@ -196,6 +218,7 @@ function EditQuestion() {
               </FormControl>
             </MDBox>
 
+            {/* Answer Section */}
             <MDBox mb={3}>
               <MDTypography variant="h6" fontWeight="medium">
                 Add Answers
@@ -333,7 +356,7 @@ function EditQuestion() {
      <ESignatureDialog
              open={openSignatureDialog}
              onClose={() => setOpenSignatureDialog(false)}
-             onConfirm={handleEditQuestion}
+             onConfirm={handleSignatureComplete}
            />
       {/* Question Edit Dialog */}
        <TinyMCEEditorDialog
@@ -351,6 +374,7 @@ function EditQuestion() {
               content={answers[currentAnswerIndex]?.text || ""}
               onSave={handleSaveAnswer}
             />
+             <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }

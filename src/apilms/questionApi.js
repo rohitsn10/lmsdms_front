@@ -18,39 +18,39 @@ export const questionApi = createApi({
       query: (formData) => ({
         url: 'lms_module/create_training_questions',
         method: 'POST',
-        body: formData, // Pass formData directly, including files
+        body: formData, 
       }),
-      transformResponse: (response) => response, // Handle raw response
+      transformResponse: (response) => response, 
     }),
     fetchTrainingQuestions: builder.query({
       query: () => ({
         url: 'lms_module/create_training_questions',
         method: 'GET',
       }),
-      transformResponse: (response) => response, // Handle raw response
+      transformResponse: (response) => response,
     }),
     updateTrainingQuestion: builder.mutation({
       query: ({ id, formData }) => ({
         url: `lms_module/update_training_questions/${id}`,
         method: 'PUT',
-        body: formData, // Pass formData directly, including files
+        body: formData, 
       }),
-      transformResponse: (response) => response, // Handle raw response
+      transformResponse: (response) => response, 
     }),
-    deleteTrainingQuestion:builder.mutation({
-        query: ({ id, formData }) => ({
-          url: `lms_module/update_training_questions/${id}`,
-          method: 'DELETE',
-          body: formData, // Pass formData directly, including files
-        }),
-        transformResponse: (response) => response, // Handle raw response
+    deleteTrainingQuestion: builder.mutation({
+      query: ({ id }) => ({
+        url: `lms_module/update_training_questions/${id}`,  
+        method: 'DELETE', 
       }),
+      transformResponse: (response) => response, 
+    }),
+    
       fetchTrainingWiseQuestions: builder.query({
         query: (training_id) => ({
           url: `lms_module/training_wise_questions/${training_id}`,
           method: 'GET',
         }),
-        transformResponse: (response) => response, // Handle raw response
+        transformResponse: (response) => response,
       }),
   }),
 });
