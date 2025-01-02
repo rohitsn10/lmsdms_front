@@ -33,11 +33,7 @@ import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import { toast, ToastContainer } from "react-toastify";
 import RemarkDialog from "./remark";
-
-// Register the ImageResize module
 Quill.register("modules/imageResize", ImageResize);
-
-// Toolbar options for the editor
 const toolbarOptions = [
   [{ font: [] }],
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
