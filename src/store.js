@@ -25,7 +25,8 @@ import { inductionApi } from "apilms/InductionApi";
 import { trainingApi } from "apilms/trainingApi";
 import { questionApi } from "apilms/questionApi";
 import { timeLineApi } from "api/auth/timeLineApi";
-
+import { jobroleApi } from "apilms/jobRoleApi";
+import { trainingMappingApi } from "apilms/trainigMappingApi";
 
 const store = configureStore({
   reducer: {
@@ -51,12 +52,12 @@ const store = configureStore({
     [areaApi.reducerPath]: areaApi.reducer,
     [methodologyApi.reducerPath]:methodologyApi.reducer,
     [trainingTypeApi.reducerPath]: trainingTypeApi.reducer,
-
     [inductionApi.reducerPath]:inductionApi.reducer,
-
     [trainingApi.reducerPath]: trainingApi.reducer,
     [questionApi.reducerPath]: questionApi.reducer,
     [timeLineApi.reducerPath]: timeLineApi.reducer,
+    [jobroleApi.reducerPath]: jobroleApi.reducer,
+    [trainingMappingApi.reducerPath]: trainingMappingApi.reducer,
 
   },
   middleware: (getDefaultMiddleware) =>
@@ -83,12 +84,12 @@ const store = configureStore({
       areaApi.middleware,
       methodologyApi.middleware,
       trainingTypeApi.middleware,
-
       inductionApi.middleware,
-
       trainingApi.middleware,
       questionApi.middleware,
-      timeLineApi.middleware
+      timeLineApi.middleware,
+      jobroleApi.middleware,
+      trainingMappingApi.middleware
 
     ),
 });

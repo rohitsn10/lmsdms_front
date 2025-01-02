@@ -57,8 +57,8 @@ const handleSignatureComplete = async (password) => {
 
   try {
     // Proceed with the delete action after successful signature
-    const response = await deleteTrainingQuestion({ id: pendingQuestionId }).unwrap(); // Only pass the `id`
-    toast.success("Question updated successfully!");
+    const response = await deleteTrainingQuestion({ id: pendingQuestionId }).unwrap(); 
+    toast.success("Question Delete successfully!");
           setTimeout(() => {
             navigate("/trainingListing");
           }, 1500);

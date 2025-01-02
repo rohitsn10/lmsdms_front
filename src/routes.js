@@ -47,6 +47,11 @@ import ModelTrainingTwoToneIcon from '@mui/icons-material/ModelTrainingTwoTone';
 import TrainingListing from "dmscomponent/Training-listing";
 import QuestionListing from "dmscomponent/question-listing";
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import WorkTwoToneIcon from '@mui/icons-material/WorkTwoTone';
+import JobroleListing from "dmscomponent/job-listing";
+import TrainingMapping from "dmscomponent/training-mappping";
+import JobRoleMapping from "dmscomponent/jobrole-mapping";
+import DisplaySettingsRoundedIcon from '@mui/icons-material/DisplaySettingsRounded';
 
 const routes = [
   {
@@ -216,16 +221,30 @@ const routes = [
     route: "/trainingListing",
     component: <TrainingListing />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "Manage Question",
-  //   key: "questions",
-  //   icon: <ManageSearchIcon />,
-  //   route: "/questions",
-  //   component: <QuestionListing />,
-  // },
-  
-
+  {
+    type: "collapse",
+    name: "Job Role",
+    key: "jobRole-listing",
+    icon: <WorkTwoToneIcon />,
+    route: "/jobRole-listing",
+    component: <JobroleListing />,
+  },
+  {
+    type: "collapse",
+    name: "Training Mapping",
+    key: "trainingMapping-listing",
+    icon: <WorkTwoToneIcon />,
+    route: "/trainingMapping-listing",
+    component:<TrainingMapping/>
+  },
+  {
+    type: "collapse",
+    name: "Job Role Mapping",
+    key: "jobrole-mapping",
+    icon: <DisplaySettingsRoundedIcon />,
+    route: "/jobrole-mapping",
+    component:<JobRoleMapping/>
+  },
 ];
 
 export default routes;

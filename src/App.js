@@ -63,7 +63,7 @@ import PrintRetrievalListing from "layouts/retrieval-listing/index.js";
 import AddArea from "dmscomponent/add-area/index.js";
 import AddDepartments from "dmscomponent/add-departments/index.js";
 import AddPlant from "dmscomponent/add-plant/index.js";
-import AddJobRole from "dmscomponent/add-jobrole/index.js";
+import AddJobRole from "dmscomponent/job-listing/add-jobrole/index.js";
 import AddTrainingType from "dmscomponent/trainingType-Listing/addTraining-type/index.js";
 import AddInductionTraining from "dmscomponent/induction-training/index.js";
 import AddTraining from "dmscomponent/Training-listing/add-training/index.js";
@@ -83,18 +83,18 @@ import MethodologyListing from "dmscomponent/methodology-listing/index.js";
 import EditMethodology from "dmscomponent/methodology-listing/edit-methodology/index.js";
 import AddMethodology from "dmscomponent/methodology-listing/add-methodology/index.js";
 import TrainingTypeListing from "dmscomponent/trainingType-Listing/index.js";
-
 import InductionListing from "dmscomponent/induction-training/induction-listing/index.js";
 import AddInductionDesignation from 'dmscomponent/induction-designation/index.js';
 import DocView from "layouts/authentication/document-listing/doc-view/index.js";
-
 import EditTrainingType from "dmscomponent/trainingType-Listing/editTraining-Type/index.js";
 import TrainingListing from "dmscomponent/Training-listing/index.js";
 import EditTraining from "dmscomponent/Training-listing/edit-training/index.js";
 import LMSDocument from "dmscomponent/Training-listing/document-view/index.js";
 import QuestionListing from "dmscomponent/question-listing/index.js";
 import EditQuestion from "dmscomponent/question-listing/edit-question/index.js";
-
+import JobroleListing from "dmscomponent/job-listing/index.js";
+import EditJobRole from "dmscomponent/job-listing/edit-jobrole/index.js";
+import JobRoleMapping from "dmscomponent/jobrole-mapping/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -300,7 +300,6 @@ export default function App() {
       <Route path="/add-material" element={<AddMaterial />} />
       <Route path="/add-question" element={<AddQuestion />} />
       <Route path="/add-quiz" element={<CreateQuiz />} />
-      <Route path="/training-mapping" element={<TrainingMapping />} />
       <Route path="/classroom-training" element={<ClassroomTraining />} />
       <Route path="/training-matrix" element={<TrainingMatrix />} />
       <Route path="/exam-result" element={<ExamResultsReport />} />
@@ -313,17 +312,18 @@ export default function App() {
       <Route path="/edit-methodology" element={<EditMethodology />} />
       <Route path="/add-methodology" element={<AddMethodology />} />
       <Route path="/trainingType-Listing" element={<TrainingTypeListing />} />
-
       <Route path= "/induction-listing" element ={<InductionListing/>}/>
       <Route path="/induction-designation" element ={<AddInductionDesignation/>}/>
-
       <Route path="/edit-trainingtype" element={<EditTrainingType />} />
       <Route path="/trainingListing" element={<TrainingListing />} />
       <Route path="/edit-training" element={<EditTraining />} />
       <Route path="/LMS-Document" element={<LMSDocument />} />
       <Route path="/questions" element={<QuestionListing />} />
       <Route path="/edit-question" element={<EditQuestion />} />
-
+      <Route path="/jobRole-listing" element={<JobroleListing />} />
+      <Route path="/edit-jobrole" element={<EditJobRole />} />
+      <Route path="/training-mapping" element={<TrainingMapping />} />
+      <Route path="/jobrole-mapping" element={<JobRoleMapping/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   </div>

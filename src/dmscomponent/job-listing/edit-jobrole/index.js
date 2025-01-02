@@ -1,6 +1,5 @@
-// AddJobRole.js
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -8,29 +7,73 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog"; // Ensure correct import
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
+import { useUpdateJobRoleMutation } from "apilms/jobRoleApi";
+import { toast,ToastContainer } from "react-toastify";
 
-function AddJobRole() {
+function EditJobRole() {
   const [title, setTitle] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleSubmit = (e) => {
+  const [updateJobRole] = useUpdateJobRoleMutation();
+
+  const { jobrole } = location.state || {}; // Getting the job role data passed from the previous screen
+  console.log("-+-+-+-+-+-+-+-+-+-+-++--++-",jobrole);
+  useEffect(() => {
+    if (jobrole) {
+      setTitle(jobrole.job_role_name);
+      setJobDescription(jobrole.job_role_description);
+    }
+  }, [jobrole]);
+
+  // Validation function
+  const validateInputs = () => {
+    const newErrors = {};
+    if (!title.trim()) newErrors.title = "Title is required.";
+    if (!jobDescription.trim()) newErrors.jobDescription = "Job Description is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setOpenSignatureDialog(true); // Open dialog on form submission
-    console.log("Job Role Details Submitted:", { title, jobDescription });
+    if (!validateInputs()) return;
+    setOpenSignatureDialog(true);
+  };
+
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+
+    try {
+      await updateJobRole({
+        job_role_id: jobrole.id, // Passing job role ID to update
+        job_role_name: title.trim(),
+        job_role_description: jobDescription.trim(),
+      }).unwrap();
+
+      toast.success("Job Role updated successfully!");
+      setTimeout(() => {
+        navigate("/jobrole-listing"); // Redirect to the job role listing page
+      }, 1500);
+    } catch (error) {
+      console.error("Error updating job role:", error);
+      toast.error("Failed to update job role. Please try again.");
+    }
   };
 
   const handleClear = () => {
     setTitle("");
     setJobDescription("");
-  };
-
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false); // Close the dialog
-    navigate("/dashboard"); // Navigate after closing
+    setErrors({});
   };
 
   return (
@@ -49,7 +92,7 @@ function AddJobRole() {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Add Job Role
+            Edit Job Role
           </MDTypography>
         </MDBox>
         <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
@@ -69,10 +112,12 @@ function AddJobRole() {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Title"
+                label="Job Role Title"
                 fullWidth
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                error={!!errors.title}
+                helperText={errors.title}
               />
             </MDBox>
             <MDBox mb={3}>
@@ -83,6 +128,8 @@ function AddJobRole() {
                 fullWidth
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
+                error={!!errors.jobDescription}
+                helperText={errors.jobDescription}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
@@ -93,14 +140,14 @@ function AddJobRole() {
           </MDBox>
         </MDBox>
       </Card>
-
-      {/* E-Signature Dialog */}
       <ESignatureDialog
         open={openSignatureDialog}
-        handleClose={handleCloseSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete}
       />
+      <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }
 
-export default AddJobRole;
+export default EditJobRole;

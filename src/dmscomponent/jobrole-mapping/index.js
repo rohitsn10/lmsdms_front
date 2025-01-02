@@ -15,16 +15,16 @@ import MDTypography from "components/MDTypography";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-const TrainingMapping = () => {
+const JobRoleMapping = () => {
   const initialData = {
     toDo: [
-      { id: "1", title: "Print Document 1", description: "Description for print 1" },
-      { id: "2", title: "Print Document 2", description: "Description for print 2" },
-      { id: "3", title: "Print Document 3", description: "Description for print 3" },
+      { id: "1", title: "Job Role 1", description: "Description for job role 1" },
+      { id: "2", title: "Job Role 2", description: "Description for job role 2" },
+      { id: "3", title: "Job Role 3", description: "Description for job role 3" },
     ],
     inProgress: [
-      { id: "7", title: "Print Document 4", description: "Description for print 4" },
-      { id: "8", title: "Print Document 5", description: "Description for print 5" },
+      { id: "7", title: "Job Role 4", description: "Description for job role 4" },
+      { id: "8", title: "Job Role 5", description: "Description for job role 5" },
     ],
   };
 
@@ -74,13 +74,13 @@ const TrainingMapping = () => {
         <MDBox p={3} display="flex" alignItems="center" justifyContent="center">
           {/* Status Dropdown */}
           <FormControl fullWidth margin="dense" sx={{ width: "250px", ml: 5 }}>
-            <InputLabel id="select-status-label">Training</InputLabel>
+            <InputLabel id="select-status-label">Job Role</InputLabel>
             <Select
               labelId="select-status-label"
               id="select-status"
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              input={<OutlinedInput label="Training" />}
+              input={<OutlinedInput label="Job Role" />}
               sx={{
                 minWidth: 150,
                 height: "2.4rem",
@@ -101,13 +101,13 @@ const TrainingMapping = () => {
             fontWeight="medium"
             sx={{ flexGrow: 1, textAlign: "center", mr: 20 }}
           >
-            Training Mapping
+            Job Role Mapping
           </MDTypography>
 
           {/* Mapping Button */}
           <MDButton
             variant="contained"
-            sx={{ ml: 2, backgroundColor: "#e91e63",color:"#fff", "&:hover": { backgroundColor: "#e2185b" } }}
+            sx={{ ml: 2, backgroundColor: "#e91e63", color: "#fff", "&:hover": { backgroundColor: "#e2185b" } }}
             onClick={handleMapping}
           >
             Mapping
@@ -121,12 +121,12 @@ const TrainingMapping = () => {
             <Droppable droppableId="toDo">
               {(provided) => (
                 <Card
-                  sx={{ width: "43%", ml: 5, p: 2,mb:2, borderRadius: 5, boxShadow: 5 }}
+                  sx={{ width: "43%", ml: 5, p: 2, mb: 2, borderRadius: 5, boxShadow: 5 }}
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
                   <MDTypography variant="h4" sx={{ textAlign: "center" }}>
-                    Job Role
+                    Available Job Roles
                   </MDTypography>
                   <Box>
                     {kanbanData.toDo.map((item, index) => (
@@ -158,12 +158,12 @@ const TrainingMapping = () => {
             <Droppable droppableId="inProgress">
               {(provided) => (
                 <Card
-                sx={{ width: "43%", mr: 5, p: 2,mb:2, borderRadius: 5, boxShadow: 5 }}
+                  sx={{ width: "43%", mr: 5, p: 2, mb: 2, borderRadius: 5, boxShadow: 5 }}
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
                   <MDTypography variant="h4" sx={{ textAlign: "center" }}>
-                    Assigned Role
+                    Assigned Job Roles
                   </MDTypography>
                   <Box>
                     {kanbanData.inProgress.map((item, index) => (
@@ -195,4 +195,4 @@ const TrainingMapping = () => {
   );
 };
 
-export default TrainingMapping;
+export default JobRoleMapping;
