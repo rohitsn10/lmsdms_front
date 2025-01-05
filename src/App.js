@@ -58,6 +58,10 @@ import EditPrinter from "layouts/authentication/edit-printer/index.js";
 import ResettPassword from "layouts/authentication/reset-passwordlog/index.js";
 import ReviseApprovalList from "layouts/authentication/revise-Listing/index.js";
 import PrintRetrievalListing from "layouts/retrieval-listing/index.js";
+import ApprovedDocument from "layouts/authentication/document-listing/approve-document/index.js";
+import RejectedDocument from "layouts/authentication/document-listing/rejected-document/index.js";
+import SavedraftDocument from "layouts/authentication/document-listing/saved-draft-document/index.js";
+import UnderReviewDocument from "layouts/authentication/document-listing/under-review-document/index.js";
 //Lms components
 
 import AddArea from "dmscomponent/add-area/index.js";
@@ -288,6 +292,10 @@ export default function App() {
       <Route path="/revise-listing" element={<ReviseApprovalList/>}/>
       <Route path="/retrieval-listing" element={<PrintRetrievalListing/>}/>
       <Route path="/PreView" element={<DocView/>}/>
+      <Route path="/approve-document" element={<ApprovedDocument/>}/>
+      <Route path="/reject-document" element={<RejectedDocument/>}/>
+      <Route path="/draft-document" element={<SavedraftDocument/>}/>
+      <Route path="/review-document" element={<UnderReviewDocument/>}/>
 
       {/* Lms components */}
       <Route path="/add-area" element={<AddArea />} />

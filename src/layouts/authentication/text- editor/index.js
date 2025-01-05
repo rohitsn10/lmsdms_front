@@ -33,6 +33,8 @@ import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import { toast, ToastContainer } from "react-toastify";
 import RemarkDialog from "./remark";
+import SelectUserDialog from "./user-select";
+
 Quill.register("modules/imageResize", ImageResize);
 const toolbarOptions = [
   [{ font: [] }],
@@ -87,7 +89,12 @@ const DocumentView = () => {
   const [openRemarkDialog, setOpenRemarkDialog] = useState(false);
   const [remark, setRemark] = useState(""); // Store entered remark
   // const [action, setAction] = useState(""); // To store the action like "submit", "approve", etc.
+  const [openuserDialog, setOpenuserDialog] = useState(false);
+  const [approver, setApprover] = useState("");
+  const [reviewer, setReviewer] = useState([]);
+  const [docAdmin, setDocAdmin] = useState("");
 
+  console.log("-+-+-+-+-+-+-+-+-+-+-++--++--+",docAdmin);
   // Extract userGroupIds directly from documentsData
   const userGroupIds = documentsData?.userGroupIds || [];
   console.log("Extracted User Group IDs:", userGroupIds);
@@ -200,7 +207,7 @@ const DocumentView = () => {
     // Close RemarkDialog and open E-Signature dialog
     setOpenRemarkDialog(false);
     setRemark(remark);
-    console.log("-+-+-+-+-+-+-+-+-++-+-+-+--+-+",remark)
+    console.log("-+-+-+-+-+-+-+-+-++-+-+-+--+-+", remark);
     // Now proceed to E-Signature dialog
     setOpenSignatureDialog(true);
   };
@@ -220,10 +227,11 @@ const DocumentView = () => {
           response = await draftDocument({ document_id: id, status_id: 2, remark }).unwrap();
           toast.success("Saved as Draft!");
           break;
-        case "submit":
-          response = await documentApproveStatus({ document_id: id, status: "3", remark }).unwrap();
-          toast.success("Document Submitted!");
-          break;
+          case "submit":
+            response = await documentApproveStatus({document_id: id,status: "3",remark,visible_to_users: reviewer,approver,doc_admin: docAdmin}).unwrap();
+            console.log("",)
+            toast.success("Document Submitted!");
+            break;
         case "review":
           response = await documentReviewStatus({ document_id: id, status: "4", remark }).unwrap();
           toast.success("Document Reviewed!");
@@ -253,8 +261,9 @@ const DocumentView = () => {
 
   const handleSubmit = () => {
     setAction("submit");
-    setOpenRemarkDialog(true);
+    setOpenuserDialog(true);  
   };
+  
 
   const handleReview = () => {
     setAction("review");
@@ -266,10 +275,10 @@ const DocumentView = () => {
     setOpenRemarkDialog(true);
   };
 
-  const handleDoc = () => {
-    setAction("docAdminApprove");
-    setOpenSignatureDialog(true);
-  };
+  // const handleDoc = () => {
+  //   setAction("docAdminApprove");
+  //   setOpenSignatureDialog(true);
+  // };
 
   const handleAddComment = () => {
     const quill = quillRef.current;
@@ -546,6 +555,26 @@ const DocumentView = () => {
     return <Box padding={2}>Error loading document</Box>;
   }
 
+  const handleOpeusernDialog = () => {
+    setOpenuserDialog(true);
+  };
+
+  const handleuserCloseDialog = () => {
+    setOpenuserDialog(false);
+    setOpenRemarkDialog(true);
+  };
+  const handleConfirmSelection = (selectedUsers) => {
+  console.log("Selected Users:", selectedUsers);
+  // Store selected users in state
+  setApprover(selectedUsers.approver);
+  setReviewer(selectedUsers.reviewer);
+  setDocAdmin(selectedUsers.docAdmin);
+
+  setOpenuserDialog(false); // Close the SelectUserDialog
+  setOpenRemarkDialog(true); // Now open the RemarkDialog
+};
+
+
   return (
     <MDBox
       sx={{
@@ -556,7 +585,6 @@ const DocumentView = () => {
         position: "relative",
       }}
     >
-      {/* Insert AntiCopyPattern as the background */}
       <AntiCopyPattern />
 
       <div
@@ -570,11 +598,10 @@ const DocumentView = () => {
           border: "1px solid #ccc",
           borderRadius: "5px",
           boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-          position: "relative", // Allow child div positioning
+          position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Random Number (Inside editor-container, Top Right Corner) */}
         <div
           style={{
             position: "absolute",
@@ -734,6 +761,11 @@ const DocumentView = () => {
         onConfirm={handleRemarkConfirm} // Handle the remark confirmation and proceed to E-Signature
       />
 
+      <SelectUserDialog
+        open={openuserDialog}
+        onClose={handleuserCloseDialog}
+        onConfirm={handleConfirmSelection}
+      />
       {/* <ConditionalDialog
         open={dialogeffectiveOpen}
         onClose={handleDialogClose} // Handle dialog close

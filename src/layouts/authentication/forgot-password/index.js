@@ -8,7 +8,7 @@ import {
   useRequestForgotPasswordOtpMutation,
   useVerifyForgotPasswordOtpMutation,
 } from "api/auth/forgotpassApi";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -17,7 +17,7 @@ function ResetPassword() {
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [message, setMessage] = useState("");
   const [step, setStep] = useState(1); // To control the flow between cards
-
+   const navigate = useNavigate();
   const inputRefs = useRef([]);
 
   const [requestForgotPasswordOtp] = useRequestForgotPasswordOtpMutation();

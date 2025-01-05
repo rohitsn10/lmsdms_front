@@ -29,7 +29,29 @@ export const userApi = createApi({
             query: () => 'user_profile/user_list',
             providesTags: ['UserList'], // Tag the user list data for cache management
         }),
+        reviewerUsers: builder.query({
+            query: () => 'user_profile/reviewer_users',
+            providesTags: ['UserList'], // Tag reviewer users data for cache management
+        }),
+
+        // Fetch approver users
+        approverUsers: builder.query({
+            query: () => 'user_profile/approver_users',
+            providesTags: ['UserList'], // Tag approver users data for cache management
+        }),
+
+        // Fetch document admin users
+        docAdminUsers: builder.query({
+            query: () => 'user_profile/docadmin_users',
+            providesTags: ['UserList'], // Tag doc admin users data for cache management
+        }),
     }),
 });
 
-export const { useCreateUserMutation, useUserListQuery } = userApi;
+export const {
+     useCreateUserMutation,
+     useUserListQuery,
+     useReviewerUsersQuery,
+     useApproverUsersQuery,
+     useDocAdminUsersQuery
+     } = userApi;
