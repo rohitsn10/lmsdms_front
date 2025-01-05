@@ -76,11 +76,7 @@ const StatusListing = () => {
     }
   };
 
-  // const handleDeleteClick = (id) => {
-  //   setStatusToDelete(id);
-  //   setConfirmationDialogOpen(true);
-  // };
-
+  
   const handleCloseConfirmationDialog = () => {
     setConfirmationDialogOpen(false);
     setStatusToDelete(null);
@@ -115,11 +111,6 @@ const StatusListing = () => {
               <EditIcon />
             </IconButton>
           )}
-          {/* {hasPermission(userPermissions, "dynamicstatus", "isDelete") && (
-            <IconButton color="error" onClick={() => handleDeleteClick(params.id)}>
-              <DeleteIcon />
-            </IconButton>
-          )} */}
         </div>
       ),
     },

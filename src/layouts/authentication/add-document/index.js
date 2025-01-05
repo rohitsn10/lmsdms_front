@@ -44,7 +44,7 @@ function AddDocument() {
   const [operations, setOperations] = useState("Create online");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [createDocument] = useCreateDocumentMutation();
-  const [selectedUsers, setSelectedUsers] = useState([]);
+  // const [selectedUsers, setSelectedUsers] = useState([]);
   const [parentDocument, setParentDocument] = useState("");
   const navigate = useNavigate();
   const isSopSelected = type === 1;
@@ -57,8 +57,8 @@ function AddDocument() {
     error: workflowsError,
   } = useFetchWorkflowsQuery();
 
-  const { data: userdata, isLoading, error } = useDepartmentWiseReviewerQuery();
-  const users = userdata || [];
+  // const { data: userdata, isLoading, error } = useDepartmentWiseReviewerQuery();
+  // const users = userdata || [];
 
   const [selectedUser, setSelectedUser] = useState("");
   const [errors, setErrors] = useState({});
@@ -173,7 +173,7 @@ function AddDocument() {
         select_template: template, // Assuming `template` is the right value
         document_current_status_id: 1, // Use the correct ID if needed
         training_required: trainingRequired.toLowerCase() === "yes", // Convert to boolean
-        visible_to_users: selectedUsers, // Assuming selectedUsers is an array
+        // visible_to_users: selectedUsers, // Assuming selectedUsers is an array
         parent_document: parentDocument,
       };
 
@@ -438,7 +438,7 @@ function AddDocument() {
                 )}
               </FormControl>
             </MDBox>
-            <MDBox mb={3}>
+            {/* <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-user-label">Select Users</InputLabel>
                 <Select
@@ -473,7 +473,7 @@ function AddDocument() {
                   )}
                 </Select>
               </FormControl>
-            </MDBox>
+            </MDBox> */}
 
             <MDBox mb={3} display="flex" alignItems="center">
               <FormLabel

@@ -40,10 +40,10 @@ export const texteditorApi = createApi({
       transformResponse: (response) => response,
     }),
     documentApproveStatus: builder.mutation({
-      query: ({ document_id, documentdetails_id, status,remark }) => ({
+      query: ({ document_id, documentdetails_id, status,remark,visible_to_users,approver,doc_admin }) => ({
         url: `dms_module/document_approve_status`,
         method: "POST",
-        body: { document_id, documentdetails_id, status, remark },
+        body: { document_id, documentdetails_id, status, remark,visible_to_users,approver,doc_admin },
       }),
       transformResponse: (response) => response,
     }),
@@ -56,10 +56,10 @@ export const texteditorApi = createApi({
       transformResponse: (response) => response,
     }),
     documentApproverStatus: builder.mutation({
-      query: ({ document_id, status,remark }) => ({
+      query: ({ document_id, status,remark,visible_to_users,approver,doc_admin }) => ({
         url: `dms_module/document_approver_status`,
         method: "POST",
-        body: { document_id, status, remark },
+        body: { document_id, status, remark,visible_to_users,approver,doc_admin },
       }),
       transformResponse: (response) => response,
     }),

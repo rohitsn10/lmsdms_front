@@ -13,7 +13,7 @@ function AddStatusDialog({ open, handleClose }) {
 
   const handleStatusChange = (event) => {
     const value = event.target.value;
-    if (/^[A-Za-z]*$/.test(value)) {
+    if (/^[A-Za-z\s]*$/.test(value)) {
       setStatus(value); 
     }
   };
@@ -21,12 +21,10 @@ function AddStatusDialog({ open, handleClose }) {
   const handleSubmit = async () => {
     if (status) {
       try {
-        // Call the API to create a new status
         await createStatus(status).unwrap();
-        handleClose(); // Close dialog after successful submission
+        handleClose(); 
       } catch (err) {
         console.error("Failed to create status:", err);
-        // Handle errors, e.g., show a toast notification or an error message
       }
     }
   };

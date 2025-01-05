@@ -143,7 +143,7 @@ export const documentApi = createApi({
     }),
    
   }),
-});
+});   
 
 export const {
   useCreateDocumentMutation,
