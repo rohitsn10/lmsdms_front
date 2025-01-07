@@ -28,8 +28,8 @@ import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 const SavedraftDocument = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDepartment, setSelectedDepartment] = useState(""); // Department Selector State
-  const [selectedDateRange, setSelectedDateRange] = useState(""); // Date Range Selector State
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedDateRange, setSelectedDateRange] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const navigate = useNavigate();
@@ -39,8 +39,6 @@ const SavedraftDocument = () => {
     departmentId: selectedDepartment,
     startDate: startDate ? moment(startDate).format("DD-MM-YYYY") : "",
     endDate: endDate ? moment(endDate).format("DD-MM-YYYY") : "",
-  }, {
-    skip: !selectedDepartment,
   });
 
   const documents = data?.saveDraftdata || [];
@@ -52,18 +50,17 @@ const SavedraftDocument = () => {
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
 
- const { data: userPermissions = [], isError: permissionError } =
+  const { data: userPermissions = [], isError: permissionError } =
     useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
       skip: !groupId,
     });
+  
   useEffect(() => {
     if (selectedDepartment && startDate && endDate) {
       refetch();
     }
-  }, [selectedDepartment, startDate, endDate, refetch]); 
+  }, [selectedDepartment, startDate, endDate, refetch]);
 
-  
- 
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
     setDialogOpen(true);
@@ -81,7 +78,7 @@ const SavedraftDocument = () => {
   const handleClick = (params) => {
     if (!params || !params.row) {
       console.error("Invalid params object:", params);
-      return; 
+      return;
     }
 
     const { id, document_current_status, training_required, approval_status } = params.row;
@@ -101,34 +98,66 @@ const SavedraftDocument = () => {
     );
   };
 
+  const formatDate = (date) => {
+    if (date) {
+      return moment(date).format("DD/MM/YYYY");
+    }
+    return "";
+  };
+
   const handleDateRangeChange = (event) => {
     const selectedRange = event.target.value;
     setSelectedDateRange(selectedRange);
 
     const today = new Date();
+    let startDate, endDate, displayRange;
 
     if (selectedRange === "today") {
-      setStartDate(today);
-      setEndDate(today);
-    } else if (selectedRange === "lastWeek") {
-      const lastWeekStart = new Date(today);
-      lastWeekStart.setDate(today.getDate() - 7);
-      setStartDate(lastWeekStart);
-      setEndDate(today);
+      startDate = today;
+      endDate = today;
+      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
+    } else if (selectedRange === "yesterday") {
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      startDate = yesterday;
+      endDate = yesterday;
+      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
+    } else if (selectedRange === "last7Days") {
+      const last7Days = new Date(today);
+      last7Days.setDate(today.getDate() - 7);
+      startDate = last7Days;
+      endDate = today;
+      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
+    } else if (selectedRange === "last30Days") {
+      const last30Days = new Date(today);
+      last30Days.setDate(today.getDate() - 30);
+      startDate = last30Days;
+      endDate = today;
+      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
+    } else if (selectedRange === "thisMonth") {
+      startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
     } else if (selectedRange === "lastMonth") {
-      const lastMonthStart = new Date(today);
-      lastMonthStart.setMonth(today.getMonth() - 1);
-      setStartDate(lastMonthStart);
-      setEndDate(today);
+      const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+      endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+      startDate = lastMonth;
+      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
     } else if (selectedRange === "lastYear") {
-      const lastYearStart = new Date(today);
-      lastYearStart.setFullYear(today.getFullYear() - 1);
-      setStartDate(lastYearStart);
-      setEndDate(today);
+      startDate = new Date(today.getFullYear() - 1, 0, 1);
+      endDate = new Date(today.getFullYear() - 1, 11, 31);
+      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
     } else if (selectedRange === "custom") {
       setStartDate(null);
       setEndDate(null);
+      return;
     }
+
+    setStartDate(startDate);
+    setEndDate(endDate);
+
+    // Set the display range value
+    setSelectedDateRange(displayRange);
   };
 
   const filteredData = documents.filter(
@@ -255,7 +284,11 @@ const SavedraftDocument = () => {
             onChange={handleSearch}
           />
 
-          <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center", mr: 28 }}>
+          <MDTypography
+            variant="h4"
+            fontWeight="medium"
+            sx={{ flexGrow: 1, textAlign: "center", mr: 28 }}
+          >
             Save Draft Listing
           </MDTypography>
 
@@ -263,7 +296,7 @@ const SavedraftDocument = () => {
           <FormControl sx={{ minWidth: 180 }}>
             <InputLabel>Date Range</InputLabel>
             <Select
-              value={selectedDateRange}
+              value={selectedDateRange} // Display the formatted date range as a string
               onChange={handleDateRangeChange}
               label="Date Range"
               sx={{
@@ -273,12 +306,21 @@ const SavedraftDocument = () => {
               }}
             >
               <MenuItem value="today">Today</MenuItem>
-              <MenuItem value="lastWeek">Last Week</MenuItem>
+              <MenuItem value="yesterday">Yesterday</MenuItem>
+              <MenuItem value="last7Days">Last 7 Days</MenuItem>
+              <MenuItem value="last30Days">Last 30 Days</MenuItem>
+              <MenuItem value="thisMonth">This Month</MenuItem>
               <MenuItem value="lastMonth">Last Month</MenuItem>
               <MenuItem value="lastYear">Last Year</MenuItem>
               <MenuItem value="custom">Custom</MenuItem>
             </Select>
           </FormControl>
+
+          {startDate && endDate && (
+            <MDTypography variant="h6" sx={{ marginLeft: 2 }}>
+              {formatDate(startDate)} to {formatDate(endDate)}
+            </MDTypography>
+          )}
 
           {selectedDateRange === "custom" && (
             <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -300,41 +342,18 @@ const SavedraftDocument = () => {
           )}
         </MDBox>
 
-        <MDBox display="flex" justifyContent="center" p={2}>
-          <div style={{ height: 500, width: "100%" }}>
-            <DataGrid
-              rows={rows || []}
-              columns={columns}
-              pageSize={10}
-              rowsPerPageOptions={[10, 25, 50]}
-              sx={{
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: "#f5f5f5",
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  justifyContent: "center",
-                },
-                "& .MuiDataGrid-cell": {
-                  textAlign: "center",
-                },
-                "& .MuiDataGrid-columnHeaderTitle": {
-                  textAlign: "center",
-                  width: "100%",
-                },
-              }}
-            />
-          </div>
+        <MDBox display="flex" justifyContent="center" sx={{ height: 500 }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            checkboxSelection
+            disableSelectionOnClick
+            autoHeight
+          />
         </MDBox>
       </Card>
-
-      <ConditionalDialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        onConfirm={() => console.log("Confirmed for row:", selectedRow)}
-        trainingStatus={selectedRow?.training_required || "false"}
-        documentId={selectedRow?.id || ""}
-        revisionMonth={selectedRow?.revision_month} // Pass revisionMonth as a prop
-      />
     </MDBox>
   );
 };

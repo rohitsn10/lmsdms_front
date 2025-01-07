@@ -40,8 +40,6 @@ const ApprovedDocument = () => {
     departmentId: selectedDepartment,
     startDate: startDate ? moment(startDate).format("DD-MM-YYYY") : "", // Format start date
     endDate: endDate ? moment(endDate).format("DD-MM-YYYY") : "", // Format end date
-  }, {
-    skip: !selectedDepartment, // Skip if no department is selected
   });
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -62,7 +60,7 @@ const ApprovedDocument = () => {
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
 
   
-  const documents = data?.data || []; // Extract documents from the new API response
+  const documents = data?.approvedata || []; // Extract documents from the new API response
 console.log("-+---+-+--+------++-+--+",documents);
   const handleDialogOpen = (row) => {
     setSelectedRow(row);

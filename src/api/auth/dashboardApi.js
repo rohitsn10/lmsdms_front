@@ -39,7 +39,7 @@ export const dashboardApi = createApi({
       query: ({ departmentId, startDate, endDate }) =>
         `dms_module/document_data_of_status_id_three?department_id=${departmentId}&start_date=${startDate}&end_date=${endDate}`,
       transformResponse: (response) => ({
-        rejectdata: response.data,
+        reviewdata: response.data,
         dataCountreview: response.data_count, 
       }),
     }),

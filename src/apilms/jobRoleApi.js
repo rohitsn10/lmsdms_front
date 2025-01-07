@@ -18,10 +18,10 @@ export const jobroleApi = createApi({
   endpoints: (builder) => ({
     // POST method for creating a job role
     createJobRole: builder.mutation({
-      query: ({ job_role_name, job_role_description }) => ({
+      query: ({ job_role_name, job_role_description, plant , area , department }) => ({
         url: 'lms_module/create_get_job_role',
         method: 'POST',
-        body: { job_role_name, job_role_description },
+        body: { job_role_name, job_role_description,plant , area , department },
       }),
       transformResponse: (response) => response, // Handle raw response
     }),
