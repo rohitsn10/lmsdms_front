@@ -99,6 +99,7 @@ import EditQuestion from "dmscomponent/question-listing/edit-question/index.js";
 import JobroleListing from "dmscomponent/job-listing/index.js";
 import EditJobRole from "dmscomponent/job-listing/edit-jobrole/index.js";
 import JobRoleMapping from "dmscomponent/jobrole-mapping/index.js";
+import ExamModule from "dmscomponent/exam-module/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -332,6 +333,7 @@ export default function App() {
       <Route path="/edit-jobrole" element={<EditJobRole />} />
       <Route path="/training-mapping" element={<TrainingMapping />} />
       <Route path="/jobrole-mapping" element={<JobRoleMapping/>}/>
+      <Route path="/exam-module" element={<ExamModule/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   </div>
