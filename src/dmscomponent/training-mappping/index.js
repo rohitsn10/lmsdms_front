@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   IconButton,
@@ -14,30 +14,43 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { useTrainingListQuery } from "apilms/trainigMappingApi"; // Import the hook
+import { useGetPlantQuery } from "apilms/plantApi";
+import { useGetAreaQuery } from "apilms/AreaApi";
+import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
+import { useJobTrainingListQuery } from "apilms/trainigMappingApi"; // Import the new hook
+import { useJobroleAssignTrainingMutation } from "apilms/trainigMappingApi";
 
 const TrainingMapping = () => {
   const initialData = {
-    toDo: [
-      { id: "1", title: "Print Document 1", description: "Description for print 1" },
-      { id: "2", title: "Print Document 2", description: "Description for print 2" },
-      { id: "3", title: "Print Document 3", description: "Description for print 3" },
-    ],
-    inProgress: [
-      { id: "7", title: "Print Document 4", description: "Description for print 4" },
-      { id: "8", title: "Print Document 5", description: "Description for print 5" },
-    ],
+    toDo: [], // Start with an empty array for the toDo column
+    inProgress: [],
   };
 
-  const statusOptions = [
-    { id: "all", status: "All" },
-    { id: "1", status: "Active" },
-    { id: "2", status: "Inactive" },
-    { id: "3", status: "Pending" },
-  ];
-
+  const [selectedTraining, setSelectedTraining] = useState(""); // State for selected training
+  const [selectedPlant, setSelectedPlant] = useState(""); // State for selected plant
+  const [selectedArea, setSelectedArea] = useState(""); // State for selected area
+  const [selectedDepartment, setSelectedDepartment] = useState(""); // State for selected department
   const [kanbanData, setKanbanData] = useState(initialData);
-  const [selectedStatus, setSelectedStatus] = useState("all");
 
+  // API calls
+  const { data: plantData } = useGetPlantQuery();
+  const { data: areaData, isLoading: areaLoading, error: areaError } = useGetAreaQuery();
+  const { data: trainingData, error, isLoading } = useTrainingListQuery();
+  const { data: departmentData, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
+
+  // Conditionally call the job training API only if a training is selected
+  const { data: jobRoleData, isLoading: jobRoleLoading, error: jobRoleError } = useJobTrainingListQuery(
+    {
+      plantId: selectedPlant,
+      departmentId: selectedDepartment,
+      areaId: selectedArea,
+      trainingId: selectedTraining, // Only pass trainingId when selectedTraining is not empty
+    },
+    { skip: !selectedTraining } // Skip the query if no training is selected
+  );
+  const [jobroleAssignTraining] = useJobroleAssignTrainingMutation();
+  // Handle the Drag and Drop
   const handleDragEnd = (result) => {
     const { destination, source } = result;
 
@@ -64,22 +77,57 @@ const TrainingMapping = () => {
     });
   };
 
-  const handleMapping = () => {
-    console.log("Mapping button clicked with selected status:", selectedStatus);
+  const handleMapping = async () => {
+    // Prepare the job role IDs from the "Assigned Role" column (inProgress)
+    const assignedJobRoles = kanbanData.inProgress.map((item) => item.id);
+
+    // If no job roles are assigned, show an error message
+    if (assignedJobRoles.length === 0) {
+      alert("Please assign job roles before mapping.");
+      return;
+    }
+
+    // Call the mutation with the selected training ID and the assigned job role IDs
+    try {
+      const response = await jobroleAssignTraining({
+        training_id: selectedTraining,
+        job_role_ids: assignedJobRoles,
+      }).unwrap(); // Unwrap the response to handle it directly
+      console.log("Mapping success:", response);
+      // Optionally, show a success message or handle additional UI updates
+    } catch (error) {
+      console.error("Mapping error:", error);
+    }
   };
+
+
+  useEffect(() => {
+    if (jobRoleData && jobRoleData.job_roles) {
+      const jobRoles = jobRoleData.job_roles.map((job) => ({
+        id: job.id.toString(),
+        title: job.job_role_name,
+        description: job.job_role_description,
+      }));
+
+      setKanbanData({
+        ...kanbanData,
+        toDo: jobRoles, // Add the fetched job roles to the 'toDo' column
+      });
+    }
+  }, [jobRoleData]); // Update Kanban data whenever jobRoleData changes
 
   return (
     <MDBox p={3}>
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center" justifyContent="center">
-          {/* Status Dropdown */}
+          {/* Training Dropdown */}
           <FormControl fullWidth margin="dense" sx={{ width: "250px", ml: 5 }}>
-            <InputLabel id="select-status-label">Training</InputLabel>
+            <InputLabel id="select-training-label">Training</InputLabel>
             <Select
-              labelId="select-status-label"
-              id="select-status"
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
+              labelId="select-training-label"
+              id="select-training"
+              value={selectedTraining}
+              onChange={(e) => setSelectedTraining(e.target.value)}
               input={<OutlinedInput label="Training" />}
               sx={{
                 minWidth: 150,
@@ -87,32 +135,124 @@ const TrainingMapping = () => {
                 ".MuiSelect-select": { padding: "0.45rem" },
               }}
             >
-              {statusOptions.map((status) => (
-                <MenuItem key={status.id} value={status.id}>
-                  {status.status}
-                </MenuItem>
-              ))}
+              {/* Loading state for the dropdown */}
+              {isLoading ? (
+                <MenuItem disabled>Loading...</MenuItem>
+              ) : error ? (
+                <MenuItem disabled>Error loading trainings</MenuItem>
+              ) : Array.isArray(trainingData) && trainingData.length > 0 ? (
+                trainingData.map((training) => (
+                  <MenuItem key={training.id} value={training.id}>
+                    {training.training_name_with_number}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No trainings available</MenuItem>
+              )}
             </Select>
           </FormControl>
 
           {/* Title */}
-          <MDTypography
-            variant="h3"
-            fontWeight="medium"
-            sx={{ flexGrow: 1, textAlign: "center", mr: 20 }}
-          >
+          <MDTypography variant="h3" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center", mr: 20 }}>
             Training Mapping
           </MDTypography>
 
           {/* Mapping Button */}
           <MDButton
             variant="contained"
-            sx={{ ml: 2, backgroundColor: "#e91e63",color:"#fff", "&:hover": { backgroundColor: "#e2185b" } }}
+            sx={{
+              ml: 2,
+              backgroundColor: "#e91e63",
+              color: "#fff",
+              "&:hover": { backgroundColor: "#e2185b" },
+            }}
             onClick={handleMapping}
           >
             Mapping
           </MDButton>
         </MDBox>
+
+        {/* Conditional Rendering for Additional Dropdowns */}
+        {selectedTraining && (
+          <MDBox p={3} display="flex" justifyContent="space-between" alignItems="center" sx={{ flexWrap: "wrap" }}>
+            {/* Plant Dropdown */}
+            <FormControl fullWidth margin="dense" sx={{ width: "20%", mb: 2, ml: 5 }}>
+              <InputLabel id="select-plant-label">Plant Name</InputLabel>
+              <Select
+                labelId="select-plant-label"
+                id="select-plant"
+                value={selectedPlant}
+                onChange={(e) => setSelectedPlant(e.target.value)}
+                input={<OutlinedInput label="Plant Name" />}
+                sx={{
+                  minWidth: 200,
+                  height: "3rem",
+                  ".MuiSelect-select": { padding: "0.45rem" },
+                }}
+                displayEmpty
+              >
+                {plantData?.data?.map((plant) => (
+                  <MenuItem key={plant.id} value={plant.id}>
+                    {plant.plant_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {/* Area Dropdown */}
+            <FormControl fullWidth margin="dense" sx={{ width: "20%", mb: 2 }}>
+              <InputLabel id="select-area-label">Select Area</InputLabel>
+              <Select
+                labelId="select-area-label"
+                id="select-area"
+                value={selectedArea}
+                onChange={(e) => setSelectedArea(e.target.value)}
+                input={<OutlinedInput label="Select Area" />}
+                sx={{
+                  minWidth: 200,
+                  height: "3rem",
+                  ".MuiSelect-select": { padding: "0.45rem" },
+                }}
+                displayEmpty
+              >
+                {areaLoading ? (
+                  <MenuItem disabled>Loading...</MenuItem>
+                ) : areaError ? (
+                  <MenuItem disabled>Error loading areas</MenuItem>
+                ) : areaData?.data?.length > 0 ? (
+                  areaData.data.map((area) => (
+                    <MenuItem key={area.id} value={area.id}>
+                      {area.area_name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No areas available</MenuItem>
+                )}
+              </Select>
+            </FormControl>
+
+            {/* Department Dropdown */}
+            <FormControl sx={{ minWidth: 180, mr: 2 }}>
+              <InputLabel>Department</InputLabel>
+              <Select
+                value={selectedDepartment}
+                onChange={(e) => setSelectedDepartment(e.target.value)}
+                label="Department"
+                sx={{
+                  minWidth: 200,
+                  height: "2.5rem",
+                  ".MuiSelect-select": { padding: "0.45rem" },
+                }}
+              >
+                {departmentData?.map((department) => (
+                  <MenuItem key={department.id} value={department.id}>
+                    {department.department_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </MDBox>
+        )}
 
         {/* Drag and Drop Context */}
         <DragDropContext onDragEnd={handleDragEnd}>
@@ -121,7 +261,14 @@ const TrainingMapping = () => {
             <Droppable droppableId="toDo">
               {(provided) => (
                 <Card
-                  sx={{ width: "43%", ml: 5, p: 2,mb:2, borderRadius: 5, boxShadow: 5 }}
+                  sx={{
+                    width: "43%",
+                    ml: 5,
+                    p: 2,
+                    mb: 2,
+                    borderRadius: 5,
+                    boxShadow: 5,
+                  }}
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
@@ -148,17 +295,20 @@ const TrainingMapping = () => {
                 </Card>
               )}
             </Droppable>
-
-            {/* Arrow Icon Between Cards */}
             <IconButton sx={{ mx: 2, fontSize: "6rem" }}>
               <ArrowForwardIcon sx={{ fontSize: "inherit" }} />
             </IconButton>
-
             {/* In Progress Column */}
             <Droppable droppableId="inProgress">
               {(provided) => (
                 <Card
-                sx={{ width: "43%", mr: 5, p: 2,mb:2, borderRadius: 5, boxShadow: 5 }}
+                  sx={{
+                    width: "43%",
+                    p: 2,
+                    mb: 2,
+                    borderRadius: 5,
+                    boxShadow: 5,
+                  }}
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
@@ -176,9 +326,6 @@ const TrainingMapping = () => {
                             {...provided.dragHandleProps}
                           >
                             <MDTypography variant="body1">{item.title}</MDTypography>
-                            <MDTypography variant="body2" color="textSecondary">
-                              {item.description}
-                            </MDTypography>
                           </Card>
                         )}
                       </Draggable>

@@ -35,13 +35,10 @@ const UnderReviewDocument = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Fetching documents using the new API
   const { data, refetch, isLoading, isError } = useGetDocumentDataOfStatusIdThreeQuery({
-    departmentId: selectedDepartment,
-    startDate: startDate ? moment(startDate).format("DD-MM-YYYY") : "", // Format start date
-    endDate: endDate ? moment(endDate).format("DD-MM-YYYY") : "", // Format end date
-  }, {
-    skip: !selectedDepartment, // Skip if no department is selected
+    departmentId: selectedDepartment || "",
+    startDate: startDate ? moment(startDate).format("DD-MM-YYYY") : "", 
+    endDate: endDate ? moment(endDate).format("DD-MM-YYYY") : "", 
   });
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -62,8 +59,8 @@ const UnderReviewDocument = () => {
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
 
   
-  const documents = data?.data || [];// Extract documents from the new API response
-console.log("-+---+-+--+------++-+--+",documents);
+  const documents = data?.reviewdata || [];// Extract documents from the new API response
+console.log("-+---+-+--+------++-+--+data get ",documents);
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
     setDialogOpen(true);

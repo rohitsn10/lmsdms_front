@@ -11,13 +11,30 @@ import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useCreateJobRoleMutation } from "apilms/jobRoleApi";
 import { toast, ToastContainer } from "react-toastify";
+import {
+  IconButton,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  OutlinedInput,
+} from "@mui/material";
+import { useGetPlantQuery } from "apilms/plantApi";
+import { useGetAreaQuery } from "apilms/AreaApi";
+import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 
 function AddJobRole() {
+  const { data: plantData } = useGetPlantQuery();
+  const { data: areaData, isLoading: areaLoading, error: areaError } = useGetAreaQuery();
+  const { data: departmentData, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
   const [title, setTitle] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [errors, setErrors] = useState({});
-
+  const [selectedPlant, setSelectedPlant] = useState(""); // State for selected plant
+  const [selectedArea, setSelectedArea] = useState(""); // State for selected area
+  const [selectedDepartment, setSelectedDepartment] = useState(""); // State for selected department
   const navigate = useNavigate();
   const [createJobRole] = useCreateJobRoleMutation();
   const validateInputs = () => {
@@ -45,6 +62,10 @@ function AddJobRole() {
       await createJobRole({
         job_role_name: title.trim(),
         job_role_description: jobDescription.trim(),
+        plant: selectedPlant,
+        area: selectedArea,
+        department: selectedDepartment,
+
       }).unwrap();
 
       toast.success("Job Role added successfully!");
@@ -117,6 +138,85 @@ function AddJobRole() {
                 error={!!errors.jobDescription}
                 helperText={errors.jobDescription}
               />
+            </MDBox>
+            <MDBox mb={3}>
+              <FormControl fullWidth margin="dense" sx={{ width: "100%"}}>
+                <InputLabel id="select-plant-label">Plant Name</InputLabel>
+                <Select
+                  labelId="select-plant-label"
+                  id="select-plant"
+                  value={selectedPlant}
+                  onChange={(e) => setSelectedPlant(e.target.value)}
+                  input={<OutlinedInput label="Plant Name" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem",
+                    ".MuiSelect-select": { padding: "0.45rem" },
+                  }}
+                  displayEmpty
+                >
+                  {plantData?.data?.map((plant) => (
+                    <MenuItem key={plant.id} value={plant.id}>
+                      {plant.plant_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </MDBox>
+            {/* Area Dropdown */}
+            <MDBox mb={3}>
+              <FormControl fullWidth margin="dense" sx={{ width: "100%", mb: 1 }}>
+                <InputLabel id="select-area-label">Select Area</InputLabel>
+                <Select
+                  labelId="select-area-label"
+                  id="select-area"
+                  value={selectedArea}
+                  onChange={(e) => setSelectedArea(e.target.value)}
+                  input={<OutlinedInput label="Select Area" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem",
+                    ".MuiSelect-select": { padding: "0.45rem" },
+                  }}
+                  displayEmpty
+                >
+                  {areaLoading ? (
+                    <MenuItem disabled>Loading...</MenuItem>
+                  ) : areaError ? (
+                    <MenuItem disabled>Error loading areas</MenuItem>
+                  ) : areaData?.data?.length > 0 ? (
+                    areaData.data.map((area) => (
+                      <MenuItem key={area.id} value={area.id}>
+                        {area.area_name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No areas available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </MDBox>
+            {/* Department Dropdown */}
+            <MDBox mb={3}>
+            <FormControl fullWidth margin="dense" sx={{ width: "100%", mb: 1 }}>
+                <InputLabel>Department</InputLabel>
+                <Select
+                  value={selectedDepartment}
+                  onChange={(e) => setSelectedDepartment(e.target.value)}
+                  label="Department"
+                  sx={{
+                    minWidth: 200,
+                    height: "2.5rem",
+                    ".MuiSelect-select": { padding: "0.45rem" },
+                  }}
+                >
+                  {departmentData?.map((department) => (
+                    <MenuItem key={department.id} value={department.id}>
+                      {department.department_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </MDBox>
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit">
