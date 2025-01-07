@@ -15,21 +15,37 @@ export const trainingMappingApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    // PUT method for assigning training to job roles
+
     jobroleAssignTraining: builder.mutation({
       query: ({ training_id, job_role_ids }) => ({
-        url: 'lms_module/jobrole_assign_training',
+        url: `lms_module/jobrole_assign_training/${training_id}`, // URL with dynamic training_id
         method: 'PUT',
         body: {
-          training_id,
-          job_role_ids,
+          job_role_ids, // Sending job_role_ids as an array
         },
       }),
-      transformResponse: (response) => response, // Handle raw response
+      transformResponse: (response) => response, // Handle the response data if needed
+    }),
+    trainingList: builder.query({
+      query: () => ({
+        url: 'lms_module/training_list',
+        method: 'GET',
+      }),
+      transformResponse: (response) => response.data, 
+    }),
+    jobTrainingList: builder.query({
+      query: ({ plantId, departmentId, areaId }) => ({
+        url: `lms_module/job_training_list?plant_id=${plantId}&department_id=${departmentId}&area_id=${areaId}`,
+        method: 'GET',  // GET method
+      }),
+      transformResponse: (response) => response.data,  // Handle the response data
     }),
   }),
 });
 
 export const {
-  useJobroleAssignTrainingMutation, // Hook for assigning training to job roles (PUT)
+  useJobroleAssignTrainingMutation, 
+  useTrainingListQuery,
+  useJobTrainingListQuery,
+  
 } = trainingMappingApi;
