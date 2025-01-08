@@ -28,6 +28,7 @@ import { timeLineApi } from "api/auth/timeLineApi";
 import { jobroleApi } from "apilms/jobRoleApi";
 import { trainingMappingApi } from "apilms/trainigMappingApi";
 
+
 const store = configureStore({
   reducer: {
     [userApi.reducerPath]: userApi.reducer,
