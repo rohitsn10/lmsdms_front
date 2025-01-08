@@ -37,8 +37,8 @@ const UnderReviewDocument = () => {
 
   const { data, refetch, isLoading, isError } = useGetDocumentDataOfStatusIdThreeQuery({
     departmentId: selectedDepartment || "",
-    startDate: startDate ? moment(startDate).format("DD-MM-YYYY") : "", 
-    endDate: endDate ? moment(endDate).format("DD-MM-YYYY") : "", 
+    startDate: startDate ? moment(startDate).format("DD-MM-YYYY") : "",
+    endDate: endDate ? moment(endDate).format("DD-MM-YYYY") : "",
   });
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -48,7 +48,7 @@ const UnderReviewDocument = () => {
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
 
- const { data: userPermissions = [], isError: permissionError } =
+  const { data: userPermissions = [], isError: permissionError } =
     useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
       skip: !groupId,
     });
@@ -58,9 +58,9 @@ const UnderReviewDocument = () => {
     }
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
 
-  
+
   const documents = data?.reviewdata || [];// Extract documents from the new API response
-console.log("-+---+-+--+------++-+--+data get ",documents);
+  console.log("-+---+-+--+------++-+--+data get ", documents);
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
     setDialogOpen(true);
@@ -98,11 +98,11 @@ console.log("-+---+-+--+------++-+--+data get ",documents);
     );
   };
   const formatDate = (date) => {
-      if (date) {
-        return moment(date).format("DD/MM/YYYY");
-      }
-      return "";
-    };
+    if (date) {
+      return moment(date).format("DD/MM/YYYY");
+    }
+    return "";
+  };
 
   const handleDateRangeChange = (event) => {
     const selectedRange = event.target.value;
@@ -226,19 +226,12 @@ console.log("-+---+-+--+------++-+--+data get ",documents);
       flex: 0.6,
       headerAlign: "center",
       renderCell: (params) => (
-        <MDBox display="flex" gap={1}>
-          {hasPermission(userPermissions, "document", "isChange") && (
-            <IconButton color="primary" onClick={() => handleEditClick(params.row.id)}>
-              <EditIcon />
-            </IconButton>
-          )}
-          <IconButton color="primary" onClick={() => handleViewFile(params.row.selected_template_url)}>
-            <VisibilityIcon />
-          </IconButton>
+        <MDBox display="flex" justifyContent="center" gap={1}>
           <IconButton color="inherit" onClick={() => handleClick(params)}>
             <EditCalendarIcon />
           </IconButton>
         </MDBox>
+
       ),
       sortable: false,
       filterable: false,
@@ -289,75 +282,75 @@ console.log("-+---+-+--+------++-+--+data get ",documents);
           </MDTypography>
 
           {/* Date Range Dropdown */}
-                    <FormControl sx={{ minWidth: 180 }}>
-                      <InputLabel>Date Range</InputLabel>
-                      <Select
-                        value={selectedDateRange}
-                        onChange={handleDateRangeChange}
-                        label="Date Range"
-                        sx={{
-                          minWidth: 200,
-                          height: "2.5rem",
-                          ".MuiSelect-select": { padding: "0.45rem" },
-                        }}
-                      >
-                        <MenuItem value="today">Today</MenuItem>
-                        <MenuItem value="yesterday">Yesterday</MenuItem>
-                        <MenuItem value="last7Days">Last 7 Days</MenuItem>
-                        <MenuItem value="last30Days">Last 30 Days</MenuItem>
-                        <MenuItem value="thisMonth">This Month</MenuItem>
-                        <MenuItem value="lastMonth">Last Month</MenuItem>
-                        <MenuItem value="lastYear">Last Year</MenuItem>
-                        <MenuItem value="custom">Custom</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </MDBox>
-          
-                  {/* Selected Date Range Display */}
-                  <MDBox display="flex" alignItems="center" mt={2} sx={{ marginBottom: "20px" }}>
-            {selectedDateRange && selectedDateRange !== "custom" && (
-              <MDTypography variant="h6" sx={{ marginLeft: "auto", marginRight: "20px" }}>
-                Selected Date: {formatDate(startDate)} to {formatDate(endDate)}
-              </MDTypography>
-            )}
-          
-            {selectedDateRange === "custom" && (
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <MDBox display="flex" gap={2} sx={{ marginLeft: "auto" }}>
-                  <DatePicker
-                    label="Start Date"
-                    value={startDate}
-                    onChange={(date) => handleCustomDateChange("start", date)}
-                    renderInput={(params) => <MDInput {...params} />}
-                  />
-                  <DatePicker
-                    label="End Date"
-                    value={endDate}
-                    onChange={(date) => handleCustomDateChange("end", date)}
-                    renderInput={(params) => <MDInput {...params} />}
-                  />
-                </MDBox>
-              </LocalizationProvider>
-            )}
-          </MDBox>
-          
-          <MDBox display="flex" justifyContent="center" sx={{ height: 500, mt: 2 }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5]}
-              disableSelectionOnClick
-              autoHeight
+          <FormControl sx={{ minWidth: 180 }}>
+            <InputLabel>Date Range</InputLabel>
+            <Select
+              value={selectedDateRange}
+              onChange={handleDateRangeChange}
+              label="Date Range"
               sx={{
-                "& .MuiDataGrid-columnHeader": {
-                  textAlign: "center", 
-                },
-                "& .MuiDataGrid-cell": {
-                  textAlign: "center",
-                },
+                minWidth: 200,
+                height: "2.5rem",
+                ".MuiSelect-select": { padding: "0.45rem" },
               }}
-            />
+            >
+              <MenuItem value="today">Today</MenuItem>
+              <MenuItem value="yesterday">Yesterday</MenuItem>
+              <MenuItem value="last7Days">Last 7 Days</MenuItem>
+              <MenuItem value="last30Days">Last 30 Days</MenuItem>
+              <MenuItem value="thisMonth">This Month</MenuItem>
+              <MenuItem value="lastMonth">Last Month</MenuItem>
+              <MenuItem value="lastYear">Last Year</MenuItem>
+              <MenuItem value="custom">Custom</MenuItem>
+            </Select>
+          </FormControl>
+        </MDBox>
+
+        {/* Selected Date Range Display */}
+        <MDBox display="flex" alignItems="center" mt={2} sx={{ marginBottom: "20px" }}>
+          {selectedDateRange && selectedDateRange !== "custom" && (
+            <MDTypography variant="h6" sx={{ marginLeft: "auto", marginRight: "20px" }}>
+              Selected Date: {formatDate(startDate)} to {formatDate(endDate)}
+            </MDTypography>
+          )}
+
+          {selectedDateRange === "custom" && (
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <MDBox display="flex" gap={2} sx={{ marginLeft: "auto" }}>
+                <DatePicker
+                  label="Start Date"
+                  value={startDate}
+                  onChange={(date) => handleCustomDateChange("start", date)}
+                  renderInput={(params) => <MDInput {...params} />}
+                />
+                <DatePicker
+                  label="End Date"
+                  value={endDate}
+                  onChange={(date) => handleCustomDateChange("end", date)}
+                  renderInput={(params) => <MDInput {...params} />}
+                />
+              </MDBox>
+            </LocalizationProvider>
+          )}
+        </MDBox>
+
+        <MDBox display="flex" justifyContent="center" sx={{ height: 500, mt: 2 }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            disableSelectionOnClick
+            autoHeight
+            sx={{
+              "& .MuiDataGrid-columnHeader": {
+                textAlign: "center",
+              },
+              "& .MuiDataGrid-cell": {
+                textAlign: "center",
+              },
+            }}
+          />
         </MDBox>
       </Card>
 
