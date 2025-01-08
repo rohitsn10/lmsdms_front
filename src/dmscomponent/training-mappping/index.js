@@ -50,7 +50,6 @@ const TrainingMapping = () => {
     { skip: !selectedTraining } // Skip the query if no training is selected
   );
   const [jobroleAssignTraining] = useJobroleAssignTrainingMutation();
-  // Handle the Drag and Drop
   const handleDragEnd = (result) => {
     const { destination, source } = result;
 

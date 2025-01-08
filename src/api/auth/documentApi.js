@@ -141,6 +141,14 @@ export const documentApi = createApi({
       transformResponse: (response) => response.data,
       providesTags: ["Documents"], // Tag documents data for cache management
     }),
+    generateCertificatePdf: builder.query({
+      query: (documentId) => ({
+        url: `dms_module/document_certificate_pdf_generate/${documentId}`,
+        method: "GET",
+      }),
+      transformResponse: (response) => response.data, // Extract the "data" field from the response
+      providesTags: ["Documents"], // Tag documents data for cache management
+    }),
    
   }),
 });   
@@ -157,5 +165,6 @@ export const {
   useUpdateDocumentTypeMutation,
   useDepartmentWiseReviewerQuery,
   useFetchAllDocumentsQuery,
+  useGenerateCertificatePdfQuery,
  
 } = documentApi;

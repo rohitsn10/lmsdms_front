@@ -14,6 +14,10 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { useGetPlantQuery } from "apilms/plantApi";
+import { useGetAreaQuery } from "apilms/AreaApi";
+import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
+import { useTrainingListQuery } from "apilms/trainigMappingApi";
 
 const JobRoleMapping = () => {
   const initialData = {

@@ -52,6 +52,7 @@ import JobroleListing from "dmscomponent/job-listing";
 import TrainingMapping from "dmscomponent/training-mappping";
 import JobRoleMapping from "dmscomponent/jobrole-mapping";
 import DisplaySettingsRoundedIcon from '@mui/icons-material/DisplaySettingsRounded';
+import ForkRightTwoToneIcon from '@mui/icons-material/ForkRightTwoTone';
 
 const routes = [
   {
@@ -233,7 +234,7 @@ const routes = [
     type: "collapse",
     name: "Training Mapping",
     key: "trainingMapping-listing",
-    icon: <WorkTwoToneIcon />,
+    icon: <ForkRightTwoToneIcon />,
     route: "/trainingMapping-listing",
     component:<TrainingMapping/>
   },

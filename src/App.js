@@ -62,8 +62,9 @@ import ApprovedDocument from "layouts/authentication/document-listing/approve-do
 import RejectedDocument from "layouts/authentication/document-listing/rejected-document/index.js";
 import SavedraftDocument from "layouts/authentication/document-listing/saved-draft-document/index.js";
 import UnderReviewDocument from "layouts/authentication/document-listing/under-review-document/index.js";
-//Lms components
+import PDFPreview from "layouts/authentication/document-listing/pdf-preview/index.js";
 
+//Lms components
 import AddArea from "dmscomponent/add-area/index.js";
 import AddDepartments from "dmscomponent/add-departments/index.js";
 import AddPlant from "dmscomponent/add-plant/index.js";
@@ -297,6 +298,7 @@ export default function App() {
       <Route path="/reject-document" element={<RejectedDocument/>}/>
       <Route path="/draft-document" element={<SavedraftDocument/>}/>
       <Route path="/review-document" element={<UnderReviewDocument/>}/>
+      <Route path="/PDFPreview" element={<PDFPreview/>}/>
 
       {/* Lms components */}
       <Route path="/add-area" element={<AddArea />} />

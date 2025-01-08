@@ -51,10 +51,20 @@ const OrdersOverview = ({ docId }) => {
       const addItem = (actions, title, icon, color) => {
         if (actions.length > 0) {
           actions.forEach((action) => {
+            // Format the date and time
+            const formattedDate = new Date(action.created_at).toLocaleString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            });
+
             timelineItems.push({
               title,
-              notes: action.notes || "No notes available",
-              dateTime: action.date || "Unknown",
+              notes: action.remarks_reviewer || "No remarks available", // Display remarks_reviewer if available
+              dateTime: formattedDate, // Use the formatted date
               icon,
               color,
             });
