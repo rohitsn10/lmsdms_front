@@ -54,7 +54,7 @@ const SavedraftDocument = () => {
     useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
       skip: !groupId,
     });
-  
+
   useEffect(() => {
     if (selectedDepartment && startDate && endDate) {
       refetch();
@@ -191,69 +191,63 @@ const SavedraftDocument = () => {
       headerName: "Title",
       flex: 1,
       headerAlign: "center",
-     
+
     },
     {
       field: "document_type_name",
       headerName: "Type",
       flex: 0.5,
       headerAlign: "center",
-     
+
     },
     {
       field: "document_number",
       headerName: "Document No.",
       flex: 0.55,
       headerAlign: "center",
-    
+
     },
     {
       field: "version",
       headerName: "Version",
       flex: 0.4,
       headerAlign: "center",
-     
+
     },
     {
       field: "created_at",
       headerName: "Created Date",
       flex: 0.5,
       headerAlign: "center",
-      
+
     },
     {
       field: "current_status_name",
       headerName: "Status",
       flex: 0.6,
       headerAlign: "center",
-     
+
     },
     {
       field: "actions",
       headerName: "Action",
       flex: 0.6,
       headerAlign: "center",
-     
+
       renderCell: (params) => (
-        <MDBox display="flex" gap={1}>
-          {hasPermission(userPermissions, "document", "isChange") && (
-            <IconButton color="primary" onClick={() => handleEditClick(params.row.id)}>
-              <EditIcon />
-            </IconButton>
-          )}
-          <IconButton color="primary" onClick={() => handleViewFile(params.row.selected_template_url)}>
-            <VisibilityIcon />
-          </IconButton>
+        <MDBox display="flex" justifyContent="center" gap={1}>
           <IconButton color="inherit" onClick={() => handleClick(params)}>
             <EditCalendarIcon />
           </IconButton>
         </MDBox>
+
+
       ),
       sortable: false,
       filterable: false,
     },
   ];
-  
+
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching documents.</div>;
@@ -329,49 +323,49 @@ const SavedraftDocument = () => {
 
         {/* Selected Date Range Display */}
         <MDBox display="flex" alignItems="center" mt={2} sx={{ marginBottom: "20px" }}>
-  {selectedDateRange && selectedDateRange !== "custom" && (
-    <MDTypography variant="h6" sx={{ marginLeft: "auto", marginRight: "20px" }}>
-      Selected Date: {formatDate(startDate)} to {formatDate(endDate)}
-    </MDTypography>
-  )}
+          {selectedDateRange && selectedDateRange !== "custom" && (
+            <MDTypography variant="h6" sx={{ marginLeft: "auto", marginRight: "20px" }}>
+              Selected Date: {formatDate(startDate)} to {formatDate(endDate)}
+            </MDTypography>
+          )}
 
-  {selectedDateRange === "custom" && (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <MDBox display="flex" gap={2} sx={{ marginLeft: "auto" }}>
-        <DatePicker
-          label="Start Date"
-          value={startDate}
-          onChange={(date) => handleCustomDateChange("start", date)}
-          renderInput={(params) => <MDInput {...params} />}
-        />
-        <DatePicker
-          label="End Date"
-          value={endDate}
-          onChange={(date) => handleCustomDateChange("end", date)}
-          renderInput={(params) => <MDInput {...params} />}
-        />
-      </MDBox>
-    </LocalizationProvider>
-  )}
-</MDBox>
+          {selectedDateRange === "custom" && (
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <MDBox display="flex" gap={2} sx={{ marginLeft: "auto" }}>
+                <DatePicker
+                  label="Start Date"
+                  value={startDate}
+                  onChange={(date) => handleCustomDateChange("start", date)}
+                  renderInput={(params) => <MDInput {...params} />}
+                />
+                <DatePicker
+                  label="End Date"
+                  value={endDate}
+                  onChange={(date) => handleCustomDateChange("end", date)}
+                  renderInput={(params) => <MDInput {...params} />}
+                />
+              </MDBox>
+            </LocalizationProvider>
+          )}
+        </MDBox>
 
-<MDBox display="flex" justifyContent="center" sx={{ height: 500, mt: 2 }}>
-  <DataGrid
-    rows={rows}
-    columns={columns}
-    pageSize={5}
-    rowsPerPageOptions={[5]}
-    disableSelectionOnClick
-    autoHeight
-    sx={{
-      "& .MuiDataGrid-columnHeader": {
-        textAlign: "center", 
-      },
-      "& .MuiDataGrid-cell": {
-        textAlign: "center",
-      },
-    }}
-  />
+        <MDBox display="flex" justifyContent="center" sx={{ height: 500, mt: 2 }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            disableSelectionOnClick
+            autoHeight
+            sx={{
+              "& .MuiDataGrid-columnHeader": {
+                textAlign: "center",
+              },
+              "& .MuiDataGrid-cell": {
+                textAlign: "center",
+              },
+            }}
+          />
 
 
         </MDBox>
