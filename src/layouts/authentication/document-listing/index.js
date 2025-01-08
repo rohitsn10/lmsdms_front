@@ -19,7 +19,7 @@ import moment from "moment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ConditionalDialog from "./effective";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-
+import BrowserUpdatedOutlinedIcon from "@mui/icons-material/BrowserUpdatedOutlined";
 // import ReviseDialog from "./Revise";
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
 
@@ -192,7 +192,7 @@ const DocumentListing = () => {
     {
       field: "actions",
       headerName: "Action",
-      flex: 0.6,
+      flex: 0.7,
       headerAlign: "center",
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
@@ -201,7 +201,10 @@ const DocumentListing = () => {
               <EditIcon />
             </IconButton>
           )}
-          <IconButton color="primary" onClick={() => handleViewFile(params.row.selected_template_url)}>
+          <IconButton
+            color="primary"
+            onClick={() => handleViewFile(params.row.selected_template_url)}
+          >
             <VisibilityIcon />
           </IconButton>
           {params.row.form_status === "save_draft"
@@ -245,6 +248,31 @@ const DocumentListing = () => {
               <ImportContactsTwoToneIcon />
             </IconButton>
           )} */}
+        </MDBox>
+      ),
+      sortable: false,
+      filterable: false,
+    },
+    {
+      field: "preview_download",
+      headerName: "Download",
+      flex: 0.4,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <MDBox display="block">
+          <IconButton
+            color="primary"
+            onClick={() => {
+              navigate("/PDFPreview", {
+                state: {
+                  documentId: params.row.id,
+                },
+              });
+            }}
+            disabled={params.row.document_current_status !== 9} 
+          >
+            <BrowserUpdatedOutlinedIcon />
+          </IconButton>
         </MDBox>
       ),
       sortable: false,

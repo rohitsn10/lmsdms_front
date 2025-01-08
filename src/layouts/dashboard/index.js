@@ -46,10 +46,7 @@ function Dashboard() {
     endDate: "",
   });
  
-  console.log("-+---+-+-+-the response of count ",rejectedData);
-  console.log("-+---+-+-+-the response of count ",approveData);
-  console.log("-+---+-+-+-the response of count ",reviewData);
-  console.log("-+---+-+-+-the response of count ",savedraftData);
+  
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading dashboard data</div>;
 
