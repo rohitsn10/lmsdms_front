@@ -110,54 +110,55 @@ const SavedraftDocument = () => {
     setSelectedDateRange(selectedRange);
 
     const today = new Date();
-    let startDate, endDate, displayRange;
+    let startDate, endDate;
 
-    if (selectedRange === "today") {
-      startDate = today;
-      endDate = today;
-      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
-    } else if (selectedRange === "yesterday") {
-      const yesterday = new Date(today);
-      yesterday.setDate(today.getDate() - 1);
-      startDate = yesterday;
-      endDate = yesterday;
-      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
-    } else if (selectedRange === "last7Days") {
-      const last7Days = new Date(today);
-      last7Days.setDate(today.getDate() - 7);
-      startDate = last7Days;
-      endDate = today;
-      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
-    } else if (selectedRange === "last30Days") {
-      const last30Days = new Date(today);
-      last30Days.setDate(today.getDate() - 30);
-      startDate = last30Days;
-      endDate = today;
-      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
-    } else if (selectedRange === "thisMonth") {
-      startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
-    } else if (selectedRange === "lastMonth") {
-      const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-      endDate = new Date(today.getFullYear(), today.getMonth(), 0);
-      startDate = lastMonth;
-      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
-    } else if (selectedRange === "lastYear") {
-      startDate = new Date(today.getFullYear() - 1, 0, 1);
-      endDate = new Date(today.getFullYear() - 1, 11, 31);
-      displayRange = `${formatDate(startDate)} to ${formatDate(endDate)}`;
-    } else if (selectedRange === "custom") {
-      setStartDate(null);
-      setEndDate(null);
-      return;
+    switch (selectedRange) {
+      case "today":
+        startDate = today;
+        endDate = today;
+        break;
+      case "yesterday":
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 1);
+        endDate = startDate;
+        break;
+      case "last7Days":
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 7);
+        endDate = today;
+        break;
+      case "last30Days":
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 30);
+        endDate = today;
+        break;
+      case "thisMonth":
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        break;
+      case "lastMonth":
+        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+        break;
+      case "lastYear":
+        startDate = new Date(today.getFullYear() - 1, 0, 1);
+        endDate = new Date(today.getFullYear() - 1, 11, 31);
+        break;
+      case "custom":
+        setStartDate(null);
+        setEndDate(null);
+        return;
+      default:
+        return;
     }
 
     setStartDate(startDate);
     setEndDate(endDate);
+  };
 
-    // Set the display range value
-    setSelectedDateRange(displayRange);
+  const handleCustomDateChange = (type, date) => {
+    if (type === "start") setStartDate(date);
+    if (type === "end") setEndDate(date);
   };
 
   const filteredData = documents.filter(
@@ -180,6 +181,7 @@ const SavedraftDocument = () => {
       headerName: "Sr.No.",
       flex: 0.3,
       headerAlign: "center",
+      align: "right", // Align data to the right
       renderCell: (params) => <span>{params.row.index + 1}</span>,
       sortable: false,
       filterable: false,
@@ -189,42 +191,49 @@ const SavedraftDocument = () => {
       headerName: "Title",
       flex: 1,
       headerAlign: "center",
+     
     },
     {
       field: "document_type_name",
       headerName: "Type",
       flex: 0.5,
       headerAlign: "center",
+     
     },
     {
       field: "document_number",
       headerName: "Document No.",
       flex: 0.55,
       headerAlign: "center",
+    
     },
     {
       field: "version",
       headerName: "Version",
       flex: 0.4,
       headerAlign: "center",
+     
     },
     {
       field: "created_at",
       headerName: "Created Date",
       flex: 0.5,
       headerAlign: "center",
+      
     },
     {
       field: "current_status_name",
       headerName: "Status",
       flex: 0.6,
       headerAlign: "center",
+     
     },
     {
       field: "actions",
       headerName: "Action",
       flex: 0.6,
       headerAlign: "center",
+     
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
           {hasPermission(userPermissions, "document", "isChange") && (
@@ -244,6 +253,7 @@ const SavedraftDocument = () => {
       filterable: false,
     },
   ];
+  
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching documents.</div>;
@@ -296,7 +306,7 @@ const SavedraftDocument = () => {
           <FormControl sx={{ minWidth: 180 }}>
             <InputLabel>Date Range</InputLabel>
             <Select
-              value={selectedDateRange} // Display the formatted date range as a string
+              value={selectedDateRange}
               onChange={handleDateRangeChange}
               label="Date Range"
               sx={{
@@ -315,43 +325,55 @@ const SavedraftDocument = () => {
               <MenuItem value="custom">Custom</MenuItem>
             </Select>
           </FormControl>
-
-          {startDate && endDate && (
-            <MDTypography variant="h6" sx={{ marginLeft: 2 }}>
-              {formatDate(startDate)} to {formatDate(endDate)}
-            </MDTypography>
-          )}
-
-          {selectedDateRange === "custom" && (
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <MDBox display="flex" gap={2} mt={2}>
-                <DatePicker
-                  label="Start Date"
-                  value={startDate}
-                  onChange={(newDate) => setStartDate(newDate)}
-                  renderInput={(params) => <MDInput {...params} />}
-                />
-                <DatePicker
-                  label="End Date"
-                  value={endDate}
-                  onChange={(newDate) => setEndDate(newDate)}
-                  renderInput={(params) => <MDInput {...params} />}
-                />
-              </MDBox>
-            </LocalizationProvider>
-          )}
         </MDBox>
 
-        <MDBox display="flex" justifyContent="center" sx={{ height: 500 }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            pageSize={5}
-            rowsPerPageOptions={[5]}
-            checkboxSelection
-            disableSelectionOnClick
-            autoHeight
-          />
+        {/* Selected Date Range Display */}
+        <MDBox display="flex" alignItems="center" mt={2} sx={{ marginBottom: "20px" }}>
+  {selectedDateRange && selectedDateRange !== "custom" && (
+    <MDTypography variant="h6" sx={{ marginLeft: "auto", marginRight: "20px" }}>
+      Selected Date: {formatDate(startDate)} to {formatDate(endDate)}
+    </MDTypography>
+  )}
+
+  {selectedDateRange === "custom" && (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <MDBox display="flex" gap={2} sx={{ marginLeft: "auto" }}>
+        <DatePicker
+          label="Start Date"
+          value={startDate}
+          onChange={(date) => handleCustomDateChange("start", date)}
+          renderInput={(params) => <MDInput {...params} />}
+        />
+        <DatePicker
+          label="End Date"
+          value={endDate}
+          onChange={(date) => handleCustomDateChange("end", date)}
+          renderInput={(params) => <MDInput {...params} />}
+        />
+      </MDBox>
+    </LocalizationProvider>
+  )}
+</MDBox>
+
+<MDBox display="flex" justifyContent="center" sx={{ height: 500, mt: 2 }}>
+  <DataGrid
+    rows={rows}
+    columns={columns}
+    pageSize={5}
+    rowsPerPageOptions={[5]}
+    disableSelectionOnClick
+    autoHeight
+    sx={{
+      "& .MuiDataGrid-columnHeader": {
+        textAlign: "center", 
+      },
+      "& .MuiDataGrid-cell": {
+        textAlign: "center",
+      },
+    }}
+  />
+
+
         </MDBox>
       </Card>
     </MDBox>
