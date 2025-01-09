@@ -34,29 +34,19 @@ import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import { toast, ToastContainer } from "react-toastify";
 import RemarkDialog from "./remark";
 import SelectUserDialog from "./user-select";
-
-Quill.register("modules/imageResize", ImageResize);
-const toolbarOptions = [
-  [{ font: [] }],
-  [{ header: [1, 2, 3, 4, 5, 6, false] }],
-  [{ size: ["small", "normal", "large", "huge"] }],
-  ["bold", "italic", "underline", "strike"],
-  [{ color: [] }, { background: [] }],
-  [{ list: "ordered" }, { list: "bullet" }],
-  [{ align: [] }],
-  ["link", "image", "video", "blockquote", "hr", "formula"],
-  ["clean"],
-  [{ indent: "-1" }, { indent: "+1" }],
-  ["code-block"],
-  ["comment"], // Custom comment button
-  // ["view-comments"], // Custom view comments button
-];
+import { Button, AppBar, Toolbar, Typography, CircularProgress } from "@mui/material";
 
 const DocumentView = () => {
+  const { id } = useParams();
+  const [loading, setLoading] = useState(true);
+  const [setError] = useState(null);
+  const [docEditorLoaded, setDocEditorLoaded] = useState(false);
+  const [editorConfig, setEditorConfig] = useState(null);
+  const { data: templateData, isError, error: apiError } = useGetTemplateQuery(id);
   const [docContent, setDocContent] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const quillRef = useRef(null);
-  const { id } = useParams();
+
   const [openDrawer, setOpenDrawer] = useState(false);
   const [opencommentDialog, setOpencommentDialog] = useState(false);
   const [currentComment, setCurrentComment] = useState("");
@@ -94,7 +84,7 @@ const DocumentView = () => {
   const [reviewer, setReviewer] = useState([]);
   const [docAdmin, setDocAdmin] = useState("");
 
-  console.log("-+-+-+-+-+-+-+-+-+-+-++--++--+",docAdmin);
+  console.log("-+-+-+-+-+-+-+-+-+-+-++--++--+", docAdmin);
   // Extract userGroupIds directly from documentsData
   const userGroupIds = documentsData?.userGroupIds || [];
   console.log("Extracted User Group IDs:", userGroupIds);
@@ -111,23 +101,101 @@ const DocumentView = () => {
   };
 
   useEffect(() => {
-    const fetchDocxFile = async () => {
-      if (data?.template_url) {
-        try {
-          const response = await fetch(data.template_url);
-          const arrayBuffer = await response.arrayBuffer();
-          const result = await Mammoth.convertToHtml({ arrayBuffer });
-          setDocContent(result.value);
-          setIsLoaded(true);
-        } catch (err) {
-          console.error("Error converting DOCX to HTML:", err);
-          setIsLoaded(true);
-        }
-      }
-    };
+    if (isLoading) return;
 
-    fetchDocxFile();
-  }, [data]);
+    if (isError) {
+      setError(apiError?.message || "Failed to fetch template data");
+      setLoading(false);
+      return;
+    }
+    console.log("Template Data:", templateData);
+    console.log("Template URL:", templateData?.template_url);
+
+    if (templateData?.template_url) {
+      const fetchEditorConfig = async () => {
+        try {
+          const response = await fetch("http://127.0.0.1:8000/dms_module/get_editor_config", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              url: templateData.template_url,
+              user_name: "John Doe",
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch editor configuration");
+          }
+
+          const config = await response.json();
+          setEditorConfig(config);
+          setDocEditorLoaded(true);
+        } catch (fetchError) {
+          setError("Failed to fetch ONLYOFFICE configuration");
+          console.error(fetchError);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchEditorConfig();
+    } else {
+      setError("Template URL is missing in the API response");
+      setLoading(false);
+    }
+  }, [isLoading, isError, templateData, apiError]);
+
+  useEffect(() => {
+    if (docEditorLoaded && editorConfig) {
+      const script = document.createElement("script");
+      script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
+      script.onload = () => {
+        try {
+          new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
+            width: "100%",
+            height: "100%",
+            type: "desktop",
+            document: editorConfig.document,
+            editorConfig: {
+              mode: "edit", // Ensure the document is in edit mode
+              callbackUrl: editorConfig.callbackUrl, // Save callback URL
+              user: {
+                id: "1",
+                name: "Rohit Sharma",
+              },
+              watermark: {
+                text: "Confidential", // The text of the watermark
+                color: "rgba(192, 192, 192, 0.5)", // Semi-transparent light gray color
+                fontSize: 50, // Size of the watermark text
+                diagonal: true, // Place the watermark diagonally
+                visibleForAllUsers: true, // Make the watermark visible for all users
+              },
+              customization: {
+                autosave: true, // Enable autosave
+                hideRightMenu: true, // Hide the right-side menu
+                buttons: ["save"], // Restrict buttons to Save
+              },
+            },
+            events: {
+              onDocumentStateChange: (event) => {
+                console.log("Document state changed:", event.data);
+              },
+            },
+            token: editorConfig.token, // Pass the authentication token
+          });
+          console.log("ONLYOFFICE editor initialized with watermark");
+        } catch (initError) {
+          setError("Failed to initialize ONLYOFFICE editor");
+          console.error(initError);
+        }
+      };
+      script.onerror = () => {
+        setError("Failed to load ONLYOFFICE script");
+        console.error("Script load error");
+      };
+      document.body.appendChild(script);
+    }
+  }, [docEditorLoaded, editorConfig]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -144,49 +212,6 @@ const DocumentView = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
-
-  useEffect(() => {
-    if (isLoaded && !quillRef.current) {
-      const quill = new Quill("#editor-container", {
-        theme: "snow",
-        modules: {
-          toolbar: {
-            container: toolbarOptions,
-            handlers: {
-              comment: handleAddComment, // Correct handler for adding comments
-              // "view-comments": handleOpenCommentsDrawer, // Correct handler for viewing comments
-            },
-          },
-          imageResize: {},
-        },
-      });
-
-      quillRef.current = quill;
-      quill.clipboard.dangerouslyPasteHTML(docContent);
-
-      comments.forEach(({ range }) => {
-        quill.formatText(range.index, range.length, { background: "yellow" });
-      });
-
-      // Add icons to the toolbar buttons
-      const commentButton = document.querySelector(".ql-comment");
-      const viewCommentsButton = document.querySelector(".ql-view-comments");
-
-      if (commentButton) {
-        commentButton.innerHTML = "";
-        const commentIcon = document.createElement("span");
-        ReactDOM.render(<CommentBankIcon fontSize="small" />, commentIcon);
-        commentButton.appendChild(commentIcon);
-      }
-
-      if (viewCommentsButton) {
-        viewCommentsButton.innerHTML = "";
-        const viewIcon = document.createElement("span");
-        ReactDOM.render(<PlaylistAddCheckIcon fontSize="small" />, viewIcon);
-        viewCommentsButton.appendChild(viewIcon);
-      }
-    }
-  }, [isLoaded, docContent, comments]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -227,11 +252,18 @@ const DocumentView = () => {
           response = await draftDocument({ document_id: id, status_id: 2, remark }).unwrap();
           toast.success("Saved as Draft!");
           break;
-          case "submit":
-            response = await documentApproveStatus({document_id: id,status: "3",remark,visible_to_users: reviewer,approver,doc_admin: docAdmin}).unwrap();
-            console.log("",)
-            toast.success("Document Submitted!");
-            break;
+        case "submit":
+          response = await documentApproveStatus({
+            document_id: id,
+            status: "3",
+            remark,
+            visible_to_users: reviewer,
+            approver,
+            doc_admin: docAdmin,
+          }).unwrap();
+          console.log("");
+          toast.success("Document Submitted!");
+          break;
         case "review":
           response = await documentReviewStatus({ document_id: id, status: "4", remark }).unwrap();
           toast.success("Document Reviewed!");
@@ -261,9 +293,8 @@ const DocumentView = () => {
 
   const handleSubmit = () => {
     setAction("submit");
-    setOpenuserDialog(true);  
+    setOpenuserDialog(true);
   };
-  
 
   const handleReview = () => {
     setAction("review");
@@ -548,11 +579,21 @@ const DocumentView = () => {
     // Close the modal or drawer after saving
     setOpenDrawer(false); // Close the drawer or modal after saving the comment
   };
-  if (isLoading) {
-    return <Box padding={2}>Loading document...</Box>;
+  if (loading || isLoading) {
+    return (
+      <Box padding={2} display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress />
+        <Typography sx={{ marginLeft: 2 }}>Loading editor...</Typography>
+      </Box>
+    );
   }
+
   if (error) {
-    return <Box padding={2}>Error loading document</Box>;
+    return (
+      <Box padding={2} display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <Typography variant="h6" color="error">{`Error: ${error.message}`}</Typography>
+      </Box>
+    );
   }
 
   const handleOpeusernDialog = () => {
@@ -564,185 +605,159 @@ const DocumentView = () => {
     setOpenRemarkDialog(true);
   };
   const handleConfirmSelection = (selectedUsers) => {
-  console.log("Selected Users:", selectedUsers);
-  // Store selected users in state
-  setApprover(selectedUsers.approver);
-  setReviewer(selectedUsers.reviewer);
-  setDocAdmin(selectedUsers.docAdmin);
+    console.log("Selected Users:", selectedUsers);
+    // Store selected users in state
+    setApprover(selectedUsers.approver);
+    setReviewer(selectedUsers.reviewer);
+    setDocAdmin(selectedUsers.docAdmin);
 
-  setOpenuserDialog(false); // Close the SelectUserDialog
-  setOpenRemarkDialog(true); // Now open the RemarkDialog
-};
-
+    setOpenuserDialog(false); // Close the SelectUserDialog
+    setOpenRemarkDialog(true); // Now open the RemarkDialog
+  };
 
   return (
     <MDBox
       sx={{
         fontFamily: "Arial, sans-serif",
-        padding: 2,
+        display: "flex",
+        flexDirection: "column",
+        height: "190vh",
         backgroundColor: "#f4f4f4",
         minHeight: "100vh",
         position: "relative",
       }}
     >
-      <AntiCopyPattern />
-
-      <div
-        id="editor-container"
-        style={{
-          width: "210mm",
-          height: "297mm",
-          margin: "20px auto",
-          backgroundColor: "rgba(255, 255, 255, 0.7)",
-          padding: "10px",
-          border: "1px solid #ccc",
-          borderRadius: "5px",
-          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-          position: "relative",
-          overflow: "hidden",
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Document Editor
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Box
+        id="onlyoffice-editor-container"
+        sx={{
+          flex: 1,
+          backgroundColor: "#fff",
+          boxShadow: 2,
+          margin: "20px",
+        }}
+      />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          padding: 2,
+          backgroundColor: "#f4f4f4",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            fontSize: "16px",
-            fontWeight: "bold",
-            color: "#333",
-            backgroundColor: "rgba(255, 255, 255, 0.9)",
-            padding: "6px 12px",
-            borderRadius: "5px",
-            zIndex: 10, // Ensures it stays on top
-            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-          }}
-        >
-          #{randomNumber}
-        </div>
-      </div>
-
-      <CommentDrawer
-        open={openDrawer}
-        onClose={() => setOpenDrawer(false)}
-        comments={comments}
-        onAddCommentClick={handleAddComment}
-        onEditCommentClick={handleEditComment}
-        handleSaveEdit={handleSaveEdit}
-        documentId={id}
-      />
-
-      <CommentModal
-        open={opencommentDialog}
-        onClose={() => setOpencommentDialog(false)}
-        currentComment={currentComment}
-        setCurrentComment={setCurrentComment}
-        handleSaveComment={handleSaveComment}
-      />
-
-      <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
-        {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
-        {(document_current_status === "1" ||
-          document_current_status === "2" ||
-          document_current_status === "8") &&
-          isButtonVisible([2]) && (
+        <MDBox mt={2} display="flex" justifyContent="center" gap={2}>
+          {/* Condition 1: Show Submit and Save Draft buttons when status is "1" or "2" */}
+          {(document_current_status === "1" ||
+            document_current_status === "2" ||
+            document_current_status === "8") &&
+            isButtonVisible([2]) && (
+              <>
+                <MDButton
+                  variant="gradient"
+                  color="submit"
+                  type="button" // Set to "button" to prevent default form submission
+                  onClick={handleSubmit}
+                  disabled={isLoading} // Disable the button while the API call is in progress
+                >
+                  {isLoading ? "Submitting..." : "Submit"}
+                </MDButton>
+              </>
+            )}
+          {/* Condition 2: Show Review button when status is "3" */}
+          {document_current_status === "3" && isButtonVisible([3]) && (
             <>
               <MDButton
                 variant="gradient"
                 color="submit"
-                type="button" // Set to "button" to prevent default form submission
-                onClick={handleSubmit}
-                disabled={isLoading} // Disable the button while the API call is in progress
+                onClick={handleReview}
+                disabled={isLoading}
               >
-                {isLoading ? "Submitting..." : "Submit"}
+                Review
+              </MDButton>
+              <MDButton
+                variant="gradient"
+                color="error" // Change color to indicate sending back
+                onClick={handleOpenDialog}
+                disabled={isLoading}
+              >
+                Send Back
               </MDButton>
             </>
           )}
-        {/* Condition 2: Show Review button when status is "3" */}
-        {document_current_status === "3" && isButtonVisible([3]) && (
-          <>
-            <MDButton variant="gradient" color="submit" onClick={handleReview} disabled={isLoading}>
-              Review
-            </MDButton>
-            <MDButton
-              variant="gradient"
-              color="error" // Change color to indicate sending back
-              onClick={handleOpenDialog}
-              disabled={isLoading}
-            >
-              Send Back
-            </MDButton>
-          </>
-        )}
-        {/* Condition 3: Show Approve button when status is "4" */}
-        {document_current_status === "4" && isButtonVisible([4]) && (
-          <>
-            <MDButton
-              variant="gradient"
-              color="submit"
-              onClick={handleApprove}
-              disabled={isLoading}
-            >
-              Approve
-            </MDButton>
-            <MDButton
-              variant="gradient"
-              onClick={handleOpenDialog}
-              color="error"
-              disabled={isLoading}
-            >
-              Send Back
-            </MDButton>
-          </>
-        )}
-        {/* Condition 4 */}
-        {document_current_status === "5" && isButtonVisible([5]) && (
-          <>
-            {/* <MDButton variant="gradient" color="submit" onClick={handleDoc} disabled={isLoading}>
+          {/* Condition 3: Show Approve button when status is "4" */}
+          {document_current_status === "4" && isButtonVisible([4]) && (
+            <>
+              <MDButton
+                variant="gradient"
+                color="submit"
+                onClick={handleApprove}
+                disabled={isLoading}
+              >
+                Approve
+              </MDButton>
+              <MDButton
+                variant="gradient"
+                onClick={handleOpenDialog}
+                color="error"
+                disabled={isLoading}
+              >
+                Send Back
+              </MDButton>
+            </>
+          )}
+          {/* Condition 4 */}
+          {document_current_status === "5" && isButtonVisible([5]) && (
+            <>
+              {/* <MDButton variant="gradient" color="submit" onClick={handleDoc} disabled={isLoading}>
               Doc Admin Approve
             </MDButton> */}
-            <MDButton
-              variant="gradient"
-              color="error"
-              onClick={handleOpenDialog}
-              disabled={isLoading}
-            >
-              Send Back
-            </MDButton>
-          </>
-        )}
-        {/* Display success or error messages */}
-        {data && <p>{data.message}</p>}
-        {error && <p>Error: {error.message}</p>}
-        <MDButton
-          variant="gradient"
-          color="submit"
-          onClick={handleSaveDraft}
-          disabled={isLoading} // Disable button when mutation is in progress
-        >
-          Save Draft
-        </MDButton>
-        <MDButton
-          variant="gradient"
-          color="submit"
-          onClick={() => {
-            handlePrint();
-          }}
-        >
-          Print
-        </MDButton>
-      </MDBox>
+              <MDButton
+                variant="gradient"
+                color="error"
+                onClick={handleOpenDialog}
+                disabled={isLoading}
+              >
+                Send Back
+              </MDButton>
+            </>
+          )}
+          {/* Display success or error messages */}
+          {data && <p>{data.message}</p>}
+          {error && <p>Error: {error.message}</p>}
+          <MDButton
+            variant="gradient"
+            color="submit"
+            onClick={handleSaveDraft}
+            disabled={isLoading} // Disable button when mutation is in progress
+          >
+            Save Draft
+          </MDButton>
+          <MDButton
+            variant="gradient"
+            color="submit"
+            onClick={() => {
+              handlePrint();
+            }}
+          >
+            Print
+          </MDButton>
+        </MDBox>
+      </Box>
       <MDBox
         sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
       >
-        
         {/* import time line code  */}
         <Grid container spacing={3} justifyContent="center" alignItems="center">
           <Grid item xs={12} md={6} lg={4}>
             <OrdersOverview docId={id} />
           </Grid>
         </Grid>
-
-        
       </MDBox>
       <SendBackDialog
         open={dialogOpen}
