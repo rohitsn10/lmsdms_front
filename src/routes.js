@@ -135,14 +135,14 @@ const routes = [
     route: "/inventory-list",
     component: <InventoryListing />,
   },
-  {
-    type: "collapse",
-    name: "Roles & Permissions",
-    key: "roles-listing",
-    icon: <SettingsIcon />,
-    route: "/roles-listing",
-    component: <RolesPermissionsListing />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Roles & Permissions",
+  //   key: "roles-listing",
+  //   icon: <SettingsIcon />,
+  //   route: "/roles-listing",
+  //   component: <RolesPermissionsListing />,
+  // },
   {
     type: "collapse",
     name: "Print Approvals",

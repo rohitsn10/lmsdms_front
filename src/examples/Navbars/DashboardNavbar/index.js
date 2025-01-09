@@ -65,13 +65,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [open, setOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [password, setPassword] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null); 
+  const [anchorEl, setAnchorEl] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
 
   // Fetch roles using the API hook
   const { data: rolesData, isLoading, isError } = useRequestUserGroupListQuery();
-  
+
   // Initialize the switch role mutation
   const [userSwitchRole, { isLoading: isSwitchLoading, isError: isSwitchError, data: switchData, error: switchError }] = useUserSwitchRoleMutation();
 
@@ -79,15 +79,15 @@ function DashboardNavbar({ absolute, light, isMini }) {
     if (isLoading) {
       console.log("Loading roles...");
     }
-  
+
     if (isError) {
       console.error("Error loading roles!");
     }
-  
+
     if (rolesData && rolesData.data) {
-      console.log('Roles data:', rolesData); 
+      console.log('Roles data:', rolesData);
       const fetchedRoles = rolesData.data.map((role) => ({
-        id: role.id, 
+        id: role.id,
         name: role.name,
       }));
       setRoles(fetchedRoles);
@@ -102,7 +102,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
 
     function handleTransparentNavbar() {
-      setTransparentNavbar(dispatch, false); 
+      setTransparentNavbar(dispatch, false);
     }
     window.addEventListener("scroll", handleTransparentNavbar);
     handleTransparentNavbar();
@@ -142,7 +142,11 @@ function DashboardNavbar({ absolute, light, isMini }) {
       setFeedbackMessage("Please select a role and enter a password.");
     }
   };
-
+  const isButtonVisible = () => {
+    return roles.some(role => role.id === 1); 
+  };
+  
+  
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {
       let colorValue = light || darkMode ? white.main : dark.main;
@@ -177,6 +181,30 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 {role}
               </Button>
             </MDBox>
+            {isButtonVisible() && (
+  <MDBox pr={1}>
+    <Button
+      variant="contained"
+      size="large"
+      sx={{
+        backgroundColor: "#e91e63",
+        color: "white !important", 
+        padding: "6px 16px", 
+        minHeight: "36px", 
+        "&:hover": {
+          backgroundColor: "#d81b60",
+        },
+      }}
+      component={RouterLink}
+      to="/roles-listing"
+    >
+      Roles
+    </Button>
+  </MDBox>
+)}
+
+
+
             <MDBox color={light ? "white" : "inherit"} display="flex" alignItems="center">
               <Dialog
                 open={open}
@@ -261,6 +289,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   </MDBox>
                 </DialogActions>
               </Dialog>
+
               <IconButton
                 size="large"
                 disableRipple
