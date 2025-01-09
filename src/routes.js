@@ -53,6 +53,7 @@ import TrainingMapping from "dmscomponent/training-mappping";
 import JobRoleMapping from "dmscomponent/jobrole-mapping";
 import DisplaySettingsRoundedIcon from '@mui/icons-material/DisplaySettingsRounded';
 import ForkRightTwoToneIcon from '@mui/icons-material/ForkRightTwoTone';
+import ArchivedListing from "layouts/authentication/archived-listing";
 
 const routes = [
   {
@@ -134,6 +135,14 @@ const routes = [
     icon: <Inventory2Icon />,
     route: "/inventory-list",
     component: <InventoryListing />,
+  },
+  {
+    type: "collapse",
+    name: "Archived",
+    key: "archived-listing",
+    icon: <Inventory2Icon />,
+    route: "/archived-listing",
+    component: <ArchivedListing />,
   },
   // {
   //   type: "collapse",
