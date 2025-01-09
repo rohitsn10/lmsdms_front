@@ -116,7 +116,9 @@ const DocumentListing = () => {
     setReviseDialogOpen(false);
     setReviseDocument(null);
   };
-
+  const isButtonVisible = () => {
+    return roles.some(role => role.id === 4);
+  };
   const handleReviseConfirm = () => {
     console.log("Revise confirmed for document:", reviseDocument);
     // Add any additional logic here
@@ -209,27 +211,27 @@ const DocumentListing = () => {
           </IconButton>
           {params.row.form_status === "save_draft"
             ? hasPermission(userPermissions, "document", "isView") && (
-                <IconButton
-                  color="secondary"
-                  onClick={() => {
-                    console.log("Params passed to handleClick:", params);
-                    handleClick(params);
-                  }}
-                >
-                  <PreviewIcon />
-                </IconButton>
-              )
+              <IconButton
+                color="secondary"
+                onClick={() => {
+                  console.log("Params passed to handleClick:", params);
+                  handleClick(params);
+                }}
+              >
+                <PreviewIcon />
+              </IconButton>
+            )
             : hasPermission(userPermissions, "document", "isView") && (
-                <IconButton
-                  color="inherit"
-                  onClick={() => {
-                    console.log("Params passed to handleClick:", params);
-                    handleClick(params);
-                  }}
-                >
-                  <EditCalendarIcon />
-                </IconButton>
-              )}
+              <IconButton
+                color="inherit"
+                onClick={() => {
+                  console.log("Params passed to handleClick:", params);
+                  handleClick(params);
+                }}
+              >
+                <EditCalendarIcon />
+              </IconButton>
+            )}
           {data?.userGroupIds?.includes(5) && ( // Hide CheckCircleIcon when status is 7
             <IconButton
               color="success"
@@ -269,7 +271,7 @@ const DocumentListing = () => {
                 },
               });
             }}
-            disabled={params.row.document_current_status !== 9} 
+            disabled={params.row.document_current_status !== 9}
           >
             <BrowserUpdatedOutlinedIcon />
           </IconButton>
@@ -296,6 +298,17 @@ const DocumentListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Document Listing
           </MDTypography>
+          {isButtonVisible && (
+            <MDButton
+              variant="contained"
+              color="primary"
+              onClick={handleAddDocument}
+              sx={{ ml: 2 }}
+            >
+              Obsolete
+            </MDButton>
+          )}
+
           {hasPermission(userPermissions, "document", "isAdd") && (
             <MDButton
               variant="contained"
