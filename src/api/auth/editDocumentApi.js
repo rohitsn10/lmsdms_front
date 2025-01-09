@@ -26,11 +26,15 @@ export const editDocumentApi = createApi({
     // Update document
     updateDocument: builder.mutation({
       query: (documentData) => ({
-        url: `dms_module/update_document/${documentData.document_id}`,
+        url: `dms_module/update_document/${documentData.document_id}`, // use document_id from the documentData
         method: "PUT",
-        body: documentData,
+        body: documentData, // directly pass the plain object
+        headers: {
+          "Content-Type": "application/json", // Ensure Content-Type is set to application/json
+        },
       }),
     }),
+    
   }),
 });
 

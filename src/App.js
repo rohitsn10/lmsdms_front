@@ -257,7 +257,7 @@ export default function App() {
       <Route path="/document-view/:id" element={<DocumentView />} />
       <Route path="/add-user" element={<AddUser />} />
       <Route path="/add-document" element={<AddDocument />} />
-      <Route path="/edit-document/:id" element={<EditDocument />} />
+      <Route path="/edit-document" element={<EditDocument />} />
       <Route path="/add-department" element={<AddDepartment />} />
       <Route path="/forgotpassword" element={<ResetPassword />} />
       <Route path="/e-sign" element={<ESignatureDialog />} />

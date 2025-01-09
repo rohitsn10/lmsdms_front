@@ -106,25 +106,34 @@ function AddDocument() {
   };
   const handleRevisionMonthChange = (e) => {
     const monthsToAdd = parseInt(e.target.value, 10);
-
-    if (isNaN(monthsToAdd) || monthsToAdd <= 0) {
+  
+    // Allow 0 or positive numbers, but display an error for negative numbers or invalid input
+    if (isNaN(monthsToAdd) || monthsToAdd < 0) {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        revisionMonth: "Please enter a valid positive number.",
+        revisionMonth: "Please enter a valid positive number or 0.",
       }));
       return;
     }
-
+  
+    // Clear any previous error for revisionMonth
     setErrors((prevErrors) => ({ ...prevErrors, revisionMonth: undefined }));
-
+  
     const currentDate = new Date();
-    currentDate.setMonth(currentDate.getMonth() + monthsToAdd);
-
-    const formattedDate = currentDate.toISOString().split("T")[0];
-
+  
+    if (monthsToAdd === 0) {
+      // If the input is 0, set the revisionTime to the current date (or you can choose to leave it empty)
+      setRevisionTime(currentDate.toISOString().split("T")[0]);
+    } else {
+      // If it's a positive number, calculate the new revision date
+      currentDate.setMonth(currentDate.getMonth() + monthsToAdd);
+      setRevisionTime(currentDate.toISOString().split("T")[0]);
+    }
+  
+    // Set the revisionMonth state to the user input (including 0)
     setRevisionMonth(monthsToAdd);
-    setRevisionTime(formattedDate);
   };
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -338,7 +347,7 @@ function AddDocument() {
                 helperText={errors.revisionMonth}
                 fullWidth
                 inputProps={{
-                  min: 1,
+                  min: 0,
                 }}
               />
             </MDBox>
