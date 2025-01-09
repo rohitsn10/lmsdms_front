@@ -188,7 +188,7 @@ const TrainingMapping = () => {
                   height: "3rem",
                   ".MuiSelect-select": { padding: "0.45rem" },
                 }}
-                displayEmpty
+                
               >
                 {plantData?.data?.map((plant) => (
                   <MenuItem key={plant.id} value={plant.id}>
@@ -212,7 +212,7 @@ const TrainingMapping = () => {
                   height: "3rem",
                   ".MuiSelect-select": { padding: "0.45rem" },
                 }}
-                displayEmpty
+                
               >
                 {areaLoading ? (
                   <MenuItem disabled>Loading...</MenuItem>

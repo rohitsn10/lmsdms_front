@@ -128,10 +128,12 @@ const DocumentListing = () => {
     navigate("/PreView", { state: { templateDoc: url } }); // Pass the URL as state
   };
 
-  const handleEditClick = (id) => {
-    navigate(`/edit-document/${id}`);
-    console.log("Edit-Document id passed", id);
-  };
+  const handleEditClick = (rowData) => {
+    navigate("/edit-document", { state: { item: rowData } });
+    console.log("Full Row Data passed", rowData);
+};
+
+
   const filteredData = documents.filter(
     (doc) =>
       doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -199,9 +201,9 @@ const DocumentListing = () => {
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
           {hasPermission(userPermissions, "document", "isChange") && (
-            <IconButton color="primary" onClick={() => handleEditClick(params.row.id)}>
-              <EditIcon />
-            </IconButton>
+            <IconButton color="primary" onClick={() => handleEditClick(params.row)}>
+            <EditIcon />
+        </IconButton>        
           )}
           <IconButton
             color="primary"

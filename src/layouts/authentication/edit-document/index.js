@@ -9,6 +9,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import { useLocation } from "react-router-dom";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import {
   FormControl,
@@ -22,52 +23,57 @@ import {
   FormLabel,
 } from "@mui/material";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useFetchDocumentDetailsQuery, useUpdateDocumentMutation } from "api/auth/editDocumentApi";
+import { useUpdateDocumentMutation } from "api/auth/editDocumentApi";
 import { useFetchDocumentTypesQuery } from "api/auth/documentApi";
 import { useFetchWorkflowsQuery } from "api/auth/workflowApi";
 import { useDepartmentWiseReviewerQuery } from "api/auth/documentApi";
-
+import { useFetchAllDocumentsQuery } from "api/auth/documentApi";
+import { useViewTemplateQuery } from "api/auth/documentApi";
+useViewTemplateQuery;
 function EditDocument() {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("");
-  const [documentNumber, setDocumentNumber] = useState("");
   const [description, setDescription] = useState("");
   const [revisionTime, setRevisionTime] = useState("");
   const [operations, setOperations] = useState("Upload files");
   const [workflow, setWorkflow] = useState("");
-  const [trainingRequired, setTrainingRequired] = useState("No");
+  const [trainingRequired, setTrainingRequired] = useState("");
   const [templateFile, setTemplateFile] = useState(null);
+  console.log("---------------------------------------",templateFile)
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
-
-  const { id } = useParams();
+  const [revisionMonth, setRevisionMonth] = useState("");
+  const [parentDocument, setParentDocument] = useState("");
+  const [template, setTemplate] = useState("");
+  const location = useLocation();
+  const { item } = location.state;
   const navigate = useNavigate();
-  console.log("Document Id in edit ------------",id);
-
-  // API calls
-  const { data: documentDetails, isLoading: documentDetailsLoading } = useFetchDocumentsQuery(id);
-  const [updateDocument] = useUpdateDocumentMutation();
+  const id = item.id;
+ 
+  // const { data: documentDetails, isLoading: documentDetailsLoading } = useFetchDocumentsQuery(2);
+  const [updateDocument] = useUpdateDocumentMutation(id);
   const { data: documentTypesData, isLoading: documentTypesLoading } = useFetchDocumentTypesQuery();
   const { data: workflowsData, isLoading: workflowsLoading } = useFetchWorkflowsQuery();
-
   const { data: userdata, isLoading: isUsersLoading } = useDepartmentWiseReviewerQuery();
+  const { data: alldocument } = useFetchAllDocumentsQuery();
+  const { data: templateData } = useViewTemplateQuery();
   const users = userdata || [];
-  // Populate form with existing data
+  
   
   useEffect(() => {
-    if (documentDetails) {
-      setTitle(documentDetails.document_title || "");
-      setType(documentDetails.document_type || "");
-      setDocumentNumber(documentDetails.document_number || "");
-      setDescription(documentDetails.document_description || "");
-      setRevisionTime(documentDetails.revision_time || "");
-      setOperations(documentDetails.document_operation || "Upload files");
-      setWorkflow(documentDetails.workflow || "");
-      setTrainingRequired(documentDetails.trainingRequired || "No");
-      setSelectedUsers(documentDetails.visible_to_users || []);
+    if (item) {
+      setTitle(item.document_title || "");
+      setType(item.document_type || "");
+      setDescription(item.document_description || "");
+      setRevisionMonth(item.revision_month || "");
+      setOperations(item.document_operation || "Upload files");
+      setWorkflow(item.workflow || "");
+      setTrainingRequired(item.training_required ? "Yes" : "No");
+      setTemplate(item.select_template || "");
+      setTemplateFile(item.selected_template_url || null);
     }
-  }, [documentDetails]);
+  }, [item]);
 
   // Validation
   const validateInputs = () => {
@@ -77,36 +83,33 @@ function EditDocument() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   // Form Submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
     setOpenSignatureDialog(true);
   };
-
+  
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
     if (!password) {
       toast.error("E-Signature is required to proceed.");
       return;
     }
-
+    const documentData = {
+      document_id: id,  // Include the document ID
+      document_title: title, // Use the updated state value
+      document_type: type,
+      document_description: description,
+      revision_month: revisionMonth,
+      document_operation: operations,
+      select_template: templateFile,
+      workflow: workflow,
+      training_required: trainingRequired.toLowerCase() === "yes",
+    };
     try {
-      await updateDocument({
-        document_id: id,
-        document_title: title.trim(),
-        document_type: type,
-        document_number: documentNumber.trim(),
-        document_description: description.trim(),
-        revision_time: revisionTime.trim(),
-        document_operation: operations,
-        select_template: templateFile,
-        workflow,
-        trainingRequired,
-        visible_to_users: selectedUsers,
-      }).unwrap(); // Use unwrap() to catch errors in the mutation
-
+      await updateDocument(documentData).unwrap(); 
+      console.log("Document updated successfully!");
       toast.success("Document updated successfully!");
       setTimeout(() => navigate("/document-listing"), 1500);
     } catch (error) {
@@ -115,11 +118,34 @@ function EditDocument() {
     }
   };
   
+  
+
+  const handleRevisionMonthChange = (e) => {
+    const monthsToAdd = parseInt(e.target.value, 10);
+
+    if (isNaN(monthsToAdd) || monthsToAdd <= 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        revisionMonth: "Please enter a valid positive number.",
+      }));
+      return;
+    }
+
+    setErrors((prevErrors) => ({ ...prevErrors, revisionMonth: undefined }));
+
+    const currentDate = new Date();
+    currentDate.setMonth(currentDate.getMonth() + monthsToAdd);
+
+    const formattedDate = currentDate.toISOString().split("T")[0];
+
+    setRevisionMonth(monthsToAdd);
+    setRevisionTime(formattedDate);
+  };
 
   const handleClear = () => {
     setTitle("");
     setType("");
-    setDocumentNumber("");
+
     setDescription("");
     setRevisionTime("");
     setOperations("Upload files");
@@ -132,7 +158,6 @@ function EditDocument() {
   const handleFileChange = (e) => {
     setTemplateFile(e.target.files[0]);
   };
-  
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
@@ -189,7 +214,7 @@ function EditDocument() {
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                  disabled={documentTypesLoading} 
+                  disabled={documentTypesLoading}
                 >
                   {documentTypesLoading ? (
                     <MenuItem disabled>Loading...</MenuItem>
@@ -204,14 +229,37 @@ function EditDocument() {
               </FormControl>
             </MDBox>
             <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Document Number"
-                value={documentNumber}
-                onChange={(e) => setDocumentNumber(e.target.value)}
-                fullWidth
-              />
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="select-parent-doc-label">Parent Document</InputLabel>
+                <Select
+                  labelId="select-parent-doc-label"
+                  id="select-parent-doc"
+                  value={parentDocument}
+                  onChange={(e) => setParentDocument(e.target.value)} // Update parent document when selected
+                  input={<OutlinedInput label="Parent Document" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem",
+                    ".MuiSelect-select": { padding: "0.45rem" },
+                  }}
+                  disabled={type === 1} // Disable Parent Document dropdown if Type is 1
+                >
+                  {alldocument?.map((doc) => (
+                    <MenuItem key={doc.id} value={doc.id}>
+                      {doc.document_title} {/* Display document title */}
+                    </MenuItem>
+                  ))}
+                </Select>
+
+                {/* Show message when Parent Document is not required */}
+                {type === 1 && (
+                  <p style={{ color: "gray", fontSize: "0.75rem", marginTop: "4px" }}>
+                    Parent Document is not required for this type.
+                  </p>
+                )}
+              </FormControl>
             </MDBox>
+            <MDBox mb={3}></MDBox>
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -223,14 +271,16 @@ function EditDocument() {
             </MDBox>
             <MDBox mb={3}>
               <MDInput
-                type="Date"
-                label="Revision Date"
-                value={revisionTime}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                onChange={(e) => setRevisionTime(e.target.value)}
+                type="number"
+                label="Revision Month"
+                value={revisionMonth}
+                onChange={handleRevisionMonthChange} // Use the new handler
+                error={Boolean(errors.revisionMonth)}
+                helperText={errors.revisionMonth}
                 fullWidth
+                inputProps={{
+                  min: 1,
+                }}
               />
             </MDBox>
             <MDBox mb={3} display="flex" alignItems="center">
@@ -275,7 +325,7 @@ function EditDocument() {
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                  disabled={workflowsLoading} 
+                  disabled={workflowsLoading}
                 >
                   {workflowsLoading ? (
                     <MenuItem disabled>Loading...</MenuItem>
@@ -289,43 +339,50 @@ function EditDocument() {
                 </Select>
               </FormControl>
             </MDBox>
-            <MDBox mb={3}>
+            {/* <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
-                <InputLabel id="select-user-label">Update Users</InputLabel>
+                <InputLabel id="select-template-label">Select Template</InputLabel>
                 <Select
-                  labelId="select-user-label"
-                  id="select-user"
-                  multiple // Enable multiple selection
-                  value={selectedUsers} // Use state to hold selected users
-                  onChange={(e) => setSelectedUsers(e.target.value)} // Update the selected users
-                  input={<OutlinedInput label="Update Users" />}
+                  labelId="select-template-label"
+                  id="select-template"
+                  value={template}
+                  onChange={(e) => setTemplate(e.target.value)}
+                  input={<OutlinedInput label="Select Template" />}
                   sx={{
                     minWidth: 200,
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                  renderValue={(selected) =>
-                    selected
-                      .map((userId) => {
-                        const user = users.find((u) => u.id === userId);
-                        return user?.first_name || userId;
-                      })
-                      .join(", ")
-                  }
                 >
-                  {users.length > 0 ? (
-                    users.map((user) => (
-                      <MenuItem key={user.id} value={user.id}>
-                        {user.first_name}
-                      </MenuItem>
-                    ))
-                  ) : (
-                    <MenuItem disabled>No users available</MenuItem>
-                  )}
+                  {templateData?.map((templateItem) => (
+                    <MenuItem key={templateItem.id} value={templateItem.id}>
+                      {templateItem.template_name}
+                    </MenuItem>
+                  ))}
                 </Select>
+                {errors.template && (
+                  <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+                    {errors.template}
+                  </p>
+                )}
               </FormControl>
+            </MDBox> */}
+            <MDBox mb={3} display="flex" alignItems="center">
+              <FormLabel
+                component="legend"
+                style={{ fontSize: "0.875rem", color: "black", marginRight: "16px" }}
+              >
+                Training Required
+              </FormLabel>
+              <RadioGroup
+                row
+                value={trainingRequired}
+                onChange={(e) => setTrainingRequired(e.target.value)}
+              >
+                <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
+                <FormControlLabel value="No" control={<Radio />} label="No" />
+              </RadioGroup>
             </MDBox>
-
             <MDBox mt={4}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit">
                 Update

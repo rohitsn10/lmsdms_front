@@ -29,6 +29,7 @@ import { jobroleApi } from "apilms/jobRoleApi";
 import { trainingMappingApi } from "apilms/trainigMappingApi";
 import { archivedListApi } from "api/auth/archivedListApi";
 
+
 const store = configureStore({
   reducer: {
     [userApi.reducerPath]: userApi.reducer,

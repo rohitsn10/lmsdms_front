@@ -32,13 +32,7 @@ const DocView = () => {
 
   return (
     <Box sx={{ padding: 2 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Document Viewer
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      
 
       <Box sx={{ marginTop: 2 }}>
         <Box
