@@ -17,7 +17,7 @@ const TrainingTypeListing = () => {
 
   // Fetch training types data using the API
   const { data, isLoading, isError,refetch } = useFetchTrainingTypesQuery();
-
+  console.log(data)
   useEffect(() => {
       refetch();
     }, [location.key]);

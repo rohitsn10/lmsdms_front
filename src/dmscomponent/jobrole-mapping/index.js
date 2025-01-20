@@ -163,9 +163,7 @@ const JobRoleMapping = () => {
             Mapping
           </MDButton>
         </MDBox>
-
         <MDBox ml="10px" display="flex" justifyContent="space-between" alignItems="center" sx={{ flexWrap: "wrap" }}>
-          {/* Job Role Dropdown */}
           <FormControl sx={{ minWidth: 200, mb: 2, ml: 5 }}>
             <InputLabel>Job Role</InputLabel>
             <Select
@@ -190,11 +188,8 @@ const JobRoleMapping = () => {
             </Select>
           </FormControl>
         </MDBox>
-
-        {/* Drag and Drop Context */}
         <DragDropContext onDragEnd={handleDragEnd}>
           <MDBox display="flex" justifyContent="center" alignItems="center">
-            {/* To Do Column */}
             <Droppable droppableId="toDo">
               {(provided) => (
                 <Card sx={{ width: "43%", ml: 5, p: 2, mb: 2, borderRadius: 5, boxShadow: 5 }} ref={provided.innerRef} {...provided.droppableProps}>
@@ -219,13 +214,9 @@ const JobRoleMapping = () => {
                 </Card>
               )}
             </Droppable>
-
-            {/* Arrow Icon Between Cards */}
             <IconButton sx={{ mx: 2, fontSize: "6rem" }}>
               <ArrowForwardIcon sx={{ fontSize: "inherit" }} />
             </IconButton>
-
-            {/* In Progress Column */}
             <Droppable droppableId="inProgress">
               {(provided) => (
                 <Card sx={{ width: "43%", mr: 5, p: 2, mb: 2, borderRadius: 5, boxShadow: 5 }} ref={provided.innerRef} {...provided.droppableProps}>
@@ -256,5 +247,4 @@ const JobRoleMapping = () => {
     </MDBox>
   );
 };
-
 export default JobRoleMapping;

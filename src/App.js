@@ -101,6 +101,8 @@ import JobroleListing from "dmscomponent/job-listing/index.js";
 import EditJobRole from "dmscomponent/job-listing/edit-jobrole/index.js";
 import JobRoleMapping from "dmscomponent/jobrole-mapping/index.js";
 import ExamModule from "dmscomponent/exam-module/index.js";
+import MultiChoiceQuesionsSection from "dmscomponent/mcq-module/index.js";
+import MaterialListing from "dmscomponent/materials-listing/index.jsx";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -336,6 +338,8 @@ export default function App() {
       <Route path="/training-mapping" element={<TrainingMapping />} />
       <Route path="/jobrole-mapping" element={<JobRoleMapping/>}/>
       <Route path="/exam-module" element={<ExamModule/>}/>
+      <Route path="/mcq-module" element={<MultiChoiceQuesionsSection/>}/>
+      <Route path="/training-material/:trainingNumber" element={<MaterialListing/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   </div>
