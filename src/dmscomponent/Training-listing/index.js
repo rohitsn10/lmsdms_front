@@ -12,13 +12,14 @@ import moment from "moment";
 import { useFetchTrainingsQuery } from "apilms/trainingApi"; // Update this path as needed
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
+import { Button } from "@mui/material";
 const TrainingListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   // Fetch training data using the API query hook
   const { data, error, isLoading, refetch } = useFetchTrainingsQuery();
-
+  console.log(data)
   useEffect(() => {
     refetch();
   }, [location.key]);
@@ -69,6 +70,7 @@ const TrainingListing = () => {
       documentView: item.training_document,
     }));
 
+    
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "created_by_name", headerName: "Created By", flex: 1, headerAlign: "center" },
@@ -107,6 +109,38 @@ const TrainingListing = () => {
       ),
       sortable: false,
       filterable: false,
+    },
+    {
+      field:"material",
+      headerName:"Material",
+      flex:0.8,
+      headerAlign:"center",
+      renderCell:(params)=>{
+        return(
+          <MDBox display="flex" justifyContent="center">
+            <Button
+            variant="contained"
+            sx={{
+              backgroundColor: '#ff3f3f',
+              borderRadius: '20px',
+              color: 'white !important',
+              padding: '2px 16px',
+              fontSize: '12px',
+              minHeight: 'unset',
+              height: '32px', 
+              textTransform: 'none',
+              "&:hover":{
+                backgroundColor: 'red',
+                color:'white'
+              }
+            }}
+            onClick={() => navigate(`/training-material/${params.row.training_number}`)} // Navigate to material path with training_id
+          >
+            Material
+          </Button>
+          </MDBox>
+        )
+      }
     },
     {
       field: "question",
