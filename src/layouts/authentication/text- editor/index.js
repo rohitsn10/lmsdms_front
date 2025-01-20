@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import ImageResize from "quill-image-resize-module-react";
@@ -35,11 +35,12 @@ import { toast, ToastContainer } from "react-toastify";
 import RemarkDialog from "./remark";
 import SelectUserDialog from "./user-select";
 import { Button, AppBar, Toolbar, Typography, CircularProgress } from "@mui/material";
-
+// Import AuthContext
+import { AuthContext } from "context/auth-context";
 const DocumentView = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
-  const [setError] = useState(null);
+  const [Error1,setError] = useState(null);
   const [docEditorLoaded, setDocEditorLoaded] = useState(false);
   const [editorConfig, setEditorConfig] = useState(null);
   const { data: templateData, isError, error: apiError } = useGetTemplateQuery(id);
@@ -83,12 +84,15 @@ const DocumentView = () => {
   const [approver, setApprover] = useState("");
   const [reviewer, setReviewer] = useState([]);
   const [docAdmin, setDocAdmin] = useState("");
-
+// Accessing Context for UserData.
+  const {user,setValue}=useContext(AuthContext)
+  console.log("User Data",user)
   console.log("-+-+-+-+-+-+-+-+-+-+-++--++--+", docAdmin);
   // Extract userGroupIds directly from documentsData
   const userGroupIds = documentsData?.userGroupIds || [];
   console.log("Extracted User Group IDs:", userGroupIds);
-
+  console.log(data)
+  // setDocID(data?.id)
   // Visibility function using extracted userGroupIds
   const isButtonVisible = (requiredGroupIds) => {
     console.log(
@@ -107,14 +111,14 @@ const DocumentView = () => {
       setError(apiError?.message || "Failed to fetch template data");
       setLoading(false);
       return;
-    }
+    } 
     console.log("Template Data:", templateData);
     console.log("Template URL:", templateData?.template_url);
 
     if (templateData?.template_url) {
       const fetchEditorConfig = async () => {
         try {
-          const response = await fetch("http://127.0.0.1:8000/dms_module/get_editor_config", {
+          const response = await fetch(`http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -161,7 +165,9 @@ const DocumentView = () => {
               callbackUrl: editorConfig.callbackUrl, // Save callback URL
               user: {
                 id: "1",
-                name: "Rohit Sharma",
+                // name: "Rohit Sharma",
+                name: `${user?.first_name}`,
+
               },
               watermark: {
                 text: "Confidential", // The text of the watermark
