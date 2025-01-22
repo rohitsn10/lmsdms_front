@@ -8,52 +8,53 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
+import { useGetClassroomsQuery } from "apilms/classRoomApi"; // Import your API hook
 import moment from "moment"; // For date formatting
+import { CircularProgress } from "@mui/material";
+import { toast } from "react-toastify";
 
 const ClassroomListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // Static classroom data (this would be your mock data)
-  const classrooms = [
-    {
-      id: 1,
-      class_name: "Math 101",
-      start_datetime: "2025-01-22T09:00:00Z",
-      class_description: "Introduction to Algebra",
-    },
-    {
-      id: 2,
-      class_name: "History 202",
-      start_datetime: "2025-01-22T10:00:00Z",
-      class_description: "World History Overview",
-    },
-    {
-      id: 3,
-      class_name: "Physics 303",
-      start_datetime: "2025-01-22T11:00:00Z",
-      class_description: "Fundamentals of Mechanics",
-    },
-    // Add more classrooms as needed
-  ];
+  // Fetch classrooms using the query hook
+  const { data, isLoading, isError, error } = useGetClassroomsQuery();
 
+  // Handle search input change
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
+  // Handle classroom edit button click
   const handleEditClassroom = (classroom) => {
     navigate("/edit-classroom", { state: { classroom } });
   };
 
+  // Handle session button click
   const handleSession = () => {
     navigate("/session-list");
   };
+
+  // Handle loading and error states
+  if (isLoading) {
+    return (
+      <MDBox sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <CircularProgress size={50} />
+      </MDBox>
+    );
+  }
+
+  if (isError) {
+    toast.error(`Error: ${error?.message}`);
+    return <MDTypography color="error.main">Failed to load classroom data.</MDTypography>;
+  }
+
   // Filter classroom data based on search term
-  const filteredData = classrooms
+  const filteredData = data?.data
     .filter(
       (classroom) =>
-        classroom.class_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        classroom.class_description.toLowerCase().includes(searchTerm.toLowerCase())
+        classroom.classroom_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        classroom.description.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .map((classroom, index) => ({
       ...classroom,
@@ -61,9 +62,10 @@ const ClassroomListing = () => {
       start_date: moment(classroom.start_datetime).format("DD/MM/YY HH:mm"), // Use moment for formatting
     }));
 
+  // Define the columns for the DataGrid
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-    { field: "class_name", headerName: "Class Name", flex: 1, headerAlign: "center" },
+    { field: "classroom_name", headerName: "Class Name", flex: 1, headerAlign: "center" },
     { field: "start_date", headerName: "Start Date & Time", flex: 1, headerAlign: "center" },
     {
       field: "session",
@@ -116,7 +118,7 @@ const ClassroomListing = () => {
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>
             <DataGrid
-              rows={filteredData}
+              rows={filteredData || []} // Use filteredData if available
               columns={columns}
               pageSize={5}
               rowsPerPageOptions={[5, 10, 20]}

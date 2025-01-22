@@ -26,7 +26,7 @@ const SessionListing = () => {
   const sessions = [
     {
       id: 1,
-      session_name: "React Basics",
+      session_name: "React Basics", 
       venue: "Room A",
       date_time: "2025-02-01T09:00:00Z",
       status: "Scheduled",

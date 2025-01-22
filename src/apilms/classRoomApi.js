@@ -41,12 +41,29 @@ export const classRoomApi = createApi({
         method: 'PUT',
         body: { classroom_name, is_assesment, description, upload_doc, status },
       }),
-      transformResponse: (response) => response, // Handle raw response
+      transformResponse: (response) => response, 
+    }),
+    createSession: builder.mutation({
+      query: (sessionData) => ({
+        url: 'lms_module/create_session',
+        method: 'POST',
+        body: sessionData,
+      }),
+      transformResponse: (response) => response,
+    }),
+    getSessions: builder.query({
+      query: (classroomId) => ({
+        url: `lms_module/create_session?classroom_id=${classroomId}`,
+        method: 'GET',
+      }),
+      transformResponse: (response) => response,
     }),
   }),
 });
 export const { 
-  useCreateClassroomMutation,     // Hook for creating a classroom
-  useGetClassroomsQuery,          // Hook for retrieving classrooms
-  useUpdateClassroomMutation,     // Hook for updating a classroom
+  useCreateClassroomMutation,     
+  useGetClassroomsQuery,          
+  useUpdateClassroomMutation, 
+  useCreateSessionMutation,
+  useGetSessionsQuery,   
 } = classRoomApi;

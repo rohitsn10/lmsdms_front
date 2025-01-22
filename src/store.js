@@ -64,7 +64,7 @@ const store = configureStore({
     [jobroleApi.reducerPath]: jobroleApi.reducer,
     [trainingMappingApi.reducerPath]: trainingMappingApi.reducer,
     [archivedListApi.reducerPath]: archivedListApi.reducer,
-    [manageSection.reducerPath]:manageSection.reducer
+    [manageSection.reducerPath]:manageSection.reducer,
     [classRoomApi.reducerPath]: classRoomApi.reducer,
 
   },
@@ -99,8 +99,8 @@ const store = configureStore({
       jobroleApi.middleware,
       trainingMappingApi.middleware,
       archivedListApi.middleware,
-      manageSection.middleware
-      classRoomApi.middleware
+      manageSection.middleware,
+      classRoomApi.middleware,
     ),
 });
 
