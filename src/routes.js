@@ -353,6 +353,14 @@ export const LmsRoutes=[
     route: "/jobrole-mapping",
     component:<JobRoleMapping/>
   },
+  {
+    type: "collapse",
+    name: "Class Room",
+    key: "class-room",
+    icon: <DisplaySettingsRoundedIcon />,
+    route: "/class-room",
+    component:<ClassroomListing/>
+  },
 ]
 export const DmsRoutes=[
   {
