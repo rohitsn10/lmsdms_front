@@ -78,7 +78,7 @@ function AddQuestion() {
 
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
-    
+  
     if (!password) {
       toast.error("E-Signature is required to proceed.");
       return;
@@ -92,7 +92,28 @@ function AddQuestion() {
     formData.append("status", status);
     formData.append("createdAt", createdAt);
     formData.append("createdBy", createdBy);
-    formData.append("correct_answer", JSON.stringify(answers)); // Convert answers to JSON string
+  
+    let options = null;
+    let correct_answer = null;
+  
+    if (questionType === "MCQ") {
+      // For MCQ, pass the options and correct_answer
+      options = answers.map((answer) => answer.text); // Only texts of the answers
+      correct_answer = answers.filter((answer) => answer.isCorrect); // The correct answer(s)
+    } else if (questionType === "True/False") {
+      // For True/False, pass null for options and the correct answer
+      options = null;
+      correct_answer = JSON.stringify([{ text: answers[0]?.text, isCorrect: true }]);
+    } else if (questionType === "Fill in the blank") {
+      // For Fill in the blank, pass null for options and correct_answer
+      options = null;
+      correct_answer = JSON.stringify([{ text: answers[0]?.text, isCorrect: true }]);
+    }
+  
+    // Append the options and correct_answer
+    formData.append("options", options ? JSON.stringify(options) : null);
+    formData.append("correct_answer", correct_answer);
+  
     if (mediaFile) {
       formData.append("mediaFile", mediaFile); // Append media file if available
     }
@@ -265,7 +286,7 @@ function AddQuestion() {
                 </RadioGroup>
               )}
 
-              {questionType !== "True/False" && (
+              {questionType !== "True/False" && questionType !== "Fill in the blank" && (
                 <MDButton variant="outlined" color="success" onClick={handleAddAnswer}>
                   Add Answer
                 </MDButton>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -8,70 +8,86 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-import { useGetAreaQuery } from "apilms/AreaApi";  // Import the correct hook
+import moment from "moment"; // For date formatting
 
-import moment from "moment"; // To format the date
-
-const AreaListing = () => {
+const ClassroomListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // Fetching area data
-  const { data: response, isLoading, isError, refetch } = useGetAreaQuery();
-
-  useEffect(() => {
-    refetch();
-  }, []);
-  const areas = response?.data || [];
+  // Static classroom data (this would be your mock data)
+  const classrooms = [
+    {
+      id: 1,
+      class_name: "Math 101",
+      start_datetime: "2025-01-22T09:00:00Z",
+      class_description: "Introduction to Algebra",
+    },
+    {
+      id: 2,
+      class_name: "History 202",
+      start_datetime: "2025-01-22T10:00:00Z",
+      class_description: "World History Overview",
+    },
+    {
+      id: 3,
+      class_name: "Physics 303",
+      start_datetime: "2025-01-22T11:00:00Z",
+      class_description: "Fundamentals of Mechanics",
+    },
+    // Add more classrooms as needed
+  ];
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleEditArea = (area) => {
-    navigate("/edit-area", { state: { area } });
+  const handleEditClassroom = (classroom) => {
+    navigate("/edit-classroom", { state: { classroom } });
   };
 
-  // Filter the area data based on search term
-  const filteredData = areas
+  const handleSession = () => {
+    navigate("/session-list");
+  };
+  // Filter classroom data based on search term
+  const filteredData = classrooms
     .filter(
-      (area) =>
-        area.area_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        area.area_description.toLowerCase().includes(searchTerm.toLowerCase())
+      (classroom) =>
+        classroom.class_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        classroom.class_description.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    .map((area, index) => ({
-      ...area,
+    .map((classroom, index) => ({
+      ...classroom,
       serial_number: index + 1,
-      date: moment(area.area_created_at).format("DD/MM/YY"),  // Use moment for formatting
+      start_date: moment(classroom.start_datetime).format("DD/MM/YY HH:mm"), // Use moment for formatting
     }));
 
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-    { field: "area_name", headerName: "Area Name", flex: 1, headerAlign: "center" },
-    { field: "department", headerName: "Department", flex: 1, headerAlign: "center" },
-    { field: "area_description", headerName: "Area Description", flex: 1.5, headerAlign: "center" },
-    { field: "date", headerName: "Date", flex: 1, headerAlign: "center" },
+    { field: "class_name", headerName: "Class Name", flex: 1, headerAlign: "center" },
+    { field: "start_date", headerName: "Start Date & Time", flex: 1, headerAlign: "center" },
+    {
+      field: "session",
+      headerName: "Session",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <MDButton variant="outlined" color="primary" onClick={handleSession}>
+          Start Session
+        </MDButton>
+      ),
+    },
     {
       field: "action",
       headerName: "Action",
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => handleEditArea(params.row)}>
+        <IconButton color="primary" onClick={() => handleEditClassroom(params.row)}>
           <EditIcon />
         </IconButton>
       ),
     },
   ];
-
-  // Handle loading and error states
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
-    return <div>Error loading areas.</div>;
-  }
 
   return (
     <MDBox p={3}>
@@ -86,15 +102,15 @@ const AreaListing = () => {
             onChange={handleSearch}
           />
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
-            Area Listing
+            Class Room Listing
           </MDTypography>
           <MDButton
             variant="contained"
             color="primary"
-            onClick={() => navigate("/add-area")}
+            onClick={() => navigate("/classroom-training")}
             sx={{ ml: 2 }}
           >
-            Add Area
+            Add Classroom
           </MDButton>
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
@@ -126,4 +142,4 @@ const AreaListing = () => {
   );
 };
 
-export default AreaListing;
+export default ClassroomListing;

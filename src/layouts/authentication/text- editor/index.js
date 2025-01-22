@@ -676,47 +676,49 @@ const DocumentView = () => {
               </>
             )}
           {/* Condition 2: Show Review button when status is "3" */}
-          {document_current_status === "3" && isButtonVisible([3]) && (
-            <>
-              <MDButton
-                variant="gradient"
-                color="submit"
-                onClick={handleReview}
-                disabled={isLoading}
-              >
-                Review
-              </MDButton>
-              <MDButton
-                variant="gradient"
-                color="error" // Change color to indicate sending back
-                onClick={handleOpenDialog}
-                disabled={isLoading}
-              >
-                Send Back
-              </MDButton>
-            </>
-          )}
+          {(document_current_status === "3" || document_current_status === "2") &&
+            isButtonVisible([3]) && (
+              <>
+                <MDButton
+                  variant="gradient"
+                  color="submit"
+                  onClick={handleReview}
+                  disabled={isLoading}
+                >
+                  Review
+                </MDButton>
+                <MDButton
+                  variant="gradient"
+                  color="error" // Change color to indicate sending back
+                  onClick={handleOpenDialog}
+                  disabled={isLoading}
+                >
+                  Send Back
+                </MDButton>
+              </>
+            )}
           {/* Condition 3: Show Approve button when status is "4" */}
-          {document_current_status === "4" && isButtonVisible([4]) && (
-            <>
-              <MDButton
-                variant="gradient"
-                color="submit"
-                onClick={handleApprove}
-                disabled={isLoading}
-              >
-                Approve
-              </MDButton>
-              <MDButton
-                variant="gradient"
-                onClick={handleOpenDialog}
-                color="error"
-                disabled={isLoading}
-              >
-                Send Back
-              </MDButton>
-            </>
-          )}
+          {(document_current_status === "4" || document_current_status === "2") &&
+            isButtonVisible([4]) && (
+              <>
+                <MDButton
+                  variant="gradient"
+                  color="submit"
+                  onClick={handleApprove}
+                  disabled={isLoading}
+                >
+                  Approve
+                </MDButton>
+                <MDButton
+                  variant="gradient"
+                  onClick={handleOpenDialog}
+                  color="error"
+                  disabled={isLoading}
+                >
+                  Send Back
+                </MDButton>
+              </>
+            )}
           {/* Condition 4 */}
           {document_current_status === "5" && isButtonVisible([5]) && (
             <>

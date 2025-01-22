@@ -24,8 +24,6 @@ function AddArea() {
   const navigate = useNavigate();
   const { data: departments, isLoading, isError } = useFetchDepartmentsQuery();
   const [createArea, { isLoading: isCreating }] = useCreateGetAreaMutation();
-
-
   const validateInputs = () => {
     const newErrors = {};
     if (!areaName.trim()) newErrors.areaName = "Area Name is required.";
@@ -33,35 +31,29 @@ function AddArea() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
     setOpenSignatureDialog(true);
   };
-
   const handleClear = () => {
     setAreaName("");
     setDepartmentName("");
     setDescription("");
     setErrors({});
   };
-
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
     if (!password) {
       toast.error("E-Signature is required to proceed.");
       return;
     }
-  
     try {
       await createArea({
         area_name: areaName.trim(),
         department_id: departmentName,
         area_description: description.trim(),
       }).unwrap();
-  
       toast.success("Area added successfully!");
       setTimeout(() => {
         navigate("/area-listing");
@@ -71,15 +63,11 @@ function AddArea() {
       toast.error("Failed to add area. Please try again.");
     }
   };
-  
-
   const handleDepartmentChange = (event) => {
     setDepartmentName(event.target.value);
   };
-
   if (isLoading) return <div>Loading departments...</div>;
   if (isError) return <div>Error fetching departments</div>;
-
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto" , mt:5 , mb:5}}>
