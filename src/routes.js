@@ -323,6 +323,14 @@ export const LmsRoutes=[
   },
   {
     type: "collapse",
+    name: "Class Room",
+    key: "class-room",
+    icon: <DisplaySettingsRoundedIcon />,
+    route: "/class-room",
+    component:<ClassroomListing/>
+  },
+  {
+    type: "collapse",
     name: "Job Role",
     key: "jobRole-listing",
     icon: <WorkTwoToneIcon />,

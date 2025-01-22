@@ -18,25 +18,35 @@ function ClassroomTraining() {
   const [errors, setErrors] = useState({});
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const classroomTrainingData = {
-      classroom_name: classroomTitle,
-      is_assesment: trainingType,
-      description,
-      upload_doc: File,
-      status,
-    };
-    console.log("---------------------------- upload in API ",classroomTrainingData);
+  
+    // Create a FormData object to handle the multipart data
+    const formData = new FormData();
+    formData.append("classroom_name", classroomTitle);
+    formData.append("is_assesment", trainingType);
+    formData.append("description", description);
+    formData.append("status", status);
+  
+    // Append the file(s)
+    if (File) {
+      formData.append("files", File); // Ensure the key matches the backend's expected key
+    }
+  
     try {
-      const response = await createClassroom(classroomTrainingData).unwrap();
+      // Send the form data using the mutation hook
+      const response = await createClassroom(formData).unwrap();
       if (response.status) {
         console.log("Classroom training created successfully:", response);
       } else {
-        console.error("Failed to create classroom training");
+        console.error("Failed to create classroom training:", response.message);
       }
     } catch (err) {
       console.error("Error creating classroom:", err);
     }
   };
+  
+  
+  
+  
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
