@@ -54,6 +54,7 @@ import JobRoleMapping from "dmscomponent/jobrole-mapping";
 import DisplaySettingsRoundedIcon from '@mui/icons-material/DisplaySettingsRounded';
 import ForkRightTwoToneIcon from '@mui/icons-material/ForkRightTwoTone';
 import ArchivedListing from "layouts/authentication/archived-listing";
+import ClassroomListing from "dmscomponent/class-room";
 
 const routes = [
   {
@@ -254,6 +255,14 @@ const routes = [
     icon: <DisplaySettingsRoundedIcon />,
     route: "/jobrole-mapping",
     component:<JobRoleMapping/>
+  },
+  {
+    type: "collapse",
+    name: "Class Room",
+    key: "class-room",
+    icon: <DisplaySettingsRoundedIcon />,
+    route: "/class-room",
+    component:<ClassroomListing/>
   },
 ];
 export const LmsRoutes=[

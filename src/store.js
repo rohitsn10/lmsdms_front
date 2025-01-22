@@ -30,6 +30,7 @@ import { trainingMappingApi } from "apilms/trainigMappingApi";
 import { archivedListApi } from "api/auth/archivedListApi";
 import {manageSection} from 'apilms/manageSection';
 import userRoleSlice from './slices/userRoleSlice.js'
+import { classRoomApi } from "apilms/classRoomApi";
 
 const store = configureStore({
   reducer: {
@@ -64,6 +65,8 @@ const store = configureStore({
     [trainingMappingApi.reducerPath]: trainingMappingApi.reducer,
     [archivedListApi.reducerPath]: archivedListApi.reducer,
     [manageSection.reducerPath]:manageSection.reducer
+    [classRoomApi.reducerPath]: classRoomApi.reducer,
+
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -97,6 +100,7 @@ const store = configureStore({
       trainingMappingApi.middleware,
       archivedListApi.middleware,
       manageSection.middleware
+      classRoomApi.middleware
     ),
 });
 
