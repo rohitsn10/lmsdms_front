@@ -6,9 +6,11 @@ import MDButton from 'components/MDButton';
 import QuestionSection from './questionSection';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
-
+import {useCreateTrainingQuizQuery} from 'apilms/questionApi';
 function MultiChoiceQuesionsSection() {
 
+    const { data, isLoading, isError, refetch } = useCreateTrainingQuizQuery();
+    console.log("-+-+-+-+---++--+-+-+-+-++--data of quiz",data);
     const [counter,setCounter]=useState(0);
     const [questions,setQuestions]=useState([]);
     const [currentPage, setCurrentPage] = useState(1); 
@@ -20,7 +22,6 @@ function MultiChoiceQuesionsSection() {
     };
 
     let timerLimit=600;
-
     const dummyResponse={
         "status": true,
         "message": "Quiz created successfully",

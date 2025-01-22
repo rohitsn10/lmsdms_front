@@ -96,7 +96,7 @@ const PrinterListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Printer Listing
           </MDTypography>
-          {hasPermission(userPermissions, "printer", "isAdd") && (
+          {hasPermission(userPermissions, "printermachinesmodel", "isAdd") && (
             <MDButton variant="contained" color="primary" onClick={handleAddPrinter} sx={{ ml: 2 }}>
               Add Printer
             </MDButton>

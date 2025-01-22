@@ -76,7 +76,7 @@ import AddMaterial from "dmscomponent/add-material/index.js";
 import AddQuestion from "dmscomponent/question-listing/add-questions/index.js";
 import CreateQuiz from "dmscomponent/add-quiz/index.js";
 import TrainingMapping from "dmscomponent/training-mappping/index.js";
-import ClassroomTraining from "dmscomponent/classroom-training/index.js";
+import ClassroomTraining from "dmscomponent/class-room/classroom-training/index.js";
 import TrainingMatrix from "dmscomponent/training-matrix/index.js";
 import TrainingProgressReport from "dmscomponent/training-progressreport/index.js";
 import ExamResultsReport from "dmscomponent/exam-result/index.js";
@@ -103,7 +103,8 @@ import JobRoleMapping from "dmscomponent/jobrole-mapping/index.js";
 import ExamModule from "dmscomponent/exam-module/index.js";
 import MultiChoiceQuesionsSection from "dmscomponent/mcq-module/index.js";
 import MaterialListing from "dmscomponent/materials-listing/index.jsx";
-
+import ClassroomListing from "dmscomponent/class-room/index.js";
+import SessionListing from "dmscomponent/class-room/session-listing/index.js";
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -340,6 +341,8 @@ export default function App() {
       <Route path="/exam-module" element={<ExamModule/>}/>
       <Route path="/mcq-module" element={<MultiChoiceQuesionsSection/>}/>
       <Route path="/training-material/:trainingNumber" element={<MaterialListing/>}/>
+      <Route path="/class-room" element={<ClassroomListing/>}/>
+      <Route path="/session-list" element={<SessionListing/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   </div>

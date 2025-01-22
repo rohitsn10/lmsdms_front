@@ -28,6 +28,7 @@ import { timeLineApi } from "api/auth/timeLineApi";
 import { jobroleApi } from "apilms/jobRoleApi";
 import { trainingMappingApi } from "apilms/trainigMappingApi";
 import { archivedListApi } from "api/auth/archivedListApi";
+import { classRoomApi } from "apilms/classRoomApi";
 
 
 const store = configureStore({
@@ -60,8 +61,8 @@ const store = configureStore({
     [timeLineApi.reducerPath]: timeLineApi.reducer,
     [jobroleApi.reducerPath]: jobroleApi.reducer,
     [trainingMappingApi.reducerPath]: trainingMappingApi.reducer,
-
     [archivedListApi.reducerPath]: archivedListApi.reducer,
+    [classRoomApi.reducerPath]: classRoomApi.reducer,
 
   },
   middleware: (getDefaultMiddleware) =>
@@ -94,7 +95,8 @@ const store = configureStore({
       timeLineApi.middleware,
       jobroleApi.middleware,
       trainingMappingApi.middleware,
-      archivedListApi.middleware
+      archivedListApi.middleware,
+      classRoomApi.middleware
 
     ),
 });
