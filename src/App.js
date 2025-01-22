@@ -103,8 +103,13 @@ import JobRoleMapping from "dmscomponent/jobrole-mapping/index.js";
 import ExamModule from "dmscomponent/exam-module/index.js";
 import MultiChoiceQuesionsSection from "dmscomponent/mcq-module/index.js";
 import MaterialListing from "dmscomponent/materials-listing/index.jsx";
+
+import {LmsRoutes,DmsRoutes} from './routes.js';
+import { useSelector } from "react-redux";
+
 import ClassroomListing from "dmscomponent/class-room/index.js";
 import SessionListing from "dmscomponent/class-room/session-listing/index.js";
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -121,7 +126,17 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
   const isTextEditor = pathname === "/document-view";
+  const { is_dms_user, is_lms_user, is_active } = useSelector((state) => state.userRole);
+  const [routeItems,setRouteItems]=useState([...routes]);
+  useEffect(()=>{
 
+      if(is_active){
+        setRouteItems([...LmsRoutes])
+      }else{
+        setRouteItems([...DmsRoutes])
+      }
+    
+  },[is_active])
   useMemo(() => {
     const cacheRtl = createCache({
       key: "rtl",
@@ -217,7 +232,7 @@ export default function App() {
                 color={sidenavColor}
                 brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
                 brandName="Material"
-                routes={routes}
+                routes={routeItems}
                 onMouseEnter={handleOnMouseEnter}
                 onMouseLeave={handleOnMouseLeave}
                 style={{ position: "fixed", zIndex: 2 }}
@@ -243,7 +258,7 @@ export default function App() {
         color={sidenavColor}
         brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
         brandName="Bharat parenterals"
-        routes={routes}
+        routes={routeItems}
         // onMouseEnter={handleOnMouseEnter}
         // onMouseLeave={handleOnMouseLeave}
         style={{ position: "fixed", zIndex: 3 }}

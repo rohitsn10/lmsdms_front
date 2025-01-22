@@ -28,11 +28,13 @@ import { timeLineApi } from "api/auth/timeLineApi";
 import { jobroleApi } from "apilms/jobRoleApi";
 import { trainingMappingApi } from "apilms/trainigMappingApi";
 import { archivedListApi } from "api/auth/archivedListApi";
+import {manageSection} from 'apilms/manageSection';
+import userRoleSlice from './slices/userRoleSlice.js'
 import { classRoomApi } from "apilms/classRoomApi";
-
 
 const store = configureStore({
   reducer: {
+    userRole:userRoleSlice,
     [userApi.reducerPath]: userApi.reducer,
     [documentApi.reducerPath]: documentApi.reducer,
     [workflowApi.reducerPath]: workflowApi.reducer,
@@ -62,6 +64,7 @@ const store = configureStore({
     [jobroleApi.reducerPath]: jobroleApi.reducer,
     [trainingMappingApi.reducerPath]: trainingMappingApi.reducer,
     [archivedListApi.reducerPath]: archivedListApi.reducer,
+    [manageSection.reducerPath]:manageSection.reducer
     [classRoomApi.reducerPath]: classRoomApi.reducer,
 
   },
@@ -96,8 +99,8 @@ const store = configureStore({
       jobroleApi.middleware,
       trainingMappingApi.middleware,
       archivedListApi.middleware,
+      manageSection.middleware
       classRoomApi.middleware
-
     ),
 });
 

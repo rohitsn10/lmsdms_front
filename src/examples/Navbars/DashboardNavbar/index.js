@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Link as RouterLink } from "react-router-dom";
-
+import { styled } from '@mui/material/styles';
 // Material-UI core components
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -28,6 +28,10 @@ import {
   Select,
   CircularProgress,
   Alert,
+  FormControlLabel,
+  Switch,
+  Stack,
+  Typography,
 } from "@mui/material";
 
 // Custom components
@@ -50,15 +54,17 @@ import {
   setOpenConfigurator,
 } from "context";
 import { useAuth } from "hooks/use-auth";
-
+import { useSelector } from 'react-redux';
+import { useDispatch } from "react-redux";
 // Import the API hook for switching roles
 import { useRequestUserGroupListQuery, useUserSwitchRoleMutation } from "api/auth/switchRoleApi";
+import { setUserDetails } from "slices/userRoleSlice";
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
-  const [openMenu, setOpenMenu] = useState(false);
+  // const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
   const { user, role } = useAuth();
   const [roles, setRoles] = useState([]);
@@ -68,11 +74,18 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
-
   // Fetch roles using the API hook
+  const dispatch2 = useDispatch();
   const { data: rolesData, isLoading, isError } = useRequestUserGroupListQuery();
-
-  // Initialize the switch role mutation
+  const { is_dms_user, is_lms_user, is_active } = useSelector((state) => state.userRole);
+  const handleToggle = (event) => {
+    dispatch2(setUserDetails({
+      is_dms_user,
+      is_lms_user,
+      is_active: !is_active         
+    }));
+  };
+  // console.log(is_active)
   const [userSwitchRole, { isLoading: isSwitchLoading, isError: isSwitchError, data: switchData, error: switchError }] = useUserSwitchRoleMutation();
 
   useEffect(() => {
@@ -157,6 +170,53 @@ function DashboardNavbar({ absolute, light, isMini }) {
     },
   });
 
+  const AntSwitch = styled(Switch)(({ theme }) => ({
+    width: 28,
+    height: 16,
+    padding: 0,
+    display: 'flex',
+    '&:active': {
+      '& .MuiSwitch-thumb': {
+        width: 15,
+      },
+      '& .MuiSwitch-switchBase.Mui-checked': {
+        transform: 'translateX(9px)',
+      },
+    },
+    '& .MuiSwitch-switchBase': {
+      padding: 2,
+      '&.Mui-checked': {
+        transform: 'translateX(12px)',
+        color: '#fff',
+        '& + .MuiSwitch-track': {
+          opacity: 1,
+          backgroundColor: '#1890ff',
+          ...theme.applyStyles('dark', {
+            backgroundColor: '#177ddc',
+          }),
+        },
+      },
+    },
+    '& .MuiSwitch-thumb': {
+      boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      transition: theme.transitions.create(['width'], {
+        duration: 200,
+      }),
+    },
+    '& .MuiSwitch-track': {
+      borderRadius: 16 / 2,
+      opacity: 1,
+      backgroundColor: 'rgba(0,0,0,.25)',
+      boxSizing: 'border-box',
+      ...theme.applyStyles('dark', {
+        backgroundColor: 'rgba(255,255,255,.35)',
+      }),
+    },
+  }));
+  
   return (
     <AppBar
       position={absolute ? "absolute" : navbarType}
@@ -170,6 +230,30 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
         {!isMini && (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
+          {/* <FormControlLabel
+              control={
+                <Switch checked={false} onChange={()=>{}} name="antoine" />
+              }
+              label="Antoine Llorca"
+            /> */}
+            {/* <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+              <Typography>DMS</Typography>
+              <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} />
+              <Typography>LMS</Typography>
+            </Stack> */}
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+            <Typography sx={{
+            fontSize: '17px'
+          }}>DMS</Typography>
+              <AntSwitch 
+                checked={is_active}  // Switch position based on is_active
+                onChange={handleToggle}
+                inputProps={{ 'aria-label': 'ant design' }} 
+              />
+            <Typography sx={{
+            fontSize: '17px'
+          }}>LMS</Typography>
+            </Stack>
             <MDBox pr={1}>
               <Button
                 endIcon={<AccountCircleIcon />}
