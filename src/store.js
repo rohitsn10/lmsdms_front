@@ -28,10 +28,12 @@ import { timeLineApi } from "api/auth/timeLineApi";
 import { jobroleApi } from "apilms/jobRoleApi";
 import { trainingMappingApi } from "apilms/trainigMappingApi";
 import { archivedListApi } from "api/auth/archivedListApi";
-
+import {manageSection} from 'apilms/manageSection';
+import userRoleSlice from './slices/userRoleSlice.js'
 
 const store = configureStore({
   reducer: {
+    userRole:userRoleSlice,
     [userApi.reducerPath]: userApi.reducer,
     [documentApi.reducerPath]: documentApi.reducer,
     [workflowApi.reducerPath]: workflowApi.reducer,
@@ -60,9 +62,8 @@ const store = configureStore({
     [timeLineApi.reducerPath]: timeLineApi.reducer,
     [jobroleApi.reducerPath]: jobroleApi.reducer,
     [trainingMappingApi.reducerPath]: trainingMappingApi.reducer,
-
     [archivedListApi.reducerPath]: archivedListApi.reducer,
-
+    [manageSection.reducerPath]:manageSection.reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -94,8 +95,8 @@ const store = configureStore({
       timeLineApi.middleware,
       jobroleApi.middleware,
       trainingMappingApi.middleware,
-      archivedListApi.middleware
-
+      archivedListApi.middleware,
+      manageSection.middleware
     ),
 });
 
