@@ -105,7 +105,7 @@ function MultiChoiceQuestionsSection() {
               video_file_url: null,
           },
         ],
-    };
+    };  
     // const { data, isLoading, isError, refetch } = useCreateTrainingQuizQuery();
     const [counter, setCounter] = useState(0);
     const [questions, setQuestions] = useState([]);
@@ -121,7 +121,6 @@ function MultiChoiceQuestionsSection() {
     const navigate = useNavigate(); // React Router's navigation hook
 
     // Function to handle modal close and redirect
-
     // console.log(answers)
     useEffect(() => {
         console.log("API Response: ", data); // Log to check the API response

@@ -5,48 +5,77 @@ import MDTypography from "components/MDTypography";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import MDButton from "components/MDButton";
-import { useCreateClassroomMutation } from "apilms/classRoomApi"; // Import the hook
+import axios from "axios";
+import config from "constants/config";
 import MDInput from "components/MDInput";
+
 function ClassroomTraining() {
   const [trainingType, setTrainingType] = useState("");
   const [classroomTitle, setClassroomTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [uploadDocument, setUploadDocument] = useState(null);
   const [status, setStatus] = useState("Assigned");
-  const [createClassroom, { isLoading, isSuccess, isError, error }] = useCreateClassroomMutation();
   const [File, setFile] = useState(null);
-  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState(null);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Create a FormData object to handle the multipart data
+
+    const token = sessionStorage.getItem("token"); 
+    const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/create_classroom`; 
+    // Validate required fields
+    if (!classroomTitle || !trainingType || !description || !status) {
+      setIsError(true);
+      setError("All fields are required. Please complete the form.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("classroom_name", classroomTitle);
     formData.append("is_assesment", trainingType);
     formData.append("description", description);
     formData.append("status", status);
-  
-    // Append the file(s)
+
+
     if (File) {
-      formData.append("files", File); // Ensure the key matches the backend's expected key
+      formData.append("upload_doc", File);
+    } else {
+      setIsError(true);
+      setError("Please upload a file.");
+      return;
     }
-  
+
+    setIsLoading(true);
+    setIsError(false);
+    setIsSuccess(false);
+
     try {
-      // Send the form data using the mutation hook
-      const response = await createClassroom(formData).unwrap();
-      if (response.status) {
-        console.log("Classroom training created successfully:", response);
+      const response = await axios.post(apiUrl, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`, 
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data.status) {
+        setIsSuccess(true);
+        console.log("Classroom training created successfully:", response.data);
       } else {
-        console.error("Failed to create classroom training:", response.message);
+        setIsError(true);
+        setError(response.data.message || "Failed to create classroom training.");
       }
-    } catch (err) {
-      console.error("Error creating classroom:", err);
+    } catch (error) {
+      // Handle errors
+      setIsError(true);
+      setError(error.response?.data?.message || error.message || "An error occurred.");
+      console.error("Error creating classroom:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
-  
-  
-  
-  
+
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
@@ -89,13 +118,6 @@ function ClassroomTraining() {
                   fullWidth
                   value={trainingType}
                   onChange={(e) => setTrainingType(e.target.value)}
-                  sx={{
-                    height: "40px", // Set desired height here
-                    "& .MuiInputBase-root": {
-                      minHeight: "2.4265em",
-                      height: "100%", // Ensures the inner select aligns with the specified height
-                    },
-                  }}
                 >
                   <MenuItem value="With Assessment">With Assessment</MenuItem>
                   <MenuItem value="Without Assessment">Without Assessment</MenuItem>
@@ -111,7 +133,6 @@ function ClassroomTraining() {
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </Grid>
-
               <Grid item xs={12}>
                 <TextField
                   select
@@ -119,13 +140,6 @@ function ClassroomTraining() {
                   fullWidth
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  sx={{
-                    height: "40px", // Set desired height here
-                    "& .MuiInputBase-root": {
-                      minHeight: "2.4265em",
-                      height: "100%", // Ensures the inner select aligns with the specified height
-                    },
-                  }}
                 >
                   <MenuItem value="Assigned">Assigned</MenuItem>
                   <MenuItem value="Completed">Completed</MenuItem>
@@ -136,17 +150,11 @@ function ClassroomTraining() {
                 <MDBox mb={3}>
                   <MDInput
                     type="file"
-                    label={
-                      <>
-                        <span style={{ color: "red" }}>*</span>Upload file
-                      </>
-                    }
+                    label="Upload file"
                     fullWidth
                     onChange={handleFileChange}
                     InputLabelProps={{ shrink: true }}
                     inputProps={{ accept: ".pdf,.ppt,.doc,.docx" }}
-                    error={!!errors.templateFile}
-                    helperText={errors.templateFile}
                   />
                 </MDBox>
               </Grid>
@@ -166,7 +174,6 @@ function ClassroomTraining() {
           </MDBox>
         </MDBox>
 
-        {/* Show Success or Error message */}
         {isSuccess && (
           <MDTypography color="success.main" mt={2}>
             Classroom training created successfully!
@@ -174,7 +181,7 @@ function ClassroomTraining() {
         )}
         {isError && (
           <MDTypography color="error.main" mt={2}>
-            Error: {error?.message}
+            Error: {error}
           </MDTypography>
         )}
       </Card>
