@@ -28,6 +28,7 @@ import { timeLineApi } from "api/auth/timeLineApi";
 import { jobroleApi } from "apilms/jobRoleApi";
 import { trainingMappingApi } from "apilms/trainigMappingApi";
 import { archivedListApi } from "api/auth/archivedListApi";
+import {quizapi} from "apilms/quizapi";
 
 
 const store = configureStore({
@@ -60,6 +61,7 @@ const store = configureStore({
     [timeLineApi.reducerPath]: timeLineApi.reducer,
     [jobroleApi.reducerPath]: jobroleApi.reducer,
     [trainingMappingApi.reducerPath]: trainingMappingApi.reducer,
+    [quizapi.reducerPath]: quizapi.reducer,
 
     [archivedListApi.reducerPath]: archivedListApi.reducer,
 
@@ -94,7 +96,8 @@ const store = configureStore({
       timeLineApi.middleware,
       jobroleApi.middleware,
       trainingMappingApi.middleware,
-      archivedListApi.middleware
+      archivedListApi.middleware,
+      quizapi.middleware,
 
     ),
 });
