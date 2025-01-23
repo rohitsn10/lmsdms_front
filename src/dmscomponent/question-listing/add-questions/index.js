@@ -121,7 +121,6 @@ function AddQuestion() {
         return;
       }
     }
-  
     try {
       const response = await createTrainingQuestion(formData).unwrap();
       toast.success("Question created successfully!");
@@ -159,7 +158,6 @@ function AddQuestion() {
     const file = e.target.files[0];
     setMediaFile(file);
   };
-
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto", mt: 5, mb: 5 }}>
@@ -179,7 +177,6 @@ function AddQuestion() {
             Add Question
           </MDTypography>
         </MDBox>
-
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <MDBox mb={3}>
@@ -191,7 +188,6 @@ function AddQuestion() {
                 onClick={handleOpenQuestionDialog}
               />
             </MDBox>
-
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-question-type-label">Question Type</InputLabel>
@@ -213,12 +209,10 @@ function AddQuestion() {
                 </Select>
               </FormControl>
             </MDBox>
-
             <MDBox mb={3}>
               <MDTypography variant="h6" fontWeight="medium">
                 Add Answers
               </MDTypography>
-
               {questionType === "Fill in the blank" && (
                 <MDInput
                   type="text"
@@ -228,7 +222,6 @@ function AddQuestion() {
                   fullWidth
                 />
               )}
-
               {questionType === "MCQ" && (
                 <List>
                   {answers.map((answer, index) => (
@@ -261,7 +254,6 @@ function AddQuestion() {
                   ))}
                 </List>
               )}
-
               {questionType === "True/False" && (
                 <RadioGroup>
                   <FormControlLabel
@@ -280,14 +272,12 @@ function AddQuestion() {
                   />
                 </RadioGroup>
               )}
-
               {questionType !== "True/False" && questionType !== "Fill in the blank" && (
                 <MDButton variant="outlined" color="success" onClick={handleAddAnswer}>
                   Add Answer
                 </MDButton>
               )}
             </MDBox>
-
             <MDBox mb={3}>
               <MDInput
                 type="number"
@@ -297,7 +287,6 @@ function AddQuestion() {
                 onChange={(e) => setQuestionMarks(e.target.value)}
               />
             </MDBox>
-
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-language-label">Question Language</InputLabel>
@@ -319,7 +308,6 @@ function AddQuestion() {
                 </Select>
               </FormControl>
             </MDBox>
-
             <MDBox mb={3}>
               <FormControl component="fieldset" fullWidth>
                 <MDTypography variant="h6" fontWeight="medium">
@@ -331,13 +319,11 @@ function AddQuestion() {
                 </RadioGroup>
               </FormControl>
             </MDBox>
-
             <MDBox mb={3}>
               <MDTypography variant="h6">Upload Media (Image/Video/Audio)</MDTypography>
               <input type="file" accept="image/*,video/*,audio/*" onChange={handleMediaChange} />
               {mediaFile && <MDTypography variant="body2">{mediaFile.name}</MDTypography>}
             </MDBox>
-
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit">
                 Submit
@@ -346,14 +332,12 @@ function AddQuestion() {
           </MDBox>
         </MDBox>
       </Card>
-
       {/* E-Signature Dialog */}
       <ESignatureDialog
         open={openSignatureDialog}
         onClose={() => setOpenSignatureDialog(false)}
         onConfirm={handleSignatureComplete}
       />
-
       {/* Question Edit Dialog */}
       <TinyMCEEditorDialog
         open={openQuestionDialog}
@@ -362,7 +346,6 @@ function AddQuestion() {
         content={questionText}
         onSave={handleSaveQuestion}
       />
-
       {/* Answer Edit Dialog */}
       <TinyMCEEditorDialog
         open={openAnswerDialog}
@@ -371,10 +354,8 @@ function AddQuestion() {
         content={answers[currentAnswerIndex]?.text || ""}
         onSave={handleSaveAnswer}
       />
-
       <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }
-
 export default AddQuestion;
