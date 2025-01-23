@@ -1,4 +1,3 @@
-// CreateQuiz.js
 import React, { useState } from "react";
 import { Card, MenuItem, TextField, IconButton, List, ListItem } from "@mui/material";
 import MDBox from "components/MDBox";
@@ -8,6 +7,7 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useCreateTrainingQuizMutation } from "apilms/quizapi";
 
 function CreateQuiz() {
   const [quizName, setQuizName] = useState("");
@@ -25,6 +25,9 @@ function CreateQuiz() {
   const [createdAt, setCreatedAt] = useState(new Date().toISOString().slice(0, 10));
   const [createdBy, setCreatedBy] = useState(""); // Replace with actual user info if needed
 
+  // Initialize the mutation
+  const [createQuiz, { isLoading, isError, error, isSuccess }] = useCreateTrainingQuizMutation();
+
   const handleAddQuestion = (question) => {
     if (!selectedQuestions.includes(question)) {
       setSelectedQuestions([...selectedQuestions, question]);
@@ -35,21 +38,37 @@ function CreateQuiz() {
     setSelectedQuestions(selectedQuestions.filter((q) => q !== question));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const quizData = {
+      training_id: "training123", // Replace with actual training ID
       name: quizName,
-      passCriteria: passCriteria,
-      time: quizTime,
-      marks: totalMarks,
-      totalQuestions: totalQuestions,
-      type: quizType,
-      questions: selectedQuestions,
-      createdAt: createdAt,
-      createdBy: createdBy,
+      pass_criteria: passCriteria,
+      quiz_time: quizTime,
+      quiz_type: quizType,
+      total_marks: totalMarks,
+      marks_breakdown: selectedQuestions.map((q) => ({
+        question_id: q.id,
+        marks: q.marks,
+      })),
+      selected_questions: selectedQuestions.map((q) => q.id),
     };
-    console.log("Quiz Created:", quizData);
-    // Implement further submission logic here
+
+    try {
+      const response = await createQuiz(quizData).unwrap();
+      console.log("Quiz Created Successfully:", response);
+      alert("Quiz created successfully!");
+      // Reset form
+      setQuizName("");
+      setPassCriteria("");
+      setQuizTime("");
+      setTotalMarks("");
+      setTotalQuestions("");
+      setSelectedQuestions([]);
+    } catch (err) {
+      console.error("Error creating quiz:", err);
+      alert("Failed to create quiz. Please try again.");
+    }
   };
 
   return (
@@ -83,7 +102,6 @@ function CreateQuiz() {
                 onChange={(e) => setQuizName(e.target.value)}
               />
             </MDBox>
-
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -93,7 +111,6 @@ function CreateQuiz() {
                 onChange={(e) => setPassCriteria(e.target.value)}
               />
             </MDBox>
-
             <MDBox mb={3}>
               <MDInput
                 type="number"
@@ -103,7 +120,6 @@ function CreateQuiz() {
                 onChange={(e) => setQuizTime(e.target.value)}
               />
             </MDBox>
-
             <MDBox mb={3}>
               <MDInput
                 type="number"
@@ -113,7 +129,6 @@ function CreateQuiz() {
                 onChange={(e) => setTotalMarks(e.target.value)}
               />
             </MDBox>
-
             <MDBox mb={3}>
               <MDInput
                 type="number"
@@ -123,7 +138,6 @@ function CreateQuiz() {
                 onChange={(e) => setTotalQuestions(e.target.value)}
               />
             </MDBox>
-
             <MDBox mb={3}>
               <TextField
                 select
@@ -131,19 +145,11 @@ function CreateQuiz() {
                 fullWidth
                 value={quizType}
                 onChange={(e) => setQuizType(e.target.value)}
-                sx={{
-                  height: "40px", // Set desired height here
-                  "& .MuiInputBase-root": {
-                    minHeight: "2.4265em",
-                    height: "100%", // Ensures the inner select aligns with the specified height
-                  },
-                }}
               >
                 <MenuItem value="Auto">Auto</MenuItem>
                 <MenuItem value="Manual">Manual</MenuItem>
               </TextField>
             </MDBox>
-
             {quizType === "Manual" && (
               <MDBox mb={3}>
                 <MDTypography variant="h6" fontWeight="medium">
@@ -152,7 +158,9 @@ function CreateQuiz() {
                 <List>
                   {availableQuestions.map((question) => (
                     <ListItem key={question.id}>
-                      <MDTypography variant="body2">{question.text} (Marks: {question.marks})</MDTypography>
+                      <MDTypography variant="body2">
+                        {question.text} (Marks: {question.marks})
+                      </MDTypography>
                       <IconButton
                         edge="end"
                         aria-label="add"
@@ -169,7 +177,9 @@ function CreateQuiz() {
                 <List>
                   {selectedQuestions.map((question) => (
                     <ListItem key={question.id}>
-                      <MDTypography variant="body2">{question.text} (Marks: {question.marks})</MDTypography>
+                      <MDTypography variant="body2">
+                        {question.text} (Marks: {question.marks})
+                      </MDTypography>
                       <IconButton
                         edge="end"
                         aria-label="delete"
@@ -182,32 +192,13 @@ function CreateQuiz() {
                 </List>
               </MDBox>
             )}
-
-            <MDBox mb={3}>
-              <MDInput
-                type="date"
-                label="Created At"
-                fullWidth
-                value={createdAt}
-                onChange={(e) => setCreatedAt(e.target.value)}
-              />
-            </MDBox>
-
-            <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Created By"
-                fullWidth
-                value={createdBy}
-                onChange={(e) => setCreatedBy(e.target.value)}
-              />
-            </MDBox>
-
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit">
-                Create Quiz
+              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
+                {isLoading ? "Creating Quiz..." : "Create Quiz"}
               </MDButton>
             </MDBox>
+            {isError && <MDTypography color="error">Failed to create quiz: {error.data?.message}</MDTypography>}
+            {isSuccess && <MDTypography color="success">Quiz created successfully!</MDTypography>}
           </MDBox>
         </MDBox>
       </Card>

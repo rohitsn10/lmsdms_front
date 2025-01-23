@@ -75,6 +75,7 @@ import AddTraining from "dmscomponent/Training-listing/add-training/index.js";
 import AddMaterial from "dmscomponent/add-material/index.js";
 import AddQuestion from "dmscomponent/question-listing/add-questions/index.js";
 import CreateQuiz from "dmscomponent/add-quiz/index.js";
+import QuizListing from "dmscomponent/add-quiz/list.js";
 import TrainingMapping from "dmscomponent/training-mappping/index.js";
 import ClassroomTraining from "dmscomponent/class-room/classroom-training/index.js";
 import TrainingMatrix from "dmscomponent/training-matrix/index.js";
@@ -329,6 +330,7 @@ export default function App() {
       <Route path="/add-material" element={<AddMaterial />} />
       <Route path="/add-question" element={<AddQuestion />} />
       <Route path="/add-quiz" element={<CreateQuiz />} />
+      <Route path="/quiz-list" element={<QuizListing />} />
       <Route path="/classroom-training" element={<ClassroomTraining />} />
       <Route path="/training-matrix" element={<TrainingMatrix />} />
       <Route path="/exam-result" element={<ExamResultsReport />} />

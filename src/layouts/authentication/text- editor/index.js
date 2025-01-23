@@ -118,7 +118,8 @@ const DocumentView = () => {
     if (templateData?.template_url) {
       const fetchEditorConfig = async () => {
         try {
-          const response = await fetch(`http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`, {
+          // const response = await fetch(`http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`, {
+            const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

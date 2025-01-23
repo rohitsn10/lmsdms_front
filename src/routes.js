@@ -41,7 +41,7 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import TrainingTypeListing from "dmscomponent/trainingType-Listing";
 
 import InductionListing from "dmscomponent/induction-training/induction-listing";
-
+import QuizListing from "dmscomponent/add-quiz/list"
 import DevicesFoldTwoToneIcon from '@mui/icons-material/DevicesFoldTwoTone';
 import ModelTrainingTwoToneIcon from '@mui/icons-material/ModelTrainingTwoTone';
 import TrainingListing from "dmscomponent/Training-listing";
@@ -219,7 +219,6 @@ const routes = [
   },
   {
     type: "collapse",
-
     name: "Induction Set",
     key: "Induction-Listing",
     icon: <AccountTreeIcon />,
@@ -258,11 +257,12 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Class Room",
-    key: "class-room",
-    icon: <DisplaySettingsRoundedIcon />,
-    route: "/class-room",
-    component:<ClassroomListing/>
+    name: "Quiz Listinng",
+    key: "quiz-list",
+    icon: <ForkRightTwoToneIcon />,
+    route: "/quiz-list",
+    component:<QuizListing/>
+
   },
 ];
 export const LmsRoutes=[
