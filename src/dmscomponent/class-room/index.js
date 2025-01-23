@@ -31,8 +31,8 @@ const ClassroomListing = () => {
   };
 
   // Handle session button click
-  const handleSession = () => {
-    navigate("/session-list");
+  const handleSession = (classroom) => {
+    navigate("/session-list", { state: { classroom } });
   };
 
   // Handle loading and error states
@@ -59,7 +59,7 @@ const ClassroomListing = () => {
     .map((classroom, index) => ({
       ...classroom,
       serial_number: index + 1,
-      start_date: moment(classroom.start_datetime).format("DD/MM/YY HH:mm"), // Use moment for formatting
+      start_date: moment(classroom.created_at).format("DD/MM/YY HH:mm"), // Use moment for formatting
     }));
 
   // Define the columns for the DataGrid
@@ -73,7 +73,7 @@ const ClassroomListing = () => {
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => (
-        <MDButton variant="outlined" color="primary" onClick={handleSession}>
+        <MDButton variant="outlined" color="primary" onClick={() => handleSession(params.row)}>
           Start Session
         </MDButton>
       ),
@@ -90,6 +90,13 @@ const ClassroomListing = () => {
       ),
     },
   ];
+  const getRowId = (row) => {
+    if (row.classroom_name && row.created_at) {
+      return `${row.classroom_name}-${row.created_at}`;
+    } else {
+      return row.serial_number || Date.now(); 
+    }
+  };
 
   return (
     <MDBox p={3}>
@@ -123,6 +130,7 @@ const ClassroomListing = () => {
               pageSize={5}
               rowsPerPageOptions={[5, 10, 20]}
               disableSelectionOnClick
+              getRowId={getRowId} // Specify how to get the row's unique id
               sx={{
                 border: "1px solid #ddd",
                 borderRadius: "4px",

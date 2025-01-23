@@ -104,7 +104,8 @@ import JobRoleMapping from "dmscomponent/jobrole-mapping/index.js";
 import ExamModule from "dmscomponent/exam-module/index.js";
 import MultiChoiceQuesionsSection from "dmscomponent/mcq-module/index.js";
 import MaterialListing from "dmscomponent/materials-listing/index.jsx";
-
+import AddSession from "dmscomponent/class-room/session-listing/add-session/index.js";
+import EditSession from "dmscomponent/class-room/session-listing/edit-session/index.js";
 import {LmsRoutes,DmsRoutes} from './routes.js';
 import { useSelector } from "react-redux";
 
@@ -360,6 +361,9 @@ export default function App() {
       <Route path="/training-material/:trainingNumber" element={<MaterialListing/>}/>
       <Route path="/class-room" element={<ClassroomListing/>}/>
       <Route path="/session-list" element={<SessionListing/>}/>
+      <Route path="/add-session" element={<AddSession/>}/>
+      <Route path="/edit-session" element={<EditSession/>}/>
+
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   </div>

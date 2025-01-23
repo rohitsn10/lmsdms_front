@@ -321,14 +321,14 @@ export const LmsRoutes=[
     route: "/trainingListing",
     component: <TrainingListing />,
   },
-  {
-    type: "collapse",
-    name: "Class Room",
-    key: "class-room",
-    icon: <DisplaySettingsRoundedIcon />,
-    route: "/class-room",
-    component:<ClassroomListing/>
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Class Room",
+  //   key: "class-room",
+  //   icon: <DisplaySettingsRoundedIcon />,
+  //   route: "/class-room",
+  //   component:<ClassroomListing/>
+  // },
   {
     type: "collapse",
     name: "Job Role",

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useGetSessionsQuery, useMarkSessionCompletedMutation } from "apilms/classRoomApi"; // Import the hook
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
@@ -20,35 +21,14 @@ const SessionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [openAttendanceDialog, setOpenAttendanceDialog] = useState(false);
   const [attendanceData, setAttendanceData] = useState([]);
+  const [markSessionCompleted] = useMarkSessionCompletedMutation(); // Mutation hook
   const navigate = useNavigate();
+  const location = useLocation();
+  const classroom = location.state?.classroom;
+  const classroomId = classroom.classroom_id;
 
-  // Static session data
-  const sessions = [
-    {
-      id: 1,
-      session_name: "React Basics", 
-      venue: "Room A",
-      date_time: "2025-02-01T09:00:00Z",
-      status: "Scheduled",
-      attendees: [
-        { name: "John Doe", present: false },
-        { name: "Jane Smith", present: true },
-        { name: "Sam Wilson", present: false },
-      ],
-    },
-    {
-      id: 2,
-      session_name: "Advanced JavaScript",
-      venue: "Room B",
-      date_time: "2025-02-02T10:00:00Z",
-      status: "Scheduled",
-      attendees: [
-        { name: "Alice Cooper", present: true },
-        { name: "Bob Brown", present: true },
-      ],
-    },
-    // Add more sessions as needed
-  ];
+  // Fetch sessions data using the useGetSessionsQuery hook
+  const { data, isLoading, isError, error } = useGetSessionsQuery(classroomId);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -74,32 +54,66 @@ const SessionListing = () => {
     setOpenAttendanceDialog(false);
   };
 
+  const handleMarkCompleted = (sessionId) => {
+    markSessionCompleted(sessionId)
+      .unwrap()
+      .then((response) => {
+        console.log("Session marked as completed:", response);
+      })
+      .catch((err) => {
+        console.error("Failed to mark session as completed:", err);
+      });
+  };
+
   // Filter session data based on search term
-  const filteredData = sessions
-    .filter(
-      (session) =>
-        session.session_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        session.venue.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .map((session, index) => ({
-      ...session,
-      serial_number: index + 1,
-      start_date: moment(session.date_time).format("DD/MM/YY HH:mm"),
-    }));
+  const filteredData = data?.data
+    ? data.data
+        .filter(
+          (session) =>
+            session.session_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            session.venue.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .map((session, index) => ({
+          ...session,
+          serial_number: index + 1,
+          start_date: moment(session.start_date).format("DD/MM/YY HH:mm"),
+        }))
+    : [];
 
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "session_name", headerName: "Session Name", flex: 1, headerAlign: "center" },
     { field: "venue", headerName: "Venue", flex: 1, headerAlign: "center" },
     { field: "start_date", headerName: "Date & Time", flex: 1, headerAlign: "center" },
-    { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <MDButton
+          variant="outlined"
+          color={params.row.is_completed ? "success" : "error"}
+          onClick={() => {
+            if (!params.row.is_completed) handleMarkCompleted(params.row.id);
+          }}
+        >
+          {params.row.is_completed ? "Completed" : "Pending"}
+        </MDButton>
+      ),
+    },
     {
       field: "attendance",
       headerName: "Attendance",
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => (
-        <MDButton variant="outlined" color="primary" onClick={() => handleAttendanceClick(params.row)}>
+        <MDButton
+          variant="outlined"
+          color="primary"
+          onClick={() => handleAttendanceClick(params.row)}
+          disabled={!params.row.is_completed} // Disable if session is not completed
+        >
           View Attendance
         </MDButton>
       ),
@@ -116,6 +130,14 @@ const SessionListing = () => {
       ),
     },
   ];
+
+  if (isLoading) {
+    return <MDTypography variant="h5" align="center">Loading...</MDTypography>;
+  }
+
+  if (isError) {
+    return <MDTypography variant="h5" align="center">Error: {error.message}</MDTypography>;
+  }
 
   return (
     <MDBox p={3}>
@@ -135,7 +157,7 @@ const SessionListing = () => {
           <MDButton
             variant="contained"
             color="primary"
-            onClick={() => navigate("/add-session")}
+            onClick={() => navigate("/add-session", { state: { classroomId } })}
             sx={{ ml: 2 }}
           >
             Add Session

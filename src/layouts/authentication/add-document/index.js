@@ -106,7 +106,7 @@ function AddDocument() {
   };
   const handleRevisionMonthChange = (e) => {
     const monthsToAdd = parseInt(e.target.value, 10);
-  
+
     // Allow 0 or positive numbers, but display an error for negative numbers or invalid input
     if (isNaN(monthsToAdd) || monthsToAdd < 0) {
       setErrors((prevErrors) => ({
@@ -115,12 +115,12 @@ function AddDocument() {
       }));
       return;
     }
-  
+
     // Clear any previous error for revisionMonth
     setErrors((prevErrors) => ({ ...prevErrors, revisionMonth: undefined }));
-  
+
     const currentDate = new Date();
-  
+
     if (monthsToAdd === 0) {
       // If the input is 0, set the revisionTime to the current date (or you can choose to leave it empty)
       setRevisionTime(currentDate.toISOString().split("T")[0]);
@@ -129,11 +129,10 @@ function AddDocument() {
       currentDate.setMonth(currentDate.getMonth() + monthsToAdd);
       setRevisionTime(currentDate.toISOString().split("T")[0]);
     }
-  
+
     // Set the revisionMonth state to the user input (including 0)
     setRevisionMonth(monthsToAdd);
   };
-  
 
   const handleSubmit = (e) => {
     e.preventDefault();
