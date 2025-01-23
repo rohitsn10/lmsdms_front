@@ -153,7 +153,8 @@ const DocumentView = () => {
   useEffect(() => {
     if (docEditorLoaded && editorConfig) {
       const script = document.createElement("script");
-      script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
+      // script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
+      script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
       script.onload = () => {
         try {
           new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
