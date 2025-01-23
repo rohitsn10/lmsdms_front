@@ -1,169 +1,333 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import CounterIndicator from './counterIndicator';
-// import BasicLayout from 'layouts/authentication/components/BasicLayout';
-// import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import MDButton from 'components/MDButton';
 import QuestionSection from './questionSection';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 
-function MultiChoiceQuesionsSection() {
+import { useCreateTrainingQuizQuery } from 'apilms/questionApi';
+import { useNavigate } from 'react-router-dom';
 
-    const [counter,setCounter]=useState(0);
-    const [questions,setQuestions]=useState([]);
-    const [currentPage, setCurrentPage] = useState(1); 
+function MultiChoiceQuestionsSection() {
+    // Mock data for testing
+    const data = {
+        status: true,
+        message: "Training question list fetched successfully",
+        data: [
+            {
+                id: 15,
+                training: 3,
+                question_type: "MCQ",
+                question_text: "Where is Rahane from?",
+                options: "Mumbai,aficea,nigeria,Nepal,Sri Lanka,UK",
+                correct_answer: "Mumbai",
+                marks: 5,
+                status: true,
+                question_created_at: "2025-01-22T22:14:52.827899+05:30",
+                question_updated_at: "2025-01-22T22:14:52.827899+05:30",
+                created_by: 2,
+                updated_by: null,
+                image_file_url: null,
+                audio_file_url: null,
+                video_file_url: null,
+            },
+            {
+                id: 14,
+                training: 3,
+                question_type: "Fill in the blank",
+                question_text: "Xyz comes between what?",
+                options: "",
+                correct_answer: "mma",
+                marks: 5,
+                status: true,
+                question_created_at: "2025-01-22T22:12:43.882912+05:30",
+                question_updated_at: "2025-01-22T22:12:43.882912+05:30",
+                created_by: 2,
+                updated_by: null,
+                image_file_url: null,
+                audio_file_url: null,
+                video_file_url: null,
+            },
+            {
+                id: 13,
+                training: 3,
+                question_type: "True/False",
+                question_text: "Is Water wet?",
+                options: "True,False",
+                correct_answer: "True",
+                marks: 5,
+                status: true,
+                question_created_at: "2025-01-22T22:11:42.086805+05:30",
+                question_updated_at: "2025-01-22T22:11:42.086805+05:30",
+                created_by: 2,
+                updated_by: null,
+                image_file_url: null,
+                audio_file_url: null,
+                video_file_url: null,
+            },
+            {
+                id: 12,
+                training: 3,
+                question_type: "MCQ",
+                question_text: "Question&nbsp; 1",
+                options: "abc,def,ghi,uio",
+                correct_answer: "abc",
+                marks: 5,
+                status: true,
+                question_created_at: "2025-01-22T22:10:15.015243+05:30",
+                question_updated_at: "2025-01-22T22:10:15.015243+05:30",
+                created_by: 2,
+                updated_by: null,
+                image_file_url: null,
+                audio_file_url: null,
+                video_file_url: null,
+            },
+            {
+              id: 17,
+              training: 3,
+              question_type: "Fill in the blank",
+              question_text: "Xyz comes between what?",
+              options: "",
+              correct_answer: "mewto",
+              marks: 5,
+              status: true,
+              question_created_at: "2025-01-22T22:12:43.882912+05:30",
+              question_updated_at: "2025-01-22T22:12:43.882912+05:30",
+              created_by: 2,
+              updated_by: null,
+              image_file_url: null,
+              audio_file_url: null,
+              video_file_url: null,
+          },
+        ],
+    };
+    // const { data, isLoading, isError, refetch } = useCreateTrainingQuizQuery();
+    const [counter, setCounter] = useState(0);
+    const [questions, setQuestions] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
     const [answers, setAnswers] = useState({});
-    const [pageCount,setPageCount]=useState(1)
+    const [correctAnswers,setCorrectAnswers] = useState([]);
+    const [pageCount, setPageCount] = useState(1);
+    const [timerLimit, setTimerLimit] = useState(0);
+
+    // Modal Setup
+    const [openModal, setOpenModal] = useState(false);
+    const [resultMessage, setResultMessage] = useState('');
+    const navigate = useNavigate(); // React Router's navigation hook
+
+    // Function to handle modal close and redirect
+
+    // console.log(answers)
+    useEffect(() => {
+        console.log("API Response: ", data); // Log to check the API response
+        if (data && data.data) {
+            setQuestions(data?.data); // Set the questions array
+            setPageCount(data?.data?.length); // Set the total number of questions
+            setTimerLimit(89); // Set a default timer limit (e.g., 60 seconds)
+            // const quizAnswers= data?.data?.map((item=>item?.correct_answer))
+            // setCorrectAnswers(quizAnswers)
+            const initialAnswers = data?.data?.reduce((acc, item) => {
+              acc[item.id] = item.correct_answer || '';
+              return acc;
+          }, {});
+          setCorrectAnswers(initialAnswers)
+        } else {
+            console.log("No quiz data found.");
+        }
+    }, []);
+    // console.log(answers )
+    // console.log("Correct Answers",correctAnswers)
+    // console.log("Selected Answers",answers)
+
+    const formatTime = (seconds) => {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${minutes} minutes, ${secs} seconds`;
+  };
+
     const handlePageChange = (event, page) => {
         setCurrentPage(page);
-        console.log('Page changed to:', page); // You can handle your logic here
     };
 
-    let timerLimit=600;
+    const handleAnswerChange = (questionId, answer) => {
+        setAnswers((prevAnswers) => ({
+            ...prevAnswers,
+            [questionId]: answer,
+        }));
+    };
 
-    const dummyResponse={
-        "status": true,
-        "message": "Quiz created successfully",
-        "data": {
-          "id": 28,
-          "quiz_name": "test Quiz",
-          "pass_criteria": "20.00",
-          "quiz_time": 30,
-          "total_marks": 5,
-          "total_questions": 5,
-          "quiz_type": "auto",
-          "questions": [
-            {
-              "question_text": "What is the capital of France?",
-              "question_type": "mcq",
-              "options": [
-                {
-                  "text": "Paris",
-                  "is_correct": true
-                },
-                {
-                  "text": "London",
-                  "is_correct": false
-                },
-                {
-                  "text": "Rome",
-                  "is_correct": false
-                },
-                {
-                  "text": "Berlin",
-                  "is_correct": false
-                }
-              ]
-            },
-            {
-              "question_text": "True or False: The Earth is flat.",
-              "question_type": "true_false",
-              "options": [
-                {
-                  "text": "True",
-                  "is_correct": false
-                },
-                {
-                  "text": "False",
-                  "is_correct": true
-                }
-              ]
-            },
-            {
-                "question_text": "What is the capital of France?",
-                "question_type": "mcq",
-                "options": [
-                  {
-                    "text": "Paris",
-                    "is_correct": true
-                  },
-                  {
-                    "text": "London",
-                    "is_correct": false
-                  },
-                  {
-                    "text": "Rome",
-                    "is_correct": false
-                  },
-                  {
-                    "text": "Berlin",
-                    "is_correct": false
-                  }
-                ]
-              },
-            // {
-            //   "question_text": "Upload an image or video that explains Newton's laws.",
-            //   "question_type": "image_video",
-            //   "media_url": "https://example.com/media/file.mp4"
-            // }
-          ],
-          "created_by": 2,
-          "updated_by": null,
-          "created_at": "2025-01-17T16:09:58.825168+05:30",
-          "updated_at": "2025-01-17T16:09:58.864874+05:30",
-          "status": true
+    // const handleSubmit = () => {
+    //     console.log("Submit answers", answers);
+    // };
+
+    const handleSubmit1 = () => {
+      console.log("Submit answers", answers);
+      console.log("Correct answers", correctAnswers);
+  
+      // Initialize variables for total marks and marks obtained
+      let totalMarks = 0;
+      let marksObtained = 0;
+  
+      // Iterate through the `questions` array
+      questions.forEach((question) => {
+          totalMarks += question.marks; // Accumulate total marks
+          const userAnswer = answers[question.id]; // User's answer for the question
+          const correctAnswer = correctAnswers[question.id]; // Correct answer for the question
+  
+          if (userAnswer === correctAnswer) {
+              marksObtained += question.marks; // Add marks if the answer is correct
+          }
+      });
+
+    //   const handleSubmit = () => {
+    // console.log("Submit answers", answers);
+    // console.log("Correct answers", correctAnswers);
+
+    // let totalMarks = 0;
+    // let marksObtained = 0;
+
+    // questions.forEach((question) => {
+    //     totalMarks += question.marks;
+    //     const userAnswer = answers[question.id];
+    //     const correctAnswer = correctAnswers[question.id];
+
+    //     if (userAnswer === correctAnswer) {
+    //         marksObtained += question.marks;
+    //     }
+    // });
+
+    // const timeTaken = counter;
+    // const message = `You scored ${marksObtained} out of ${totalMarks} marks.\nTime taken: ${formatTime(timeTaken)}`;
+    // setResultMessage(message);
+    // setOpenModal(true);
+    //   };
+      
+
+    
+  
+      // Log the results
+      // console.log("Total Marks:", totalMarks);
+      // console.log("Marks Obtained:", marksObtained);
+      // const timeTaken = counter;
+      // alert(`You scored ${marksObtained} out of ${totalMarks} marks
+      //   You scored ${marksObtained} out of ${totalMarks} marks.\nTime taken: ${formatTime(timeTaken)}
+      //   `);
+      // alert(`You scored ${marksObtained} out of ${totalMarks} marks.\nTime taken: ${formatTime(timeTaken)}`);
+  };
+  const handleSubmit = () => {
+    console.log("Submit answers", answers);
+    console.log("Correct answers", correctAnswers);
+
+    let totalMarks = 0;
+    let marksObtained = 0;
+
+    questions.forEach((question) => {
+        totalMarks += question.marks;
+        // const userAnswer = answers[question.id];
+        // const correctAnswer = correctAnswers[question.id];
+
+        const userAnswer = (answers[question.id] || '').toLowerCase();
+        const correctAnswer = (correctAnswers[question.id] || '').toLowerCase();
+
+
+        if (userAnswer === correctAnswer) {
+            marksObtained += question.marks;
         }
-    }
-      useEffect(()=>{
-        setQuestions(dummyResponse?.data?.questions)
-        setPageCount(dummyResponse?.data?.questions?.length)
-        console.log(pageCount)
-      },[])
+    });
 
-    // Styles 
-    const mcqSection={
-        width:'900px',
-        marginLeft:"400px",
-        marginTop:"100px",
-        backgroundColor:"white",
-        padding:'20px',
-        borderRadius:'10px',
-        display:'flex',
-        flexDirection:'column',
-        gap:'10px'
-    }
-    const topSection={
-        display:'flex',
-        flexDirection:'row',
-        justifyContent:'space-between',
-        itemCenter:'center'
-    }
-    const paginationStyles={
-        display:'flex',
-        justifyContent:'center',
-        itemCenter:'center',
-        marginTop:'20px',
-        marginBottom:'20px'
-    }
-    // Styles End
-  return (
-            <div style={mcqSection}>
-                <div style={topSection}>
-                    <CounterIndicator counter={counter} setCounter={setCounter} timerLimit={timerLimit}/>
-                    <MDButton
-                        variant="contained"
-                        color="primary"
-                        onClick={() => {}}
-                        sx={{ height:'30px' }}
-                    >
-                        Submit
-                    </MDButton>
-                </div>
-                <div>       
-                    <QuestionSection 
-                    question={questions[currentPage - 1]} 
-                    questionIndex={currentPage} 
-                    pageCount={pageCount}
-                    />
-                </div>
-                <div style={paginationStyles}>
-                    <Stack        
-                    spacing={2}>
-                        <Pagination onChange={handlePageChange} count={pageCount} page={currentPage} variant="outlined" size="large" color="primary" shape="rounded" />
-                    </Stack>
-                </div>
+    const timeTaken = counter;
+    const message = `You scored ${marksObtained} out of ${totalMarks} marks.\n Time taken: ${formatTime(timeTaken)}`;
+    setResultMessage(message);
+    setOpenModal(true);
+};
+const handleModalClose = () => {
+  setOpenModal(false);
+  // setAnswers({});
+  // setCounter(0); // Reset timer
+  navigate('/trainingListing'); // Redirect to /questions
+};
+    // Styles
+    const mcqSection = {
+        width: '900px',
+        marginLeft: '400px',
+        marginTop: '100px',
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '10px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+    };
+
+    const topSection = {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    };
+
+    const paginationStyles = {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '20px',
+        marginBottom: '20px',
+    };
+
+    return (
+        <div style={mcqSection}>
+            <div style={topSection}>
+                <CounterIndicator counter={counter} setCounter={setCounter} timerLimit={timerLimit} />
+                <MDButton
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSubmit}
+                    sx={{ height: '30px' }}
+                >
+                    Submit
+                </MDButton>
             </div>
-  )
+            <div>
+                <QuestionSection
+                    question={questions[currentPage - 1]}
+                    questionIndex={currentPage}
+                    pageCount={pageCount}
+                    onAnswerChange={handleAnswerChange}
+                    answers={answers}
+                />
+
+            </div>
+            <div style={paginationStyles}>
+                <Stack spacing={2}>
+                    <Pagination
+                        onChange={handlePageChange}
+                        count={pageCount}
+                        page={currentPage}
+                        variant="outlined"
+                        size="large"
+                        color="primary"
+                        shape="rounded"
+                    />
+                </Stack>
+            </div>
+            <Dialog open={openModal} onClose={handleModalClose}>
+                <DialogTitle>Quiz Results</DialogTitle>
+                <DialogContent>
+                    <p>{resultMessage}</p>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleModalClose} color="primary">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </div>
+    );
 }
 
-export default MultiChoiceQuesionsSection
+export default MultiChoiceQuestionsSection;

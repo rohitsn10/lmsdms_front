@@ -78,7 +78,7 @@ function AddQuestion() {
 
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
-    
+  
     if (!password) {
       toast.error("E-Signature is required to proceed.");
       return;
@@ -92,9 +92,34 @@ function AddQuestion() {
     formData.append("status", status);
     formData.append("createdAt", createdAt);
     formData.append("createdBy", createdBy);
-    formData.append("correct_answer", JSON.stringify(answers)); // Convert answers to JSON string
+  
+    let options = null;
+    let correct_answer = null;
+  
+    if (questionType === "MCQ") {
+      options = answers.map((answer) => answer.text).join(","); 
+      correct_answer = answers.filter((answer) => answer.isCorrect).map((answer) => answer.text).join(","); 
+    } else if (questionType === "True/False") {
+      options = "True,False";
+      correct_answer = answers[0]?.text; 
+    } else if (questionType === "Fill in the blank") {
+      options = "";
+      correct_answer = answers[0]?.text; 
+    }
+    formData.append("options", options ? options : "");
+    formData.append("correct_answer", correct_answer ? correct_answer : "");
     if (mediaFile) {
-      formData.append("mediaFile", mediaFile); // Append media file if available
+      const fileType = mediaFile.type; 
+      if (fileType.startsWith("image")) {
+        formData.append("image_file_url", mediaFile); 
+      } else if (fileType.startsWith("audio")) {
+        formData.append("audio_file_url", mediaFile); 
+      } else if (fileType.startsWith("video")) {
+        formData.append("video_file_url", mediaFile);
+      } else {
+        toast.error("Unsupported file type. Please upload an image, audio, or video.");
+        return;
+      }
     }
   
     try {
@@ -109,35 +134,27 @@ function AddQuestion() {
       setOpenSignatureDialog(false);
     }
   };
-
   const handleOpenQuestionDialog = () => {
     setOpenQuestionDialog(true);
   };
-
   const handleCloseQuestionDialog = () => {
     setOpenQuestionDialog(false);
   };
-
   const handleOpenAnswerDialog = (index) => {
     setCurrentAnswerIndex(index);
     setOpenAnswerDialog(true);
   };
-
   const handleCloseAnswerDialog = () => {
     setOpenAnswerDialog(false);
   };
-
   const handleSaveQuestion = (content) => {
     setQuestionText(content);
   };
-
   const handleSaveAnswer = (content) => {
     const updatedAnswers = [...answers];
     updatedAnswers[currentAnswerIndex].text = content;
     setAnswers(updatedAnswers);
   };
-
-  // Handle media file change (image/video/audio)
   const handleMediaChange = (e) => {
     const file = e.target.files[0];
     setMediaFile(file);
@@ -197,7 +214,6 @@ function AddQuestion() {
               </FormControl>
             </MDBox>
 
-            {/* Add Answers Section */}
             <MDBox mb={3}>
               <MDTypography variant="h6" fontWeight="medium">
                 Add Answers
@@ -265,7 +281,7 @@ function AddQuestion() {
                 </RadioGroup>
               )}
 
-              {questionType !== "True/False" && (
+              {questionType !== "True/False" && questionType !== "Fill in the blank" && (
                 <MDButton variant="outlined" color="success" onClick={handleAddAnswer}>
                   Add Answer
                 </MDButton>

@@ -30,66 +30,105 @@ import { toast, ToastContainer } from "react-toastify";
 function EditQuestion() {
   const { state } = useLocation(); // Get the passed state from location
   const navigate = useNavigate();
+  const [answers, setAnswers] = useState(() => {
+    if (typeof state?.item?.options === "string") {
+      try {
+        return JSON.parse(state?.item?.options);
+      } catch (error) {
+        console.error("Error parsing options:", error);
+        return [{ text: "", isCorrect: false }];
+      }
+    }
+    return Array.isArray(state?.item?.options) ? state?.item?.options : [{ text: "", isCorrect: false }];
+  });
+ console.log("answer get in edit",answers)
   const [questionText, setQuestionText] = useState(state?.item?.question_text || "");
   const [questionType, setQuestionType] = useState(state?.item?.question_type || "MCQ");
-  const [answers, setAnswers] = useState(state?.item?.options || [{ text: "", isCorrect: false }]);
   const [questionMarks, setQuestionMarks] = useState(state?.item?.marks || "");
   const [questionLanguage, setQuestionLanguage] = useState(state?.item?.language || "English");
   const [status, setStatus] = useState(state?.item?.status ? "Active" : "Inactive");
   const [createdAt, setCreatedAt] = useState(
     state?.question_created_at ? state.question_created_at : new Date().toISOString().slice(0, 10)
   );
-  const [updateTrainingQuestion] = useUpdateTrainingQuestionMutation();
-
   const [createdBy, setCreatedBy] = useState(state?.item?.created_by || "");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [openQuestionDialog, setOpenQuestionDialog] = useState(false);
   const [openAnswerDialog, setOpenAnswerDialog] = useState(false);
   const [currentAnswerIndex, setCurrentAnswerIndex] = useState(null);
   const [mediaFile, setMediaFile] = useState(
-    state?.item?.image_file_url || state?.item?.video_file_url || state?.item?.audio_file_url || null
+    state?.item?.image_file_url ||
+      state?.item?.video_file_url ||
+      state?.item?.audio_file_url ||
+      null
   );
+
+  const [updateTrainingQuestion] = useUpdateTrainingQuestionMutation();
 
   useEffect(() => {
     // Automatically set answers based on the question type
     if (questionType === "True/False") {
-      setAnswers([{ text: "True", isCorrect: false }, { text: "False", isCorrect: false }]);
+      setAnswers([
+        { text: "True", isCorrect: false },
+        { text: "False", isCorrect: false },
+      ]);
     } else if (questionType === "MCQ") {
-      setAnswers([{ text: questionText, isCorrect: false }]);
+      // Set MCQ answers from the state options (parsing stringified options)
+      setAnswers(state?.item?.options ? JSON.parse(state?.item?.options) : [{ text: "", isCorrect: false }]);
     } else if (questionType === "Fill in the blank") {
       setAnswers([{ text: questionText, isCorrect: false }]);
     }
-  }, [questionType]); // Trigger when questionType changes
+  }, [questionType, state?.item?.options]); // Trigger when questionType or options change
 
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
-    
+
     if (!password) {
       toast.error("E-Signature is required to proceed.");
       return;
     }
 
     const formData = new FormData();
-    formData.append("training_id", state?.item?.training_id || "1"); // Adjust this based on your state data
+    formData.append("training_id", id);
     formData.append("question_text", questionText);
     formData.append("question_type", questionType);
     formData.append("marks", questionMarks);
     formData.append("status", status);
     formData.append("createdAt", createdAt);
     formData.append("createdBy", createdBy);
-    formData.append("correct_answer", JSON.stringify(answers)); // Convert answers to JSON string
+
+    let options = null;
+    let correct_answer = null;
+
+    if (questionType === "MCQ") {
+      // For MCQ, pass the options and correct_answer
+      options = answers.map((answer) => answer.text); // Only texts of the answers
+      correct_answer = answers.filter((answer) => answer.isCorrect); // The correct answer(s)
+    } else if (questionType === "True/False") {
+      // For True/False, pass null for options and the correct answer
+      options = null;
+      correct_answer = JSON.stringify([{ text: answers[0]?.text, isCorrect: true }]);
+    } else if (questionType === "Fill in the blank") {
+      // For Fill in the blank, pass null for options and correct_answer
+      options = null;
+      correct_answer = JSON.stringify([{ text: answers[0]?.text, isCorrect: true }]);
+    }
+
+    // Append the options and correct_answer
+    formData.append("options", options ? JSON.stringify(options) : null);
+    formData.append("correct_answer", correct_answer);
+
     if (mediaFile) {
       formData.append("mediaFile", mediaFile); // Append media file if available
     }
 
     try {
-      const response = await updateTrainingQuestion({ id: state?.item?.id, formData }).unwrap();
-      toast.success("Question updated successfully!");
+      const response = await createTrainingQuestion(formData).unwrap();
+      toast.success("Question created successfully!");
       setTimeout(() => {
         navigate("/trainingListing");
       }, 1500);
     } catch (error) {
-      toast.error("Failed to update question. Please try again.");
+      toast.error("Failed to create question. Please try again.");
     } finally {
       setOpenSignatureDialog(false);
     }
@@ -123,13 +162,6 @@ function EditQuestion() {
     updatedAnswers[index].isCorrect = true; // Set the selected answer as correct
     setAnswers(updatedAnswers);
   };
-
-  
-
-  // const handleCloseSignatureDialog = () => {
-  //   setOpenSignatureDialog(false);
-  //   navigate("/questions"); 
-  // };
 
   const handleOpenQuestionDialog = () => {
     setOpenQuestionDialog(true);
@@ -221,7 +253,7 @@ function EditQuestion() {
             {/* Answer Section */}
             <MDBox mb={3}>
               <MDTypography variant="h6" fontWeight="medium">
-                Add Answers
+                Add Options
               </MDTypography>
 
               {questionType === "Fill in the blank" && (
@@ -353,28 +385,28 @@ function EditQuestion() {
       </Card>
 
       {/* E-Signature Dialog */}
-     <ESignatureDialog
-             open={openSignatureDialog}
-             onClose={() => setOpenSignatureDialog(false)}
-             onConfirm={handleSignatureComplete}
-           />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete}
+      />
       {/* Question Edit Dialog */}
-       <TinyMCEEditorDialog
-              open={openQuestionDialog}
-              onClose={handleCloseQuestionDialog}
-              title="Edit Question"
-              content={questionText}
-              onSave={handleSaveQuestion}
-            />
+      <TinyMCEEditorDialog
+        open={openQuestionDialog}
+        onClose={handleCloseQuestionDialog}
+        title="Edit Question"
+        content={questionText}
+        onSave={handleSaveQuestion}
+      />
 
       <TinyMCEEditorDialog
-              open={openAnswerDialog}
-              onClose={handleCloseAnswerDialog}
-              title="Edit Answer"
-              content={answers[currentAnswerIndex]?.text || ""}
-              onSave={handleSaveAnswer}
-            />
-             <ToastContainer position="top-right" autoClose={3000} />
+        open={openAnswerDialog}
+        onClose={handleCloseAnswerDialog}
+        title="Edit Answer"
+        content={answers[currentAnswerIndex]?.text || ""}
+        onSave={handleSaveAnswer}
+      />
+      <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }

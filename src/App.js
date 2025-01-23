@@ -77,7 +77,7 @@ import AddQuestion from "dmscomponent/question-listing/add-questions/index.js";
 import CreateQuiz from "dmscomponent/add-quiz/index.js";
 import QuizListing from "dmscomponent/add-quiz/list.js";
 import TrainingMapping from "dmscomponent/training-mappping/index.js";
-import ClassroomTraining from "dmscomponent/classroom-training/index.js";
+import ClassroomTraining from "dmscomponent/class-room/classroom-training/index.js";
 import TrainingMatrix from "dmscomponent/training-matrix/index.js";
 import TrainingProgressReport from "dmscomponent/training-progressreport/index.js";
 import ExamResultsReport from "dmscomponent/exam-result/index.js";
@@ -105,6 +105,12 @@ import ExamModule from "dmscomponent/exam-module/index.js";
 import MultiChoiceQuesionsSection from "dmscomponent/mcq-module/index.js";
 import MaterialListing from "dmscomponent/materials-listing/index.jsx";
 
+import {LmsRoutes,DmsRoutes} from './routes.js';
+import { useSelector } from "react-redux";
+
+import ClassroomListing from "dmscomponent/class-room/index.js";
+import SessionListing from "dmscomponent/class-room/session-listing/index.js";
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -121,7 +127,17 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
   const isTextEditor = pathname === "/document-view";
+  const { is_dms_user, is_lms_user, is_active } = useSelector((state) => state.userRole);
+  const [routeItems,setRouteItems]=useState([...routes]);
+  useEffect(()=>{
 
+      if(is_active){
+        setRouteItems([...LmsRoutes])
+      }else{
+        setRouteItems([...DmsRoutes])
+      }
+    
+  },[is_active])
   useMemo(() => {
     const cacheRtl = createCache({
       key: "rtl",
@@ -217,7 +233,7 @@ export default function App() {
                 color={sidenavColor}
                 brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
                 brandName="Material"
-                routes={routes}
+                routes={routeItems}
                 onMouseEnter={handleOnMouseEnter}
                 onMouseLeave={handleOnMouseLeave}
                 style={{ position: "fixed", zIndex: 2 }}
@@ -243,7 +259,7 @@ export default function App() {
         color={sidenavColor}
         brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
         brandName="Bharat parenterals"
-        routes={routes}
+        routes={routeItems}
         // onMouseEnter={handleOnMouseEnter}
         // onMouseLeave={handleOnMouseLeave}
         style={{ position: "fixed", zIndex: 3 }}
@@ -342,6 +358,8 @@ export default function App() {
       <Route path="/exam-module" element={<ExamModule/>}/>
       <Route path="/mcq-module" element={<MultiChoiceQuesionsSection/>}/>
       <Route path="/training-material/:trainingNumber" element={<MaterialListing/>}/>
+      <Route path="/class-room" element={<ClassroomListing/>}/>
+      <Route path="/session-list" element={<SessionListing/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   </div>

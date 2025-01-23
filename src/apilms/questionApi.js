@@ -52,6 +52,13 @@ export const questionApi = createApi({
         }),
         transformResponse: (response) => response,
       }),
+      createTrainingQuiz: builder.query({
+        query: () => ({
+          url: 'lms_module/create_training_quiz', // No params or query added
+          method: 'GET',
+        }),
+        transformResponse: (response) => response,
+      }),
   }),
 });
 
@@ -61,4 +68,5 @@ export const {
   useUpdateTrainingQuestionMutation,
   useDeleteTrainingQuestionMutation,
   useFetchTrainingWiseQuestionsQuery,
+  useCreateTrainingQuizQuery, 
 } = questionApi;

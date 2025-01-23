@@ -1,56 +1,45 @@
-import React, { forwardRef, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   IconButton,
   TextField,
-  Typography,
-  MenuItem,
   Button,
   Snackbar,
   Alert,
+  MenuItem,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PropTypes from "prop-types";
 
-const AddSectionModal = forwardRef((props, ref) => {
-  const { open, handleClose, sectionNameRef, descriptionRef, status, setStatus, handleSubmit } = props;
-
+const EditSectionModal = ({ open, handleClose, sectionData, handleSubmit }) => {
+  const [sectionName, setSectionName] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState(true);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
+  useEffect(() => {
+    if (sectionData) {
+      setSectionName(sectionData.section_name || "");
+      setDescription(sectionData.section_description || "");
+      setStatus(sectionData.status || "Active");
+    }
+  }, [sectionData]);
+
+  const handleCloseSnackbar = () => setOpenSnackbar(false);
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    let hasError = false;
-    let errorMessage = "";
 
-    if (!sectionNameRef.current.value) {
-      hasError = true;
-      errorMessage = "Section Name is required";
-    }
-
-    if (!descriptionRef.current.value) {
-      hasError = true;
-      errorMessage = "Description is required";
-    }
-
-    if (!status) {
-      hasError = true;
-      errorMessage = "Status is required";
-    }
-
-    if (hasError) {
+    if (!sectionName || !description || !status) {
+      setErrorMessage("All fields are required");
       setOpenSnackbar(true);
-      setErrorMessage(errorMessage);
       return;
     }
-
-    handleSubmit();
+    console.log("Update Section",sectionName,description,status)
+    // handleSubmit({ ...sectionData, section_name: sectionName, section_description: description, status });
   };
 
   return (
@@ -58,12 +47,11 @@ const AddSectionModal = forwardRef((props, ref) => {
       <Dialog
         onClose={handleClose}
         open={open}
-        aria-labelledby="add-section-dialog-title"
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle id="add-section-dialog-title" sx={{ m: 0, p: 2 }}>
-          Add Section
+        <DialogTitle>
+          Edit Section
           <IconButton
             aria-label="close"
             onClick={handleClose}
@@ -77,31 +65,35 @@ const AddSectionModal = forwardRef((props, ref) => {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent>
           <form onSubmit={handleFormSubmit}>
-            {/* Section Name */}
             <TextField
-              inputRef={sectionNameRef}
-              type="text"
+              value={sectionName}
+              onChange={(e) => setSectionName(e.target.value)}
               label="Section Name"
               fullWidth
               margin="normal"
-              sx={{ mt: "2px" }}
             />
-
-            {/* Description */}
             <TextField
-              inputRef={descriptionRef}
-              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               label="Description"
               fullWidth
               margin="normal"
               multiline
               rows={3}
-              sx={{ mt: "2px" }}
             />
-
-            {/* Status */}
+            {/* <TextField
+              select
+              label="Status"
+              fullWidth
+              margin="normal"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </TextField> */}
             <TextField
               select
               label="Status"
@@ -124,21 +116,14 @@ const AddSectionModal = forwardRef((props, ref) => {
               <MenuItem value="true">Active</MenuItem>
               <MenuItem value="false">Inactive</MenuItem>
             </TextField>
-
             <Button
-              variant="custom"
-              sx={{
-                color: "white !important",
-                background: "#31AC47",
-                padding: "12px",
-                "&:hover": {
-                  backgroundColor: "#1ebf39",
-                },
-              }}
               type="submit"
+              variant="contained"
+              color="primary"
               fullWidth
+              sx={{ marginTop: 2 }}
             >
-              Submit
+              Save Changes
             </Button>
           </form>
         </DialogContent>
@@ -150,16 +135,13 @@ const AddSectionModal = forwardRef((props, ref) => {
       </Snackbar>
     </div>
   );
-});
+};
 
-AddSectionModal.propTypes = {
+EditSectionModal.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
-  sectionNameRef: PropTypes.object.isRequired,
-  descriptionRef: PropTypes.object.isRequired,
-  status: PropTypes.string.isRequired,
-  setStatus: PropTypes.func.isRequired,
+  sectionData: PropTypes.object,
   handleSubmit: PropTypes.func.isRequired,
 };
 
-export default AddSectionModal;
+export default EditSectionModal;

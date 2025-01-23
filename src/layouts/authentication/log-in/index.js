@@ -13,6 +13,7 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import bplogo from "assets/images/logo-removebg-preview.png";
+import { useDispatch } from "react-redux";
 import {
   Dialog,
   DialogActions,
@@ -30,6 +31,7 @@ import {
 } from "@mui/material";
 import { login, groupList } from '../../../api/auth/auth';
 import { useAuth } from "hooks/use-auth";
+import { setUserDetails } from "slices/userRoleSlice";
 
 function Login() {
   const [userId, setUserId] = useState(""); 
@@ -43,7 +45,7 @@ function Login() {
   const navigate = useNavigate(); 
   const [firstName, setFirstName] = useState("");
   const { updateUser, updateRole } = useAuth();
-
+  const dispatch = useDispatch();
   const handleLogin = async () => {
     if (!userId || !password) {
       setError("Both User ID and Password are required.");
@@ -96,11 +98,11 @@ function Login() {
   
       if (response && response.data) {
         const { status, data } = response.data;
-  
+        
         if (status === true) {
           const { token, is_password_expired } = data;
           const userFirstName = data.first_name || "User";
-  
+          
           if (is_password_expired) {
             setError("Your password has expired. Please reset it.");
             navigate("/reset-password"); 
@@ -108,6 +110,9 @@ function Login() {
           }
   
           if (token) {
+            // console.log("Login Details:",data.is_dms_user,data.is_lms_user);
+            dispatch(setUserDetails({is_dms_user: data?.is_dms_user, is_lms_user: data?.is_lms_user, is_active: true}))
+            // dispatch(setUserDetails({is_dms_user: true, is_lms_user: false, is_active: true }))
             sessionStorage.setItem("token", token);
             updateUser(data, token);
             updateRole(selectedRole);
