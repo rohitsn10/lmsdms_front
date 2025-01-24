@@ -149,6 +149,14 @@ export const documentApi = createApi({
       transformResponse: (response) => response.data, // Extract the "data" field from the response
       providesTags: ["Documents"], // Tag documents data for cache management
     }),
+    getObsoleteStatusData: builder.query({
+      query: () => ({
+        url: "dms_module/get_obsolete_satatus_data_to_doc_admin_user_only",
+        method: "GET",
+      }),
+      transformResponse: (response) => response.data, // Transform the response to only include the 'data' part
+      providesTags: ["Documents"], // Tag it for cache management, as this fetches document-related data
+    }),
    
   }),
 });   
@@ -166,5 +174,6 @@ export const {
   useDepartmentWiseReviewerQuery,
   useFetchAllDocumentsQuery,
   useGenerateCertificatePdfQuery,
+  useGetObsoleteStatusDataQuery,
  
 } = documentApi;

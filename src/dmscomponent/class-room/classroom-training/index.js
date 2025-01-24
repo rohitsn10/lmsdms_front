@@ -1,13 +1,25 @@
 import React, { useState } from "react";
-import { Card, MenuItem, TextField, Grid, CircularProgress } from "@mui/material";
+import {
+  Card,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+  OutlinedInput,
+  Grid,
+  CircularProgress,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import BasicLayout from "layouts/authentication/components/BasicLayout";
-import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import MDButton from "components/MDButton";
-import axios from "axios";
-import config from "constants/config";
+import BasicLayout from "layouts/authentication/components/BasicLayout";
+import ESignatureDialog from "layouts/authentication/ESignatureDialog"; // Ensure correct import
+import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import MDInput from "components/MDInput";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function ClassroomTraining() {
   const [trainingType, setTrainingType] = useState("");
@@ -15,62 +27,73 @@ function ClassroomTraining() {
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("Assigned");
   const [File, setFile] = useState(null);
+  const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [error, setError] = useState(null);
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const validateInputs = () => {
+    const newErrors = {};
+    if (!classroomTitle.trim()) newErrors.classroomTitle = "Classroom Title is required.";
+    if (!trainingType) newErrors.trainingType = "Training Type is required.";
+    if (!description.trim()) newErrors.description = "Description is required.";
+    if (!File) newErrors.File = "File upload is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateInputs()) return;
+    setOpenSignatureDialog(true); // Open e-signature dialog
+  };
 
-    const token = sessionStorage.getItem("token"); 
-    const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/create_classroom`; 
-    // Validate required fields
-    if (!classroomTitle || !trainingType || !description || !status) {
-      setIsError(true);
-      setError("All fields are required. Please complete the form.");
-      return;
-    }
+  const handleClear = () => {
+    setClassroomTitle("");
+    setTrainingType("");
+    setDescription("");
+    setStatus("Assigned");
+    setFile(null);
+    setErrors({});
+    toast.info("Form cleared successfully.");
+  };
 
-    const formData = new FormData();
-    formData.append("classroom_name", classroomTitle);
-    formData.append("is_assesment", trainingType);
-    formData.append("description", description);
-    formData.append("status", status);
-
-
-    if (File) {
-      formData.append("upload_doc", File);
-    } else {
-      setIsError(true);
-      setError("Please upload a file.");
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
       return;
     }
 
     setIsLoading(true);
-    setIsError(false);
-    setIsSuccess(false);
+    const formData = new FormData();
+    formData.append("classroom_name", classroomTitle.trim());
+    formData.append("is_assesment", trainingType);
+    formData.append("description", description.trim());
+    formData.append("status", status);
+    formData.append("upload_doc", File);
+
+    const token = sessionStorage.getItem("token");
+    const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/create_classroom`;
 
     try {
       const response = await axios.post(apiUrl, formData, {
         headers: {
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
 
       if (response.data.status) {
-        setIsSuccess(true);
-        console.log("Classroom training created successfully:", response.data);
+        toast.success("Classroom training created successfully!");
+        setTimeout(() => navigate("/class-room"), 1500); 
       } else {
-        setIsError(true);
-        setError(response.data.message || "Failed to create classroom training.");
+        toast.error(response.data.message || "Failed to create classroom training.");
       }
     } catch (error) {
-      // Handle errors
-      setIsError(true);
-      setError(error.response?.data?.message || error.message || "An error occurred.");
-      console.error("Error creating classroom:", error);
+      toast.error(
+        error.response?.data?.message || error.message || "An error occurred while creating the classroom training."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -78,6 +101,7 @@ function ClassroomTraining() {
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
+    setErrors((prev) => ({ ...prev, File: "" })); 
   };
 
   return (
@@ -100,63 +124,103 @@ function ClassroomTraining() {
           </MDTypography>
         </MDBox>
 
+        <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
+          <MDButton
+            variant="outlined"
+            color="error"
+            size="small"
+            onClick={handleClear}
+            sx={{ marginLeft: "10px", marginRight: "10px" }}
+          >
+            Clear
+          </MDButton>
+        </MDBox>
+
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <TextField
-                  label="Classroom Title"
+                <MDInput
+                  type="text"
+                  label={<><span style={{ color: "red" }}>*</span> Classroom Title</>}
                   fullWidth
                   value={classroomTitle}
                   onChange={(e) => setClassroomTitle(e.target.value)}
+                  error={!!errors.classroomTitle}
+                  helperText={errors.classroomTitle}
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  select
-                  label="Type"
-                  fullWidth
-                  value={trainingType}
-                  onChange={(e) => setTrainingType(e.target.value)}
-                >
-                  <MenuItem value="With Assessment">With Assessment</MenuItem>
-                  <MenuItem value="Without Assessment">Without Assessment</MenuItem>
-                </TextField>
+                <FormControl fullWidth margin="dense" error={!!errors.trainingType}>
+                  <InputLabel id="training-type-label">
+                    <span style={{ color: "red" }}>*</span> Type
+                  </InputLabel>
+                  <Select
+                    labelId="training-type-label"
+                    id="training-type"
+                    value={trainingType}
+                    onChange={(e) => setTrainingType(e.target.value)}
+                    input={<OutlinedInput label="Type" />}
+                    sx={{
+                      minWidth: 200,
+                      height: "3rem",
+                      ".MuiSelect-select": { padding: "0.45rem" },
+                    }}
+                  >
+                    <MenuItem value="With Assessment">With Assessment</MenuItem>
+                    <MenuItem value="Without Assessment">Without Assessment</MenuItem>
+                  </Select>
+                </FormControl>
+                {errors.trainingType && (
+                  <MDTypography variant="caption" color="error">
+                    {errors.trainingType}
+                  </MDTypography>
+                )}
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  label="Description"
-                  fullWidth
+                <MDInput
+                  label={<><span style={{ color: "red" }}>*</span> Description</>}
                   multiline
                   rows={4}
+                  fullWidth
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  error={!!errors.description}
+                  helperText={errors.description}
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  select
-                  label="Status"
-                  fullWidth
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                >
-                  <MenuItem value="Assigned">Assigned</MenuItem>
-                  <MenuItem value="Completed">Completed</MenuItem>
-                  <MenuItem value="In Progress">In Progress</MenuItem>
-                </TextField>
+                <FormControl fullWidth margin="dense">
+                  <InputLabel id="status-label">Status</InputLabel>
+                  <Select
+                    labelId="status-label"
+                    id="status"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    input={<OutlinedInput label="Status" />}
+                    sx={{
+                      minWidth: 200,
+                      height: "3rem",
+                      ".MuiSelect-select": { padding: "0.45rem" },
+                    }}
+                  >
+                    <MenuItem value="Assigned">Assigned</MenuItem>
+                    <MenuItem value="Completed">Completed</MenuItem>
+                    <MenuItem value="In Progress">In Progress</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12}>
-                <MDBox mb={3}>
-                  <MDInput
-                    type="file"
-                    label="Upload file"
-                    fullWidth
-                    onChange={handleFileChange}
-                    InputLabelProps={{ shrink: true }}
-                    inputProps={{ accept: ".pdf,.ppt,.doc,.docx" }}
-                  />
-                </MDBox>
+                <MDInput
+                  type="file"
+                  label={<><span style={{ color: "red" }}>*</span> Upload File</>}
+                  fullWidth
+                  onChange={handleFileChange}
+                  InputLabelProps={{ shrink: true }}
+                  inputProps={{ accept: ".pdf,.ppt,.doc,.docx" }}
+                  error={!!errors.File}
+                  helperText={errors.File}
+                />
               </Grid>
             </Grid>
 
@@ -168,23 +232,22 @@ function ClassroomTraining() {
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? <CircularProgress size={24} /> : "Create Classroom Training"}
+                {isLoading ? <CircularProgress size={24} /> : "Submit"}
               </MDButton>
             </MDBox>
           </MDBox>
         </MDBox>
-
-        {isSuccess && (
-          <MDTypography color="success.main" mt={2}>
-            Classroom training created successfully!
-          </MDTypography>
-        )}
-        {isError && (
-          <MDTypography color="error.main" mt={2}>
-            Error: {error}
-          </MDTypography>
-        )}
       </Card>
+
+      {/* Toast Container */}
+      <ToastContainer />
+
+      {/* E-Signature Dialog */}
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete}
+      />
     </BasicLayout>
   );
 }

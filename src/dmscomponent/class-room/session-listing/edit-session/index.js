@@ -6,38 +6,27 @@ import MDTypography from "components/MDTypography";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import MDButton from "components/MDButton";
-import OutlinedInput from '@mui/material/OutlinedInput';
+import OutlinedInput from "@mui/material/OutlinedInput";
 import { useUserListQuery } from "api/auth/userApi"; // Import user list query
 import { useUpdateSessionMutation } from "apilms/classRoomApi"; // Import the updateSession mutation hook
-import moment from 'moment'; // Import Moment.js
+import moment from "moment"; // Import Moment.js
 
 function EditSession() {
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Get session data from state (passed from previous page)
   const sessionData = location.state?.session;
-
-  // Initialize state with the session data
   const [sessionName, setSessionName] = useState(sessionData?.session_name || "");
   const [sessionVenue, setSessionVenue] = useState(sessionData?.venue || "");
-
-  // Format the date to remove the time part (DD/MM/YY) using moment
   const [sessionDate, setSessionDate] = useState(formatDate(sessionData?.start_date || ""));
   const [sessionTime, setSessionTime] = useState(formatTime(sessionData?.start_time || ""));
-  const [selectedUser, setSelectedUser] = useState(sessionData?.user_ids[0] || "");
-
-  // Helper function to format date to "DD/MM/YY" using Moment.js
+  const [selectedUser, setSelectedUser] = useState(sessionData?.user_ids?.[0] || "");
   function formatDate(date) {
-    return moment(date, "DD/MM/YY HH:mm").format("DD/MM/YY"); // Format to only include the date part
+    return moment(date, "DD/MM/YY HH:mm").format("DD/MM/YY"); 
   }
-
-  // Helper function to format time to "HH:mm" using Moment.js
   function formatTime(time) {
-    return moment(time, "HH:mm:ss").format("HH:mm"); // Format to only include time
+    return moment(time, "HH:mm:ss").format("HH:mm"); 
   }
-
-  // Fetch the user list
+// console.log("----------------daata in edit session",sessionData);
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
 
   // Use the update session mutation hook
@@ -52,16 +41,19 @@ function EditSession() {
       session_name: sessionName,
       venue: sessionVenue,
       start_date: sessionDate, // Only the date part will be used
-      end_date: sessionDate, // Assuming start and end date are the same, adjust if necessary
+
       start_time: sessionTime,
-      end_time: sessionTime, // Assuming start and end time are the same, adjust if necessary
+
       user_ids: [selectedUser], // If you want to handle multiple users, adjust the logic
       classroom_id: sessionData?.classroom_id,
     };
 
     try {
       // Call the mutation to update the session
-      const response = await updateSession({ sessionId: sessionData?.id, sessionData: updatedSessionData }).unwrap();
+      const response = await updateSession({
+        sessionId: sessionData?.id,
+        sessionData: updatedSessionData,
+      }).unwrap();
       console.log("Session updated successfully", response);
       navigate("/class-room"); // Redirect to sessions list after successful update
     } catch (error) {
@@ -165,8 +157,14 @@ function EditSession() {
             </Grid>
 
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isUpdating}>
-                {isUpdating ? 'Updating...' : 'Update Session'}
+              <MDButton
+                variant="gradient"
+                color="submit"
+                fullWidth
+                type="submit"
+                disabled={isUpdating}
+              >
+                {isUpdating ? "Updating..." : "Update Session"}
               </MDButton>
             </MDBox>
           </MDBox>

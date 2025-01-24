@@ -11,20 +11,20 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import moment from "moment";
-import AttendanceDialog from "./attendance/index";
+import AttendanceDialog from "./attendance";
 import ViewAttendanceDialog from "./view-attendance";
 const SessionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [attendanceData, setAttendanceData] = useState([]);
   const [openAttendanceDialog, setOpenAttendanceDialog] = useState(false);
   console.log("----------------------------",openAttendanceDialog)
-  const [selectedSessionId, setSelectedSessionId] = useState(null); // Track selected session ID
+  const [selectedSessionId, setSelectedSessionId] = useState(null); 
   const navigate = useNavigate();
   const location = useLocation();
   const classroom = location.state?.classroom;
   const classroomId = classroom.classroom_id;
   const [markSessionCompleted] = useMarkSessionCompletedMutation();
-  const { data, isLoading, error } = useGetSessionsQuery(classroomId);
+  const { data, isLoading, error,refetch } = useGetSessionsQuery(classroomId);
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
   const [openViewAttendanceDialog, setOpenViewAttendanceDialog] = useState(false);
   const [viewAttendanceData, setViewAttendanceData] = useState([]);
@@ -32,45 +32,45 @@ const SessionListing = () => {
   const handleSearch = (event) => setSearchTerm(event.target.value);
 
   // Edit session handler
-  const handleEditSession = (session) => navigate("/edit-session", { state: { session } });
+  const handleEditSession = (session) => navigate("/edit-session", { state: { session } }
+    
+  );
+  useEffect(() => {
+      refetch();
+    }, [location.key]);
+  
 
   const handleAttendanceClick = (sessionId, isViewAttendance = false) => {
-    // console.log("handleAttendanceClick called for sessionId:", sessionId);  // Add this line
-    console.log("Click")
-    console.log("SessionID",sessionId)
-    console.log("View Attendance.",isViewAttendance)
-    console.log(data)
-    setSelectedSessionId(sessionId); // Set the selected session ID
-    console.log("Selected sessionId",selectedSessionId);
+
+    setSelectedSessionId(sessionId); 
     const session = data?.data?.find((s) => s.session_id === sessionId);
-    console.log(session);
+    console.log("session",session)
     if (session && session.user_ids) {
       const userIds = session.user_ids;
       const filteredUsers = userData?.data?.filter((user) => userIds.includes(user.id));
   
       if (isViewAttendance) {
-        // Open View Attendance Dialog
         setViewAttendanceData(filteredUsers);
         setOpenViewAttendanceDialog(true);
       } else {
-        // Open Attendance Dialog
         setAttendanceData(filteredUsers);
         setOpenAttendanceDialog(true);
         console.log("Dialog open state:", openAttendanceDialog); 
       }
+      refetch();
     }
   };
   
 
-  // Mark session as completed
   const handleMarkCompleted = (sessionId) => {
     markSessionCompleted(sessionId)
       .unwrap()
-      .then((response) => console.log("Session marked as completed:", response))
+      .then((response) => {
+        console.log("Session marked as completed:", response);
+        refetch(); 
+      })
       .catch((err) => console.error("Failed to mark session as completed:", err));
   };
-
-  // Filtered session data for search
   const filteredData = data?.data
     ? data.data
         .filter(
@@ -80,9 +80,9 @@ const SessionListing = () => {
         )
         .map((session, index) => ({
           ...session,
-          id: session.session_id, // Use session_id as the unique id
-          serial_number: index + 1, // Add serial number (index + 1)
-          start_date: moment(session.start_date).format("DD/MM/YY HH:mm"), // Format start date
+          id: session.session_id,
+          serial_number: index + 1, 
+          start_date: moment(session.start_date).format("DD/MM/YY HH:mm"), 
         }))
     : [];
 
@@ -122,12 +122,12 @@ const SessionListing = () => {
         <MDButton
           variant="outlined"
           color="primary"
-          onClick={()=>{
-            handleNewAttendance();
-              const isViewAttendance = params.row.attend;
-              console.log("View Attendance",isViewAttendance)
-              console.log(params.row.id);
-              handleAttendanceClick(params.row.id,isViewAttendance)
+
+          onClick={() => {
+            const isViewAttendance = params.row.attend; 
+            // console.log("is view open get or not ",isViewAttendance)
+            handleAttendanceClick(params.row.id, isViewAttendance); 
+
           }}
           // onClick={() => {
           //   const isViewAttendance = params.row.attend; // Check if attendance is available to view
@@ -185,7 +185,8 @@ const SessionListing = () => {
               columns={columns}
               pageSize={5}
               rowsPerPageOptions={[5, 10, 20]}
-              getRowId={(row) => row.session_id} // Specify session_id as the unique id
+              disableSelectionOnClick
+              getRowId={(row) => row.session_id}
               sx={{
                 border: "1px solid #ddd",
                 borderRadius: "4px",
@@ -203,19 +204,19 @@ const SessionListing = () => {
           </div>
         </MDBox>
       </Card>
-
-      {/* Attendance Dialog */}
       <AttendanceDialog
         open={openAttendanceDialog}
         setOpen={setOpenAttendanceDialog}
         attendanceData={attendanceData}
         setAttendanceData={setAttendanceData}
-        sessionId={selectedSessionId} // Pass sessionId to the dialog
+        sessionId={selectedSessionId} 
+        refetch={refetch}
       />
       <ViewAttendanceDialog
         open={openViewAttendanceDialog}
         setOpen={setOpenViewAttendanceDialog}
         attendanceData={viewAttendanceData}
+         sessionId={selectedSessionId}
       />
     </MDBox>
   );
