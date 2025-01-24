@@ -28,7 +28,7 @@ const SessionListing = () => {
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
   const [openViewAttendanceDialog, setOpenViewAttendanceDialog] = useState(false);
   const [viewAttendanceData, setViewAttendanceData] = useState([]);
-
+  // console.log(data?.data)
   const handleSearch = (event) => setSearchTerm(event.target.value);
 
   // Edit session handler
@@ -36,8 +36,14 @@ const SessionListing = () => {
 
   const handleAttendanceClick = (sessionId, isViewAttendance = false) => {
     // console.log("handleAttendanceClick called for sessionId:", sessionId);  // Add this line
+    console.log("Click")
+    console.log("SessionID",sessionId)
+    console.log("View Attendance.",isViewAttendance)
+    console.log(data)
     setSelectedSessionId(sessionId); // Set the selected session ID
-    const session = data?.data?.find((s) => s.id === sessionId);
+    console.log("Selected sessionId",selectedSessionId);
+    const session = data?.data?.find((s) => s.session_id === sessionId);
+    console.log(session);
     if (session && session.user_ids) {
       const userIds = session.user_ids;
       const filteredUsers = userData?.data?.filter((user) => userIds.includes(user.id));
@@ -80,6 +86,10 @@ const SessionListing = () => {
         }))
     : [];
 
+    const handleNewAttendance =()=>{
+      console.log("New Toggle")
+    }
+  
   // Columns for the data grid
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
@@ -112,11 +122,18 @@ const SessionListing = () => {
         <MDButton
           variant="outlined"
           color="primary"
-          onClick={() => {
-            const isViewAttendance = params.row.attend; // Check if attendance is available to view
-            // console.log("is view open get or not ",isViewAttendance)
-            handleAttendanceClick(params.row.id, isViewAttendance); // Pass isViewAttendance flag
+          onClick={()=>{
+            handleNewAttendance();
+              const isViewAttendance = params.row.attend;
+              console.log("View Attendance",isViewAttendance)
+              console.log(params.row.id);
+              handleAttendanceClick(params.row.id,isViewAttendance)
           }}
+          // onClick={() => {
+          //   const isViewAttendance = params.row.attend; // Check if attendance is available to view
+          //   console.log("View Attendance",isViewAttendance);
+          //   handleAttendanceClick(params.row.id, isViewAttendance); // Pass isViewAttendance flag
+          // }}
           disabled={!params.row.is_completed}
         >
           {params.row.attend ? "View Attendance" : "Mark Attendance"}
@@ -135,6 +152,7 @@ const SessionListing = () => {
       ),
     },
   ];
+
 
   return (
     <MDBox p={3}>
@@ -167,7 +185,6 @@ const SessionListing = () => {
               columns={columns}
               pageSize={5}
               rowsPerPageOptions={[5, 10, 20]}
-              disableSelectionOnClick
               getRowId={(row) => row.session_id} // Specify session_id as the unique id
               sx={{
                 border: "1px solid #ddd",

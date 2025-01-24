@@ -19,7 +19,6 @@ const ClassroomListing = () => {
 
   // Fetch classrooms using the query hook
   const { data, isLoading, isError, error } = useGetClassroomsQuery();
-
   // Handle search input change
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);

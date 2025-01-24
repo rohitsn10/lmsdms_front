@@ -56,6 +56,7 @@ import ForkRightTwoToneIcon from '@mui/icons-material/ForkRightTwoTone';
 import ArchivedListing from "layouts/authentication/archived-listing";
 import ClassroomListing from "dmscomponent/class-room";
 import ViewEmployeeStatus from "dmscomponent/view-employees";
+import GroupIcon from '@mui/icons-material/Group';
 
 const routes = [
   {
@@ -281,7 +282,7 @@ export const LmsRoutes=[
     type: "collapse",
     name: "Employee Workflow",
     key: "employee-workflow",
-    icon: <DashboardIcon fontSize="small" />,
+    icon: <GroupIcon fontSize="small" />,
     route: "/employee-workflow",
     component: <ViewEmployeeStatus />,
   },

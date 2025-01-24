@@ -256,7 +256,7 @@ export default function App() {
   <CssBaseline />
   <div>
     {/* Always render Sidenav */}
-    {window.location.pathname !== "/login" && !/^\/document-view\/\d+$/.test(pathname) && window.location.pathname !== "/forgotpassword" && (
+    {window.location.pathname !== "/login" && !/^\/document-view\/\d+$/.test(pathname) && window.location.pathname !== "/forgotpassword" && window.location.pathname !== "/mcq-module" &&(
       <Sidenav
         color={sidenavColor}
         brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
@@ -361,7 +361,7 @@ export default function App() {
       <Route path="/mcq-module" element={<MultiChoiceQuesionsSection/>}/>
       <Route path="/training-material/:trainingNumber" element={<MaterialListing/>}/>
       <Route path="/class-room" element={<ClassroomListing/>}/>
-      <Route path="/session-list1" element={<SessionListing/>}/> 
+      {/* <Route path="/session-list1" element={<SessionListing/>}/>  */}
       <Route path="/employee-workflow" element={<ViewEmployeeStatus/>}/>
       <Route path="/session-list" element={<SessionListing/>}/>
       <Route path="/add-session" element={<AddSession/>}/>

@@ -13,6 +13,8 @@ import { useFetchTrainingsQuery } from "apilms/trainingApi"; // Update this path
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 import { Button } from "@mui/material";
+import ChecklistIcon from '@mui/icons-material/Checklist';
+
 const TrainingListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
@@ -40,6 +42,9 @@ const TrainingListing = () => {
     navigate("/questions", { state: { rowData } });
     // You can implement additional logic here, such as opening a modal, navigating to another page, etc.
   };
+  const handleAssessmentClick=(rowData)=>{
+    navigate("/mcq-module", { state: { rowData } });
+  }
   const handleview = (item) => {
     const documentUrl = item; // Ensure the correct field is used
 
@@ -162,6 +167,27 @@ const TrainingListing = () => {
       sortable: false,
       filterable: false,
     },
+    {
+      field: "Assessment",
+      headerName: "Assessment",
+      flex: 0.8,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <MDBox display="flex" justifyContent="center">
+          {/* Question Icon */}
+          <IconButton
+            color="error"
+            onClick={() => 
+              handleAssessmentClick(params.row.id)
+            } // Define this function to handle the question click action
+          >
+            <ChecklistIcon />{" "}
+          </IconButton>
+        </MDBox>
+      ),
+      sortable: false,
+      filterable: false,
+    }
   ];
 
   return (

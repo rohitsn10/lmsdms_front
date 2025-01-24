@@ -11,11 +11,14 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 
 import { useCreateTrainingQuizQuery } from 'apilms/questionApi';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function MultiChoiceQuestionsSection() {
-    // Mock data for testing
-    const data = {
+      const navigate = useNavigate(); 
+      const location = useLocation();
+      const id = location?.state?.rowData || null;
+      console.log("ID=>",id)
+        const data2 = {
         status: true,
         message: "Training question list fetched successfully",
         data: [
@@ -40,7 +43,7 @@ function MultiChoiceQuestionsSection() {
                 id: 14,
                 training: 3,
                 question_type: "Fill in the blank",
-                question_text: "Xyz comes between what?",
+                question_text: "Xyz comes between what?.(Give answer in DD Format)",
                 options: "",
                 correct_answer: "mma",
                 marks: 5,
@@ -106,7 +109,143 @@ function MultiChoiceQuestionsSection() {
           },
         ],
     };  
-    // const { data, isLoading, isError, refetch } = useCreateTrainingQuizQuery();
+        const data={
+            "status": true,
+            "message": "Training question list fetched successfully",
+            "data": [   
+                {
+                    "id": 19,
+                    "training": 3,
+                    "question_type": "MCQ",
+                    "question_text": "What nation is this?",
+                    "options": "test 1,test 2,test 3",
+                    "correct_answer": "test 2",
+                    "marks": 5,
+                    "status": true,
+                    "question_created_at": "2025-01-24T14:31:49.714574+05:30",
+                    "question_updated_at": "2025-01-24T14:31:49.714574+05:30",
+                    "created_by": 2,
+                    "updated_by": null,
+                    "selected_file_type": null,
+                    "selected_file": null
+                },
+                {
+                    "id": 18,
+                    "training": 3,
+                    "question_type": "MCQ",
+                    "question_text": "What is this country?",
+                    "options": "India,Sri Lanka,Bangladesh",
+                    "correct_answer": "",
+                    "marks": 5,
+                    "status": true,
+                    "question_created_at": "2025-01-24T14:28:17.662609+05:30",
+                    "question_updated_at": "2025-01-24T14:28:17.662609+05:30",
+                    "created_by": 2,
+                    "updated_by": null,
+                    "selected_file_type": null,
+                    "selected_file": null
+                },
+                {
+                    "id": 17,
+                    "training": 3,
+                    "question_type": "MCQ",
+                    "question_text": "Which animal is this?",
+                    "options": "Elephant,Tiger,Cheetah,Jaguar",
+                    "correct_answer": "Jaguar",
+                    "marks": 5,
+                    "status": true,
+                    "question_created_at": "2025-01-24T14:20:21.358104+05:30",
+                    "question_updated_at": "2025-01-24T14:20:21.358104+05:30",
+                    "created_by": 2,
+                    "updated_by": null,
+                    "selected_file_type": null,
+                    "selected_file": null
+                },
+                {
+                    "id": 16,
+                    "training": 3,
+                    "question_type": "MCQ",
+                    "question_text": "Which country does Neymar play for?",
+                    "options": "India,Nepal,Pakistan,Brazil",
+                    "correct_answer": "Brazil",
+                    "marks": 3,
+                    "status": true,
+                    "question_created_at": "2025-01-23T10:27:03.285003+05:30",
+                    "question_updated_at": "2025-01-23T10:27:03.285003+05:30",
+                    "created_by": 2,
+                    "updated_by": null,
+                    "selected_file_type": null,
+                    "selected_file": null
+                },
+                {
+                    "id": 15,
+                    "training": 3,
+                    "question_type": "MCQ",
+                    "question_text": "Where is Rahane from?",
+                    "options": "Mumbai,aficea,nigeria,Nepal,Sri Lanka,UK",
+                    "correct_answer": "Mumbai",
+                    "marks": 5,
+                    "status": true,
+                    "question_created_at": "2025-01-22T22:14:52.827899+05:30",
+                    "question_updated_at": "2025-01-22T22:14:52.827899+05:30",
+                    "created_by": 2,
+                    "updated_by": null,
+                    "selected_file_type": null,
+                    "selected_file": null
+                },
+                {
+                    "id": 14,
+                    "training": 3,
+                    "question_type": "Fill in the blank",
+                    "question_text": "Xyz comes between what?",
+                    "options": "",
+                    "correct_answer": "mma",
+                    "marks": 5,
+                    "status": true,
+                    "question_created_at": "2025-01-22T22:12:43.882912+05:30",
+                    "question_updated_at": "2025-01-22T22:12:43.882912+05:30",
+                    "created_by": 2,
+                    "updated_by": null,
+                    "selected_file_type": null,
+                    "selected_file": null
+                },
+                {
+                    "id": 13,
+                    "training": 3,
+                    "question_type": "True/False",
+                    "question_text": "Is Water wet",
+                    "options": "True,False",
+                    "correct_answer": "True",
+                    "marks": 5,
+                    "status": true,
+                    "question_created_at": "2025-01-22T22:11:42.086805+05:30",
+                    "question_updated_at": "2025-01-22T22:11:42.086805+05:30",
+                    "created_by": 2,
+                    "updated_by": null,
+                    "selected_file_type": null,
+                    "selected_file": null
+                },
+                {
+                    "id": 12,
+                    "training": 3,
+                    "question_type": "MCQ",
+                    "question_text": "Question&nbsp; 1",
+                    "options": "abc,def,ghi,uio",
+                    "correct_answer": "",
+                    "marks": 5,
+                    "status": true,
+                    "question_created_at": "2025-01-22T22:10:15.015243+05:30",
+                    "question_updated_at": "2025-01-22T22:10:15.015243+05:30",
+                    "created_by": 2,
+                    "updated_by": null,
+                    "selected_file_type": null,
+                    "selected_file": null
+                }
+            ]
+        }
+
+    const { data:newData, isLoading, isError, refetch } = useCreateTrainingQuizQuery();
+    console.log(newData)
     const [counter, setCounter] = useState(0);
     const [questions, setQuestions] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -118,7 +257,7 @@ function MultiChoiceQuestionsSection() {
     // Modal Setup
     const [openModal, setOpenModal] = useState(false);
     const [resultMessage, setResultMessage] = useState('');
-    const navigate = useNavigate(); // React Router's navigation hook
+    // React Router's navigation hook
 
     // Function to handle modal close and redirect
     // console.log(answers)
@@ -127,7 +266,7 @@ function MultiChoiceQuestionsSection() {
         if (data && data.data) {
             setQuestions(data?.data); // Set the questions array
             setPageCount(data?.data?.length); // Set the total number of questions
-            setTimerLimit(89); // Set a default timer limit (e.g., 60 seconds)
+            setTimerLimit(10*60); // Set a default timer limit (e.g., 60 seconds)
             // const quizAnswers= data?.data?.map((item=>item?.correct_answer))
             // setCorrectAnswers(quizAnswers)
             const initialAnswers = data?.data?.reduce((acc, item) => {
