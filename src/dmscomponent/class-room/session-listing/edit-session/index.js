@@ -17,24 +17,24 @@ function EditSession() {
 
   // Get session data from state (passed from previous page)
   const sessionData = location.state?.session;
-console.log("sesson -----------------------",sessionData);
+
   // Initialize state with the session data
   const [sessionName, setSessionName] = useState(sessionData?.session_name || "");
   const [sessionVenue, setSessionVenue] = useState(sessionData?.venue || "");
 
-  // Use Moment.js to format date and time correctly
+  // Format the date to remove the time part (DD/MM/YY) using moment
   const [sessionDate, setSessionDate] = useState(formatDate(sessionData?.start_date || ""));
   const [sessionTime, setSessionTime] = useState(formatTime(sessionData?.start_time || ""));
   const [selectedUser, setSelectedUser] = useState(sessionData?.user_ids[0] || "");
 
-  // Helper function to format date to "yyyy-MM-dd" using Moment.js
+  // Helper function to format date to "DD/MM/YY" using Moment.js
   function formatDate(date) {
-    return moment(date).format("YYYY-MM-DD"); // Moment.js formatting
+    return moment(date, "DD/MM/YY HH:mm").format("DD/MM/YY"); // Format to only include the date part
   }
 
-  // Helper function to format time to "hh:mm" using Moment.js
+  // Helper function to format time to "HH:mm" using Moment.js
   function formatTime(time) {
-    return moment(time, "HH:mm:ss").format("HH:mm"); // Moment.js formatting
+    return moment(time, "HH:mm:ss").format("HH:mm"); // Format to only include time
   }
 
   // Fetch the user list
@@ -51,7 +51,7 @@ console.log("sesson -----------------------",sessionData);
     const updatedSessionData = {
       session_name: sessionName,
       venue: sessionVenue,
-      start_date: sessionDate,
+      start_date: sessionDate, // Only the date part will be used
       end_date: sessionDate, // Assuming start and end date are the same, adjust if necessary
       start_time: sessionTime,
       end_time: sessionTime, // Assuming start and end time are the same, adjust if necessary
@@ -63,7 +63,7 @@ console.log("sesson -----------------------",sessionData);
       // Call the mutation to update the session
       const response = await updateSession({ sessionId: sessionData?.id, sessionData: updatedSessionData }).unwrap();
       console.log("Session updated successfully", response);
-      navigate("/sessions"); // Redirect to sessions list after successful update
+      navigate("/class-room"); // Redirect to sessions list after successful update
     } catch (error) {
       console.error("Error updating session:", error);
     }
