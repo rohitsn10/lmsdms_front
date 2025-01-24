@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useLocation,useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, MenuItem, Select, InputLabel, FormControl, Grid, TextField } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -7,58 +7,74 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import MDButton from "components/MDButton";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import { useCreateSessionMutation } from "apilms/classRoomApi"; // Import your mutation hook
-import { useUserListQuery } from "api/auth/userApi"; // Import user list query
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
+import { useCreateSessionMutation } from "apilms/classRoomApi";
+import { useUserListQuery } from "api/auth/userApi";
 
 function AddSession() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const classroomId = location.state?.classroomId;
+
   const [sessionName, setSessionName] = useState("");
   const [sessionVenue, setSessionVenue] = useState("");
   const [sessionDate, setSessionDate] = useState("");
   const [sessionTime, setSessionTime] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const location = useLocation();
-  const classroomId = location.state?.classroomId;
+  const [errors, setErrors] = useState({});
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
-  // Get the mutation hook
-  const [createSession, { isLoading, error }] = useCreateSessionMutation();
-
-  // Fetch the user list
+  const [createSession, { isLoading }] = useCreateSessionMutation();
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
 
-  // Handle form submission
+  const validateInputs = () => {
+    const newErrors = {};
+    if (!sessionName.trim()) newErrors.sessionName = "Session Name is required.";
+    if (!sessionVenue.trim()) newErrors.sessionVenue = "Session Venue is required.";
+    if (!sessionDate.trim()) newErrors.sessionDate = "Session Date is required.";
+    if (!sessionTime.trim()) newErrors.sessionTime = "Session Time is required.";
+    if (selectedUsers.length === 0) newErrors.selectedUsers = "At least one user must be selected.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Prepare the session data
-    const sessionData = {
-      session_name: sessionName,
-      venue: sessionVenue,
-      start_date: sessionDate,
-      start_time: sessionTime,
-      user_ids: selectedUsers, // Pass an array of selected user IDs
-      classroom_id: classroomId,
-    };
-
-    // Call the mutation
-    createSession(sessionData)
-      .unwrap() // To handle promise resolution
-      .then((response) => {
-        console.log("Session created successfully:", response);
-        navigate("/class-room");
-      })
-      .catch((err) => {
-        console.error("Error creating session:", err);
-        // Handle error, show notification or alert
-      });
+    if (!validateInputs()) return;
+    setOpenSignatureDialog(true); // Open E-Signature Dialog
   };
 
-  // Handle user selection change
-  const handleUserChange = (e) => {
-    setSelectedUsers(e.target.value); // Update selected users
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
+
+    try {
+      const sessionData = {
+        session_name: sessionName.trim(),
+        venue: sessionVenue.trim(),
+        start_date: sessionDate.trim(),
+        start_time: sessionTime.trim(),
+        user_ids: selectedUsers,
+        classroom_id: classroomId,
+      };
+
+      const response = await createSession(sessionData).unwrap();
+      console.log("Session created successfully:", response);
+      toast.success("Session created successfully!");
+      setTimeout(() => navigate("/class-room"), 1500);
+    } catch (err) {
+      console.error("Error creating session:", err);
+      toast.error("Failed to create session. Please try again.");
+    }
   };
 
-  // Loading and error handling for user list
+  const handleUserChange = (e) => setSelectedUsers(e.target.value);
+
   if (isUserLoading) return <p>Loading users...</p>;
   if (userError) return <p>Error loading users: {userError.message}</p>;
 
@@ -87,78 +103,90 @@ function AddSession() {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  label="Session Name"
+                  label={<><span style={{ color: "red" }}>*</span> Session Name</>}
                   fullWidth
                   value={sessionName}
                   onChange={(e) => setSessionName(e.target.value)}
+                  error={!!errors.sessionName}
+                  helperText={errors.sessionName}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Session Venue"
+                  label={<><span style={{ color: "red" }}>*</span> Session Venue</>}
                   fullWidth
                   value={sessionVenue}
                   onChange={(e) => setSessionVenue(e.target.value)}
+                  error={!!errors.sessionVenue}
+                  helperText={errors.sessionVenue}
                 />
               </Grid>
               <Grid item xs={6}>
                 <TextField
                   type="date"
-                  label="Session Date"
+                  label={<><span style={{ color: "red" }}>*</span> Session Date</>}
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   value={sessionDate}
                   onChange={(e) => setSessionDate(e.target.value)}
+                  error={!!errors.sessionDate}
+                  helperText={errors.sessionDate}
                 />
               </Grid>
               <Grid item xs={6}>
                 <TextField
                   type="time"
-                  label="Session Time"
+                  label={<><span style={{ color: "red" }}>*</span> Session Time</>}
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   value={sessionTime}
                   onChange={(e) => setSessionTime(e.target.value)}
+                  error={!!errors.sessionTime}
+                  helperText={errors.sessionTime}
                 />
               </Grid>
-
               <Grid item xs={12}>
-                <MDBox mb={3}>
-                  <FormControl fullWidth margin="dense">
-                    <InputLabel id="select-user-label">Select Users</InputLabel>
-                    <Select
-                      labelId="select-user-label"
-                      id="select-user"
-                      multiple // Enable multiple selection
-                      value={selectedUsers} // Use an array to hold selected values
-                      onChange={handleUserChange} // Update the handler for multiple selection
-                      input={<OutlinedInput label="Select Users" />}
-                      sx={{
-                        minWidth: 200,
-                        height: "3rem",
-                        ".MuiSelect-select": { padding: "0.45rem" },
-                      }}
-                      renderValue={(selected) =>
-                        selected
-                          .map((userId) => {
-                            const user = userData?.data.find((u) => u.id === userId);
-                            return user?.username || userId;
-                          })
-                          .join(", ")
-                      }
-                    >
-                      {userData?.data.length > 0 ? (
-                        userData.data.map((user) => (
-                          <MenuItem key={user.id} value={user.id}>
-                            {user.username} {/* Display username */}
-                          </MenuItem>
-                        ))
-                      ) : (
-                        <MenuItem disabled>No users available</MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
-                </MDBox>
+                <FormControl fullWidth error={!!errors.selectedUsers}>
+                  <InputLabel id="select-user-label">
+                    <span style={{ color: "red" }}>*</span> Select Users
+                  </InputLabel>
+                  <Select
+                    labelId="select-user-label"
+                    id="select-user"
+                    multiple
+                    value={selectedUsers}
+                    onChange={handleUserChange}
+                    input={<OutlinedInput />}
+                    renderValue={(selected) =>
+                      selected
+                        .map((userId) => {
+                          const user = userData?.data.find((u) => u.id === userId);
+                          return user?.username || userId;
+                        })
+                        .join(", ")
+                    }
+                    sx={{
+                      minWidth: 200,
+                      height: "3rem",
+                      ".MuiSelect-select": { padding: "0.45rem" },
+                    }}
+                  >
+                    {userData?.data.length > 0 ? (
+                      userData.data.map((user) => (
+                        <MenuItem key={user.id} value={user.id}>
+                          {user.username}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem disabled>No users available</MenuItem>
+                    )}
+                  </Select>
+                  {errors.selectedUsers && (
+                    <MDTypography color="error" variant="caption">
+                      {errors.selectedUsers}
+                    </MDTypography>
+                  )}
+                </FormControl>
               </Grid>
             </Grid>
 
@@ -173,15 +201,16 @@ function AddSession() {
                 {isLoading ? "Creating..." : "Create Session"}
               </MDButton>
             </MDBox>
-
-            {error && (
-              <MDTypography color="error" variant="body2" align="center">
-                Failed to create session: {error.message}
-              </MDTypography>
-            )}
           </MDBox>
         </MDBox>
       </Card>
+
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete}
+      />
+      <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 }
