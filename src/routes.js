@@ -225,7 +225,9 @@ const routes = [
     icon: <AccountTreeIcon />,
     route: "/induction-Listing",
     component: <InductionListing />,
-  
+  },
+    {
+    type: "collapse",
     name: "Training Activity",
     key: "trainingListing",
     icon: <ModelTrainingTwoToneIcon />,
@@ -322,7 +324,9 @@ export const LmsRoutes=[
     icon: <AccountTreeIcon />,
     route: "/induction-Listing",
     component: <InductionListing />,
-  
+  },
+    {
+    type:"collapse",
     name: "Training Activity",
     key: "trainingListing",
     icon: <ModelTrainingTwoToneIcon />,

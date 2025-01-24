@@ -58,6 +58,21 @@ export const classRoomApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    markSessionCompleted: builder.mutation({
+      query: (sessionId) => ({
+        url: `lms_module/session_completed/${sessionId}`,
+        method: 'POST', // Typically, this would be a POST request to mark something as completed
+      }),
+      transformResponse: (response) => response,
+    }),
+    updateSession: builder.mutation({
+      query: ({ sessionId, sessionData }) => ({
+        url: `lms_module/update_session/${sessionId}/`,  // Dynamically insert sessionId into the URL
+        method: 'PUT',
+        body: sessionData, // Session data like name, venue, etc.
+      }),
+      transformResponse: (response) => response,
+    }),
   }),
 });
 export const { 
@@ -66,4 +81,6 @@ export const {
   useUpdateClassroomMutation, 
   useCreateSessionMutation,
   useGetSessionsQuery,   
+  useMarkSessionCompletedMutation,
+  useUpdateSessionMutation,
 } = classRoomApi;
