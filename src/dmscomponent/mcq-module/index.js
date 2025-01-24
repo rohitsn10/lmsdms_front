@@ -9,284 +9,48 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import { useCreateTrainingQuizQuery } from 'apilms/questionApi';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useFetchTrainingWiseQuestionsQuery } from 'apilms/questionApi';
 
 function MultiChoiceQuestionsSection() {
-      const navigate = useNavigate(); 
-      const location = useLocation();
-      const id = location?.state?.rowData || null;
-      console.log("ID=>",id)
-        const data2 = {
-        status: true,
-        message: "Training question list fetched successfully",
-        data: [
-            {
-                id: 15,
-                training: 3,
-                question_type: "MCQ",
-                question_text: "Where is Rahane from?",
-                options: "Mumbai,aficea,nigeria,Nepal,Sri Lanka,UK",
-                correct_answer: "Mumbai",
-                marks: 5,
-                status: true,
-                question_created_at: "2025-01-22T22:14:52.827899+05:30",
-                question_updated_at: "2025-01-22T22:14:52.827899+05:30",
-                created_by: 2,
-                updated_by: null,
-                image_file_url: null,
-                audio_file_url: null,
-                video_file_url: null,
-            },
-            {
-                id: 14,
-                training: 3,
-                question_type: "Fill in the blank",
-                question_text: "Xyz comes between what?.(Give answer in DD Format)",
-                options: "",
-                correct_answer: "mma",
-                marks: 5,
-                status: true,
-                question_created_at: "2025-01-22T22:12:43.882912+05:30",
-                question_updated_at: "2025-01-22T22:12:43.882912+05:30",
-                created_by: 2,
-                updated_by: null,
-                image_file_url: null,
-                audio_file_url: null,
-                video_file_url: null,
-            },
-            {
-                id: 13,
-                training: 3,
-                question_type: "True/False",
-                question_text: "Is Water wet?",
-                options: "True,False",
-                correct_answer: "True",
-                marks: 5,
-                status: true,
-                question_created_at: "2025-01-22T22:11:42.086805+05:30",
-                question_updated_at: "2025-01-22T22:11:42.086805+05:30",
-                created_by: 2,
-                updated_by: null,
-                image_file_url: null,
-                audio_file_url: null,
-                video_file_url: null,
-            },
-            {
-                id: 12,
-                training: 3,
-                question_type: "MCQ",
-                question_text: "Question&nbsp; 1",
-                options: "abc,def,ghi,uio",
-                correct_answer: "abc",
-                marks: 5,
-                status: true,
-                question_created_at: "2025-01-22T22:10:15.015243+05:30",
-                question_updated_at: "2025-01-22T22:10:15.015243+05:30",
-                created_by: 2,
-                updated_by: null,
-                image_file_url: null,
-                audio_file_url: null,
-                video_file_url: null,
-            },
-            {
-              id: 17,
-              training: 3,
-              question_type: "Fill in the blank",
-              question_text: "Xyz comes between what?",
-              options: "",
-              correct_answer: "mewto",
-              marks: 5,
-              status: true,
-              question_created_at: "2025-01-22T22:12:43.882912+05:30",
-              question_updated_at: "2025-01-22T22:12:43.882912+05:30",
-              created_by: 2,
-              updated_by: null,
-              image_file_url: null,
-              audio_file_url: null,
-              video_file_url: null,
-          },
-        ],
-    };  
-        const data={
-            "status": true,
-            "message": "Training question list fetched successfully",
-            "data": [   
-                {
-                    "id": 19,
-                    "training": 3,
-                    "question_type": "MCQ",
-                    "question_text": "What nation is this?",
-                    "options": "test 1,test 2,test 3",
-                    "correct_answer": "test 2",
-                    "marks": 5,
-                    "status": true,
-                    "question_created_at": "2025-01-24T14:31:49.714574+05:30",
-                    "question_updated_at": "2025-01-24T14:31:49.714574+05:30",
-                    "created_by": 2,
-                    "updated_by": null,
-                    "selected_file_type": null,
-                    "selected_file": null
-                },
-                {
-                    "id": 18,
-                    "training": 3,
-                    "question_type": "MCQ",
-                    "question_text": "What is this country?",
-                    "options": "India,Sri Lanka,Bangladesh",
-                    "correct_answer": "",
-                    "marks": 5,
-                    "status": true,
-                    "question_created_at": "2025-01-24T14:28:17.662609+05:30",
-                    "question_updated_at": "2025-01-24T14:28:17.662609+05:30",
-                    "created_by": 2,
-                    "updated_by": null,
-                    "selected_file_type": null,
-                    "selected_file": null
-                },
-                {
-                    "id": 17,
-                    "training": 3,
-                    "question_type": "MCQ",
-                    "question_text": "Which animal is this?",
-                    "options": "Elephant,Tiger,Cheetah,Jaguar",
-                    "correct_answer": "Jaguar",
-                    "marks": 5,
-                    "status": true,
-                    "question_created_at": "2025-01-24T14:20:21.358104+05:30",
-                    "question_updated_at": "2025-01-24T14:20:21.358104+05:30",
-                    "created_by": 2,
-                    "updated_by": null,
-                    "selected_file_type": null,
-                    "selected_file": null
-                },
-                {
-                    "id": 16,
-                    "training": 3,
-                    "question_type": "MCQ",
-                    "question_text": "Which country does Neymar play for?",
-                    "options": "India,Nepal,Pakistan,Brazil",
-                    "correct_answer": "Brazil",
-                    "marks": 3,
-                    "status": true,
-                    "question_created_at": "2025-01-23T10:27:03.285003+05:30",
-                    "question_updated_at": "2025-01-23T10:27:03.285003+05:30",
-                    "created_by": 2,
-                    "updated_by": null,
-                    "selected_file_type": null,
-                    "selected_file": null
-                },
-                {
-                    "id": 15,
-                    "training": 3,
-                    "question_type": "MCQ",
-                    "question_text": "Where is Rahane from?",
-                    "options": "Mumbai,aficea,nigeria,Nepal,Sri Lanka,UK",
-                    "correct_answer": "Mumbai",
-                    "marks": 5,
-                    "status": true,
-                    "question_created_at": "2025-01-22T22:14:52.827899+05:30",
-                    "question_updated_at": "2025-01-22T22:14:52.827899+05:30",
-                    "created_by": 2,
-                    "updated_by": null,
-                    "selected_file_type": null,
-                    "selected_file": null
-                },
-                {
-                    "id": 14,
-                    "training": 3,
-                    "question_type": "Fill in the blank",
-                    "question_text": "Xyz comes between what?",
-                    "options": "",
-                    "correct_answer": "mma",
-                    "marks": 5,
-                    "status": true,
-                    "question_created_at": "2025-01-22T22:12:43.882912+05:30",
-                    "question_updated_at": "2025-01-22T22:12:43.882912+05:30",
-                    "created_by": 2,
-                    "updated_by": null,
-                    "selected_file_type": null,
-                    "selected_file": null
-                },
-                {
-                    "id": 13,
-                    "training": 3,
-                    "question_type": "True/False",
-                    "question_text": "Is Water wet",
-                    "options": "True,False",
-                    "correct_answer": "True",
-                    "marks": 5,
-                    "status": true,
-                    "question_created_at": "2025-01-22T22:11:42.086805+05:30",
-                    "question_updated_at": "2025-01-22T22:11:42.086805+05:30",
-                    "created_by": 2,
-                    "updated_by": null,
-                    "selected_file_type": null,
-                    "selected_file": null
-                },
-                {
-                    "id": 12,
-                    "training": 3,
-                    "question_type": "MCQ",
-                    "question_text": "Question&nbsp; 1",
-                    "options": "abc,def,ghi,uio",
-                    "correct_answer": "",
-                    "marks": 5,
-                    "status": true,
-                    "question_created_at": "2025-01-22T22:10:15.015243+05:30",
-                    "question_updated_at": "2025-01-22T22:10:15.015243+05:30",
-                    "created_by": 2,
-                    "updated_by": null,
-                    "selected_file_type": null,
-                    "selected_file": null
-                }
-            ]
-        }
+    const navigate = useNavigate(); 
+    const location = useLocation();
+    const id = location?.state?.rowData;
 
-    const { data:newData, isLoading, isError, refetch } = useCreateTrainingQuizQuery();
-    console.log(newData)
+    const { data, isLoading, isError } = useFetchTrainingWiseQuestionsQuery(id, {
+        skip: !id // Skip the query if id is not available
+    });
+
     const [counter, setCounter] = useState(0);
     const [questions, setQuestions] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [answers, setAnswers] = useState({});
-    const [correctAnswers,setCorrectAnswers] = useState([]);
+    const [correctAnswers, setCorrectAnswers] = useState({});
     const [pageCount, setPageCount] = useState(1);
-    const [timerLimit, setTimerLimit] = useState(0);
-
-    // Modal Setup
+    const [timerLimit, setTimerLimit] = useState(10 * 60);
     const [openModal, setOpenModal] = useState(false);
     const [resultMessage, setResultMessage] = useState('');
-    // React Router's navigation hook
 
-    // Function to handle modal close and redirect
-    // console.log(answers)
     useEffect(() => {
-        console.log("API Response: ", data); // Log to check the API response
-        if (data && data.data) {
-            setQuestions(data?.data); // Set the questions array
-            setPageCount(data?.data?.length); // Set the total number of questions
-            setTimerLimit(10*60); // Set a default timer limit (e.g., 60 seconds)
-            // const quizAnswers= data?.data?.map((item=>item?.correct_answer))
-            // setCorrectAnswers(quizAnswers)
-            const initialAnswers = data?.data?.reduce((acc, item) => {
-              acc[item.id] = item.correct_answer || '';
-              return acc;
-          }, {});
-          setCorrectAnswers(initialAnswers)
-        } else {
-            console.log("No quiz data found.");
+        if (data?.data?.length > 0) {
+            setQuestions(data.data);
+            setPageCount(data.data.length);
+            
+            const initialCorrectAnswers = data.data.reduce((acc, item) => {
+                acc[item.id] = (item.correct_answer || '').toLowerCase();
+                return acc;
+            }, {});
+            setCorrectAnswers(initialCorrectAnswers);
         }
-    }, []);
-    // console.log(answers )
-    // console.log("Correct Answers",correctAnswers)
-    // console.log("Selected Answers",answers)
+    }, [data]);
 
     const formatTime = (seconds) => {
-      const minutes = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${minutes} minutes, ${secs} seconds`;
-  };
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes} minutes, ${secs} seconds`;
+    };
 
     const handlePageChange = (event, page) => {
         setCurrentPage(page);
@@ -299,96 +63,31 @@ function MultiChoiceQuestionsSection() {
         }));
     };
 
-    // const handleSubmit = () => {
-    //     console.log("Submit answers", answers);
-    // };
+    const handleSubmit = () => {
+        let totalMarks = 0;
+        let marksObtained = 0;
 
-    const handleSubmit1 = () => {
-      console.log("Submit answers", answers);
-      console.log("Correct answers", correctAnswers);
-  
-      // Initialize variables for total marks and marks obtained
-      let totalMarks = 0;
-      let marksObtained = 0;
-  
-      // Iterate through the `questions` array
-      questions.forEach((question) => {
-          totalMarks += question.marks; // Accumulate total marks
-          const userAnswer = answers[question.id]; // User's answer for the question
-          const correctAnswer = correctAnswers[question.id]; // Correct answer for the question
-  
-          if (userAnswer === correctAnswer) {
-              marksObtained += question.marks; // Add marks if the answer is correct
-          }
-      });
+        questions.forEach((question) => {
+            totalMarks += question.marks;
+            const userAnswer = (answers[question.id] || '').toLowerCase();
+            const correctAnswer = correctAnswers[question.id] || '';
 
-    //   const handleSubmit = () => {
-    // console.log("Submit answers", answers);
-    // console.log("Correct answers", correctAnswers);
+            if (userAnswer === correctAnswer) {
+                marksObtained += question.marks;
+            }
+        });
 
-    // let totalMarks = 0;
-    // let marksObtained = 0;
+        const timeTaken = counter;
+        const message = `You scored ${marksObtained} out of ${totalMarks} marks.\n Time taken: ${formatTime(timeTaken)}`;
+        setResultMessage(message);
+        setOpenModal(true);
+    };
 
-    // questions.forEach((question) => {
-    //     totalMarks += question.marks;
-    //     const userAnswer = answers[question.id];
-    //     const correctAnswer = correctAnswers[question.id];
+    const handleModalClose = () => {
+        setOpenModal(false);
+        navigate('/trainingListing');
+    };
 
-    //     if (userAnswer === correctAnswer) {
-    //         marksObtained += question.marks;
-    //     }
-    // });
-
-    // const timeTaken = counter;
-    // const message = `You scored ${marksObtained} out of ${totalMarks} marks.\nTime taken: ${formatTime(timeTaken)}`;
-    // setResultMessage(message);
-    // setOpenModal(true);
-    //   };
-      
-
-    
-  
-      // Log the results
-      // console.log("Total Marks:", totalMarks);
-      // console.log("Marks Obtained:", marksObtained);
-      // const timeTaken = counter;
-      // alert(`You scored ${marksObtained} out of ${totalMarks} marks
-      //   You scored ${marksObtained} out of ${totalMarks} marks.\nTime taken: ${formatTime(timeTaken)}
-      //   `);
-      // alert(`You scored ${marksObtained} out of ${totalMarks} marks.\nTime taken: ${formatTime(timeTaken)}`);
-  };
-  const handleSubmit = () => {
-    console.log("Submit answers", answers);
-    console.log("Correct answers", correctAnswers);
-
-    let totalMarks = 0;
-    let marksObtained = 0;
-
-    questions.forEach((question) => {
-        totalMarks += question.marks;
-        // const userAnswer = answers[question.id];
-        // const correctAnswer = correctAnswers[question.id];
-
-        const userAnswer = (answers[question.id] || '').toLowerCase();
-        const correctAnswer = (correctAnswers[question.id] || '').toLowerCase();
-
-
-        if (userAnswer === correctAnswer) {
-            marksObtained += question.marks;
-        }
-    });
-
-    const timeTaken = counter;
-    const message = `You scored ${marksObtained} out of ${totalMarks} marks.\n Time taken: ${formatTime(timeTaken)}`;
-    setResultMessage(message);
-    setOpenModal(true);
-};
-const handleModalClose = () => {
-  setOpenModal(false);
-  // setAnswers({});
-  // setCounter(0); // Reset timer
-  navigate('/trainingListing'); // Redirect to /questions
-};
     // Styles
     const mcqSection = {
         width: '900px',
@@ -417,10 +116,31 @@ const handleModalClose = () => {
         marginBottom: '20px',
     };
 
+    // Loading and error states
+    if (isLoading) {
+        return (
+            <div style={{...mcqSection, justifyContent: 'center', alignItems: 'center'}}>
+                <CircularProgress />
+            </div>
+        );
+    }
+
+    if (isError || !id || questions.length === 0) {
+        return (
+            <div style={{...mcqSection, justifyContent: 'center', alignItems: 'center'}}>
+                <p>No questions available or an error occurred.</p>
+            </div>
+        );
+    }
+
     return (
         <div style={mcqSection}>
             <div style={topSection}>
-                <CounterIndicator counter={counter} setCounter={setCounter} timerLimit={timerLimit} />
+                <CounterIndicator 
+                    counter={counter} 
+                    setCounter={setCounter} 
+                    timerLimit={timerLimit} 
+                />
                 <MDButton
                     variant="contained"
                     color="primary"
@@ -431,14 +151,15 @@ const handleModalClose = () => {
                 </MDButton>
             </div>
             <div>
-                <QuestionSection
-                    question={questions[currentPage - 1]}
-                    questionIndex={currentPage}
-                    pageCount={pageCount}
-                    onAnswerChange={handleAnswerChange}
-                    answers={answers}
-                />
-
+                {questions[currentPage - 1] && (
+                    <QuestionSection
+                        question={questions[currentPage - 1]}
+                        questionIndex={currentPage}
+                        pageCount={pageCount}
+                        onAnswerChange={handleAnswerChange}
+                        answers={answers}
+                    />
+                )}
             </div>
             <div style={paginationStyles}>
                 <Stack spacing={2}>
