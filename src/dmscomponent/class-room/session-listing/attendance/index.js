@@ -7,50 +7,45 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
-import PropTypes from "prop-types"; // Import PropTypes for validation
-import { useCreateAttendanceMutation } from "apilms/classRoomApi"; // Import the mutation hook
+import PropTypes from "prop-types";
+import { useCreateAttendanceMutation } from "apilms/classRoomApi"; 
 
-const AttendanceDialog = ({ open, setOpen, attendanceData, setAttendanceData, sessionId,refetch  }) => {
-  // console.log("AttendanceDialog open-------------:", open); 
-  const [createAttendance] = useCreateAttendanceMutation(); // Hook to call the mutation
+const AttendanceDialog = ({ open, setOpen, attendanceData, setAttendanceData, sessionId,refetch  }) => { 
+  const [createAttendance] = useCreateAttendanceMutation(); 
 
   // Handle attendance change (checkbox toggle)
   const handleAttendanceChange = (index, event) => {
     const updatedAttendance = attendanceData.map((user, idx) => {
       if (idx === index) {
-        return { ...user, present: event.target.checked }; // Update present status
+        return { ...user, present: event.target.checked };
       }
       return user;
     });
 
-    setAttendanceData(updatedAttendance); // Update the state
+    setAttendanceData(updatedAttendance); 
   };
 
-  // Handle saving attendance
+ 
   const handleSaveAttendance = () => {
-    // Collect user IDs and their status from the attendanceData state
     const userIds = attendanceData
-      .filter(user => user.present !== undefined) // Filter out users with undefined status
-      .map(user => user.id); // Get only user IDs
+      .filter(user => user.present !== undefined) 
+      .map(user => user.id);
 
     // const statuses = attendanceData
     //   .filter(user => user.present !== undefined) // Filter out users with undefined status
     //   .map(user => user.present ? 'present' : 'absent'); // Convert present status to 'present' or 'absent'
 
     if (userIds.length > 0) {
-      // Create an object with the session ID, user IDs, and statuses
       const attendanceDataToSend = {
-        session_id: sessionId,  // Use the session ID from the current session
-        user_ids: userIds,      // Send the user IDs
-        status:  "present",       // Send the statuses (present/absent)
+        session_id: sessionId, 
+        user_ids: userIds,     
+        status:  "present",       
       };
-
-      // Call the API to save the attendance
       createAttendance(attendanceDataToSend)
         .unwrap()
         .then((response) => {
           console.log("Attendance marked:", response);
-          setOpen(false); // Close the dialog after saving
+          setOpen(false); 
           refetch(); 
         })
         .catch((error) => {
@@ -60,8 +55,8 @@ const AttendanceDialog = ({ open, setOpen, attendanceData, setAttendanceData, se
     }
   };
   const handleCloseDialog = () => {
-    setOpen(false); // Close dialog
-    refetch(); // Trigger refetch to refresh session data
+    setOpen(false); 
+    refetch(); 
   };
 
   return (
@@ -99,20 +94,18 @@ const AttendanceDialog = ({ open, setOpen, attendanceData, setAttendanceData, se
     </Dialog>
   );
 };
-
-// PropTypes validation
 AttendanceDialog.propTypes = {
-  open: PropTypes.bool.isRequired, // open is a boolean, and it's required
-  setOpen: PropTypes.func.isRequired, // setOpen is a function, and it's required
+  open: PropTypes.bool.isRequired,
+  setOpen: PropTypes.func.isRequired, 
   attendanceData: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       username: PropTypes.string.isRequired,
       present: PropTypes.bool,
     })
-  ).isRequired, // attendanceData is an array of objects, each with id, username, and present (boolean)
-  setAttendanceData: PropTypes.func.isRequired, // setAttendanceData is a function, and it's required
-  sessionId: PropTypes.number.isRequired, // sessionId is a number and required
+  ).isRequired, 
+  setAttendanceData: PropTypes.func.isRequired, 
+  sessionId: PropTypes.number.isRequired, 
   refetch:PropTypes.func.isRequired,
   
 };

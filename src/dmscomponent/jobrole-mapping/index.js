@@ -33,10 +33,8 @@ const JobRoleMapping = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [errors, setErrors] = useState({});
   const { data: jobRoleData } = useGetJobRoleQuery();
-
-  // Fetch training types only when a training type is selected
   const { data: trainingTypesData } = useFetchTrainingTypesQuery({
-    enabled: !!trainingType, // Only enable the query when trainingType is selected
+    enabled: !!trainingType, 
   });
 
   const {
@@ -45,8 +43,7 @@ const JobRoleMapping = () => {
     error: trainingError,
   } = useTrainingListDataQuery({ training_type: trainingType });
   const { data: jobTrainingListData, refetch,isLoading: jobTrainingLoading } = useJobTrainingListMappingQuery({
-    job_role_id: selectedJobRole, // Trigger the API call when selectedJobRole changes
-    // enabled: !!selectedJobRole, // Enable the query only when selectedJobRole is not empty
+    job_role_id: selectedJobRole, 
   
   });
   useEffect(() => {
@@ -55,8 +52,6 @@ const JobRoleMapping = () => {
     console.log('Triggering Job Training API with:', selectedJobRole);
     console.log("------------------------------*---------------",jobTrainingListData);
   }, [selectedJobRole]);
-
-  // console.log("------------------------------*---------------",jobTrainingListData);
   const handleDragEnd = (result) => {
     const { destination, source } = result;
 
@@ -84,7 +79,6 @@ const JobRoleMapping = () => {
   };
 
   useEffect(() => {
-    // Update toDo list if trainingListData is available
     if (trainingListData?.length > 0) {
       const updatedToDoList = trainingListData.map((training) => ({
         id: training.training_number,
@@ -97,8 +91,6 @@ const JobRoleMapping = () => {
       }));
     }
   }, [trainingListData]);
-
-  // Update inProgress kanban list when jobTrainingListData changes
   useEffect(() => {
     if (jobTrainingListData?.data?.length > 0) {
       const updatedInProgressList = jobTrainingListData.data.map((training) => ({

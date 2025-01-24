@@ -18,7 +18,7 @@ const SessionListing = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [openAttendanceDialog, setOpenAttendanceDialog] = useState(false);
   console.log("----------------------------",openAttendanceDialog)
-  const [selectedSessionId, setSelectedSessionId] = useState(null); // Track selected session ID
+  const [selectedSessionId, setSelectedSessionId] = useState(null); 
   const navigate = useNavigate();
   const location = useLocation();
   const classroom = location.state?.classroom;
@@ -41,8 +41,7 @@ const SessionListing = () => {
   
 
   const handleAttendanceClick = (sessionId, isViewAttendance = false) => {
-    // console.log("handleAttendanceClick called for sessionId:", sessionId);  // Add this line
-    setSelectedSessionId(sessionId); // Set the selected session ID
+    setSelectedSessionId(sessionId); 
     const session = data?.data?.find((s) => s.session_id === sessionId);
     console.log("session",session)
     if (session && session.user_ids) {
@@ -50,11 +49,9 @@ const SessionListing = () => {
       const filteredUsers = userData?.data?.filter((user) => userIds.includes(user.id));
   
       if (isViewAttendance) {
-        // Open View Attendance Dialog
         setViewAttendanceData(filteredUsers);
         setOpenViewAttendanceDialog(true);
       } else {
-        // Open Attendance Dialog
         setAttendanceData(filteredUsers);
         setOpenAttendanceDialog(true);
         console.log("Dialog open state:", openAttendanceDialog); 
@@ -69,13 +66,10 @@ const SessionListing = () => {
       .unwrap()
       .then((response) => {
         console.log("Session marked as completed:", response);
-        // Trigger refetch after marking session as completed
-        refetch(); // This will refresh the session data
+        refetch(); 
       })
       .catch((err) => console.error("Failed to mark session as completed:", err));
   };
-
-  // Filtered session data for search
   const filteredData = data?.data
     ? data.data
         .filter(
@@ -85,9 +79,9 @@ const SessionListing = () => {
         )
         .map((session, index) => ({
           ...session,
-          id: session.session_id, // Use session_id as the unique id
-          serial_number: index + 1, // Add serial number (index + 1)
-          start_date: moment(session.start_date).format("DD/MM/YY HH:mm"), // Format start date
+          id: session.session_id,
+          serial_number: index + 1, 
+          start_date: moment(session.start_date).format("DD/MM/YY HH:mm"), 
         }))
     : [];
 
@@ -124,9 +118,9 @@ const SessionListing = () => {
           variant="outlined"
           color="primary"
           onClick={() => {
-            const isViewAttendance = params.row.attend; // Check if attendance is available to view
+            const isViewAttendance = params.row.attend; 
             // console.log("is view open get or not ",isViewAttendance)
-            handleAttendanceClick(params.row.id, isViewAttendance); // Pass isViewAttendance flag
+            handleAttendanceClick(params.row.id, isViewAttendance); 
           }}
           disabled={!params.row.is_completed}
         >
@@ -179,7 +173,7 @@ const SessionListing = () => {
               pageSize={5}
               rowsPerPageOptions={[5, 10, 20]}
               disableSelectionOnClick
-              getRowId={(row) => row.session_id} // Specify session_id as the unique id
+              getRowId={(row) => row.session_id}
               sx={{
                 border: "1px solid #ddd",
                 borderRadius: "4px",
@@ -197,14 +191,12 @@ const SessionListing = () => {
           </div>
         </MDBox>
       </Card>
-
-      {/* Attendance Dialog */}
       <AttendanceDialog
         open={openAttendanceDialog}
         setOpen={setOpenAttendanceDialog}
         attendanceData={attendanceData}
         setAttendanceData={setAttendanceData}
-        sessionId={selectedSessionId} // Pass sessionId to the dialog
+        sessionId={selectedSessionId} 
         refetch={refetch}
       />
       <ViewAttendanceDialog

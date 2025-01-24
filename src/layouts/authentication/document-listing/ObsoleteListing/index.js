@@ -4,16 +4,12 @@ import { DataGrid } from "@mui/x-data-grid";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
-import moment from "moment";  // Import moment.js
+import moment from "moment"; 
 import { useGetObsoleteStatusDataQuery } from "api/auth/documentApi";
 
 const ObsoleteDataListing = () => {
   const [searchTerm, setSearchTerm] = useState(""); 
-
-  // Use the API hook to fetch the data
   const { data: obsoleteData, isLoading, error } = useGetObsoleteStatusDataQuery();
-
-  // Handle loading state
   if (isLoading) {
     return (
       <MDBox p={3}>
@@ -42,8 +38,6 @@ const ObsoleteDataListing = () => {
       </MDBox>
     );
   }
-
-  // Filter the fetched data based on search term, using optional chaining to avoid errors if data is undefined
   const filteredData = (obsoleteData?.length > 0 ? obsoleteData : []).filter(
     (doc) =>
       doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -51,12 +45,10 @@ const ObsoleteDataListing = () => {
       doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  // Map the filtered data to the format required by DataGrid
   const rows = filteredData.map((doc, index) => ({
     ...doc,
     index,
-    created_at: moment(doc.created_at).format("DD/MM/YY"), // Format date
+    created_at: moment(doc.created_at).format("DD/MM/YY"), 
   }));
 
   const columns = [
