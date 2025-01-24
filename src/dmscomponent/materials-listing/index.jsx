@@ -1,4 +1,4 @@
-  import React, { useRef, useState } from 'react'
+  import React, { useEffect, useRef, useState } from 'react'
   import { Box, Grid, MenuItem, TextField, Typography } from '@mui/material';
   import Divider from '@mui/material/Divider';
   import Card from "@mui/material/Card";
@@ -6,9 +6,12 @@
   import MDTypography from 'components/MDTypography'; 
   import AddSectionModal from './AddSectionModal';
   import AddMaterialModal from './AddMaterialModal';
-import CollapsibleTable from './collapsableContent.jsx';
-import { useAuth } from "hooks/use-auth";
-import { data } from './constant';
+  import CollapsibleTable from './collapsableContent.jsx';
+  import { useAuth } from "hooks/use-auth";
+  import { data } from './constant';
+  import axios from 'axios';
+  import { useLocation } from 'react-router-dom';
+import apiService from 'services/apiService';
 
   function MaterialListing() {
       const [open, setOpen] = useState(false);
@@ -20,14 +23,43 @@ import { data } from './constant';
       const descriptionRef = useRef(null);
       const [status, setStatus] = useState("");
       const [openSectionModal, setOpenSectionModal] = useState(false);
-      
-    const { user, role } = useAuth();
-  // console.log(user)
+      const [sectionData,setSectionData] = useState([]);
+      const { user, role } = useAuth();
+      const location = useLocation();
+      const [trainingTitle, setTrainingTitle] = useState("");
+
+  useEffect(() => {
+    // Extract training_id from the current path
+    const pathParts = location.pathname.split('/');
+    const trainingId = pathParts[pathParts.length - 1]; // The last part is the training_id
+
+    // Fetch training section data using the extracted training_id
+    const fetchTrainingSection = async (trainingId) => {
+        try {
+            const response = await apiService.get(`/lms_module/create_training_section`, {
+                params: {
+                    training_id: trainingId,
+                },
+            });
+            console.log('Training Section Data:', response?.data);
+            setSectionData(response?.data);
+            const trainingTitle = response?.data?.training_title;
+            setTrainingTitle(trainingTitle || "Default Training Title");
+        } catch (error) {
+            console.error('Error fetching training section:', error);
+        }
+    };
+
+    if (trainingId) {
+        fetchTrainingSection(trainingId); // Make the GET request with training_id
+    }
+}, [location.pathname]);
+
       const handleFileChange = (e) => {
-        setUploadedFile(e.target.files[0]);
+        setUploadedFile(e?.target?.files[0]);
       };
 
-      const handleClickOpen = () => {
+        const handleClickOpen = () => {
           setOpen(true);
         };
         const handleClose = () => {
@@ -41,24 +73,6 @@ import { data } from './constant';
         const handleCloseSectionModal = () => {
           setOpenSectionModal(false);
         };
-
-
-      const dummyRows=[
-        {
-          id: 1,
-          serial_number: "Section 1",
-          min_time: "10 mins",
-          plant_name: "Yes",
-          training_name: "Safety update",
-        },
-        {
-          id: 2,
-          serial_number: "Section 2",
-          min_time: "15 mins",
-          plant_name: "No",
-          training_name: "Procedure change",
-        },
-      ]
 
         const handleSubmit=()=>{
 
@@ -82,13 +96,13 @@ import { data } from './constant';
                       <MDTypography variant="h5" color="textSecondary">
                           Training No.:
                       </MDTypography>
-                      <Typography variant="h5">PRD052</Typography>
+                      <Typography variant="h5">--</Typography>
                   </Grid>
                   <Grid item xs={2}>
                       <MDTypography variant="h5" color="textSecondary">
                           Version:
                       </MDTypography>
-                      <Typography variant="h5">6.0</Typography>
+                      <Typography variant="h5">--</Typography>
                   </Grid>
                   <Grid item xs={3}>
                       <MDTypography variant="h5" color="textSecondary">
@@ -102,7 +116,8 @@ import { data } from './constant';
                       <MDTypography variant="h5" color="textSecondary">
                       Training Title:                    
                       </MDTypography>
-                      <Typography variant="h6">Capacity Calibration of Manufacturing Equipments Manufacturing Manufacturing Manufacturing
+                      <Typography variant="h6">
+                      {trainingTitle}
                       </Typography>
                   </Grid>
               </Grid>
@@ -138,8 +153,7 @@ import { data } from './constant';
               </Box>
               </div>
           </Box>
-        {/* <CollapsibleTable/> */}
-        <CollapsibleTable open={open} setOpen={setOpen} data={data}/>
+        <CollapsibleTable open={open} setOpen={setOpen} data={sectionData?.data}/>
         </Card>
             <AddMaterialModal 
             open={open}

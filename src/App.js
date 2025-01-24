@@ -110,6 +110,7 @@ import { useSelector } from "react-redux";
 
 import ClassroomListing from "dmscomponent/class-room/index.js";
 import SessionListing from "dmscomponent/class-room/session-listing/index.js";
+import ViewEmployeeStatus from "dmscomponent/view-employees/index.jsx";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -359,7 +360,8 @@ export default function App() {
       <Route path="/mcq-module" element={<MultiChoiceQuesionsSection/>}/>
       <Route path="/training-material/:trainingNumber" element={<MaterialListing/>}/>
       <Route path="/class-room" element={<ClassroomListing/>}/>
-      <Route path="/session-list" element={<SessionListing/>}/>
+      <Route path="/session-list" element={<SessionListing/>}/> 
+      <Route path="/employee-workflow" element={<ViewEmployeeStatus/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   </div>

@@ -44,8 +44,8 @@ const PDFPreview = () => {
         const pdfDataUrl = fileReader.result;
         const embed = document.createElement("embed");
         embed.src = pdfDataUrl;
-        embed.width = "100%";
-        embed.height = "100%"; // Set the desired height for the preview
+        embed.width = "250px";
+        embed.height = "250px"; // Set the desired height for the preview
         pdfContainerRef.current.innerHTML = ""; // Clear previous content
         pdfContainerRef.current.appendChild(embed);
       };
@@ -70,7 +70,7 @@ const PDFPreview = () => {
           <Box
             ref={pdfContainerRef}
             sx={{
-              width: "100%",  
+              width: "500px",  
               height: "800px", 
               marginBottom: 2,
               border: "1px solid #ccc",

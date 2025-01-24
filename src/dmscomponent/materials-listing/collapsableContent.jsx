@@ -23,6 +23,7 @@ import {
 import EditSectionModal from "./editSectionModal";
 import EditMaterialModal from "./editMaterialModal";
 import ViewFileModal from "./ViewFileModal";
+import CollapsibleSection from "./materialCards";
 
 const CollapsibleCard = ({ data, open, setOpen }) => {
   const [openRows, setOpenRows] = useState({}); // To track which rows are open
@@ -32,7 +33,6 @@ const CollapsibleCard = ({ data, open, setOpen }) => {
   const [openEditMaterialModal, setOpenEditMaterialModal] = useState(false);
   const [editMaterialData, setEditMaterialData] = useState(null);
 
-  // View File.
   const [openViewFileModal, setOpenViewFileModal] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
 
@@ -81,174 +81,188 @@ const CollapsibleCard = ({ data, open, setOpen }) => {
     setSelectedMaterial(material); // Set selected material
     setOpenViewFileModal(true); // Open the ViewFileModal
   };
-
+  console.log("Data",data)
   return (
     <Box sx={{ padding: 5 }}>
+
       <Grid container spacing={3}>
-        {data?.map((row) => (
-          <Grid item xs={12} key={row.id}>
-            <Card
-              sx={{
-                boxShadow: 8,
-                borderRadius: 2,
-                background: "linear-gradient(to right, #f9f9f9, #e8e8e8)",
-                paddingTop: 3,
-                transition: "transform 0.2s",
-                "&:hover": {
-                  transform: "scale(1.02)",
-                },
-              }}
-              elevation={10}
-            >
-              <CardContent>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h6" color="primary" sx={{ fontWeight: "bold" }}>
-                      Section: {row.section_name}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "gray", fontSize: 14 }}
-                    >
-                      {row.section_description}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Button
-                      startIcon={<Add />}
-                      onClick={() => setOpen(!open)}
-                      sx={{
-                        color: "white",
-                        background: "#4caf50",
-                        "&:hover": {
-                          background: "#43a047",
-                          color: "white",
-                        },
-                      }}
-                    >
-                      Add Material
-                    </Button>
-                    <Button
-                      startIcon={<Edit />}
-                      sx={{ marginLeft: 1, color: "#1976d2" }}
-                      onClick={() => handleOpenEditModal(row)}
-                    >
-                      Edit Section
-                    </Button>
-                    <Button
-                      startIcon={<Delete />}
-                      sx={{
-                        marginLeft: 1,
-                        color: "#d32f2f",
-                        "&:hover": {
-                          color: "white",
-                          background: "#c62828",
-                        },
-                      }}
-                    >
-                      Delete Section
-                    </Button>
-                  </Box>
-                  <IconButton onClick={() => toggleRow(row.id)}>
-                    {openRows[row.id] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                  </IconButton>
-                </Box>
-              </CardContent>
-
-              <Collapse in={openRows[row.id]} timeout="auto" unmountOnExit>
-                <CardContent sx={{ borderTop: "1px solid #ddd" }}>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Materials
+    {/* Check if data is an array and has items */}
+    {Array.isArray(data) && data.length > 0 ? (
+      data.map((row) => (
+        <Grid item xs={12} key={row.id}>
+          <Card
+            sx={{
+              boxShadow: 8,
+              borderRadius: 2,
+              background: "linear-gradient(to right, #f9f9f9, #e8e8e8)",
+              paddingTop: 3,
+              transition: "transform 0.2s",
+              "&:hover": {
+                transform: "scale(1.02)",
+              },
+            }}
+            elevation={10}
+          >
+            <CardContent>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Box>
+                  <Typography variant="h6" color="primary" sx={{ fontWeight: "bold" }}>
+                    Section: {row.section_name}
                   </Typography>
-                  {row.material.map((material, index) => (
-                    <Paper
-                      key={index}
-                      elevation={1}
-                      sx={{
-                        padding: 2,
-                        marginBottom: 2,
-                        border: "1px solid #ddd",
-                        borderRadius: 1,
-                        "&:hover": {
-                          boxShadow: 4,
-                        },
-                      }}
-                    >
-                      <Typography variant="body1">
-                        <strong>Title:</strong> {material.material_title}
-                      </Typography>
-                      <Typography variant="body2">
-                        <strong>Type:</strong> {material.material_type}
-                      </Typography>
-                      <Typography variant="body2">
-                        <strong>Reading Time:</strong> {material.minimum_reading_time}
-                      </Typography>
-                      <Typography variant="body2">
-                        <strong>Created At:</strong>{" "}
-                        {new Date(material.material_created_at).toLocaleString()}
-                      </Typography>
-                      <Box sx={{ display: "flex", flexDirection: "row", gap: "10px" }}>
-                        <Button
-                          variant="contained"
-                          startIcon={<Visibility />}
-                          color="primary"
-                          onClick={() => handleViewFileClick(material)}
-                          size="small"
-                          sx={{
-                            marginTop: 1,
-                            textTransform: "none",
-                          }}
-                        >
-                          View File
-                        </Button>
-                        <Button
-                          startIcon={<Edit />}
-                          onClick={() => handleOpenEditMaterialModal(material)} // Open the edit material modal
-                          size="small"
-                          sx={{
-                            marginTop: 1,
-                            color: "white !important",
-                            background: "#62B866",
-                            "&:hover": {
-                              color: "white !important",
-                              background: "#4caf50",
-                            },
-                          }}
-                        >
-                          Edit Material
-                        </Button>
-                        <Button
-                          variant="contained"
-                          startIcon={<Delete />}
-                          size="small"
-                          sx={{
-                            marginTop: 1,
-                            color: "white !important",
-                            background: "#d32f2f",
-                            "&:hover": {
-                              color: "white !important",
-                              background: "#c62828",
-                            },
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </Box>
-                    </Paper>
-                  ))}
-                </CardContent>
-              </Collapse>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "gray", fontSize: 14 }}
+                  >
+                    {row.section_description}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Button
+                    startIcon={<Add />}
+                    onClick={() => setOpen(!open)}
+                    sx={{
+                      color: "green",
+                      "&:hover": {
+                        background: "#43a047",
+                        color: "white !important",
+                      },
+                    }}
+                  >
+                    Add Material
+                  </Button>
+                  <Button
+                    startIcon={<Edit />}
+                    sx={{ marginLeft: 1, color: "#1976d2" }}
+                    onClick={() => handleOpenEditModal(row)}
+                  >
+                    Edit Section
+                  </Button>
+                  <Button
+                    startIcon={<Delete />}
+                    sx={{
+                      marginLeft: 1,
+                      color: "#d32f2f",
+                      "&:hover": {
+                        color: "red !important",
+                      },
+                    }}
+                  >
+                    Delete Section
+                  </Button>
+                </Box>
+                <IconButton onClick={() => toggleRow(row.id)}>
+                  {openRows[row.id] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                </IconButton>
+              </Box>
+            </CardContent>
 
+            {/* <Collapse in={openRows[row.id]} timeout="auto" unmountOnExit>
+              <CardContent sx={{ borderTop: "1px solid #ddd" }}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Materials
+                </Typography>
+                {Array.isArray(row?.material) && row.material.map((material, index) => (
+                  <Paper
+                    key={index}
+                    elevation={1}
+                    sx={{
+                      padding: 2,
+                      marginBottom: 2,
+                      border: "1px solid #ddd",
+                      borderRadius: 1,
+                      "&:hover": {
+                        boxShadow: 4,
+                      },
+                    }}
+                  >
+                    <Typography variant="body1">
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Title:</strong> {material.material_title}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Type:</strong> {material.material_type}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Reading Time:</strong> {material.minimum_reading_time}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Created At:</strong>{" "}
+                      {new Date(material.material_created_at).toLocaleString()}
+                    </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "row", gap: "10px" }}>
+                      <Button
+                        variant="contained"
+                        startIcon={<Visibility />}
+                        color="primary"
+                        onClick={() => handleViewFileClick(material)}
+                        size="small"
+                        sx={{
+                          marginTop: 1,
+                          textTransform: "none",
+                        }}
+                      >
+                        View File
+                      </Button>
+                      <Button
+                        startIcon={<Edit />}
+                        onClick={() => handleOpenEditMaterialModal(material)} // Open the edit material modal
+                        size="small"
+                        sx={{
+                          marginTop: 1,
+                          color: "white !important",
+                          background: "#62B866",
+                          "&:hover": {
+                            color: "white !important",
+                            background: "#4caf50",
+                          },
+                        }}
+                      >
+                        Edit Material
+                      </Button>
+                      <Button
+                        variant="contained"
+                        startIcon={<Delete />}
+                        size="small"
+                        sx={{
+                          marginTop: 1,
+                          color: "white !important",
+                          background: "#d32f2f",
+                          "&:hover": {
+                            color: "white !important",
+                            background: "#c62828",
+                          },
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </Box>
+                  </Paper>
+                ))}
+              </CardContent>
+            </Collapse> */}
+            <CollapsibleSection
+                  open={openRows[row.id]}
+                  materials={row.material}
+                  handleViewFileClick={handleViewFileClick}
+                  handleOpenEditMaterialModal={handleOpenEditMaterialModal}
+                  sectionID={row.id}
+                />
+          </Card>
+        </Grid>
+      ))
+    ) : (
+      <Typography variant="h6" color="error" sx={{ textAlign: 'center', width: '100%' }}>
+        Section not found.
+      </Typography>
+    )}
+  </Grid>
       {selectedMaterial && (
         <ViewFileModal
           open={openViewFileModal}
