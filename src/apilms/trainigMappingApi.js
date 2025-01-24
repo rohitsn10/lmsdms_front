@@ -20,7 +20,7 @@ export const trainingMappingApi = createApi({
         url: `lms_module/jobrole_assign_training/${training_id}`, // URL with dynamic training_id
         method: "PUT",
         body: {
-          job_role_ids, // Sending job_role_ids as an array
+          job_role_ids, 
         },
       }),
       transformResponse: (response) => response, // Handle the response data if needed

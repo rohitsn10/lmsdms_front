@@ -24,7 +24,7 @@ const SessionListing = () => {
   const classroom = location.state?.classroom;
   const classroomId = classroom.classroom_id;
   const [markSessionCompleted] = useMarkSessionCompletedMutation();
-  const { data, isLoading, error } = useGetSessionsQuery(classroomId);
+  const { data, isLoading, error,refetch } = useGetSessionsQuery(classroomId);
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
   const [openViewAttendanceDialog, setOpenViewAttendanceDialog] = useState(false);
   const [viewAttendanceData, setViewAttendanceData] = useState([]);
@@ -35,6 +35,10 @@ const SessionListing = () => {
   const handleEditSession = (session) => navigate("/edit-session", { state: { session } }
     
   );
+  useEffect(() => {
+      refetch();
+    }, [location.key]);
+  
 
   const handleAttendanceClick = (sessionId, isViewAttendance = false) => {
     // console.log("handleAttendanceClick called for sessionId:", sessionId);  // Add this line
@@ -55,15 +59,19 @@ const SessionListing = () => {
         setOpenAttendanceDialog(true);
         console.log("Dialog open state:", openAttendanceDialog); 
       }
+      refetch();
     }
   };
   
 
-  // Mark session as completed
   const handleMarkCompleted = (sessionId) => {
     markSessionCompleted(sessionId)
       .unwrap()
-      .then((response) => console.log("Session marked as completed:", response))
+      .then((response) => {
+        console.log("Session marked as completed:", response);
+        // Trigger refetch after marking session as completed
+        refetch(); // This will refresh the session data
+      })
       .catch((err) => console.error("Failed to mark session as completed:", err));
   };
 
@@ -197,6 +205,7 @@ const SessionListing = () => {
         attendanceData={attendanceData}
         setAttendanceData={setAttendanceData}
         sessionId={selectedSessionId} // Pass sessionId to the dialog
+        refetch={refetch}
       />
       <ViewAttendanceDialog
         open={openViewAttendanceDialog}

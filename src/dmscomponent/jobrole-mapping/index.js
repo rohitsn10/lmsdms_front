@@ -20,7 +20,7 @@ import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 import { useGetJobRoleQuery } from "apilms/jobRoleApi";
 import { useFetchTrainingTypesQuery } from "apilms/trainingtypeApi";
 import { useTrainingListDataQuery } from "apilms/trainigMappingApi";
-import { useJobTrainingListMappingQuery } from "apilms/trainigMappingApi"; // Import the query
+import { useJobTrainingListMappingQuery } from "apilms/trainigMappingApi"; 
 
 const JobRoleMapping = () => {
   
@@ -44,14 +44,19 @@ const JobRoleMapping = () => {
     isLoading: trainingLoading,
     error: trainingError,
   } = useTrainingListDataQuery({ training_type: trainingType });
-
-  // Use the job role API to fetch job training list
-  const { data: jobTrainingListData, isLoading: jobTrainingLoading } = useJobTrainingListMappingQuery({
+  const { data: jobTrainingListData, refetch,isLoading: jobTrainingLoading } = useJobTrainingListMappingQuery({
     job_role_id: selectedJobRole, // Trigger the API call when selectedJobRole changes
-    enabled: !!selectedJobRole, // Enable the query only when selectedJobRole is not empty
+    // enabled: !!selectedJobRole, // Enable the query only when selectedJobRole is not empty
+  
   });
+  useEffect(() => {
+    refetch()
+    console.log('Selected Job Role:', selectedJobRole);
+    console.log('Triggering Job Training API with:', selectedJobRole);
+    console.log("------------------------------*---------------",jobTrainingListData);
+  }, [selectedJobRole]);
 
-  console.log("------------------------------*---------------",jobTrainingListData);
+  // console.log("------------------------------*---------------",jobTrainingListData);
   const handleDragEnd = (result) => {
     const { destination, source } = result;
 

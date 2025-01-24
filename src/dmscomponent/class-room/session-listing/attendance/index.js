@@ -10,7 +10,7 @@ import MDTypography from "components/MDTypography";
 import PropTypes from "prop-types"; // Import PropTypes for validation
 import { useCreateAttendanceMutation } from "apilms/classRoomApi"; // Import the mutation hook
 
-const AttendanceDialog = ({ open, setOpen, attendanceData, setAttendanceData, sessionId }) => {
+const AttendanceDialog = ({ open, setOpen, attendanceData, setAttendanceData, sessionId,refetch  }) => {
   // console.log("AttendanceDialog open-------------:", open); 
   const [createAttendance] = useCreateAttendanceMutation(); // Hook to call the mutation
 
@@ -51,11 +51,17 @@ const AttendanceDialog = ({ open, setOpen, attendanceData, setAttendanceData, se
         .then((response) => {
           console.log("Attendance marked:", response);
           setOpen(false); // Close the dialog after saving
+          refetch(); 
         })
         .catch((error) => {
           console.error("Error saving attendance:", error);
         });
+       
     }
+  };
+  const handleCloseDialog = () => {
+    setOpen(false); // Close dialog
+    refetch(); // Trigger refetch to refresh session data
   };
 
   return (
@@ -83,7 +89,7 @@ const AttendanceDialog = ({ open, setOpen, attendanceData, setAttendanceData, se
         )}
       </DialogContent>
       <DialogActions>
-        <MDButton onClick={() => setOpen(false)} color="secondary">
+      <MDButton onClick={handleCloseDialog} color="secondary">
           Close
         </MDButton>
         <MDButton onClick={handleSaveAttendance} color="primary">
@@ -107,6 +113,8 @@ AttendanceDialog.propTypes = {
   ).isRequired, // attendanceData is an array of objects, each with id, username, and present (boolean)
   setAttendanceData: PropTypes.func.isRequired, // setAttendanceData is a function, and it's required
   sessionId: PropTypes.number.isRequired, // sessionId is a number and required
+  refetch:PropTypes.func.isRequired,
+  
 };
 
 export default AttendanceDialog;
