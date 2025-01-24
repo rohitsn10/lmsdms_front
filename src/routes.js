@@ -39,7 +39,7 @@ import HomeMiniRoundedIcon from '@mui/icons-material/HomeMiniRounded';
 import MethodologyListing from "dmscomponent/methodology-listing";
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import TrainingTypeListing from "dmscomponent/trainingType-Listing";
-
+import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import InductionListing from "dmscomponent/induction-training/induction-listing";
 import QuizListing from "dmscomponent/add-quiz/list"
 import DevicesFoldTwoToneIcon from '@mui/icons-material/DevicesFoldTwoTone';
@@ -56,7 +56,7 @@ import ForkRightTwoToneIcon from '@mui/icons-material/ForkRightTwoTone';
 import ArchivedListing from "layouts/authentication/archived-listing";
 import ClassroomListing from "dmscomponent/class-room";
 import ViewEmployeeStatus from "dmscomponent/view-employees";
-
+import SchoolTwoToneIcon from '@mui/icons-material/SchoolTwoTone';
 const routes = [
   {
     type: "collapse",
@@ -281,7 +281,7 @@ export const LmsRoutes=[
     type: "collapse",
     name: "Employee Workflow",
     key: "employee-workflow",
-    icon: <DashboardIcon fontSize="small" />,
+    icon: <AssignmentIndOutlinedIcon fontSize="small" />,
     route: "/employee-workflow",
     component: <ViewEmployeeStatus />,
   },
@@ -361,7 +361,7 @@ export const LmsRoutes=[
     type: "collapse",
     name: "Class Room",
     key: "class-room",
-    icon: <DisplaySettingsRoundedIcon />,
+    icon: <SchoolTwoToneIcon />,
     route: "/class-room",
     component:<ClassroomListing/>
   },

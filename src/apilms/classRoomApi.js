@@ -81,6 +81,13 @@ export const classRoomApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    getAttendance: builder.query({
+      query: (sessionId) => ({
+        url: `lms_module/attendance?session_id=${sessionId}`,
+        method: 'GET',
+      }),
+      transformResponse: (response) => response.data, 
+    }),
   }),
 });
 export const { 
@@ -92,4 +99,5 @@ export const {
   useMarkSessionCompletedMutation,
   useUpdateSessionMutation,
   useCreateAttendanceMutation,
+  useGetAttendanceQuery,
 } = classRoomApi;

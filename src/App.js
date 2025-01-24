@@ -64,6 +64,7 @@ import SavedraftDocument from "layouts/authentication/document-listing/saved-dra
 import UnderReviewDocument from "layouts/authentication/document-listing/under-review-document/index.js";
 import PDFPreview from "layouts/authentication/document-listing/pdf-preview/index.js";
 import ArchivedListing from "layouts/authentication/archived-listing/index.js";
+import ObsoleteDataListing from "layouts/authentication/document-listing/ObsoleteListing/index.js";
 //Lms components
 import AddArea from "dmscomponent/add-area/index.js";
 import AddDepartments from "dmscomponent/add-departments/index.js";
@@ -321,6 +322,7 @@ export default function App() {
       <Route path="/review-document" element={<UnderReviewDocument/>}/>
       <Route path="/PDFPreview" element={<PDFPreview/>}/>
       <Route path="/archived-listing" element={<ArchivedListing/>}/>
+      <Route path="/Obsolete-data" element={<ObsoleteDataListing/>}/>
       {/* Lms components */}
       <Route path="/add-area" element={<AddArea />} />
       <Route path="/add-departments" element={<AddDepartments />} />

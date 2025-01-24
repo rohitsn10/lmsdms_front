@@ -12,7 +12,7 @@ import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 import { useAuth } from "hooks/use-auth";
 import { hasPermission } from "utils/hasPermission";
-import moment from "moment";  // Import moment.js
+import moment from "moment";  
 
 const DepartmentListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,13 +24,11 @@ const DepartmentListing = () => {
   const groupId = group.id;
  
   const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
-    skip: !groupId, // Ensure it skips if groupId is missing
+    skip: !groupId, 
   });
 
   if (isLoading) return <div>Loading departments...</div>;
   if (error) return <div>Error loading departments: {error.message}</div>;
-
-  // Use moment.js to format the date
   const formatDate = (dateString) => {
     return moment(dateString).format('DD/MM/YY');
   };
@@ -40,7 +38,7 @@ const DepartmentListing = () => {
     serial_number: index + 1,
     department_name: item.department_name || "N/A",
     department_description: item.department_description || "N/A",
-    department_created_at: formatDate(item.department_created_at),  // Format date using moment.js
+    department_created_at: formatDate(item.department_created_at), 
   }));
 
   const handleSearch = (event) => {

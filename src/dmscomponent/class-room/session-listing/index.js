@@ -11,7 +11,7 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import moment from "moment";
-import AttendanceDialog from "./attendance/index";
+import AttendanceDialog from "./attendance";
 import ViewAttendanceDialog from "./view-attendance";
 const SessionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,12 +32,15 @@ const SessionListing = () => {
   const handleSearch = (event) => setSearchTerm(event.target.value);
 
   // Edit session handler
-  const handleEditSession = (session) => navigate("/edit-session", { state: { session } });
+  const handleEditSession = (session) => navigate("/edit-session", { state: { session } }
+    
+  );
 
   const handleAttendanceClick = (sessionId, isViewAttendance = false) => {
     // console.log("handleAttendanceClick called for sessionId:", sessionId);  // Add this line
     setSelectedSessionId(sessionId); // Set the selected session ID
-    const session = data?.data?.find((s) => s.id === sessionId);
+    const session = data?.data?.find((s) => s.session_id === sessionId);
+    console.log("session",session)
     if (session && session.user_ids) {
       const userIds = session.user_ids;
       const filteredUsers = userData?.data?.filter((user) => userIds.includes(user.id));
@@ -199,6 +202,7 @@ const SessionListing = () => {
         open={openViewAttendanceDialog}
         setOpen={setOpenViewAttendanceDialog}
         attendanceData={viewAttendanceData}
+         sessionId={selectedSessionId}
       />
     </MDBox>
   );

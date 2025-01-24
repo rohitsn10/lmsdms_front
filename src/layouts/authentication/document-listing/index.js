@@ -77,6 +77,9 @@ const DocumentListing = () => {
   const handleAddDocument = () => {
     navigate("/add-document");
   };
+  const handleObsolete = () => {
+    navigate("/Obsolete-data"); 
+  };
   const handleClick = (params) => {
     if (!params || !params.row) {
       console.error("Invalid params object:", params);
@@ -96,7 +99,6 @@ const DocumentListing = () => {
       return;
     }
 
-    // Navigate with all required data
     navigate(
       `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}`
     );
@@ -304,7 +306,7 @@ const DocumentListing = () => {
             <MDButton
               variant="contained"
               color="primary"
-              onClick={handleAddDocument}
+              onClick={handleObsolete}
               sx={{ ml: 2 }}
             >
               Obsolete
