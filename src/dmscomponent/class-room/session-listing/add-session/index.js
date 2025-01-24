@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation,useNavigate } from "react-router-dom";
 import { Card, MenuItem, Select, InputLabel, FormControl, Grid, TextField } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import MDButton from "components/MDButton";
-import OutlinedInput from '@mui/material/OutlinedInput';
-import { useCreateSessionMutation } from 'apilms/classRoomApi'; // Import your mutation hook
+import OutlinedInput from "@mui/material/OutlinedInput";
+import { useCreateSessionMutation } from "apilms/classRoomApi"; // Import your mutation hook
 import { useUserListQuery } from "api/auth/userApi"; // Import user list query
 
 function AddSession() {
+  const navigate = useNavigate();
   const [sessionName, setSessionName] = useState("");
   const [sessionVenue, setSessionVenue] = useState("");
   const [sessionDate, setSessionDate] = useState("");
@@ -34,19 +35,17 @@ function AddSession() {
       session_name: sessionName,
       venue: sessionVenue,
       start_date: sessionDate,
-      end_date: sessionDate,  // Assuming start and end date are the same for simplicity, adjust if necessary
       start_time: sessionTime,
-      end_time: sessionTime,  // Assuming start and end time are the same for simplicity, adjust if necessary
       user_ids: selectedUsers, // Pass an array of selected user IDs
       classroom_id: classroomId,
     };
 
     // Call the mutation
     createSession(sessionData)
-      .unwrap()  // To handle promise resolution
+      .unwrap() // To handle promise resolution
       .then((response) => {
         console.log("Session created successfully:", response);
-        // Handle success, show notification or redirect, etc.
+        navigate("/class-room");
       })
       .catch((err) => {
         console.error("Error creating session:", err);
@@ -79,7 +78,7 @@ function AddSession() {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Session Form
+            Add Session
           </MDTypography>
         </MDBox>
 
@@ -164,7 +163,13 @@ function AddSession() {
             </Grid>
 
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
+              <MDButton
+                variant="gradient"
+                color="submit"
+                fullWidth
+                type="submit"
+                disabled={isLoading}
+              >
                 {isLoading ? "Creating..." : "Create Session"}
               </MDButton>
             </MDBox>

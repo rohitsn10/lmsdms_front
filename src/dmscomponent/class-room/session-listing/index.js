@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useGetSessionsQuery, useMarkSessionCompletedMutation } from "apilms/classRoomApi"; // Import the hook
+import { useGetSessionsQuery, useMarkSessionCompletedMutation } from "apilms/classRoomApi";
+import { useUserListQuery } from "api/auth/userApi";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
@@ -9,63 +10,61 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-import moment from "moment"; // For date formatting
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
-
+import moment from "moment";
+import AttendanceDialog from "./attendance/index";
+import ViewAttendanceDialog from "./view-attendance";
 const SessionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [openAttendanceDialog, setOpenAttendanceDialog] = useState(false);
   const [attendanceData, setAttendanceData] = useState([]);
-  const [markSessionCompleted] = useMarkSessionCompletedMutation(); // Mutation hook
+  const [openAttendanceDialog, setOpenAttendanceDialog] = useState(false);
+  console.log("----------------------------",openAttendanceDialog)
+  const [selectedSessionId, setSelectedSessionId] = useState(null); // Track selected session ID
   const navigate = useNavigate();
   const location = useLocation();
   const classroom = location.state?.classroom;
   const classroomId = classroom.classroom_id;
+  const [markSessionCompleted] = useMarkSessionCompletedMutation();
+  const { data, isLoading, error } = useGetSessionsQuery(classroomId);
+  const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
+  const [openViewAttendanceDialog, setOpenViewAttendanceDialog] = useState(false);
+  const [viewAttendanceData, setViewAttendanceData] = useState([]);
 
-  // Fetch sessions data using the useGetSessionsQuery hook
-  const { data, isLoading, isError, error } = useGetSessionsQuery(classroomId);
+  const handleSearch = (event) => setSearchTerm(event.target.value);
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
+  // Edit session handler
+  const handleEditSession = (session) => navigate("/edit-session", { state: { session } });
+
+  const handleAttendanceClick = (sessionId, isViewAttendance = false) => {
+    // console.log("handleAttendanceClick called for sessionId:", sessionId);  // Add this line
+    setSelectedSessionId(sessionId); // Set the selected session ID
+    const session = data?.data?.find((s) => s.id === sessionId);
+    if (session && session.user_ids) {
+      const userIds = session.user_ids;
+      const filteredUsers = userData?.data?.filter((user) => userIds.includes(user.id));
+  
+      if (isViewAttendance) {
+        // Open View Attendance Dialog
+        setViewAttendanceData(filteredUsers);
+        setOpenViewAttendanceDialog(true);
+      } else {
+        // Open Attendance Dialog
+        setAttendanceData(filteredUsers);
+        setOpenAttendanceDialog(true);
+        console.log("Dialog open state:", openAttendanceDialog); 
+      }
+    }
   };
+  
 
-  const handleEditSession = (session) => {
-    navigate("/edit-session", { state: { session } });
-  };
-
-  const handleAttendanceClick = (session) => {
-    setAttendanceData(session.attendees);
-    setOpenAttendanceDialog(true);
-  };
-
-  const handleAttendanceChange = (index, event) => {
-    const updatedAttendance = [...attendanceData];
-    updatedAttendance[index].present = event.target.checked;
-    setAttendanceData(updatedAttendance);
-  };
-
-  const handleSaveAttendance = () => {
-    console.log("Updated Attendance:", attendanceData);
-    setOpenAttendanceDialog(false);
-  };
-
+  // Mark session as completed
   const handleMarkCompleted = (sessionId) => {
     markSessionCompleted(sessionId)
       .unwrap()
-      .then((response) => {
-        console.log("Session marked as completed:", response);
-      })
-      .catch((err) => {
-        console.error("Failed to mark session as completed:", err);
-      });
+      .then((response) => console.log("Session marked as completed:", response))
+      .catch((err) => console.error("Failed to mark session as completed:", err));
   };
 
-  // Filter session data based on search term
+  // Filtered session data for search
   const filteredData = data?.data
     ? data.data
         .filter(
@@ -75,11 +74,13 @@ const SessionListing = () => {
         )
         .map((session, index) => ({
           ...session,
-          serial_number: index + 1,
-          start_date: moment(session.start_date).format("DD/MM/YY HH:mm"),
+          id: session.session_id, // Use session_id as the unique id
+          serial_number: index + 1, // Add serial number (index + 1)
+          start_date: moment(session.start_date).format("DD/MM/YY HH:mm"), // Format start date
         }))
     : [];
 
+  // Columns for the data grid
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "session_name", headerName: "Session Name", flex: 1, headerAlign: "center" },
@@ -111,10 +112,14 @@ const SessionListing = () => {
         <MDButton
           variant="outlined"
           color="primary"
-          onClick={() => handleAttendanceClick(params.row)}
-          disabled={!params.row.is_completed} // Disable if session is not completed
+          onClick={() => {
+            const isViewAttendance = params.row.attend; // Check if attendance is available to view
+            // console.log("is view open get or not ",isViewAttendance)
+            handleAttendanceClick(params.row.id, isViewAttendance); // Pass isViewAttendance flag
+          }}
+          disabled={!params.row.is_completed}
         >
-          View Attendance
+          {params.row.attend ? "View Attendance" : "Mark Attendance"}
         </MDButton>
       ),
     },
@@ -130,14 +135,6 @@ const SessionListing = () => {
       ),
     },
   ];
-
-  if (isLoading) {
-    return <MDTypography variant="h5" align="center">Loading...</MDTypography>;
-  }
-
-  if (isError) {
-    return <MDTypography variant="h5" align="center">Error: {error.message}</MDTypography>;
-  }
 
   return (
     <MDBox p={3}>
@@ -171,6 +168,7 @@ const SessionListing = () => {
               pageSize={5}
               rowsPerPageOptions={[5, 10, 20]}
               disableSelectionOnClick
+              getRowId={(row) => row.session_id} // Specify session_id as the unique id
               sx={{
                 border: "1px solid #ddd",
                 borderRadius: "4px",
@@ -190,32 +188,18 @@ const SessionListing = () => {
       </Card>
 
       {/* Attendance Dialog */}
-      <Dialog open={openAttendanceDialog} onClose={() => setOpenAttendanceDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Attendance</DialogTitle>
-        <DialogContent>
-          {attendanceData.map((attendee, index) => (
-            <FormControlLabel
-              key={index}
-              control={
-                <Checkbox
-                  checked={attendee.present}
-                  onChange={(e) => handleAttendanceChange(index, e)}
-                  name={attendee.name}
-                />
-              }
-              label={attendee.name}
-            />
-          ))}
-        </DialogContent>
-        <DialogActions>
-          <MDButton onClick={() => setOpenAttendanceDialog(false)} color="secondary">
-            Close
-          </MDButton>
-          <MDButton onClick={handleSaveAttendance} color="primary">
-            Save
-          </MDButton>
-        </DialogActions>
-      </Dialog>
+      <AttendanceDialog
+        open={openAttendanceDialog}
+        setOpen={setOpenAttendanceDialog}
+        attendanceData={attendanceData}
+        setAttendanceData={setAttendanceData}
+        sessionId={selectedSessionId} // Pass sessionId to the dialog
+      />
+      <ViewAttendanceDialog
+        open={openViewAttendanceDialog}
+        setOpen={setOpenViewAttendanceDialog}
+        attendanceData={viewAttendanceData}
+      />
     </MDBox>
   );
 };
