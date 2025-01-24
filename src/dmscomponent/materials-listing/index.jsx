@@ -15,10 +15,10 @@ import apiService from 'services/apiService';
 
   function MaterialListing() {
       const [open, setOpen] = useState(false);
-      const [materialType, setMaterialType] = useState("");
-      const materialNameRef = useRef(null);
-      const minReadingTimeRef = useRef(null);
-      const fileRef = useRef(null);
+      // const [materialType, setMaterialType] = useState("");
+      // const materialNameRef = useRef(null);
+      // const minReadingTimeRef = useRef(null);
+      // const fileRef = useRef(null);
       const sectionNameRef = useRef(null);
       const descriptionRef = useRef(null);
       const [status, setStatus] = useState("");
@@ -27,12 +27,14 @@ import apiService from 'services/apiService';
       const { user, role } = useAuth();
       const location = useLocation();
       const [trainingTitle, setTrainingTitle] = useState("");
+      const [trainingIdState, setTrainingIdState] = useState(1)
+
 
   useEffect(() => {
     // Extract training_id from the current path
     const pathParts = location.pathname.split('/');
     const trainingId = pathParts[pathParts.length - 1]; // The last part is the training_id
-
+    setTrainingIdState(trainingId)
     // Fetch training section data using the extracted training_id
     const fetchTrainingSection = async (trainingId) => {
         try {
@@ -74,9 +76,120 @@ import apiService from 'services/apiService';
           setOpenSectionModal(false);
         };
 
-        const handleSubmit=()=>{
+      // const handleAddMaterial=async (event)=>{
+      //     event.preventDefault();
+      //     let hasError = false;
+      //     let errorMessage = "";
+      //     console.log("okokko")
+      //     // Validations
+      //     if (!materialNameRef.current.value) {
+      //       hasError = true;
+      //       errorMessage = "Material Name is required";
+      //     }
+        
+      //     if (!minReadingTimeRef.current.value) {
+      //       hasError = true;
+      //       errorMessage = "Min Reading Time is required";
+      //     }
+        
+      //     if (!materialType) {
+      //       hasError = true;
+      //       errorMessage = "Material Type is required";
+      //     }
+        
+      //     if (fileRef.current.files.length === 0) {
+      //       hasError = true;
+      //       errorMessage = "Please select a file";
+      //     }
+        
+      //     if (hasError) {
+      //       return;
+      //     }
+        
+      //     // Preparing FormData for the POST request
+      //     const formData = new FormData();
+      //     formData.append("material_name", materialNameRef.current.value);
+      //     formData.append("min_reading_time", minReadingTimeRef.current.value);
+      //     formData.append("material_type", materialType);
+      //     formData.append("file", fileRef.current.files[0]); // File object
+        
+      //     try {
+      //       const response =await apiService.post(
+      //         "/lms_module/create_training_material",
+      //         formData,
+      //         {
+      //           headers: {
+      //             "Authorization": `Bearer ${user.token}`,
+      //             "Content-Type": "multipart/form-data",
+      //           },
+      //         }
+      //       );
+        
+      //       if (response?.data?.status) {
+      //         console.log("Material added successfully:", response.data);
+        
+      //         materialNameRef.current.value = "";
+      //         minReadingTimeRef.current.value = "";
+      //         fileRef.current.value = null;
+      //         setMaterialType("");
+      //         handleClose();
+      //       } else {
+      //         throw new Error(response?.data?.message || "Failed to add material");
+      //       }
+      //     } catch (error) {
+      //       console.error("Error adding material:", error);
+      //     }
+      //   };
+   
 
-        }
+        const handleAddSection = async () => {
+          // Create a FormData object
+          const formData = new FormData();
+          formData.append("training_id", trainingIdState); // Make sure trainingId is extracted correctly
+          formData.append("section_name", sectionNameRef.current.value);
+          formData.append("section_description", descriptionRef.current.value);
+          formData.append("section_order", "1.0"); // Adjust dynamically if needed
+          console.log(formData)
+          try {
+              const response = await apiService.post(
+                  "/lms_module/create_training_section",
+                  formData,
+                  {
+                      headers: {
+                          "Content-Type": "multipart/form-data", // Override default JSON header for FormData
+                      },
+                  }
+              );
+              
+              if (response?.data?.status) {
+                const fetchTrainingSection = async () => {
+                  try {
+                    const response = await apiService.get(`/lms_module/create_training_section`, {
+                      params: {
+                        training_id: trainingIdState,
+                      },
+                    });
+                    setSectionData(response?.data);
+                  } catch (error) {
+                    console.error('Error refetching training section:', error);
+                  }
+                };
+          
+                fetchTrainingSection();
+          
+                sectionNameRef.current.value = "";
+                descriptionRef.current.value = "";
+          
+                // Close the modal
+                handleCloseSectionModal();
+              } else {
+                  console.error("Failed to add section:", response?.data?.message);
+              }
+          } catch (error) {
+              console.error("Error adding section:", error);
+          }
+      };
+      
     return (
       <div>
         <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 4 }}>
@@ -155,7 +268,7 @@ import apiService from 'services/apiService';
           </Box>
         <CollapsibleTable open={open} setOpen={setOpen} data={sectionData?.data}/>
         </Card>
-            <AddMaterialModal 
+            {/* <AddMaterialModal 
             open={open}
             setOpen={setOpen}
             handleClose={handleClose}
@@ -164,8 +277,8 @@ import apiService from 'services/apiService';
             fileRef={fileRef}
             materialType={materialType}
             setMaterialType={setMaterialType}
-            handleSubmit={handleSubmit}
-            />
+            handleSubmit={handleAddMaterial}
+            /> */}
             <AddSectionModal
             open={openSectionModal}
             handleClose={handleCloseSectionModal}
@@ -173,12 +286,13 @@ import apiService from 'services/apiService';
             descriptionRef={descriptionRef}
             status={status}
             setStatus={setStatus}
-            handleSubmit={() => {
-              console.log("Section Name:", sectionNameRef.current.value);
-              console.log("Description:", descriptionRef.current.value);
-              console.log("Status:", status);
-              handleCloseSectionModal();
-            }}
+            // handleSubmit={() => {
+            //   console.log("Section Name:", sectionNameRef.current.value);
+            //   console.log("Description:", descriptionRef.current.value);
+            //   console.log("Status:", status);
+            //   handleCloseSectionModal();
+            // }}
+            handleSubmit={handleAddSection}
           />
       </div>
     )

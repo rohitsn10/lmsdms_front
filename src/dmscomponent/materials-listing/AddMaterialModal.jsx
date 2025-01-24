@@ -28,41 +28,42 @@ const AddMaterialModal = forwardRef((props, ref) => {
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+  console.log(materialNameRef,minReadingTimeRef)
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
 
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-    let hasError = false;
-    let errorMessage = "";
+  // const handleFormSubmit = (event) => {
+  //   event.preventDefault();
+  //   let hasError = false;
+  //   let errorMessage = "";
 
-    if (!materialNameRef.current.value) {
-      hasError = true;
-      errorMessage = "Material Name is required";
-    }
+  //   if (!materialNameRef.current.value) {
+  //     hasError = true;
+  //     errorMessage = "Material Name is required";
+  //   }
 
-    if (!minReadingTimeRef.current.value) {
-      hasError = true;
-      errorMessage = "Min Reading Time is required";
-    }
+  //   if (!minReadingTimeRef.current.value) {
+  //     hasError = true;
+  //     errorMessage = "Min Reading Time is required";
+  //   }
 
-    if (!materialType) {
-      hasError = true;
-      errorMessage = "Material Type is required";
-    }
-    if (fileRef.current.files.length === 0) {
-        hasError = true;
-        errorMessage = "Please select a file";
-      }
+  //   if (!materialType) {
+  //     hasError = true;
+  //     errorMessage = "Material Type is required";
+  //   }
+  //   if (fileRef.current.files.length === 0) {
+  //       hasError = true;
+  //       errorMessage = "Please select a file";
+  //     }
 
-    if (hasError) {
-      setOpenSnackbar(true);
-      setErrorMessage(errorMessage);
-      return;
-    }
-  };
+  //   if (hasError) {
+  //     setOpenSnackbar(true);
+  //     setErrorMessage(errorMessage);
+  //     return;
+  //   }
+  //   console.log(minReadingTimeRef,fileRef,materialNameRef,materialType) 
+  // };
   
   return (
     <div>
@@ -89,7 +90,7 @@ const AddMaterialModal = forwardRef((props, ref) => {
         </IconButton>
       </DialogTitle>
       <DialogContent dividers>
-        <form onSubmit={handleFormSubmit}>
+        <form onSubmit={handleSubmit}>
           {/* Material Name */}
           <TextField
             inputRef={materialNameRef}
