@@ -55,6 +55,7 @@ import DisplaySettingsRoundedIcon from '@mui/icons-material/DisplaySettingsRound
 import ForkRightTwoToneIcon from '@mui/icons-material/ForkRightTwoTone';
 import ArchivedListing from "layouts/authentication/archived-listing";
 import ClassroomListing from "dmscomponent/class-room";
+import ViewEmployeeStatus from "dmscomponent/view-employees";
 
 const routes = [
   {
@@ -224,7 +225,9 @@ const routes = [
     icon: <AccountTreeIcon />,
     route: "/induction-Listing",
     component: <InductionListing />,
-  
+  },
+    {
+    type: "collapse",
     name: "Training Activity",
     key: "trainingListing",
     icon: <ModelTrainingTwoToneIcon />,
@@ -276,6 +279,14 @@ export const LmsRoutes=[
   },
   {
     type: "collapse",
+    name: "Employee Workflow",
+    key: "employee-workflow",
+    icon: <DashboardIcon fontSize="small" />,
+    route: "/employee-workflow",
+    component: <ViewEmployeeStatus />,
+  },
+  {
+    type: "collapse",
     name: "Plants",
     key: "plant-listing",
     icon: <FactoryTwoToneIcon />,
@@ -308,27 +319,20 @@ export const LmsRoutes=[
   },
   {
     type: "collapse",
-
     name: "Induction Set",
     key: "Induction-Listing",
     icon: <AccountTreeIcon />,
     route: "/induction-Listing",
     component: <InductionListing />,
-  
+  },
+    {
+    type:"collapse",
     name: "Training Activity",
     key: "trainingListing",
     icon: <ModelTrainingTwoToneIcon />,
     route: "/trainingListing",
     component: <TrainingListing />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "Class Room",
-  //   key: "class-room",
-  //   icon: <DisplaySettingsRoundedIcon />,
-  //   route: "/class-room",
-  //   component:<ClassroomListing/>
-  // },
   {
     type: "collapse",
     name: "Job Role",
