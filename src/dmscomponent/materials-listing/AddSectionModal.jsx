@@ -13,13 +13,15 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
+
 
 const AddSectionModal = forwardRef((props, ref) => {
   const { open, handleClose, sectionNameRef, descriptionRef, status, setStatus, handleSubmit } = props;
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+  const navigate=useNavigate();
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
@@ -51,6 +53,8 @@ const AddSectionModal = forwardRef((props, ref) => {
     }
 
     handleSubmit();
+    // window.location.reload()
+    navigate(0)
   };
 
   return (
