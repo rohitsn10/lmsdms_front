@@ -88,14 +88,14 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
       setErrorMessage(errorMessage);
       return;
     }
-    console.log(material.material_title,material.material_type,material.minimum_reading_time,material.section_id,material.file)
+    // console.log(material.material_title,material.material_type,material.minimum_reading_time,material.section_id,material.file)
     const formData = new FormData();
     formData.append('material_title', material.material_title);
     formData.append('material_type', material.material_type);
     formData.append('minimum_reading_time', material.minimum_reading_time);
     formData.append('section_ids', material.section_id);
     formData.append('material_file', material.file);
-    console.log(formData);
+    // console.log(formData);
 
     try {
         // Make the POST request using your Axios instance
@@ -105,7 +105,7 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
           },
         });
     
-        console.log('Response:', response.data);
+        // console.log('Response:', response.data);
         // Reset form and close modal
         setMaterial({
           material_title: '',
@@ -114,8 +114,10 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
           file: null,
           section_id: sectionId,
         });
+        navigate(0);
+
         handleClose();
-        // navigate(0);
+        navigate(0);
       } catch (error) {
         console.error('Error creating training material:', error);
         setOpenSnackbar(true);
@@ -180,6 +182,18 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
               onChange={handleChange}
               fullWidth
               margin="normal"
+              InputProps={{
+                sx: {
+                  height: 50,
+                  fontSize: "1rem",
+                  padding:'20px'
+                },
+              }}
+              SelectProps={{
+                sx: {
+                  padding: "10px",
+                },
+              }}
               required
             >
               <MenuItem value="pdf">PDF</MenuItem>
@@ -197,6 +211,10 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
               margin="normal"
               required
               InputProps={{ inputProps: { min: 1 } }}
+              sx={{
+                height:50
+              }}
+              
             />
 
             <Button

@@ -1,24 +1,19 @@
   import React, { useEffect, useRef, useState } from 'react'
-  import { Box, Grid, MenuItem, TextField, Typography } from '@mui/material';
+  import { Box, Grid, Typography } from '@mui/material';
   import Divider from '@mui/material/Divider';
   import Card from "@mui/material/Card";
   import MDButton from "components/MDButton";
   import MDTypography from 'components/MDTypography'; 
   import AddSectionModal from './AddSectionModal';
-  import AddMaterialModal from './AddMaterialModal';
+  // import AddMaterialModal from './AddMaterialModal';
   import CollapsibleTable from './collapsableContent.jsx';
   import { useAuth } from "hooks/use-auth";
   import { data } from './constant';
-  import axios from 'axios';
   import { useLocation } from 'react-router-dom';
 import apiService from 'services/apiService';
 
   function MaterialListing() {
       const [open, setOpen] = useState(false);
-      // const [materialType, setMaterialType] = useState("");
-      // const materialNameRef = useRef(null);
-      // const minReadingTimeRef = useRef(null);
-      // const fileRef = useRef(null);
       const sectionNameRef = useRef(null);
       const descriptionRef = useRef(null);
       const [status, setStatus] = useState("");
@@ -28,7 +23,7 @@ import apiService from 'services/apiService';
       const location = useLocation();
       const [trainingTitle, setTrainingTitle] = useState("");
       const [trainingIdState, setTrainingIdState] = useState(1)
-
+      // console.log(trainingIdState)
 
   useEffect(() => {
     // Extract training_id from the current path
@@ -43,7 +38,7 @@ import apiService from 'services/apiService';
                     training_id: trainingId,
                 },
             });
-            console.log('Training Section Data:', response?.data);
+            // console.log('Training Section Data:', response?.data);
             setSectionData(response?.data);
             const trainingTitle = response?.data?.training_title;
             setTrainingTitle(trainingTitle || "Default Training Title");
@@ -76,80 +71,13 @@ import apiService from 'services/apiService';
           setOpenSectionModal(false);
         };
 
-      // const handleAddMaterial=async (event)=>{
-      //     event.preventDefault();
-      //     let hasError = false;
-      //     let errorMessage = "";
-      //     console.log("okokko")
-      //     // Validations
-      //     if (!materialNameRef.current.value) {
-      //       hasError = true;
-      //       errorMessage = "Material Name is required";
-      //     }
-        
-      //     if (!minReadingTimeRef.current.value) {
-      //       hasError = true;
-      //       errorMessage = "Min Reading Time is required";
-      //     }
-        
-      //     if (!materialType) {
-      //       hasError = true;
-      //       errorMessage = "Material Type is required";
-      //     }
-        
-      //     if (fileRef.current.files.length === 0) {
-      //       hasError = true;
-      //       errorMessage = "Please select a file";
-      //     }
-        
-      //     if (hasError) {
-      //       return;
-      //     }
-        
-      //     // Preparing FormData for the POST request
-      //     const formData = new FormData();
-      //     formData.append("material_name", materialNameRef.current.value);
-      //     formData.append("min_reading_time", minReadingTimeRef.current.value);
-      //     formData.append("material_type", materialType);
-      //     formData.append("file", fileRef.current.files[0]); // File object
-        
-      //     try {
-      //       const response =await apiService.post(
-      //         "/lms_module/create_training_material",
-      //         formData,
-      //         {
-      //           headers: {
-      //             "Authorization": `Bearer ${user.token}`,
-      //             "Content-Type": "multipart/form-data",
-      //           },
-      //         }
-      //       );
-        
-      //       if (response?.data?.status) {
-      //         console.log("Material added successfully:", response.data);
-        
-      //         materialNameRef.current.value = "";
-      //         minReadingTimeRef.current.value = "";
-      //         fileRef.current.value = null;
-      //         setMaterialType("");
-      //         handleClose();
-      //       } else {
-      //         throw new Error(response?.data?.message || "Failed to add material");
-      //       }
-      //     } catch (error) {
-      //       console.error("Error adding material:", error);
-      //     }
-      //   };
-   
-
         const handleAddSection = async () => {
-          // Create a FormData object
           const formData = new FormData();
           formData.append("training_id", trainingIdState); // Make sure trainingId is extracted correctly
           formData.append("section_name", sectionNameRef.current.value);
           formData.append("section_description", descriptionRef.current.value);
           formData.append("section_order", "1.0"); // Adjust dynamically if needed
-          console.log(formData)
+          // console.log(formData)
           try {
               const response = await apiService.post(
                   "/lms_module/create_training_section",
@@ -160,7 +88,7 @@ import apiService from 'services/apiService';
                       },
                   }
               );
-              
+              // console.log("Cerate Section Test",response);
               if (response?.data?.status) {
                 const fetchTrainingSection = async () => {
                   try {
@@ -268,17 +196,6 @@ import apiService from 'services/apiService';
           </Box>
         <CollapsibleTable open={open} setOpen={setOpen} data={sectionData?.data}/>
         </Card>
-            {/* <AddMaterialModal 
-            open={open}
-            setOpen={setOpen}
-            handleClose={handleClose}
-            materialNameRef={materialNameRef}
-            minReadingTimeRef={minReadingTimeRef}
-            fileRef={fileRef}
-            materialType={materialType}
-            setMaterialType={setMaterialType}
-            handleSubmit={handleAddMaterial}
-            /> */}
             <AddSectionModal
             open={openSectionModal}
             handleClose={handleCloseSectionModal}
@@ -286,12 +203,6 @@ import apiService from 'services/apiService';
             descriptionRef={descriptionRef}
             status={status}
             setStatus={setStatus}
-            // handleSubmit={() => {
-            //   console.log("Section Name:", sectionNameRef.current.value);
-            //   console.log("Description:", descriptionRef.current.value);
-            //   console.log("Status:", status);
-            //   handleCloseSectionModal();
-            // }}
             handleSubmit={handleAddSection}
           />
       </div>

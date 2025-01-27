@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   Box,
@@ -11,6 +11,11 @@ import {
   CardContent,
   CardActions,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import {
   KeyboardArrowDown,
@@ -24,15 +29,23 @@ import EditSectionModal from "./editSectionModal";
 import EditMaterialModal from "./editMaterialModal";
 import ViewFileModal from "./ViewFileModal";
 import CollapsibleSection from "./materialCards";
+import apiService from "services/apiService";
 
 const CollapsibleCard = ({ data, open, setOpen }) => {
-  const [openRows, setOpenRows] = useState({}); // To track which rows are open
+  const [openRows, setOpenRows] = useState({}); 
   const [openEditModal, setOpenEditModal] = useState(false);
   const [editSectionData, setEditSectionData] = useState(null);
   const [openEditMaterialModal, setOpenEditMaterialModal] = useState(false);
   const [editMaterialData, setEditMaterialData] = useState(null);
   const [openViewFileModal, setOpenViewFileModal] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [sectionList, setSectionList] = useState([]);
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [sectionToDelete, setSectionToDelete] = useState(null);
+
+  useEffect(() => { 
+    setSectionList(data)
+  }, [data])
 
   const toggleRow = (id) => {
     setOpenRows((prevState) => ({
@@ -52,17 +65,18 @@ const CollapsibleCard = ({ data, open, setOpen }) => {
   };
 
   const handleOpenEditMaterialModal = (material) => {
-    setEditMaterialData(material); // Set the material data to be edited
-    setOpenEditMaterialModal(true); // Open the material edit modal
+    setEditMaterialData(material);
+    setOpenEditMaterialModal(true);
   };
 
   const handleCloseEditMaterialModal = () => {
-    setOpenEditMaterialModal(false); // Close the material edit modal
-    setEditMaterialData(null); // Clear material data
+    setOpenEditMaterialModal(false);
+    setEditMaterialData(null);
   };
+
   const handleCloseViewFileModal = () => {
     setOpenViewFileModal(false);
-    setSelectedMaterial(null); // Clear the selected material
+    setSelectedMaterial(null);
   };
 
   const handleEditSubmit = (updatedSection) => {
@@ -76,92 +90,148 @@ const CollapsibleCard = ({ data, open, setOpen }) => {
   };
 
   const handleViewFileClick = (material) => {
-    setSelectedMaterial(material); // Set selected material
-    setOpenViewFileModal(true); // Open the ViewFileModal
+    setSelectedMaterial(material);
+    setOpenViewFileModal(true);
   };
-  // console.log("Data",data)
+
+  const openDeleteConfirmation = (trainingMaterialId) => {
+    setSectionToDelete(trainingMaterialId);
+    setDeleteConfirmationOpen(true);
+  };
+
+  const handleCloseDeleteConfirmation = () => {
+    setDeleteConfirmationOpen(false);
+    setSectionToDelete(null);
+  };
+
+  const deleteSection = async () => {
+    if (!sectionToDelete) return;
+
+    try {
+      const response = await apiService.delete(`/lms_module/update_training_section/${sectionToDelete}`);
+      console.log('Section deleted successfully:', response.data);
+      
+      // Remove the section from the list immediately
+      setSectionList((prevData) => 
+        prevData.filter((section) => section.id !== sectionToDelete)
+      );
+
+      // Close the confirmation dialog
+      handleCloseDeleteConfirmation();
+    } catch (error) {
+      console.error('Error deleting Section:', error);
+      // Optionally, show an error message to the user
+    }
+  };
+
   return (
     <Box sx={{ padding: 5 }}>
-
       <Grid container spacing={3}>
-    {/* Check if data is an array and has items */}
-    {Array.isArray(data) && data.length > 0 ? (
-      data.map((row) => (
-        <Grid item xs={12} key={row.id}>
-          <Card
-            sx={{
-              boxShadow: 8,
-              borderRadius: 2,
-              background: "linear-gradient(to right, #f9f9f9, #e8e8e8)",
-              paddingTop: 3,
-              transition: "transform 0.2s",
-              "&:hover": {
-                transform: "scale(1.02)",
-              },
-            }}
-            elevation={10}
-          >
-            <CardContent>
-              <Box
+        {Array.isArray(sectionList) && sectionList.length > 0 ? (
+          sectionList.map((row) => (
+            <Grid item xs={12} key={row.id}>
+              <Card
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  boxShadow: 8,
+                  borderRadius: 2,
+                  background: "linear-gradient(to right, #f9f9f9, #e8e8e8)",
+                  paddingTop: 3,
+                  transition: "transform 0.2s",
+                  "&:hover": {
+                    transform: "scale(1.02)",
+                  },
                 }}
+                elevation={10}
               >
-                <Box>
-                  <Typography variant="h6" color="primary" sx={{ fontWeight: "bold" }}>
-                    Section: {row.section_name}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "gray", fontSize: 14 }}
-                  >
-                    {row.section_description}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Button
-                    startIcon={<Edit />}
-                    sx={{ marginLeft: 1, color: "#1976d2" }}
-                    onClick={() => handleOpenEditModal(row)}
-                  >
-                    Edit Section
-                  </Button>
-                  <Button
-                    startIcon={<Delete />}
+                <CardContent>
+                  <Box
                     sx={{
-                      marginLeft: 1,
-                      color: "#d32f2f",
-                      "&:hover": {
-                        color: "red !important",
-                      },
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                     }}
                   >
-                    Delete Section
-                  </Button>
-                </Box>
-                <IconButton onClick={() => toggleRow(row.id)}>
-                  {openRows[row.id] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                </IconButton>
-              </Box>
-            </CardContent>
-            <CollapsibleSection
+                    <Box>
+                      <Typography variant="h6" color="primary" sx={{ fontWeight: "bold" }}>
+                        Section: {row.section_name}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "gray", fontSize: 14 }}
+                      >
+                        {row.section_description}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Button
+                        startIcon={<Edit />}
+                        sx={{ marginLeft: 1, color: "#1976d2" }}
+                        onClick={() => handleOpenEditModal(row)}
+                      >
+                        Edit Section
+                      </Button>
+                      <Button
+                        startIcon={<Delete />}
+                        onClick={() => openDeleteConfirmation(row.id)}
+                        sx={{
+                          marginLeft: 1,
+                          color: "#d32f2f",
+                          "&:hover": {
+                            color: "red !important",
+                          },
+                        }}
+                      >
+                        Delete Section
+                      </Button>
+                    </Box>
+                    <IconButton onClick={() => toggleRow(row.id)}>
+                      {openRows[row.id] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                    </IconButton>
+                  </Box>
+                </CardContent>
+                <CollapsibleSection
                   open={openRows[row.id]}
                   materials={row.material}
                   handleViewFileClick={handleViewFileClick}
                   handleOpenEditMaterialModal={handleOpenEditMaterialModal}
                   sectionID={row.id}
                 />
-          </Card>
-        </Grid>
-      ))
-    ) : (
-      <Typography variant="h6" color="error" sx={{ textAlign: 'center', width: '100%' }}>
-        Section not found.
-      </Typography>
-    )}
-  </Grid>
+              </Card>
+            </Grid>
+          ))
+        ) : (
+          <Typography variant="h6" color="error" sx={{ textAlign: 'center', width: '100%' }}>
+            Section not found.
+          </Typography>
+        )}
+      </Grid>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteConfirmationOpen}
+        onClose={handleCloseDeleteConfirmation}
+        aria-labelledby="delete-section-dialog-title"
+        aria-describedby="delete-section-dialog-description"
+      >
+        <DialogTitle id="delete-section-dialog-title">
+          Confirm Delete
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-section-dialog-description">
+            Are you sure you want to delete this section? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteConfirmation} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={deleteSection} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Other existing modals... */}
       {selectedMaterial && (
         <ViewFileModal
           open={openViewFileModal}
@@ -187,12 +257,6 @@ const CollapsibleCard = ({ data, open, setOpen }) => {
           handleSubmit={handleEditMaterialSubmit}
         />
       )}
-      {/* <AddMaterialModal
-        open={openAddMaterialModal}
-        handleClose={handleCloseAddMaterialModal}
-        sectionId={currentSectionId}
-        handleSubmit={handleAddMaterialSubmit}
-      /> */}
     </Box>
   );
 };
@@ -206,19 +270,10 @@ CollapsibleCard.propTypes = {
       section_name: PropTypes.string.isRequired,
       section_description: PropTypes.string.isRequired,
       section_order: PropTypes.string.isRequired,
-      // material: PropTypes.arrayOf(
-      //   PropTypes.shape({
-      //     material_title: PropTypes.string.isRequired,
-      //     material_type: PropTypes.string.isRequired,
-      //     material_file_url: PropTypes.string.isRequired,
-      //     minimum_reading_time: PropTypes.string.isRequired,
-      //     material_created_at: PropTypes.string.isRequired,
-      //   })
-      // ).isRequired,
     })
   ).isRequired,
   open: PropTypes.bool,
-  setOpen: PropTypes.func,
+  setOpen: PropTypes.func,  
 };
 
 export default CollapsibleCard;

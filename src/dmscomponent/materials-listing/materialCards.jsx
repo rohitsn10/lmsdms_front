@@ -11,6 +11,8 @@ import {
 import { Visibility, Edit, Delete, Add } from "@mui/icons-material";
 import useSectionMaterials from "../../hooks/materialHook"; // Import the hook
 import AddMaterialModal from "./createMaterialModal";
+import apiService from "services/apiService";
+import { useNavigate } from "react-router-dom";
 
 const CollapsibleSection = ({
   open,
@@ -19,7 +21,7 @@ const CollapsibleSection = ({
   sectionID,
 }) => {
   const [openAddMaterialModal, setOpenAddMaterialModal] = useState(false);
-
+  const navigate = useNavigate();
   // Use the custom hook
   const { materialItems, fetchMaterialSection, loading, error } =
     useSectionMaterials(sectionID);
@@ -47,13 +49,24 @@ const CollapsibleSection = ({
       // Refetch materials after successfully adding
       await fetchMaterialSection();
 
-      console.log("New Material Added:", newMaterial);
+      // console.log("New Material Added:", newMaterial);
     } catch (err) {
       console.error("Error adding material:", err);
     }
     handleCloseAddMaterialModal();
   };
-
+  const deleteMaterial = async (trainingMaterialId) => {
+    try {
+      const response = await apiService.delete(`/lms_module/update_training_material/${trainingMaterialId}`);
+      navigate(0)
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting material:', error);
+      throw error;
+    }
+  };  
+  
+  // console.log("Material ID",materialItems)
   return (
     <Collapse in={open} timeout="auto" unmountOnExit>
       <CardContent sx={{ borderTop: "1px solid #ddd" }}>
@@ -144,6 +157,7 @@ const CollapsibleSection = ({
                   variant="contained"
                   startIcon={<Delete />}
                   size="small"
+                  onClick={()=>{deleteMaterial(material?.id)}}
                   sx={{
                     marginTop: 1,
                     color: "white !important",

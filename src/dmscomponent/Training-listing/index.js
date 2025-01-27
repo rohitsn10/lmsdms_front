@@ -139,7 +139,7 @@ const TrainingListing = () => {
                 color:'white'
               }
             }}
-            onClick={() => navigate(`/training-material/${params.row.training_number}`)} // Navigate to material path with training_id
+            onClick={() => navigate(`/training-material/${params.row.id}`)} // Navigate to material path with training_id
           >
             Material
           </Button>

@@ -12,6 +12,9 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PropTypes from "prop-types";
+// import { updateTrainingSection } from "./apiService";
+import apiService from "services/apiService";
+import { useNavigate } from "react-router-dom";
 
 const EditSectionModal = ({ open, handleClose, sectionData, handleSubmit }) => {
   const [sectionName, setSectionName] = useState("");
@@ -19,7 +22,8 @@ const EditSectionModal = ({ open, handleClose, sectionData, handleSubmit }) => {
   const [status, setStatus] = useState(true);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+  // console.log(sectionData.id);
+  const navigate=useNavigate();
   useEffect(() => {
     if (sectionData) {
       setSectionName(sectionData.section_name || "");
@@ -30,7 +34,7 @@ const EditSectionModal = ({ open, handleClose, sectionData, handleSubmit }) => {
 
   const handleCloseSnackbar = () => setOpenSnackbar(false);
 
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = async(event) => {
     event.preventDefault();
 
     if (!sectionName || !description || !status) {
@@ -38,7 +42,32 @@ const EditSectionModal = ({ open, handleClose, sectionData, handleSubmit }) => {
       setOpenSnackbar(true);
       return;
     }
-    console.log("Update Section",sectionName,description,status)
+    // console.log("Update Section",sectionName,description,status)
+    const updateData = {
+      section_name: sectionName,
+      section_description: description,
+      training_section_active_status: status === "true",  // Convert to boolean
+    };
+    try{
+      // const response = await updateTrainingSection(sectionData.id, updateData);
+      const url = `/lms_module/update_training_section/${sectionData?.id}`;
+        // const response = await apiService.post('/lms_module/update_training_section/${trainingSectionId}/', formData)
+      const response = await apiService.put(url, updateData);
+        // console.log(response)
+      if (response?.data?.status === true) {
+        console.log(response?.data)
+        handleClose();
+          // window.location.reload();
+          navigate(0)
+              } else {
+        // If the update fails, show the error message  
+        setErrorMessage(response.message || "Something went wrong");
+        setOpenSnackbar(true);
+      }
+    }catch(error){
+      setErrorMessage("An error occurred while updating the section");
+      setOpenSnackbar(true);
+    }
     // handleSubmit({ ...sectionData, section_name: sectionName, section_description: description, status });
   };
 
