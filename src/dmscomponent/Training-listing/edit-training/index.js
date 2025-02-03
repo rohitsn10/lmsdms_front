@@ -204,7 +204,7 @@ function EditTraining() {
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                  displayEmpty
+                  
                   error={!!errors.plantName}
                 >
                   {plantData?.data.map((plant) => (
@@ -249,7 +249,7 @@ function EditTraining() {
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                  displayEmpty
+               
                   error={!!errors.trainingType}
                 >
                   {trainingTypesData?.data.map((type) => (
@@ -322,7 +322,7 @@ function EditTraining() {
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                  displayEmpty
+                
                   error={!!errors.methodology}
                 >
                   {methodologiesData?.data.map((method) => (
