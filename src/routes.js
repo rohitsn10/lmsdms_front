@@ -56,7 +56,7 @@ import ForkRightTwoToneIcon from '@mui/icons-material/ForkRightTwoTone';
 import ArchivedListing from "layouts/authentication/archived-listing";
 import ClassroomListing from "dmscomponent/class-room";
 import ViewEmployeeStatus from "dmscomponent/view-employees";
-
+import ArchiveIcon from '@mui/icons-material/Archive';
 import GroupIcon from '@mui/icons-material/Group';
 import SchoolTwoToneIcon from '@mui/icons-material/SchoolTwoTone';
 const routes = [
@@ -144,7 +144,7 @@ const routes = [
     type: "collapse",
     name: "Archived",
     key: "archived-listing",
-    icon: <Inventory2Icon />,
+    icon: <ArchiveIcon />,
     route: "/archived-listing",
     component: <ArchivedListing />,
   },
@@ -445,7 +445,7 @@ export const DmsRoutes=[
     type: "collapse",
     name: "Archived",
     key: "archived-listing",
-    icon: <Inventory2Icon />,
+    icon: <ArchiveIcon />,
     route: "/archived-listing",
     component: <ArchivedListing />,
   },

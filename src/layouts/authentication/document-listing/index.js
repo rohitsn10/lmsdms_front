@@ -22,7 +22,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import BrowserUpdatedOutlinedIcon from "@mui/icons-material/BrowserUpdatedOutlined";
 // import ReviseDialog from "./Revise";
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
-
+import FolderSharedOutlinedIcon from '@mui/icons-material/FolderSharedOutlined';
+import ChildDocumentsDialog from "./child-document";
 const DocumentListing = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,6 +35,8 @@ const DocumentListing = () => {
   const [userGroupIds, setUserGroupIds] = useState([]);
   const [isReviseDialogOpen, setReviseDialogOpen] = useState(false); // Unique state for ReviseDialog
   const [reviseDocument, setReviseDocument] = useState(null); // Unique state for selected document
+  const [openChildDialog, setOpenChildDialog] = useState(false);
+  const [selectedChildDocuments, setSelectedChildDocuments] = useState([]);
 
   useEffect(() => {
     if (data && data.userGroupIds) {
@@ -66,7 +69,12 @@ const DocumentListing = () => {
     setSelectedRow(row);
     setDialogOpen(true);
   };
-
+  const handleViewChildDocuments = (row) => {
+   setSelectedRow(row);
+    setSelectedChildDocuments([]); 
+    setOpenChildDialog(true); 
+  };
+  
   const handleDialogClose = () => {
     setDialogOpen(false);
     setSelectedRow(null);
@@ -78,7 +86,7 @@ const DocumentListing = () => {
     navigate("/add-document");
   };
   const handleObsolete = () => {
-    navigate("/Obsolete-data"); 
+    navigate("/Obsolete-data");
   };
   const handleClick = (params) => {
     if (!params || !params.row) {
@@ -119,7 +127,7 @@ const DocumentListing = () => {
     setReviseDocument(null);
   };
   const isButtonVisible = () => {
-    return roles.some(role => role.id === 4);
+    return roles.some((role) => role.id === 4);
   };
   const handleReviseConfirm = () => {
     console.log("Revise confirmed for document:", reviseDocument);
@@ -133,8 +141,7 @@ const DocumentListing = () => {
   const handleEditClick = (rowData) => {
     navigate("/edit-document", { state: { item: rowData } });
     console.log("Full Row Data passed", rowData);
-};
-
+  };
 
   const filteredData = documents.filter(
     (doc) =>
@@ -172,6 +179,28 @@ const DocumentListing = () => {
       headerAlign: "center",
     },
     {
+      field: "sop_icon",
+      headerName: "SOP Action",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => {
+        const isSOP = params.row.document_type_name === "SOP";
+        return (
+          <MDBox display="flex" justifyContent="center">
+            <IconButton
+              color="success"
+              onClick={() => handleViewChildDocuments(params.row)}
+              disabled={!isSOP} // Disable if document type is not SOP
+            >
+              <FolderSharedOutlinedIcon /> {/* Replace with the desired icon */}
+            </IconButton>
+          </MDBox>
+        );
+      },
+      sortable: false,
+      filterable: false,
+    },
+    {
       field: "document_number",
       headerName: "Document No.",
       flex: 0.55,
@@ -196,6 +225,18 @@ const DocumentListing = () => {
       headerAlign: "center",
     },
     {
+      field: "revision_date",
+      headerName: "Revision Date",
+      flex: 0.6,
+      headerAlign: "center",
+    },
+    {
+      field: "effective_date",
+      headerName: "Effective Date",
+      flex: 0.6,
+      headerAlign: "center",
+    },
+    {
       field: "actions",
       headerName: "Action",
       flex: 0.7,
@@ -204,8 +245,8 @@ const DocumentListing = () => {
         <MDBox display="flex" gap={1}>
           {hasPermission(userPermissions, "document", "isChange") && (
             <IconButton color="primary" onClick={() => handleEditClick(params.row)}>
-            <EditIcon />
-        </IconButton>        
+              <EditIcon />
+            </IconButton>
           )}
           <IconButton
             color="primary"
@@ -215,27 +256,27 @@ const DocumentListing = () => {
           </IconButton>
           {params.row.form_status === "save_draft"
             ? hasPermission(userPermissions, "document", "isView") && (
-              <IconButton
-                color="secondary"
-                onClick={() => {
-                  console.log("Params passed to handleClick:", params);
-                  handleClick(params);
-                }}
-              >
-                <PreviewIcon />
-              </IconButton>
-            )
+                <IconButton
+                  color="secondary"
+                  onClick={() => {
+                    console.log("Params passed to handleClick:", params);
+                    handleClick(params);
+                  }}
+                >
+                  <PreviewIcon />
+                </IconButton>
+              )
             : hasPermission(userPermissions, "document", "isView") && (
-              <IconButton
-                color="inherit"
-                onClick={() => {
-                  console.log("Params passed to handleClick:", params);
-                  handleClick(params);
-                }}
-              >
-                <EditCalendarIcon />
-              </IconButton>
-            )}
+                <IconButton
+                  color="inherit"
+                  onClick={() => {
+                    console.log("Params passed to handleClick:", params);
+                    handleClick(params);
+                  }}
+                >
+                  <EditCalendarIcon />
+                </IconButton>
+              )}
           {data?.userGroupIds?.includes(5) && ( // Hide CheckCircleIcon when status is 7
             <IconButton
               color="success"
@@ -303,12 +344,7 @@ const DocumentListing = () => {
             Document Listing
           </MDTypography>
           {isButtonVisible && (
-            <MDButton
-              variant="contained"
-              color="primary"
-              onClick={handleObsolete}
-              sx={{ ml: 2 }}
-            >
+            <MDButton variant="contained" color="primary" onClick={handleObsolete} sx={{ ml: 2 }}>
               Obsolete
             </MDButton>
           )}
@@ -325,13 +361,14 @@ const DocumentListing = () => {
           )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
-          <div style={{ height: 500, width: "100%" }}>
+          <div style={{ height: 500, width: "100%", overflow: "auto" }}>
             <DataGrid
               rows={rows || []}
               columns={columns}
               pageSize={10}
               rowsPerPageOptions={[10, 25, 50]}
               sx={{
+                minWidth: 1500,
                 "& .MuiDataGrid-columnHeaders": {
                   backgroundColor: "#f5f5f5",
                   fontWeight: "bold",
@@ -356,7 +393,12 @@ const DocumentListing = () => {
         onConfirm={() => console.log("Confirmed for row:", selectedRow)}
         trainingStatus={selectedRow?.training_required || "false"}
         documentId={selectedRow?.id || ""}
-        revisionMonth={selectedRow?.revision_month} // Pass revisionMonth as a prop
+        revisionMonth={selectedRow?.revision_month}
+      />
+      <ChildDocumentsDialog
+        open={openChildDialog}
+        onClose={() => setOpenChildDialog(false)}
+        documentId={selectedRow?.id || ""}
       />
       {/* <ReviseDialog
   open={isReviseDialogOpen}

@@ -32,15 +32,25 @@ const PrintApprovalListing = () => {
   const [selectedDocumentId, setSelectedDocumentId] = useState(null); // Store document id
   const [Selectedstatus, setSelectedstatus] = useState(""); // State for Parent Document selection
   const { data: status, isError } = useViewStatusQuery();
-  const { data: printRequests, error, isLoading,refetch } = useGetPrintRequestsQuery(Selectedstatus);
+  const {
+    data: printRequests,
+    error,
+    isLoading,
+    refetch,
+  } = useGetPrintRequestsQuery(Selectedstatus);
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
-  const { data: excelReportData, isLoading: isExcelLoading, error: excelError } = usePrintRequestExcelReportQuery(Selectedstatus);
-  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
-    skip: !groupId, // Ensure it skips if groupId is missing
-  });
-useEffect(() => {
+  const {
+    data: excelReportData,
+    isLoading: isExcelLoading,
+    error: excelError,
+  } = usePrintRequestExcelReportQuery(Selectedstatus);
+  const { data: userPermissions = [], isError: permissionError } =
+    useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+      skip: !groupId, // Ensure it skips if groupId is missing
+    });
+  useEffect(() => {
     refetch();
   }, [location.key]);
 
@@ -54,15 +64,15 @@ useEffect(() => {
   }, [groupId]);
 
   // Fetch print requests filtered by selected status
-  
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
   const filteredData = (printRequests || [])
-    .filter((item) =>
-      item.document_title && item.document_title.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(
+      (item) =>
+        item.document_title && item.document_title.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .reverse()
     .map((item, index) => ({
@@ -131,9 +141,7 @@ useEffect(() => {
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => {
-        const date = params.row.created_at
-          ? moment(params.row.created_at).format("DD/MM/YY")
-          : "-";
+        const date = params.row.created_at ? moment(params.row.created_at).format("DD/MM/YY") : "-";
         return date;
       },
     },
@@ -194,10 +202,11 @@ useEffect(() => {
                 <CheckCircleIcon />
               </IconButton>
             )}
-
             <IconButton
               color="primary" // Static color for the print icon
-              onClick={() => handleOpenPrintDialog(params.row.sop_document_id, params.row.no_of_request_by_admin)} // Open PrintDialog with document id
+              onClick={() =>
+                handleOpenPrintDialog(params.row.sop_document_id, params.row.no_of_request_by_admin)
+              } // Open PrintDialog with document id
               disabled={params.row.status !== "Approve"} // Disable button if status is not "Approve"
             >
               <LocalPrintshopTwoToneIcon />
@@ -207,7 +216,6 @@ useEffect(() => {
       },
     },
   ];
-
   return (
     <MDBox p={3}>
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
@@ -222,7 +230,7 @@ useEffect(() => {
           />
 
           {/* Conditionally render the status dropdown based on groupId */}
-          {(groupId !== 5 && groupId !== 6) && (
+          {groupId !== 5 && groupId !== 6 && (
             <FormControl fullWidth margin="dense" sx={{ width: "250px" }}>
               <InputLabel id="select-parent-doc-label">Status</InputLabel>
               <Select
@@ -237,7 +245,7 @@ useEffect(() => {
                   ".MuiSelect-select": { padding: "0.45rem" },
                 }}
               >
-                <MenuItem value="all">All</MenuItem>  
+                <MenuItem value="all">All</MenuItem>
                 {status?.map((status) => (
                   <MenuItem key={status.id} value={status.id}>
                     {status.status}
@@ -247,7 +255,11 @@ useEffect(() => {
             </FormControl>
           )}
 
-          <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center", mr: 20 }}>
+          <MDTypography
+            variant="h4"
+            fontWeight="medium"
+            sx={{ flexGrow: 1, textAlign: "center", mr: 20 }}
+          >
             Print Approval Listing
           </MDTypography>
 
