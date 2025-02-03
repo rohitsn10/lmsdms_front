@@ -157,7 +157,14 @@ export const documentApi = createApi({
       transformResponse: (response) => response.data, // Transform the response to only include the 'data' part
       providesTags: ["Documents"], // Tag it for cache management, as this fetches document-related data
     }),
-   
+    fetchParentDocuments: builder.query({
+      query: (documentId) => ({
+        url: `dms_module/parent_document/${documentId}`,
+        method: "GET",
+      }),
+      transformResponse: (response) => response.data, // Extract only the 'data' field
+      providesTags: ["Documents"], // Tag it for cache management
+    }),
   }),
 });   
 
@@ -175,5 +182,6 @@ export const {
   useFetchAllDocumentsQuery,
   useGenerateCertificatePdfQuery,
   useGetObsoleteStatusDataQuery,
+  useFetchParentDocumentsQuery,
  
 } = documentApi;

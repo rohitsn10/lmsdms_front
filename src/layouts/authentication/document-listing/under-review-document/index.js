@@ -60,7 +60,7 @@ const UnderReviewDocument = () => {
 
 
   const documents = data?.reviewdata || [];// Extract documents from the new API response
-  console.log("-+---+-+--+------++-+--+data get ", documents);
+ 
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
     setDialogOpen(true);
