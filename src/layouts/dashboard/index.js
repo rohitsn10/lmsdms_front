@@ -22,31 +22,46 @@ import { useGetDocumentDataOfStatusIdTwoQuery } from "api/auth/dashboardApi";
 
 function Dashboard() {
   const { data, error, isLoading } = useGetDashboardCountsQuery(); // Fetch the dashboard counts
-  const { data: rejectedData, isLoading: loadingRejected, error: rejectedError } = useGetDocumentDataOfStatusIdElevenQuery({
+  const {
+    data: rejectedData,
+    isLoading: loadingRejected,
+    error: rejectedError,
+  } = useGetDocumentDataOfStatusIdElevenQuery({
     departmentId: "",
     startDate: "",
     endDate: "",
   });
-  
-  const { data: approveData, isLoading: loadingApprove, error: approveError } = useGetDocumentDataOfStatusIdNineQuery({
+
+  const {
+    data: approveData,
+    isLoading: loadingApprove,
+    error: approveError,
+  } = useGetDocumentDataOfStatusIdNineQuery({
     departmentId: "",
     startDate: "",
     endDate: "",
   });
-  
-  const { data: reviewData, isLoading: loadingReview, error: reviewError } = useGetDocumentDataOfStatusIdThreeQuery({
+
+  const {
+    data: reviewData,
+    isLoading: loadingReview,
+    error: reviewError,
+  } = useGetDocumentDataOfStatusIdThreeQuery({
     departmentId: "",
     startDate: "",
     endDate: "",
   });
-  
-  const { data: savedraftData, isLoading: loadingSavedraft, error: savedraftError } = useGetDocumentDataOfStatusIdTwoQuery({
+
+  const {
+    data: savedraftData,
+    isLoading: loadingSavedraft,
+    error: savedraftError,
+  } = useGetDocumentDataOfStatusIdTwoQuery({
     departmentId: "",
     startDate: "",
     endDate: "",
   });
- 
-  
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading dashboard data</div>;
 
@@ -61,7 +76,7 @@ function Dashboard() {
                 color="primary"
                 icon={<PersonAddIcon />}
                 title="User"
-                count={data?.user_count || 0}  // Assuming user_count comes from your main `data`
+                count={data?.user_count || 0} // Assuming user_count comes from your main `data`
                 percentage={{
                   color: "success",
                   label: "Updated yesterday",
@@ -75,7 +90,7 @@ function Dashboard() {
                 icon={<TopicIcon />}
                 color="warning"
                 title="Document"
-                count={data?.document_count || 0}  // Assuming document_count comes from your main `data`
+                count={data?.document_count || 0} // Assuming document_count comes from your main `data`
                 percentage={{
                   color: "success",
                   label: "Just updated",
@@ -89,7 +104,7 @@ function Dashboard() {
                 color="success"
                 icon={<ApartmentIcon />}
                 title="Department"
-                count={data?.department_count || 0}  // Assuming department_count comes from your main `data`
+                count={data?.department_count || 0} // Assuming department_count comes from your main `data`
                 percentage={{
                   color: "success",
                   label: "Just updated",
@@ -103,7 +118,7 @@ function Dashboard() {
                 color="dark"
                 icon={<AssignmentTurnedInIcon />}
                 title="WorkFlow"
-                count={data?.workflow_count || 0}  // Assuming workflow_count comes from your main `data`
+                count={data?.workflow_count || 0} // Assuming workflow_count comes from your main `data`
                 percentage={{
                   color: "success",
                   label: "Updated yesterday",
@@ -113,17 +128,17 @@ function Dashboard() {
           </Grid>
         </Grid>
       </MDBox>
-  
+
       <MDBox py={3}>
         <Grid container spacing={3}>
-        <Grid item xs={12} md={6} lg={3}>
+          <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <Link to="/review-document">
                 <ComplexStatisticsCard
                   icon={<RateReviewTwoToneIcon />}
                   color="warning"
                   title="Under Review"
-                  count={reviewData?.dataCountreview || 0}  
+                  count={reviewData?.dataCountreview || 0}
                   percentage={{
                     color: "success",
                   }}
@@ -138,7 +153,7 @@ function Dashboard() {
                   color="dark"
                   icon={<DraftsIcon />}
                   title="Under Draft"
-                  count={savedraftData?.dataCountsavedraft || 0}  
+                  count={savedraftData?.dataCountsavedraft || 0}
                   percentage={{
                     color: "success",
                   }}
@@ -153,7 +168,7 @@ function Dashboard() {
                   color="error"
                   icon={<CancelPresentationTwoToneIcon />}
                   title="Rejected"
-                  count={rejectedData?.dataCountreject || 0}  
+                  count={rejectedData?.dataCountreject || 0}
                   percentage={{
                     color: "success",
                   }}
@@ -168,7 +183,7 @@ function Dashboard() {
                   color="success"
                   icon={<TaskIcon />}
                   title="Approved"
-                  count={approveData?.dataCountapprove  || 0}  
+                  count={approveData?.dataCountapprove || 0}
                   percentage={{
                     color: "success",
                   }}
@@ -176,11 +191,23 @@ function Dashboard() {
               </Link>
             </MDBox>
           </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
+                color="dark"
+                icon={<TaskIcon />}
+                title="Due Sop "
+                count={approveData?.dataCountapprove || 0}
+                percentage={{
+                  color: "success",
+                }}
+              />
+            </MDBox>
+          </Grid>
         </Grid>
       </MDBox>
     </DashboardLayout>
   );
-  
 }
 
 export default Dashboard;

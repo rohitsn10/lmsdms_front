@@ -165,6 +165,22 @@ export const documentApi = createApi({
       transformResponse: (response) => response.data, // Extract only the 'data' field
       providesTags: ["Documents"], // Tag it for cache management
     }),
+    updateObsoleteStatus: builder.mutation({
+      query: ({ document_id, status }) => {
+        const formData = new FormData();
+        formData.append("document_id", document_id);
+        formData.append("status", status);
+
+        return {
+          url: "dms_module/docadmin_obsolete_status",
+          method: "POST",
+          body: formData,
+        };
+      },
+      transformResponse: (response) => response, // Transform the response if needed
+      invalidatesTags: ["Documents"], // Invalidate document data to trigger refetch
+    }),
+
   }),
 });   
 
@@ -183,5 +199,6 @@ export const {
   useGenerateCertificatePdfQuery,
   useGetObsoleteStatusDataQuery,
   useFetchParentDocumentsQuery,
+  useUpdateObsoleteStatusMutation,
  
 } = documentApi;

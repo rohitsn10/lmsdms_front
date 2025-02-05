@@ -22,8 +22,12 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import BrowserUpdatedOutlinedIcon from "@mui/icons-material/BrowserUpdatedOutlined";
 // import ReviseDialog from "./Revise";
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
-import FolderSharedOutlinedIcon from '@mui/icons-material/FolderSharedOutlined';
+import FolderSharedOutlinedIcon from "@mui/icons-material/FolderSharedOutlined";
 import ChildDocumentsDialog from "./child-document";
+import SubtitlesOffIcon from "@mui/icons-material/SubtitlesOff";
+import ObsoleteDialog from "./obsolete";
+import { useUpdateObsoleteStatusMutation } from "api/auth/documentApi";
+import { toast, ToastContainer } from "react-toastify";
 const DocumentListing = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,7 +40,9 @@ const DocumentListing = () => {
   const [isReviseDialogOpen, setReviseDialogOpen] = useState(false); // Unique state for ReviseDialog
   const [reviseDocument, setReviseDocument] = useState(null); // Unique state for selected document
   const [openChildDialog, setOpenChildDialog] = useState(false);
+  const [ObsoletedialogOpen, setObsoleteDialogOpen] = useState(false);
   const [selectedChildDocuments, setSelectedChildDocuments] = useState([]);
+  const [updateObsoleteStatus] = useUpdateObsoleteStatusMutation();
 
   useEffect(() => {
     if (data && data.userGroupIds) {
@@ -70,14 +76,17 @@ const DocumentListing = () => {
     setDialogOpen(true);
   };
   const handleViewChildDocuments = (row) => {
-   setSelectedRow(row);
-    setSelectedChildDocuments([]); 
-    setOpenChildDialog(true); 
+    setSelectedRow(row);
+    setSelectedChildDocuments([]);
+    setOpenChildDialog(true);
   };
-  
+
   const handleDialogClose = () => {
     setDialogOpen(false);
     setSelectedRow(null);
+  };
+  const handleObsoleteClose = () => {
+    setObsoleteDialogOpen(false);
   };
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -142,13 +151,31 @@ const DocumentListing = () => {
     navigate("/edit-document", { state: { item: rowData } });
     console.log("Full Row Data passed", rowData);
   };
+  const handleObsoleteDialogOpen = (row) => {
+    setSelectedRow(row);
+    setObsoleteDialogOpen(true);
+  };
+  const handleObsoleteConfirm = async (documentId) => {
+    try {
+      await updateObsoleteStatus({
+        document_id: documentId,
+        status: "12", 
+      });
+      toast.success("Document marked as obsolete successfully!");
+      setObsoleteDialogOpen(false);
+    } catch (error) {
+      toast.error("Failed to mark the document as obsolete. Please try again.");
+    }
+  };
+
 
   const filteredData = documents.filter(
     (doc) =>
-      doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())
+      (doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        doc.document_current_status !== 12
   );
 
   const rows = filteredData.map((doc, index) => ({
@@ -325,6 +352,27 @@ const DocumentListing = () => {
       sortable: false,
       filterable: false,
     },
+    {
+      field: "obsolete",
+      headerName: "Obsolete",
+      flex: 0.4,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <MDBox display="block">
+          <IconButton
+            color="warning"
+            onClick={() => {
+              // Open ObsoleteDialog with row data (pass document_title)
+              handleObsoleteDialogOpen(params.row);
+            }}
+          >
+            <SubtitlesOffIcon />
+          </IconButton>
+        </MDBox>
+      ),
+      sortable: false,
+      filterable: false,
+    },
   ];
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching documents.</div>;
@@ -385,6 +433,7 @@ const DocumentListing = () => {
               }}
             />
           </div>
+         <ToastContainer position="top-right" autoClose={3000} />
         </MDBox>
       </Card>
       <ConditionalDialog
@@ -400,6 +449,14 @@ const DocumentListing = () => {
         onClose={() => setOpenChildDialog(false)}
         documentId={selectedRow?.id || ""}
       />
+      <ObsoleteDialog
+        open={ObsoletedialogOpen}
+        onClose={handleObsoleteClose}
+        onConfirm={handleObsoleteConfirm}
+        documentTitle={selectedRow?.document_title || "Unknown Document"} // Pass document_title here
+        documentId={selectedRow?.id || ""}
+      />
+
       {/* <ReviseDialog
   open={isReviseDialogOpen}
   onClose={() => setReviseDialogOpen(false)}
