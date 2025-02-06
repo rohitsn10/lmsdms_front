@@ -59,6 +59,7 @@ import ViewEmployeeStatus from "dmscomponent/view-employees";
 import ArchiveIcon from '@mui/icons-material/Archive';
 import GroupIcon from '@mui/icons-material/Group';
 import SchoolTwoToneIcon from '@mui/icons-material/SchoolTwoTone';
+import Diversity1Icon from '@mui/icons-material/Diversity1';
 const routes = [
   {
     type: "collapse",
@@ -333,6 +334,14 @@ export const LmsRoutes=[
     key: "trainingListing",
     icon: <ModelTrainingTwoToneIcon />,
     route: "/trainingListing",
+    component: <TrainingListing />,
+  },
+  {
+    type:"collapse",
+    name: "Trainer ",
+    key: "trainingListing",
+    icon: <Diversity1Icon />,
+    route: "/trainer-listing",
     component: <TrainingListing />,
   },
   {
