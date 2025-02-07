@@ -22,7 +22,12 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import BrowserUpdatedOutlinedIcon from "@mui/icons-material/BrowserUpdatedOutlined";
 // import ReviseDialog from "./Revise";
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
-
+import FolderSharedOutlinedIcon from "@mui/icons-material/FolderSharedOutlined";
+import ChildDocumentsDialog from "./child-document";
+import SubtitlesOffIcon from "@mui/icons-material/SubtitlesOff";
+import ObsoleteDialog from "./obsolete";
+import { useUpdateObsoleteStatusMutation } from "api/auth/documentApi";
+import { toast, ToastContainer } from "react-toastify";
 const DocumentListing = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,6 +39,10 @@ const DocumentListing = () => {
   const [userGroupIds, setUserGroupIds] = useState([]);
   const [isReviseDialogOpen, setReviseDialogOpen] = useState(false); // Unique state for ReviseDialog
   const [reviseDocument, setReviseDocument] = useState(null); // Unique state for selected document
+  const [openChildDialog, setOpenChildDialog] = useState(false);
+  const [ObsoletedialogOpen, setObsoleteDialogOpen] = useState(false);
+  const [selectedChildDocuments, setSelectedChildDocuments] = useState([]);
+  const [updateObsoleteStatus] = useUpdateObsoleteStatusMutation();
 
   useEffect(() => {
     if (data && data.userGroupIds) {
@@ -66,10 +75,18 @@ const DocumentListing = () => {
     setSelectedRow(row);
     setDialogOpen(true);
   };
+  const handleViewChildDocuments = (row) => {
+    setSelectedRow(row);
+    setSelectedChildDocuments([]);
+    setOpenChildDialog(true);
+  };
 
   const handleDialogClose = () => {
     setDialogOpen(false);
     setSelectedRow(null);
+  };
+  const handleObsoleteClose = () => {
+    setObsoleteDialogOpen(false);
   };
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -78,7 +95,7 @@ const DocumentListing = () => {
     navigate("/add-document");
   };
   const handleObsolete = () => {
-    navigate("/Obsolete-data"); 
+    navigate("/Obsolete-data");
   };
   const handleClick = (params) => {
     if (!params || !params.row) {
@@ -119,7 +136,7 @@ const DocumentListing = () => {
     setReviseDocument(null);
   };
   const isButtonVisible = () => {
-    return roles.some(role => role.id === 4);
+    return roles.some((role) => role.id === 4);
   };
   const handleReviseConfirm = () => {
     console.log("Revise confirmed for document:", reviseDocument);
@@ -133,15 +150,32 @@ const DocumentListing = () => {
   const handleEditClick = (rowData) => {
     navigate("/edit-document", { state: { item: rowData } });
     console.log("Full Row Data passed", rowData);
-};
+  };
+  const handleObsoleteDialogOpen = (row) => {
+    setSelectedRow(row);
+    setObsoleteDialogOpen(true);
+  };
+  const handleObsoleteConfirm = async (documentId) => {
+    try {
+      await updateObsoleteStatus({
+        document_id: documentId,
+        status: "12", 
+      });
+      toast.success("Document marked as obsolete successfully!");
+      setObsoleteDialogOpen(false);
+    } catch (error) {
+      toast.error("Failed to mark the document as obsolete. Please try again.");
+    }
+  };
 
 
   const filteredData = documents.filter(
     (doc) =>
-      doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())
+      (doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        doc.document_current_status !== 12
   );
 
   const rows = filteredData.map((doc, index) => ({
@@ -172,6 +206,28 @@ const DocumentListing = () => {
       headerAlign: "center",
     },
     {
+      field: "sop_icon",
+      headerName: "SOP Action",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => {
+        const isSOP = params.row.document_type_name === "SOP";
+        return (
+          <MDBox display="flex" justifyContent="center">
+            <IconButton
+              color="success"
+              onClick={() => handleViewChildDocuments(params.row)}
+              disabled={!isSOP} // Disable if document type is not SOP
+            >
+              <FolderSharedOutlinedIcon /> {/* Replace with the desired icon */}
+            </IconButton>
+          </MDBox>
+        );
+      },
+      sortable: false,
+      filterable: false,
+    },
+    {
       field: "document_number",
       headerName: "Document No.",
       flex: 0.55,
@@ -196,6 +252,18 @@ const DocumentListing = () => {
       headerAlign: "center",
     },
     {
+      field: "revision_date",
+      headerName: "Revision Date",
+      flex: 0.6,
+      headerAlign: "center",
+    },
+    {
+      field: "effective_date",
+      headerName: "Effective Date",
+      flex: 0.6,
+      headerAlign: "center",
+    },
+    {
       field: "actions",
       headerName: "Action",
       flex: 0.7,
@@ -204,8 +272,8 @@ const DocumentListing = () => {
         <MDBox display="flex" gap={1}>
           {hasPermission(userPermissions, "document", "isChange") && (
             <IconButton color="primary" onClick={() => handleEditClick(params.row)}>
-            <EditIcon />
-        </IconButton>        
+              <EditIcon />
+            </IconButton>
           )}
           <IconButton
             color="primary"
@@ -215,27 +283,27 @@ const DocumentListing = () => {
           </IconButton>
           {params.row.form_status === "save_draft"
             ? hasPermission(userPermissions, "document", "isView") && (
-              <IconButton
-                color="secondary"
-                onClick={() => {
-                  console.log("Params passed to handleClick:", params);
-                  handleClick(params);
-                }}
-              >
-                <PreviewIcon />
-              </IconButton>
-            )
+                <IconButton
+                  color="secondary"
+                  onClick={() => {
+                    console.log("Params passed to handleClick:", params);
+                    handleClick(params);
+                  }}
+                >
+                  <PreviewIcon />
+                </IconButton>
+              )
             : hasPermission(userPermissions, "document", "isView") && (
-              <IconButton
-                color="inherit"
-                onClick={() => {
-                  console.log("Params passed to handleClick:", params);
-                  handleClick(params);
-                }}
-              >
-                <EditCalendarIcon />
-              </IconButton>
-            )}
+                <IconButton
+                  color="inherit"
+                  onClick={() => {
+                    console.log("Params passed to handleClick:", params);
+                    handleClick(params);
+                  }}
+                >
+                  <EditCalendarIcon />
+                </IconButton>
+              )}
           {data?.userGroupIds?.includes(5) && ( // Hide CheckCircleIcon when status is 7
             <IconButton
               color="success"
@@ -284,6 +352,27 @@ const DocumentListing = () => {
       sortable: false,
       filterable: false,
     },
+    {
+      field: "obsolete",
+      headerName: "Obsolete",
+      flex: 0.4,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <MDBox display="block">
+          <IconButton
+            color="warning"
+            onClick={() => {
+              // Open ObsoleteDialog with row data (pass document_title)
+              handleObsoleteDialogOpen(params.row);
+            }}
+          >
+            <SubtitlesOffIcon />
+          </IconButton>
+        </MDBox>
+      ),
+      sortable: false,
+      filterable: false,
+    },
   ];
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching documents.</div>;
@@ -303,12 +392,7 @@ const DocumentListing = () => {
             Document Listing
           </MDTypography>
           {isButtonVisible && (
-            <MDButton
-              variant="contained"
-              color="primary"
-              onClick={handleObsolete}
-              sx={{ ml: 2 }}
-            >
+            <MDButton variant="contained" color="primary" onClick={handleObsolete} sx={{ ml: 2 }}>
               Obsolete
             </MDButton>
           )}
@@ -325,13 +409,14 @@ const DocumentListing = () => {
           )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
-          <div style={{ height: 500, width: "100%" }}>
+          <div style={{ height: 500, width: "100%", overflow: "auto" }}>
             <DataGrid
               rows={rows || []}
               columns={columns}
               pageSize={10}
               rowsPerPageOptions={[10, 25, 50]}
               sx={{
+                minWidth: 1500,
                 "& .MuiDataGrid-columnHeaders": {
                   backgroundColor: "#f5f5f5",
                   fontWeight: "bold",
@@ -348,6 +433,7 @@ const DocumentListing = () => {
               }}
             />
           </div>
+         <ToastContainer position="top-right" autoClose={3000} />
         </MDBox>
       </Card>
       <ConditionalDialog
@@ -356,8 +442,21 @@ const DocumentListing = () => {
         onConfirm={() => console.log("Confirmed for row:", selectedRow)}
         trainingStatus={selectedRow?.training_required || "false"}
         documentId={selectedRow?.id || ""}
-        revisionMonth={selectedRow?.revision_month} // Pass revisionMonth as a prop
+        revisionMonth={selectedRow?.revision_month}
       />
+      <ChildDocumentsDialog
+        open={openChildDialog}
+        onClose={() => setOpenChildDialog(false)}
+        documentId={selectedRow?.id || ""}
+      />
+      <ObsoleteDialog
+        open={ObsoletedialogOpen}
+        onClose={handleObsoleteClose}
+        onConfirm={handleObsoleteConfirm}
+        documentTitle={selectedRow?.document_title || "Unknown Document"} // Pass document_title here
+        documentId={selectedRow?.id || ""}
+      />
+
       {/* <ReviseDialog
   open={isReviseDialogOpen}
   onClose={() => setReviseDialogOpen(false)}
