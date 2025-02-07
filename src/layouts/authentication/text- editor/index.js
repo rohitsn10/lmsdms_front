@@ -40,6 +40,9 @@ import { AuthContext } from "context/auth-context";
 const DocumentView = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
+  const docEditorRef = useRef(null);
+
+  const [saving, setSaving] = useState(false);
   const [Error1,setError] = useState(null);
   const [docEditorLoaded, setDocEditorLoaded] = useState(false);
   const [editorConfig, setEditorConfig] = useState(null);
@@ -71,7 +74,7 @@ const DocumentView = () => {
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(""); // State for Assigned To dropdown
   const [statusSendBack, setStatusSendBack] = useState(""); // State for Status Send Back dropdown
-  console.log("Navigated with data in text Editor :", { id, document_current_status });
+  // console.log("Navigated with data in text Editor :", { id, document_current_status });
   // console.log("Training Required:", trainingRequired)
   const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
   const [randomNumber] = useState(Math.floor(Math.random() * 100000));
@@ -86,12 +89,12 @@ const DocumentView = () => {
   const [docAdmin, setDocAdmin] = useState("");
 // Accessing Context for UserData.
   const {user,setValue}=useContext(AuthContext)
-  console.log("User Data",user)
-  console.log("-+-+-+-+-+-+-+-+-+-+-++--++--+", docAdmin);
+  // console.log("User Data",user)
+  // console.log("-+-+-+-+-+-+-+-+-+-+-++--++--+", docAdmin);
   // Extract userGroupIds directly from documentsData
   const userGroupIds = documentsData?.userGroupIds || [];
-  console.log("Extracted User Group IDs:", userGroupIds);
-  console.log(data)
+  // console.log("Extracted User Group IDs:", userGroupIds);
+  // console.log(data)
   // setDocID(data?.id)
   // Visibility function using extracted userGroupIds
   const isButtonVisible = (requiredGroupIds) => {
@@ -112,14 +115,14 @@ const DocumentView = () => {
       setLoading(false);
       return;
     } 
-    console.log("Template Data:", templateData);
-    console.log("Template URL:", templateData?.template_url);
+    // console.log("Template Data:", templateData);
+    // console.log("Template URL:", templateData?.template_url);
 
     if (templateData?.template_url) {
       const fetchEditorConfig = async () => {
         try {
-          // const response = await fetch(`http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`, {
-            const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
+          const response = await fetch(`http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`, {
+            // const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -153,11 +156,19 @@ const DocumentView = () => {
   useEffect(() => {
     if (docEditorLoaded && editorConfig) {
       const script = document.createElement("script");
-      // script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
-      script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
+      script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
+      // script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
       script.onload = () => {
         try {
-          new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
+          const handleSave = () => {
+            if (docEditorRef.current) {
+              console.log("Save button clicked, triggering save...");
+              // docEditorRef.current.serviceCommand("save");
+              // docEditorRef.current?.requestSave();
+            }
+          };
+
+           docEditorRef.current = new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
             width: "100%",
             height: "100%",
             type: "desktop",
@@ -179,15 +190,94 @@ const DocumentView = () => {
                 visibleForAllUsers: true, // Make the watermark visible for all users
               },
               customization: {
-                autosave: true, // Enable autosave
-                hideRightMenu: true, // Hide the right-side menu
-                buttons: ["save"], // Restrict buttons to Save
+                autosave: true,
+                forcesave: true, // Enable forced saving
+                features: {
+                  forcesave: true
+                },
+                saveButton: true, // Enable save button
+                chat: false,
+                comments: false,
+                zoom: 100,
+                compactHeader: false,
+                leftMenu: true,
+                rightMenu: false,
+                toolbar: true,
+                statusBar: true,
+                autosaveMessage: true,
+                forcesaveMessage: true,
               },
             },
             events: {
+              // onDocumentStateChange: (event) => {
+              //   console.log("Document state changed:", event.data);
+              // },
               onDocumentStateChange: (event) => {
-                console.log("Document state changed:", event.data);
+                const hasChanges = event.data;
+                console.log("Document has unsaved changes:", hasChanges);
+                
+                if (hasChanges) {
+                    // Document has unsaved changes - you could trigger auto-save here
+                    if (window.DocEditor) {
+                        window.DocEditor.execCommand("save");
+                    }
+                }
+            },
+              onAppReady: () => {
+                // Store the editor instance globally
+                window.docEditor = docEditorRef.current;
+                console.log("Window Editor is ready");
+                console.log("WIndow Editor log:",window.docEditor.openDocument())
+            },
+              onRequestSave: () => {
+                // This event is triggered when user clicks save button or uses Ctrl+S
+                // console.log("Save requested");
+                // handleSave();
+                console.log("Save requested");
+                handleSave();
               },
+              onSave: () => {
+                // This event is triggered when the document has been saved
+                console.log("Document saved successfully");
+              },
+              onError: (event) => {
+                console.error("Editor error:", event);
+              },
+              // onDownloadAs: (response) => {
+              //   console.log('Download response:', response);
+              //   console.log(response?.data?.url)
+              //   return true;
+              // }
+              onDownloadAs: async (response) => {
+                try {
+                    console.log('Download response:', response);
+                    const cacheUrl = response?.data?.url;
+                    
+                    if (cacheUrl) {
+                        // Fetch the file from the cache URL
+                        const fileResponse = await fetch(cacheUrl);
+                        const blob = await fileResponse.blob();
+                        console.log("Blob Response.",blob)
+                        // Create FormData to send file to backend
+                        const formData = new FormData();
+                        formData.append('file', blob, 'document.docx');
+                        
+                        // Send to your backend
+                        const saveResponse = await fetch('/your-backend-save-endpoint', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const result = await saveResponse.json();
+                        console.log('Save result:', result);
+                    }
+                    
+                    return true; // Allow the normal download to proceed
+                } catch (error) {
+                    console.error('Error saving document:', error);
+                    return true;
+                }
+            }
             },
             token: editorConfig.token, // Pass the authentication token
           });
@@ -520,6 +610,109 @@ const DocumentView = () => {
     }
   };
 
+  const container = document.getElementById('onlyoffice-editor-container');
+
+  const handleDownloadFeature1 = async()=>{
+    try {
+      if (docEditorRef.current) {
+        console.log("Debug 1")
+          // Try multiple save methods
+          docEditorRef.current.downloadAs('docx', (blob) => {
+              // Create FormData and send to backend
+              console.log(blob)
+              
+              const formData = new FormData();
+              formData.append('file', blob, 'document.docx');
+              
+              fetch(editorConfig.callbackUrl, {
+                  method: 'POST',
+                  body: formData
+              })
+              .then(response => response.json())
+              .then(data => console.log('Save response:', data))
+              .catch(error => console.error('Save error:', error));
+          });
+      }
+  } catch (error) {
+      console.error("Save failed:", error);
+  }
+  }
+  const handleDownloadFeature2 = async () => {
+    try {
+        if (docEditorRef.current) {
+            console.log("Debug 1");
+
+            docEditorRef.current.downloadAs('docx', async (blobUrl) => {
+                console.log("Blob URL:", blobUrl); // This might be a URL, not a Blob
+
+                try {
+                    // Fetch the actual file content if blobUrl is a URL
+                    const response = await fetch(blobUrl);
+                    const blob = await response.blob();
+
+                    // Trigger download in the browser
+                    const downloadLink = document.createElement("a");
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = "document.docx";
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    
+                    // Upload to backend
+                    const formData = new FormData();
+                    formData.append('file', blob, 'document.docx');
+
+                    const uploadResponse = await fetch(editorConfig.callbackUrl, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await uploadResponse.json();
+                    console.log('Save response:', data);
+                } catch (fetchError) {
+                    console.error('Error fetching blob:', fetchError);
+                }
+            });
+        }
+    } catch (error) {
+        console.error("Save failed:", error);
+    }
+};
+const handleDownloadFeature = async () => {
+  try {
+      if (docEditorRef.current) {
+          console.log("Debug 1");
+
+          docEditorRef.current.downloadAs('docx', async (blobUrl) => {
+              console.log("Blob URL:", blobUrl); 
+
+              try {
+                  // Fetch the actual file content if blobUrl is a URL
+                  const response = await fetch(blobUrl);
+                  const blob = await response.blob();
+
+                  // Create FormData and send to backend
+                  const formData = new FormData();
+                  formData.append('file', blob, 'document.docx');
+
+                  const uploadResponse = await fetch(editorConfig.callbackUrl, {
+                      method: 'POST',
+                      body: formData
+                  });
+
+                  const data = await uploadResponse.json();
+                  console.log('Save response:', data);
+              } catch (fetchError) {
+                  console.error('Error fetching blob:', fetchError);
+              }
+          });
+      }
+  } catch (error) {
+      console.error("Save failed:", error);
+  }
+};
+
+
   // const handleDialogConfirm = async () => {
   //   setDialogeffectiveOpen(false); // Close the dialog after confirmation
 
@@ -587,6 +780,7 @@ const DocumentView = () => {
     // Close the modal or drawer after saving
     setOpenDrawer(false); // Close the drawer or modal after saving the comment
   };
+
   if (loading || isLoading) {
     return (
       <Box padding={2} display="flex" justifyContent="center" alignItems="center" height="100vh">
@@ -622,6 +816,59 @@ const DocumentView = () => {
     setOpenuserDialog(false); // Close the SelectUserDialog
     setOpenRemarkDialog(true); // Now open the RemarkDialog
   };
+
+  const handleSave = async () => {
+    if (!docEditorRef.current) {
+      console.error("Editor not initialized");
+      return;
+    }
+  
+    try {
+      setSaving(true);
+      console.log("Starting save process...");
+  
+      // Use direct save command
+      docEditorRef.current.execCommand('save', {
+        callback: async (response) => {
+          console.log("Save command response:", response);
+          
+          if (response.success) {
+            // If the save command returns a URL or content
+            if (response.data) {
+              const formData = new FormData();
+              formData.append('file', response.data);
+              formData.append('fileName', editorConfig.document.title);
+  
+              const serverResponse = await fetch(editorConfig.callbackUrl, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${editorConfig.token}`,
+                },
+                body: formData,
+              });
+  
+              if (serverResponse.ok) {
+                console.log('Document saved successfully');
+                alert('Document saved successfully!');
+              } else {
+                throw new Error('Failed to save to server');
+              }
+            }
+          } else {
+            throw new Error('Save command failed');
+          }
+        }
+      });
+  
+    } catch (error) {
+      console.error('Error saving document:', error);
+      alert(`Failed to save document: ${error.message}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+  console.log("Editor ref",docEditorRef.current);
+  console.log("Django")
 
   return (
     <MDBox
@@ -748,6 +995,17 @@ const DocumentView = () => {
           >
             Save Draft
           </MDButton>
+          <button
+          onClick={handleSave}
+          // disabled={saving}
+          className={`px-4 py-2 rounded ${
+            saving 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-blue-500 hover:bg-blue-600'
+          } text-white font-medium`}
+        >
+          {true ? 'Saving...' : 'Save Document'}
+        </button>
           <MDButton
             variant="gradient"
             color="submit"
@@ -757,6 +1015,13 @@ const DocumentView = () => {
           >
             Print
           </MDButton>
+          <button onClick={() => docEditorRef.current.serviceCommand("save")}>
+  Force Save
+</button>
+
+      <button onClick={handleDownloadFeature}>
+        Force Save
+      </button>
         </MDBox>
       </Box>
       <MDBox
