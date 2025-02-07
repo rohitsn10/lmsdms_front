@@ -109,10 +109,12 @@ import AddSession from "dmscomponent/class-room/session-listing/add-session/inde
 import EditSession from "dmscomponent/class-room/session-listing/edit-session/index.js";
 import {LmsRoutes,DmsRoutes} from './routes.js';
 import { useSelector } from "react-redux";
-
 import ClassroomListing from "dmscomponent/class-room/index.js";
 import SessionListing from "dmscomponent/class-room/session-listing/index.js";
 import ViewEmployeeStatus from "dmscomponent/view-employees/index.jsx";
+import TrainerListing from "dmscomponent/trainer-list/index.js";
+import AddTrainer from "dmscomponent/trainer-list/add-trainer/index.js";
+import EditTrainer from "dmscomponent/trainer-list/edit-trainer/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -368,6 +370,9 @@ export default function App() {
       <Route path="/session-list" element={<SessionListing/>}/>
       <Route path="/add-session" element={<AddSession/>}/>
       <Route path="/edit-session" element={<EditSession/>}/>
+      <Route path="/trainer-listing" element={<TrainerListing/>}/>
+      <Route path="/add-trainer" element={<AddTrainer/>}/>
+      <Route path="/edit-trainer" element={<EditTrainer/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   </div>
