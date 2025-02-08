@@ -85,7 +85,7 @@ function AddQuestion() {
     }
   
     const formData = new FormData();
-    formData.append("training_id", id);
+    formData.append("document_id", id);
     formData.append("question_text", questionText);
     formData.append("question_type", questionType);
     formData.append("marks", questionMarks);

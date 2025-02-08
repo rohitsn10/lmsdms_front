@@ -339,7 +339,7 @@ export const LmsRoutes=[
   {
     type:"collapse",
     name: "Trainer ",
-    key: "trainingListing",
+    key: "trainer-listing",
     icon: <Diversity1Icon />,
     route: "/trainer-listing",
     component: <TrainingListing />,
