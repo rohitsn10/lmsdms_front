@@ -107,7 +107,11 @@ const AddTrainer = () => {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label={<><span style={{ color: "red" }}>*</span> Trainer Name</>}
+                label={
+                  <>
+                    <span style={{ color: "red" }}>*</span> Trainer Name
+                  </>
+                }
                 fullWidth
                 value={trainerName}
                 onChange={(e) => setTrainerName(e.target.value)}
@@ -117,7 +121,11 @@ const AddTrainer = () => {
             </MDBox>
             <MDBox mb={3}>
               <MDInput
-                label={<><span style={{ color: "red" }}>*</span> Trainer Description</>}
+                label={
+                  <>
+                    <span style={{ color: "red" }}>*</span> Trainer Description
+                  </>
+                }
                 multiline
                 rows={4}
                 fullWidth
@@ -128,7 +136,13 @@ const AddTrainer = () => {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
+              <MDButton
+                variant="gradient"
+                color="submit"
+                fullWidth
+                type="submit"
+                disabled={isLoading}
+              >
                 {isLoading ? "Submitting..." : "Submit"}
               </MDButton>
             </MDBox>

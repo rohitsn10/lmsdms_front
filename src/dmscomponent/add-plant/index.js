@@ -111,7 +111,11 @@ const AddPlant = () => {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label={<><span style={{ color: "red" }}>*</span> Plant Name</>}
+                label={
+                  <>
+                    <span style={{ color: "red" }}>*</span> Plant Name
+                  </>
+                }
                 fullWidth
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -122,7 +126,11 @@ const AddPlant = () => {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label={<><span style={{ color: "red" }}>*</span> Plant Location</>}
+                label={
+                  <>
+                    <span style={{ color: "red" }}>*</span> Plant Location
+                  </>
+                }
                 fullWidth
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
@@ -132,7 +140,11 @@ const AddPlant = () => {
             </MDBox>
             <MDBox mb={3}>
               <MDInput
-                label={<><span style={{ color: "red" }}>*</span> Plant Description</>}
+                label={
+                  <>
+                    <span style={{ color: "red" }}>*</span> Plant Description
+                  </>
+                }
                 multiline
                 rows={4}
                 fullWidth
@@ -143,7 +155,13 @@ const AddPlant = () => {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
+              <MDButton
+                variant="gradient"
+                color="submit"
+                fullWidth
+                type="submit"
+                disabled={isLoading}
+              >
                 {isLoading ? "Submitting..." : "Submit"}
               </MDButton>
             </MDBox>
