@@ -43,11 +43,37 @@ export const jobroleApi = createApi({
       }),
       transformResponse: (response) => response, // Handle raw response
     }),
+    createJobDescription: builder.mutation({
+      query: ({ user_id, employee_job_description }) => ({
+        url: 'lms_module/jobdescriptioncreate',
+        method: 'POST',
+        body: { user_id, employee_job_description },
+      }),
+      transformResponse: (response) => response, // Handle raw response
+    }),
+    getJobDescriptionList: builder.query({
+      query: (userId) => ({
+        url: `lms_module/jobdescription_list/${userId}`,
+        method: 'GET',
+      }),
+      transformResponse: (response) => response, // Handle raw response
+    }),
+    hodRemarks: builder.mutation({
+      query: ({ user_id, status,remark }) => ({
+        url: `lms_module/hod_remarks/${user_id}`, // Endpoint with user_id
+        method: 'PUT',
+        body: { status,remark }, // Status to update (e.g., "approved")
+      }),
+      transformResponse: (response) => response, // Handle raw response
+    })
   }),
 });
 
 export const { 
-  useCreateJobRoleMutation,   // Hook for creating a job role (POST)
-  useGetJobRoleQuery,         // Hook for getting job roles (GET)
-  useUpdateJobRoleMutation,   // Hook for updating job roles (PUT)
+  useCreateJobRoleMutation,   
+  useGetJobRoleQuery,       
+  useUpdateJobRoleMutation,   
+  useCreateJobDescriptionMutation,
+  useGetJobDescriptionListQuery,
+  useHodRemarksMutation,
 } = jobroleApi;
