@@ -26,7 +26,7 @@ import { trainingApi } from "apilms/trainingApi";
 import { questionApi } from "apilms/questionApi";
 import { timeLineApi } from "api/auth/timeLineApi";
 import { jobroleApi } from "apilms/jobRoleApi";
-import { trainingMappingApi } from "apilms/trainigMappingApi";
+import { trainingMappingApi } from "apilms/MappingApi";
 import { archivedListApi } from "api/auth/archivedListApi";
 import {quizapi} from "apilms/quizapi";
 import {manageSection} from 'apilms/manageSection';

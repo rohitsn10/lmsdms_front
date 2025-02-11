@@ -14,44 +14,50 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { useGetPlantQuery } from "apilms/plantApi";
-import { useGetAreaQuery } from "apilms/AreaApi";
-import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
+import { useFetchTrainingsQuery } from "apilms/trainingApi";
 import { useGetJobRoleQuery } from "apilms/jobRoleApi";
-import { useFetchTrainingTypesQuery } from "apilms/trainingtypeApi";
-import { useTrainingListDataQuery } from "apilms/trainigMappingApi";
-import { useJobTrainingListMappingQuery } from "apilms/trainigMappingApi"; 
+import { useTrainingAssignJobroleQuery } from "apilms/MappingApi";
+import { useTrainingAssignJobroleMutationMutation } from "apilms/MappingApi";
+import { toast } from "react-toastify";
 
 const JobRoleMapping = () => {
-  
   const [selectedJobRole, setSelectedJobRole] = useState("");
-  const [trainingType, setTrainingType] = useState("");
   const [kanbanData, setKanbanData] = useState({
     toDo: [],
     inProgress: [],
   });
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [errors, setErrors] = useState({});
-  const { data: jobRoleData } = useGetJobRoleQuery();
-  const { data: trainingTypesData } = useFetchTrainingTypesQuery({
-    enabled: !!trainingType, 
-  });
 
-  const {
-    data: trainingListData,
-    isLoading: trainingLoading,
-    error: trainingError,
-  } = useTrainingListDataQuery({ training_type: trainingType });
-  const { data: jobTrainingListData, refetch,isLoading: jobTrainingLoading } = useJobTrainingListMappingQuery({
-    job_role_id: selectedJobRole, 
-  
-  });
+  const { data: trainingData, error: trainingError, isLoading: trainingIsLoading } = useFetchTrainingsQuery();
+  const { data: jobRoleData, error: jobRoleError, isLoading: jobRoleIsLoading } = useGetJobRoleQuery();
+
+  const { data: assignedTraining, error: assignedTrainingError, isLoading: assignedTrainingIsLoading } = useTrainingAssignJobroleQuery(selectedJobRole, { skip: !selectedJobRole });
+  const [trainingAssignJobrole, { isLoading: isMappingLoading, error: mappingError }] = useTrainingAssignJobroleMutationMutation();
   useEffect(() => {
-    refetch()
-    console.log('Selected Job Role:', selectedJobRole);
-    console.log('Triggering Job Training API with:', selectedJobRole);
-    console.log("------------------------------*---------------",jobTrainingListData);
-  }, [selectedJobRole]);
+    if (trainingData) {
+      const sampleToDo = trainingData.document_data.map((doc) => ({
+        id: doc.id.toString(),
+        title: doc.document_title,
+        description: doc.document_description,
+      }));
+      setKanbanData({
+        toDo: sampleToDo,
+        inProgress: [],
+      });
+    }
+
+    if (assignedTraining && Array.isArray(assignedTraining.data)) {
+      const assignedItems = assignedTraining.data.map((training) => ({
+        id: training.id.toString(),
+        title: training.training_title,
+        description: training.training_description,
+      }));
+      setKanbanData((prev) => ({
+        ...prev,
+        inProgress: assignedItems, // Set the assigned training in the "Assigned Training" section
+      }));
+    }
+  }, [trainingData, assignedTraining]);
+
   const handleDragEnd = (result) => {
     const { destination, source } = result;
 
@@ -78,36 +84,30 @@ const JobRoleMapping = () => {
     });
   };
 
-  useEffect(() => {
-    if (trainingListData?.length > 0) {
-      const updatedToDoList = trainingListData.map((training) => ({
-        id: training.training_number,
-        title: training.training_name,
-        description: `Training No: ${training.training_version}`,
-      }));
-      setKanbanData((prevData) => ({
-        ...prevData,
-        toDo: updatedToDoList,
-      }));
-    }
-  }, [trainingListData]);
-  useEffect(() => {
-    if (jobTrainingListData?.data?.length > 0) {
-      const updatedInProgressList = jobTrainingListData.data.map((training) => ({
-        id: training.training_number,
-        title: training.training_name,
-        description: `Training No: ${training.training_number}`,
-      }));
-      setKanbanData((prevData) => ({
-        ...prevData,
-        inProgress: updatedInProgressList,
-      }));
-    }
-  }, [jobTrainingListData]);
+  const handleMapping = async () => {
+    // Get document ids from the "inProgress" column
+    const documentIds = kanbanData.inProgress.map((item) => parseInt(item.id)); // Convert to numbers as expected in API
 
-  const handleMapping = () => {
-    console.log("Mapping button clicked with selected status:", selectedStatus);
+    try {
+      await trainingAssignJobrole({
+        job_role_id: selectedJobRole,
+        document_ids: documentIds,
+      });
+      toast.success("Training successfully assigned!"); // Success toast
+      console.log("Training successfully assigned");
+    } catch (err) {
+      toast.error("Error assigning training: " + err.message); // Error toast
+      console.error("Error assigning training:", err);
+    }
   };
+
+  if (trainingIsLoading || jobRoleIsLoading || assignedTrainingIsLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (trainingError || jobRoleError || assignedTrainingError) {
+    return <div>Error fetching data</div>;
+  }
 
   return (
     <MDBox p={3}>
@@ -115,31 +115,32 @@ const JobRoleMapping = () => {
         <MDBox p={3} display="flex" alignItems="center" justifyContent="center">
           <MDBox mb={3}>
             <FormControl sx={{ width: "250px", ml: 5 }}>
-              <InputLabel id="select-training-type-label">Training Type</InputLabel>
+              <InputLabel id="select-job-role-label">Job Role</InputLabel>
               <Select
-                labelId="select-training-type-label"
-                id="select-training-type"
-                value={trainingType}
-                onChange={(e) => setTrainingType(e.target.value)}
-                input={<OutlinedInput label="Training Type" />}
+                labelId="select-job-role-label"
+                id="select-job-role"
+                value={selectedJobRole}
+                onChange={(e) => setSelectedJobRole(e.target.value)}
+                input={<OutlinedInput label="Job Role" />}
                 sx={{
                   minWidth: 200,
                   height: "3rem",
                   ".MuiSelect-select": { padding: "0.45rem" },
                 }}
-                error={!!errors.trainingType}
               >
-                {trainingTypesData?.data?.map((type) => (
-                  <MenuItem key={type.id} value={type.id}>
-                    {type.training_type_name}
+                {jobRoleData?.data?.map((job) => (
+                  <MenuItem key={job.id} value={job.id}>
+                    <Box>
+                      <MDTypography variant="body1" sx={{ fontWeight: "bold" }}>
+                        {job.job_role_name}
+                      </MDTypography>
+                      <MDTypography variant="body2" color="textSecondary">
+                        {job.job_role_description}
+                      </MDTypography>
+                    </Box>
                   </MenuItem>
                 ))}
               </Select>
-              {errors.trainingType && (
-                <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
-                  {errors.trainingType}
-                </p>
-              )}
             </FormControl>
           </MDBox>
 
@@ -160,31 +161,7 @@ const JobRoleMapping = () => {
             Mapping
           </MDButton>
         </MDBox>
-        <MDBox ml="10px" display="flex" justifyContent="space-between" alignItems="center" sx={{ flexWrap: "wrap" }}>
-          <FormControl sx={{ minWidth: 200, mb: 2, ml: 5 }}>
-            <InputLabel>Job Role</InputLabel>
-            <Select
-              value={selectedJobRole}
-              onChange={(e) => setSelectedJobRole(e.target.value)}
-              label="Job Role"
-              sx={{
-                minWidth: 200,
-                height: "2.5rem",
-                ".MuiSelect-select": { padding: "0.45rem" },
-              }}
-            >
-              {jobRoleData?.data?.length > 0 ? (
-                jobRoleData.data.map((jobRole) => (
-                  <MenuItem key={jobRole.id} value={jobRole.id}>
-                    {jobRole.job_role_name}
-                  </MenuItem>
-                ))
-              ) : (
-                <MenuItem disabled>No Job Roles Available</MenuItem>
-              )}
-            </Select>
-          </FormControl>
-        </MDBox>
+
         <DragDropContext onDragEnd={handleDragEnd}>
           <MDBox display="flex" justifyContent="center" alignItems="center">
             <Droppable droppableId="toDo">
@@ -211,9 +188,11 @@ const JobRoleMapping = () => {
                 </Card>
               )}
             </Droppable>
+
             <IconButton sx={{ mx: 2, fontSize: "6rem" }}>
               <ArrowForwardIcon sx={{ fontSize: "inherit" }} />
             </IconButton>
+
             <Droppable droppableId="inProgress">
               {(provided) => (
                 <Card sx={{ width: "43%", mr: 5, p: 2, mb: 2, borderRadius: 5, boxShadow: 5 }} ref={provided.innerRef} {...provided.droppableProps}>
@@ -244,4 +223,5 @@ const JobRoleMapping = () => {
     </MDBox>
   );
 };
+
 export default JobRoleMapping;

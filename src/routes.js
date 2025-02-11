@@ -282,6 +282,14 @@ export const LmsRoutes=[
   },
   {
     type: "collapse",
+    name: "User Management",
+    key: "user-listing",
+    icon: <PersonAddIcon />,
+    route: "/user-listing",
+    component: <UsersListing />,
+  },
+  {
+    type: "collapse",
     name: "Employee Workflow",
     key: "employee-workflow",
     icon: <AssignmentIndOutlinedIcon fontSize="small" />,

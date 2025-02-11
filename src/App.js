@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
+import { ToastContainer } from "react-toastify";
 import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
@@ -375,6 +376,7 @@ export default function App() {
       <Route path="/edit-trainer" element={<EditTrainer/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
+    <ToastContainer />
   </div>
 </ThemeProvider>
   );

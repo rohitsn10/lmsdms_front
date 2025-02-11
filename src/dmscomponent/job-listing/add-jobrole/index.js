@@ -140,7 +140,7 @@ function AddJobRole() {
               />
             </MDBox>
             <MDBox mb={3}>
-              <FormControl fullWidth margin="dense" sx={{ width: "100%"}}>
+              <FormControl fullWidth  sx={{ width: "100%"}}>
                 <InputLabel id="select-plant-label">Plant Name</InputLabel>
                 <Select
                   labelId="select-plant-label"
@@ -153,7 +153,7 @@ function AddJobRole() {
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                  displayEmpty
+                  
                 >
                   {plantData?.data?.map((plant) => (
                     <MenuItem key={plant.id} value={plant.id}>
@@ -178,7 +178,7 @@ function AddJobRole() {
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                  displayEmpty
+                 
                 >
                   {areaLoading ? (
                     <MenuItem disabled>Loading...</MenuItem>
