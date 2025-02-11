@@ -8,20 +8,23 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
+import { useAuth } from "hooks/use-auth";
 import moment from "moment";
 import { useFetchTrainingsQuery } from "apilms/trainingApi"; // Update this path as needed
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 import { Button } from "@mui/material";
-import ChecklistIcon from '@mui/icons-material/Checklist';
-
+import ChecklistIcon from "@mui/icons-material/Checklist";
+import QuizIcon from "@mui/icons-material/Quiz";
 const TrainingListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
+  const { user } = useAuth();
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
   // Fetch training data using the API query hook
   const { data, error, isLoading, refetch } = useFetchTrainingsQuery();
-  console.log(data)
+ 
   useEffect(() => {
     refetch();
   }, [location.key]);
@@ -42,9 +45,13 @@ const TrainingListing = () => {
     navigate("/questions", { state: { rowData } });
     // You can implement additional logic here, such as opening a modal, navigating to another page, etc.
   };
-  const handleAssessmentClick=(rowData)=>{
+  const handleQuizClick = (row) => {
+    navigate("/quiz-list", { state: { row } });
+    console.log("-----------------------------------------",row)
+  };
+  const handleAssessmentClick = (rowData) => {
     navigate("/mcq-module", { state: { rowData } });
-  }
+  };
   const handleview = (item) => {
     const documentUrl = item; // Ensure the correct field is used
 
@@ -56,22 +63,22 @@ const TrainingListing = () => {
     }
   };
   const filteredData = (Array.isArray(data?.document_data) ? data.document_data : [])
-  .filter((item) => item.document_title.toLowerCase().includes(searchTerm.toLowerCase())) // Filter by title
-  .map((item, index) => {
-    console.log("Created at:", item.created_at); // Log the created_at field to check it
-    return {
-      id: item.id,
-      serial_number: index + 1,
-      document_name: item.document_title,
-      document_type: item.document_type_name,
-      document_number: item.document_number,
-      version: item.version,
-      created_date: moment(item.created_at).format("DD-MM-YY"), // Format the date
-      status: item.current_status_name,
-      revision_date: item.revision_month, // Revision month
-      effective_date: moment(item.created_at).format("DD-MM-YY"), // Use created_at for now
-    };
-  });
+    .filter((item) => item.document_title.toLowerCase().includes(searchTerm.toLowerCase())) // Filter by title
+    .map((item, index) => {
+      // console.log("Created at:", item.created_at); // Log the created_at field to check it
+      return {
+        id: item.id,
+        serial_number: index + 1,
+        document_name: item.document_title,
+        document_type: item.document_type_name,
+        document_number: item.document_number,
+        version: item.version,
+        created_date: moment(item.created_at).format("DD-MM-YY"), // Format the date
+        status: item.current_status_name,
+        revision_date: item.revision_month, // Revision month
+        effective_date: moment(item.created_at).format("DD-MM-YY"), // Use created_at for now
+      };
+    });
 
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
@@ -82,7 +89,7 @@ const TrainingListing = () => {
     { field: "created_date", headerName: "Created Date", flex: 1, headerAlign: "center" },
     { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
     { field: "revision_date", headerName: "Revision Date", flex: 1, headerAlign: "center" },
-    { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" },  
+    { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" },
     {
       field: "action",
       headerName: "Action",
@@ -111,57 +118,79 @@ const TrainingListing = () => {
       filterable: false,
     },
     {
-      field:"material",
-      headerName:"Material",
-      flex:0.8,
-      headerAlign:"center",
-      renderCell:(params)=>{
-        return(
-          <MDBox display="flex" justifyContent="center">
-            <Button
-            variant="contained"
-            sx={{
-              backgroundColor: '#ff3f3f',
-              borderRadius: '20px',
-              color: 'white !important',
-              padding: '2px 16px',
-              fontSize: '12px',
-              minHeight: 'unset',
-              height: '32px', 
-              textTransform: 'none',
-              "&:hover":{
-                backgroundColor: 'red',
-                color:'white'
-              }
-            }}
-            onClick={() => navigate(`/training-material/${params.row.id}`)} // Navigate to material path with training_id
-          >
-            Material
-          </Button>
-          </MDBox>
-        )
-      }
-    },
-    {
-      field: "question",
-      headerName: "Question",
+      field: "material",
+      headerName: "Material",
       flex: 0.8,
       headerAlign: "center",
-      renderCell: (params) => (
-        <MDBox display="flex" justifyContent="center">
-          {/* Question Icon */}
-          <IconButton
-            color="error"
-            onClick={() => handleQuestionClick(params.row.id)} // Define this function to handle the question click action
-          >
-            <QuestionAnswerOutlinedIcon />{" "}
-            {/* Assuming you are using a Question Icon, like 'QuestionAnswerIcon' */}
-          </IconButton>
-        </MDBox>
-      ),
-      sortable: false,
-      filterable: false,
+      renderCell: (params) => {
+        return (
+          <MDBox display="flex" justifyContent="center">
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#ff3f3f",
+                borderRadius: "20px",
+                color: "white !important",
+                padding: "2px 16px",
+                fontSize: "12px",
+                minHeight: "unset",
+                height: "32px",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "red",
+                  color: "white",
+                },
+              }}
+              onClick={() => navigate(`/training-material/${params.row.id}`)}
+            >
+              Material
+            </Button>
+          </MDBox>
+        );
+      },
     },
+    ...(groupId === 7
+      ? [
+          {
+            field: "question",
+            headerName: "Question",
+            flex: 0.8,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <MDBox display="flex" justifyContent="center">
+                {/* Question Icon */}
+                <IconButton color="error" onClick={() => handleQuestionClick(params.row.id)}>
+                  <QuestionAnswerOutlinedIcon />{" "}
+                  {/* Assuming you are using a Question Icon, like 'QuestionAnswerIcon' */}
+                </IconButton>
+              </MDBox>
+            ),
+            sortable: false,
+            filterable: false,
+          },
+        ]
+      : []),
+    ...(groupId === 7
+      ? [
+          {
+            field: "Quiz",
+            headerName: "Quiz",
+            flex: 0.8,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <MDBox display="flex" justifyContent="center">
+                {/* Question Icon */}
+                <IconButton color="secondary" onClick={() => handleQuizClick(params.row)}>
+                  <QuizIcon />{" "}
+                  {/* Assuming you are using a Question Icon, like 'QuestionAnswerIcon' */}
+                </IconButton>
+              </MDBox>
+            ),
+            sortable: false,
+            filterable: false,
+          },
+        ]
+      : []),
     {
       field: "Assessment",
       headerName: "Assessment",
@@ -170,19 +199,14 @@ const TrainingListing = () => {
       renderCell: (params) => (
         <MDBox display="flex" justifyContent="center">
           {/* Question Icon */}
-          <IconButton
-            color="error"
-            onClick={() => 
-              handleAssessmentClick(params.row.id)
-            } // Define this function to handle the question click action
-          >
+          <IconButton color="error" onClick={() => handleAssessmentClick(params.row.id)}>
             <ChecklistIcon />{" "}
           </IconButton>
         </MDBox>
       ),
       sortable: false,
       filterable: false,
-    }
+    },
   ];
 
   return (

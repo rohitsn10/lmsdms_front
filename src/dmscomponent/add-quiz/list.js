@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
@@ -13,8 +13,9 @@ import { useGetTrainingQuizzesQuery } from "apilms/quizapi"; // Update with the 
 const QuizListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
-  // Fetch quiz data
+  const location = useLocation();
+  const { row } = location.state || {}; 
+  console.log("row data++++++++++++++++++++++++++++",row);
   const { data: response, isLoading, isError, refetch } = useGetTrainingQuizzesQuery();
 
   useEffect(() => {
@@ -72,7 +73,7 @@ const QuizListing = () => {
 
   return (
     <MDBox p={3}>
-      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3 }}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search"
