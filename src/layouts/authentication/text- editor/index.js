@@ -10,7 +10,7 @@ import ReactDOM from "react-dom";
 import CommentBankIcon from "@mui/icons-material/CommentBank";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
-import { Box } from "@mui/material";
+import { Box, TextareaAutosize, TextField } from "@mui/material";
 import MDBox from "components/MDBox";
 import Grid from "@mui/material/Grid";
 import MDButton from "components/MDButton";
@@ -50,7 +50,7 @@ const DocumentView = () => {
   const [docContent, setDocContent] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const quillRef = useRef(null);
-
+  // console.log("Template Data",templateData)
   const [openDrawer, setOpenDrawer] = useState(false);
   const [opencommentDialog, setOpencommentDialog] = useState(false);
   const [currentComment, setCurrentComment] = useState("");
@@ -60,6 +60,7 @@ const DocumentView = () => {
   const [createDocument] = useCreateDocumentMutation();
   const [createComment] = useCreateCommentMutation();
   const { data, error, isLoading } = useGetTemplateQuery(id);
+  console.log("Template ID:",data?.select_template)
   const [draftDocument] = useDraftDocumentMutation();
   const [documentReviewStatus] = useDocumentReviewStatusMutation();
   const navigate = useNavigate();
@@ -77,6 +78,7 @@ const DocumentView = () => {
   // console.log("Navigated with data in text Editor :", { id, document_current_status });
   // console.log("Training Required:", trainingRequired)
   const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
+  // console.log("Document datatat",documentsData);
   const [randomNumber] = useState(Math.floor(Math.random() * 100000));
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [action, setAction] = useState("");
@@ -87,9 +89,42 @@ const DocumentView = () => {
   const [approver, setApprover] = useState("");
   const [reviewer, setReviewer] = useState([]);
   const [docAdmin, setDocAdmin] = useState("");
-// Accessing Context for UserData.
+  const [docComments,setDocComments] = useState("");
+  const [cacheDocument, setCacheDocument] = useState("");
+
+  const [docComments2, setDocComments2] = useState([]);
+  const [docCurrentComment, setDocCurrentComment] = useState("");
+
+  // const docCommentsRef = useRef("");
+  const docCommentsRef = useRef([]);  
+  const commentsRef = useRef([]);
+
   const {user,setValue}=useContext(AuthContext)
-  // console.log("User Data",user)
+  // console.log("User Data",user?.email)
+  // console.log("User ID",user?.id)
+  // console.log("User ID",user?.id)
+  // console.log("User ID",user?.first_name)
+  const handleSaveDraftDocument = (cacheUrl,)=>{
+    console.log("Console Comment",docCommentsRef.current)
+  }
+
+  const handleDocComment = () => {
+    if (docCurrentComment.trim()) {
+      const newDocComment = {
+        id: Date.now(),
+        text: docCurrentComment,
+        timestamp: new Date().toISOString(),
+        user: user?.first_name,
+      };
+      
+      const updatedDocComments = [...docComments, newDocComment];
+      setDocComments(updatedDocComments);
+      docCommentsRef.current = updatedDocComments;
+      setDocCurrentComment(""); // Clear input after adding
+    }
+  };
+
+
   // console.log("-+-+-+-+-+-+-+-+-+-+-++--++--+", docAdmin);
   // Extract userGroupIds directly from documentsData
   const userGroupIds = documentsData?.userGroupIds || [];
@@ -121,8 +156,8 @@ const DocumentView = () => {
     if (templateData?.template_url) {
       const fetchEditorConfig = async () => {
         try {
-          const response = await fetch(`http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`, {
-            // const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
+          // const response = await fetch(`http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`, {
+            const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -156,15 +191,13 @@ const DocumentView = () => {
   useEffect(() => {
     if (docEditorLoaded && editorConfig) {
       const script = document.createElement("script");
-      script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
-      // script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
+      // script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
+      script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
       script.onload = () => {
         try {
           const handleSave = () => {
             if (docEditorRef.current) {
               console.log("Save button clicked, triggering save...");
-              // docEditorRef.current.serviceCommand("save");
-              // docEditorRef.current?.requestSave();
             }
           };
 
@@ -209,9 +242,6 @@ const DocumentView = () => {
               },
             },
             events: {
-              // onDocumentStateChange: (event) => {
-              //   console.log("Document state changed:", event.data);
-              // },
               onDocumentStateChange: (event) => {
                 const hasChanges = event.data;
                 console.log("Document has unsaved changes:", hasChanges);
@@ -229,47 +259,27 @@ const DocumentView = () => {
                 console.log("Window Editor is ready");
                 console.log("WIndow Editor log:",window.docEditor.openDocument())
             },
-              onRequestSave: () => {
-                // This event is triggered when user clicks save button or uses Ctrl+S
-                // console.log("Save requested");
-                // handleSave();
-                console.log("Save requested");
-                handleSave();
-              },
-              onSave: () => {
-                // This event is triggered when the document has been saved
-                console.log("Document saved successfully");
-              },
               onError: (event) => {
                 console.error("Editor error:", event);
               },
-              // onDownloadAs: (response) => {
-              //   console.log('Download response:', response);
-              //   console.log(response?.data?.url)
-              //   return true;
-              // }
               onDownloadAs: async (response) => {
                 try {
                     console.log('Download response:', response);
                     const cacheUrl = response?.data?.url;
-                    
-                    if (cacheUrl) {
-                        // Fetch the file from the cache URL
-                        const fileResponse = await fetch(cacheUrl);
-                        const blob = await fileResponse.blob();
-                        console.log("Blob Response.",blob)
-                        // Create FormData to send file to backend
-                        const formData = new FormData();
-                        formData.append('file', blob, 'document.docx');
-                        
-                        // Send to your backend
-                        const saveResponse = await fetch('/your-backend-save-endpoint', {
-                            method: 'POST',
-                            body: formData
-                        });
-                        
-                        const result = await saveResponse.json();
-                        console.log('Save result:', result);
+                    console.log('Cache Url Link:',cacheUrl)
+                    console.log("Comment",docCommentsRef?.current)
+                    setCacheDocument(cacheUrl);
+                    if (cacheUrl) {                 
+                      const draftData = {
+                        documentUrl: cacheUrl,
+                        docComment: docCommentsRef?.current,
+                        docId: data?.select_template,
+                        templateID: data?.select_template,
+                        userEmail: user?.email,
+                        userID: user?.id,
+                        username: user?.first_name,
+                      };
+                      console.log("Submitting draft:", draftData);      
                     }
                     
                     return true; // Allow the normal download to proceed
@@ -612,73 +622,7 @@ const DocumentView = () => {
 
   const container = document.getElementById('onlyoffice-editor-container');
 
-  const handleDownloadFeature1 = async()=>{
-    try {
-      if (docEditorRef.current) {
-        console.log("Debug 1")
-          // Try multiple save methods
-          docEditorRef.current.downloadAs('docx', (blob) => {
-              // Create FormData and send to backend
-              console.log(blob)
-              
-              const formData = new FormData();
-              formData.append('file', blob, 'document.docx');
-              
-              fetch(editorConfig.callbackUrl, {
-                  method: 'POST',
-                  body: formData
-              })
-              .then(response => response.json())
-              .then(data => console.log('Save response:', data))
-              .catch(error => console.error('Save error:', error));
-          });
-      }
-  } catch (error) {
-      console.error("Save failed:", error);
-  }
-  }
-  const handleDownloadFeature2 = async () => {
-    try {
-        if (docEditorRef.current) {
-            console.log("Debug 1");
-
-            docEditorRef.current.downloadAs('docx', async (blobUrl) => {
-                console.log("Blob URL:", blobUrl); // This might be a URL, not a Blob
-
-                try {
-                    // Fetch the actual file content if blobUrl is a URL
-                    const response = await fetch(blobUrl);
-                    const blob = await response.blob();
-
-                    // Trigger download in the browser
-                    const downloadLink = document.createElement("a");
-                    downloadLink.href = URL.createObjectURL(blob);
-                    downloadLink.download = "document.docx";
-                    document.body.appendChild(downloadLink);
-                    downloadLink.click();
-                    document.body.removeChild(downloadLink);
-                    
-                    // Upload to backend
-                    const formData = new FormData();
-                    formData.append('file', blob, 'document.docx');
-
-                    const uploadResponse = await fetch(editorConfig.callbackUrl, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const data = await uploadResponse.json();
-                    console.log('Save response:', data);
-                } catch (fetchError) {
-                    console.error('Error fetching blob:', fetchError);
-                }
-            });
-        }
-    } catch (error) {
-        console.error("Save failed:", error);
-    }
-};
-const handleDownloadFeature = async () => {
+  const handleDownloadFeature = async () => {
   try {
       if (docEditorRef.current) {
           console.log("Debug 1");
@@ -686,25 +630,25 @@ const handleDownloadFeature = async () => {
           docEditorRef.current.downloadAs('docx', async (blobUrl) => {
               console.log("Blob URL:", blobUrl); 
 
-              try {
-                  // Fetch the actual file content if blobUrl is a URL
-                  const response = await fetch(blobUrl);
-                  const blob = await response.blob();
+              // try {
+              //     // Fetch the actual file content if blobUrl is a URL
+              //     const response = await fetch(blobUrl);
+              //     const blob = await response.blob();
 
-                  // Create FormData and send to backend
-                  const formData = new FormData();
-                  formData.append('file', blob, 'document.docx');
+              //     // Create FormData and send to backend
+              //     const formData = new FormData();
+              //     formData.append('file', blob, 'document.docx');
 
-                  const uploadResponse = await fetch(editorConfig.callbackUrl, {
-                      method: 'POST',
-                      body: formData
-                  });
+              //     const uploadResponse = await fetch(editorConfig.callbackUrl, {
+              //         method: 'POST',
+              //         body: formData
+              //     });
 
-                  const data = await uploadResponse.json();
-                  console.log('Save response:', data);
-              } catch (fetchError) {
-                  console.error('Error fetching blob:', fetchError);
-              }
+              //     const data = await uploadResponse.json();
+              //     console.log('Save response:', data);
+              // } catch (fetchError) {
+              //     console.error('Error fetching blob:', fetchError);
+              // }
           });
       }
   } catch (error) {
@@ -867,8 +811,7 @@ const handleDownloadFeature = async () => {
       setSaving(false);
     }
   };
-  console.log("Editor ref",docEditorRef.current);
-  console.log("Django")
+
 
   return (
     <MDBox
@@ -995,9 +938,8 @@ const handleDownloadFeature = async () => {
           >
             Save Draft
           </MDButton>
-          <button
+          {/* <button
           onClick={handleSave}
-          // disabled={saving}
           className={`px-4 py-2 rounded ${
             saving 
               ? 'bg-gray-400 cursor-not-allowed' 
@@ -1005,7 +947,7 @@ const handleDownloadFeature = async () => {
           } text-white font-medium`}
         >
           {true ? 'Saving...' : 'Save Document'}
-        </button>
+        </button> */}
           <MDButton
             variant="gradient"
             color="submit"
@@ -1015,15 +957,129 @@ const handleDownloadFeature = async () => {
           >
             Print
           </MDButton>
-          <button onClick={() => docEditorRef.current.serviceCommand("save")}>
-  Force Save
-</button>
 
       <button onClick={handleDownloadFeature}>
         Force Save
       </button>
         </MDBox>
       </Box>
+          <Box sx={{ maxWidth: 700, mx: "auto", p: 3, mt: 3, boxShadow: 3,display:'flex',flexDirection:'column',gap:2 }}>
+      {/* <h2>{document.document_title} (Version {latestVersion?.version})</h2>
+      <p><strong>Updated By:</strong> {latestVersion?.updated_by}</p>
+      <p><strong>Last Updated:</strong> {new Date(latestVersion?.updated_at).toLocaleString()}</p> */}
+
+      {/* Comment Section */}
+      <h3>Add Comment</h3>
+      {/* <Box>
+        {latestVersion?.comments?.length > 0 ? (
+          <ul>
+            {latestVersion.comments.map((comment) => (
+              <li key={comment.comment_id}>
+                <strong>{comment.commented_by}:</strong> {comment.comment_text} 
+                <em> ({new Date(comment.commented_at).toLocaleString()})</em>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No comments yet.</p>
+        )}
+      </Box> */}
+
+      {/* Add Comment Input */}
+      <MDBox display="flex" gap={2} mt={1}>
+        {/* <TextField
+          label="Add a comment"
+          variant="outlined"
+          fullWidth
+          value={docComments}
+          onChange={(e)=>setDocComments(e.target.value)}
+        /> */}
+                {/* <TextareaAutosize
+          minRows={3}
+          placeholder="Write your comment here..."
+          value={docComments}
+          onChange={(e)=>setDocComments(e.target.value)}
+          style={{
+            width: "400px",
+            padding: "10px",
+            fontSize: "16px",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+            resize: "vertical",
+          }}
+        /> */}
+        {/* <TextareaAutosize
+  minRows={3}
+  placeholder="Write your comment here..."
+  value={docComments}
+  onChange={(e) => {
+    setDocComments(e.target.value);
+    docCommentsRef.current = e.target.value; // Keep ref updated
+  }}
+  style={{
+    width: "400px",
+    padding: "10px",
+    fontSize: "16px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    resize: "vertical",
+  }}
+/> */}
+
+      </MDBox>
+      {/* <MDButton variant="gradient" color="primary"
+        //  onClick={handleAddComment}
+         >
+          Add Comment
+        </MDButton> */}
+    </Box>
+  <h2>New Instance:</h2>
+    <Box>
+    <MDBox>
+        {/* Display existing comments */}
+        {/* {docComments?.map((docComment) => (
+          <MDBox 
+            key={docComment.id}
+            sx={{
+              margin: "10px 0",
+              padding: "10px",
+              backgroundColor: "#f5f5f5",
+              borderRadius: "5px",
+            }}
+          >
+            <div><strong>{docComment.user}</strong> - {new Date(docComment.timestamp).toLocaleString()}</div>
+            <div>{docComment.text}</div>
+          </MDBox>
+        ))} */}
+
+        {/* Comment input */}
+        <TextareaAutosize
+          minRows={3}
+          placeholder="Write your comment here..."
+          value={docCurrentComment}
+          onChange={(e) => setDocCurrentComment(e.target.value)}
+          style={{
+            width: "400px",
+            padding: "10px",
+            fontSize: "16px",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+            resize: "vertical",
+          }}
+        />
+      </MDBox>
+      
+      <MDButton 
+        variant="gradient" 
+        color="primary"
+        onClick={handleDocComment}
+        disabled={!docCurrentComment.trim()}
+      >
+        Add Comment
+      </MDButton>
+    </Box>
+
+
       <MDBox
         sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
       >
@@ -1034,6 +1090,9 @@ const handleDownloadFeature = async () => {
           </Grid>
         </Grid>
       </MDBox>
+      <div>
+            
+      </div>
       <SendBackDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
