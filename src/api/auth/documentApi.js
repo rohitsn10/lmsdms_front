@@ -180,6 +180,13 @@ export const documentApi = createApi({
       transformResponse: (response) => response, // Transform the response if needed
       invalidatesTags: ["Documents"], // Invalidate document data to trigger refetch
     }),
+    saveDocumentDraft:builder.mutation({
+      query:({documentId,draftData})=>({
+        url: `dms_module/add_comment/${documentId}`, 
+        method: "POST",
+        body: draftData,
+      }),
+    })
 
   }),
 });   
@@ -200,5 +207,6 @@ export const {
   useGetObsoleteStatusDataQuery,
   useFetchParentDocumentsQuery,
   useUpdateObsoleteStatusMutation,
+  useSaveDocumentDraftMutation
  
 } = documentApi;
