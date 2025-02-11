@@ -59,6 +59,7 @@ import ViewEmployeeStatus from "dmscomponent/view-employees";
 import ArchiveIcon from '@mui/icons-material/Archive';
 import GroupIcon from '@mui/icons-material/Group';
 import SchoolTwoToneIcon from '@mui/icons-material/SchoolTwoTone';
+import Diversity1Icon from '@mui/icons-material/Diversity1';
 const routes = [
   {
     type: "collapse",
@@ -281,6 +282,14 @@ export const LmsRoutes=[
   },
   {
     type: "collapse",
+    name: "User Management",
+    key: "user-listing",
+    icon: <PersonAddIcon />,
+    route: "/user-listing",
+    component: <UsersListing />,
+  },
+  {
+    type: "collapse",
     name: "Employee Workflow",
     key: "employee-workflow",
     icon: <AssignmentIndOutlinedIcon fontSize="small" />,
@@ -333,6 +342,14 @@ export const LmsRoutes=[
     key: "trainingListing",
     icon: <ModelTrainingTwoToneIcon />,
     route: "/trainingListing",
+    component: <TrainingListing />,
+  },
+  {
+    type:"collapse",
+    name: "Trainer ",
+    key: "trainer-listing",
+    icon: <Diversity1Icon />,
+    route: "/trainer-listing",
     component: <TrainingListing />,
   },
   {

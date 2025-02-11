@@ -60,6 +60,19 @@ export const departmentApi = createApi({
       },
       invalidatesTags: ['Departments'], 
     }),
+    assignDepartment: builder.mutation({
+      query: ({ department_id, user_id }) => ({
+        url: `user_profile/assigndepartment/${user_id}`,
+        method: 'PUT',
+        body: { department_id },
+      }),
+      transformResponse: (response) => {
+        if (response.status) {
+          return response.message;
+        }
+        throw new Error(response.message || 'Failed to assign department');
+      },
+    }),
   }),
 });
 
@@ -67,4 +80,5 @@ export const {
   useCreateDepartmentMutation,
   useFetchDepartmentsQuery,
   useUpdateDeleteDepartmentMutation,
+  useAssignDepartmentMutation,
 } = departmentApi;

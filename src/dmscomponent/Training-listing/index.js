@@ -55,39 +55,34 @@ const TrainingListing = () => {
       console.error("training_document is undefined or missing for this item", item);
     }
   };
-
-  // Ensure that data is an array and filter it
-  const filteredData = (Array.isArray(data?.data) ? data.data : [])
-    .filter((item) => item.training_name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .map((item, index) => ({
+  const filteredData = (Array.isArray(data?.document_data) ? data.document_data : [])
+  .filter((item) => item.document_title.toLowerCase().includes(searchTerm.toLowerCase())) // Filter by title
+  .map((item, index) => {
+    console.log("Created at:", item.created_at); // Log the created_at field to check it
+    return {
       id: item.id,
       serial_number: index + 1,
-      created_by_name: item.created_by_name,
-      plant_name: item.plant_name,
-      training_name: item.training_name,
-      training_type_name: item.training_type_name,
-      training_number: item.training_number,
-      training_version: item.training_version,
-      refresher_time: moment(item.refresher_time).format("DD-MM-YY"),
-      training_created_at: moment(item.training_created_at).format("DD-MM-YY"),
-      schedule_date: moment(item.schedule_date).format("DD-MM-YY"),
-      training_status: item.training_status,
-      documentView: item.training_document,
-    }));
+      document_name: item.document_title,
+      document_type: item.document_type_name,
+      document_number: item.document_number,
+      version: item.version,
+      created_date: moment(item.created_at).format("DD-MM-YY"), // Format the date
+      status: item.current_status_name,
+      revision_date: item.revision_month, // Revision month
+      effective_date: moment(item.created_at).format("DD-MM-YY"), // Use created_at for now
+    };
+  });
 
-    
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-    { field: "created_by_name", headerName: "Created By", flex: 1, headerAlign: "center" },
-    { field: "plant_name", headerName: "Plant Name", flex: 1, headerAlign: "center" },
-    { field: "training_name", headerName: "Training Name", flex: 1, headerAlign: "center" },
-    { field: "training_number", headerName: "Training Number", flex: 1.2, headerAlign: "center" },
-    { field: "training_type_name", headerName: "Training Type", flex: 1.2, headerAlign: "center" },
-    { field: "refresher_time", headerName: "Refresher Time", flex: 1, headerAlign: "center" },
-    { field: "training_version", headerName: "Version", flex: 1, headerAlign: "center" },
-    { field: "training_created_at", headerName: "Created Date", flex: 1, headerAlign: "center" },
-    { field: "schedule_date", headerName: "Schedule Date", flex: 0.8, headerAlign: "center" },
-    { field: "training_status", headerName: "Status", flex: 1, headerAlign: "center" },
+    { field: "document_name", headerName: "Title", flex: 1.5, headerAlign: "center" },
+    { field: "document_type", headerName: "Type", flex: 1, headerAlign: "center" },
+    { field: "document_number", headerName: "Document No", flex: 1.5, headerAlign: "center" },
+    { field: "version", headerName: "Version", flex: 0.8, headerAlign: "center" },
+    { field: "created_date", headerName: "Created Date", flex: 1, headerAlign: "center" },
+    { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
+    { field: "revision_date", headerName: "Revision Date", flex: 1, headerAlign: "center" },
+    { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" },  
     {
       field: "action",
       headerName: "Action",

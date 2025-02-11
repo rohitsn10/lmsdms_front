@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
@@ -10,23 +10,32 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useCreateGetPlantMutation } from "apilms/plantApi"; // Adjust the path to where your API slice is located
+import { useTrainerUpdateMutation } from "api/auth/trainerApi";
 
-const AddPlant = () => {
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
+const EditTrainer = () => {
+  const [trainerName, setTrainerName] = useState("");
   const [description, setDescription] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [errors, setErrors] = useState({});
-  const [createPlant, { isLoading }] = useCreateGetPlantMutation();
+  const [updateTrainer, { isLoading }] = useTrainerUpdateMutation();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Fetching trainer data from the location state
+  const trainer = location.state?.trainer || {};
+
+  useEffect(() => {
+    if (trainer) {
+      setTrainerName(trainer.trainer_name);
+      setDescription(trainer.description);
+    }
+  }, [trainer]);
 
   // Validation function
   const validateInputs = () => {
     const newErrors = {};
-    if (!name.trim()) newErrors.name = "Plant Name is required.";
-    if (!location.trim()) newErrors.location = "Plant Location is required.";
-    if (!description.trim()) newErrors.description = "Plant Description is required.";
+    if (!trainerName.trim()) newErrors.trainerName = "Trainer Name is required.";
+    if (!description.trim()) newErrors.description = "Trainer Description is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -39,8 +48,7 @@ const AddPlant = () => {
   };
 
   const handleClear = () => {
-    setName("");
-    setLocation("");
+    setTrainerName("");
     setDescription("");
     setErrors({});
   };
@@ -54,23 +62,23 @@ const AddPlant = () => {
     }
 
     try {
-      const response = await createPlant({
-        plant_name: name.trim(),
-        plant_location: location.trim(),
-        plant_description: description.trim(),
+      const response = await updateTrainer({
+        trainer_id: trainer.id, // Passing the trainer ID from the state
+        trainer_name: trainerName.trim(),
+        description: description.trim(),
       }).unwrap();
 
       if (response.status) {
-        toast.success("Plant added successfully!");
+        toast.success("Trainer updated successfully!");
         setTimeout(() => {
-          navigate("/plant-listing "); // Navigate after successful submission
+          navigate("/trainer-listing"); // Navigate after successful submission
         }, 1500);
       } else {
-        toast.error(response.message || "Failed to add plant. Please try again.");
+        toast.error(response.message || "Failed to update trainer. Please try again.");
       }
     } catch (error) {
-      console.error("Error adding plant:", error);
-      toast.error("An error occurred while adding the plant.");
+      console.error("Error updating trainer:", error);
+      toast.error("An error occurred while updating the trainer.");
     }
   };
 
@@ -90,7 +98,7 @@ const AddPlant = () => {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Add Plant
+            Edit Trainer
           </MDTypography>
         </MDBox>
 
@@ -111,40 +119,17 @@ const AddPlant = () => {
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label={
-                  <>
-                    <span style={{ color: "red" }}>*</span> Plant Name
-                  </>
-                }
+                label={<><span style={{ color: "red" }}>*</span> Trainer Name</>}
                 fullWidth
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                error={!!errors.name}
-                helperText={errors.name}
+                value={trainerName}
+                onChange={(e) => setTrainerName(e.target.value)}
+                error={!!errors.trainerName}
+                helperText={errors.trainerName}
               />
             </MDBox>
             <MDBox mb={3}>
               <MDInput
-                type="text"
-                label={
-                  <>
-                    <span style={{ color: "red" }}>*</span> Plant Location
-                  </>
-                }
-                fullWidth
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                error={!!errors.location}
-                helperText={errors.location}
-              />
-            </MDBox>
-            <MDBox mb={3}>
-              <MDInput
-                label={
-                  <>
-                    <span style={{ color: "red" }}>*</span> Plant Description
-                  </>
-                }
+                label={<><span style={{ color: "red" }}>*</span> Trainer Description</>}
                 multiline
                 rows={4}
                 fullWidth
@@ -155,13 +140,7 @@ const AddPlant = () => {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton
-                variant="gradient"
-                color="submit"
-                fullWidth
-                type="submit"
-                disabled={isLoading}
-              >
+              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
                 {isLoading ? "Submitting..." : "Submit"}
               </MDButton>
             </MDBox>
@@ -181,4 +160,4 @@ const AddPlant = () => {
   );
 };
 
-export default AddPlant;
+export default EditTrainer;

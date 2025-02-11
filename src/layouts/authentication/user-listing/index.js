@@ -2,29 +2,31 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
-// import IconButton from "@mui/material/IconButton";
-// import EditIcon from "@mui/icons-material/Edit";
+import { IconButton } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-import { useUserListQuery } from 'api/auth/userApi'; 
-import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi"; 
-import { useAuth } from "hooks/use-auth"; 
-import { hasPermission } from "utils/hasPermission"; 
+import { useUserListQuery } from "api/auth/userApi";
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { useAuth } from "hooks/use-auth";
+import { hasPermission } from "utils/hasPermission";
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import AssignDepartmentDialog from "./assign-dep";
 
 const UsersListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-  const { user } = useAuth(); 
-  const { data, error, isLoading } = useUserListQuery(); 
-
+  const { user } = useAuth();
+  const { data, error, isLoading } = useUserListQuery();
+  const [selectedUser, setSelectedUser] = useState(null);
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
-
-  const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
-    skip: !groupId, // Ensure it skips if groupId is missing
-  });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { data: userPermissions = [], isError: permissionError } =
+    useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+      skip: !groupId, // Ensure it skips if groupId is missing
+    });
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching users</div>;
@@ -33,8 +35,8 @@ const UsersListing = () => {
     ? data.data.map((item, index) => ({
         id: item.id,
         serial_number: index + 1,
-        full_name: item.first_name ? `${item.first_name} ${item.last_name || ''}`.trim() : "N/A",
-        email: item.email || "N/A", 
+        full_name: item.first_name ? `${item.first_name} ${item.last_name || ""}`.trim() : "N/A",
+        email: item.email || "N/A",
         username: item.username || "N/A",
         created_at: new Date(item.created_at).toLocaleDateString(),
         UserRole: item.groups_list?.map((group) => group.name).join(", ") || "N/A", // Join role names into a single string
@@ -48,7 +50,10 @@ const UsersListing = () => {
   const handleAddUser = () => {
     navigate("/add-user");
   };
-
+  const handleAssignDepartmentClick = (user) => {
+    setSelectedUser(user); // Set selected user for the dialog
+    setIsDialogOpen(true); // Open the dialog
+  };
   // const handleEditUser = (user) => {
   //   navigate("/edit-user", { state: { user } });
   // };
@@ -61,30 +66,31 @@ const UsersListing = () => {
   );
 
   const columns = [
-    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: 'center' },
-    { field: "full_name", headerName: "Full Name", flex: 1, headerAlign: 'center' },
-    { field: "email", headerName: "Email", flex: 1, headerAlign: 'center' },
-    { field: "username", headerName: "Username", flex: 0.75, headerAlign: 'center' },
-    { field: "UserRole", headerName: "Role", flex: 1, headerAlign: 'center' },
-    { field: "created_at", headerName: "Date", flex: 0.75, headerAlign: 'center' },
-    // {
-    //   field: "action",
-    //   headerName: "Action",
-    //   flex: 0.5,
-    //   headerAlign: 'center',
-    //   renderCell: (params) => (
-    //     hasPermission(userPermissions, "customuser", "isChange") ? (
-    //       <IconButton color="primary" onClick={() => handleEditUser(params.row)}>
-    //         <EditIcon />
-    //       </IconButton>
-    //     ) : null
-    //   ),
-    // },
+    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
+    { field: "full_name", headerName: "Full Name", flex: 1, headerAlign: "center" },
+    { field: "email", headerName: "Email", flex: 1, headerAlign: "center" },
+    { field: "username", headerName: "Username", flex: 0.75, headerAlign: "center" },
+    { field: "UserRole", headerName: "Role", flex: 1, headerAlign: "center" },
+    { field: "created_at", headerName: "Date", flex: 0.75, headerAlign: "center" },
+    {
+      field: "action",
+      headerName: "Assign",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) =>
+        hasPermission(userPermissions, "customuser", "isChange") ? (
+          <IconButton color="success"
+          onClick={() => handleAssignDepartmentClick(params.row)}
+           >
+            <AssignmentIndIcon />
+          </IconButton>
+        ) : null,
+    },
   ];
 
   return (
     <MDBox p={3}>
-      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search"
@@ -114,20 +120,29 @@ const UsersListing = () => {
               sx={{
                 border: "1px solid #ddd",
                 borderRadius: "4px",
-                '& .MuiDataGrid-columnHeaders': {
-                  display: 'flex',
-                  justifyContent: 'center',
-                  backgroundColor: '#f5f5f5',
-                  fontWeight: 'bold',
+                "& .MuiDataGrid-columnHeaders": {
+                  display: "flex",
+                  justifyContent: "center",
+                  backgroundColor: "#f5f5f5",
+                  fontWeight: "bold",
                 },
-                '& .MuiDataGrid-cell': {
-                  textAlign: 'center',
+                "& .MuiDataGrid-cell": {
+                  textAlign: "center",
                 },
               }}
             />
           </div>
         </MDBox>
       </Card>
+      {selectedUser && (
+        <AssignDepartmentDialog
+          open={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          fullName={selectedUser.full_name}
+          selectedUserid={selectedUser.id}
+        />
+      )}
+      
     </MDBox>
   );
 };

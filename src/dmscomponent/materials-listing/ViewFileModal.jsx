@@ -1,13 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Typography } from "@mui/material";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  Typography,
+} from "@mui/material";
 import ReactPlayer from "react-player"; // For video rendering
 import PropTypes from "prop-types";
 
 const ViewFileModal = ({ open, handleClose, material }) => {
   const [pdfBlob, setPdfBlob] = useState(null);
-  const pdfContainerRef = useRef(null); // Reference to where the PDF will be rendered
-
-  // Function to fetch PDF and convert it to a Blob
+  const pdfContainerRef = useRef(null);
   const fetchPdf = async (url) => {
     try {
       const response = await fetch(url);
@@ -20,16 +25,12 @@ const ViewFileModal = ({ open, handleClose, material }) => {
       console.error("Error fetching PDF:", error);
     }
   };
-
-  // This effect runs whenever the 'material' changes
   useEffect(() => {
     if (material.material_type === "pdf" && open) {
       console.log("Fetching PDF from URL:", material.material_file_url);
       fetchPdf(material.material_file_url); // Fetch and render the PDF
     }
   }, [material, open]);
-
-  // Render PDF preview by converting Blob to Data URL
   const renderPDFPreview = () => {
     if (pdfBlob && pdfContainerRef.current) {
       const fileReader = new FileReader();
@@ -38,24 +39,21 @@ const ViewFileModal = ({ open, handleClose, material }) => {
         console.log("PDF Data URL loaded, rendering...");
         const embed = document.createElement("embed");
         embed.src = pdfDataUrl;
-        embed.type = "application/pdf"; // Ensure it's a PDF
+        embed.type = "application/pdf";
         embed.width = "100%";
-        embed.height = "500px"; // Adjust height as necessary
-        pdfContainerRef.current.innerHTML = ""; // Clear previous content
-        pdfContainerRef.current.appendChild(embed); // Append new embed element
+        embed.height = "500px";
+        pdfContainerRef.current.innerHTML = "";
+        pdfContainerRef.current.appendChild(embed);
       };
-      fileReader.readAsDataURL(pdfBlob); // Convert blob to Data URL
+      fileReader.readAsDataURL(pdfBlob);
     }
   };
-
   useEffect(() => {
     if (pdfBlob) {
       console.log("Rendering PDF...");
-      renderPDFPreview(); // Render the PDF preview once the blob is set
+      renderPDFPreview();
     }
   }, [pdfBlob]);
-
-  // Render content based on the file type
   const renderContent = () => {
     if (material.material_type === "pdf") {
       return (
@@ -64,14 +62,7 @@ const ViewFileModal = ({ open, handleClose, material }) => {
         </div>
       );
     } else if (material.material_type === "video") {
-      return (
-        <ReactPlayer
-          url={material.material_file_url}
-          controls
-          width="100%"
-          height="500px"
-        />
-      );
+      return <ReactPlayer url={material.material_file_url} controls width="100%" height="500px" />;
     } else if (material.material_type === "audio") {
       return (
         <audio controls width="100%">

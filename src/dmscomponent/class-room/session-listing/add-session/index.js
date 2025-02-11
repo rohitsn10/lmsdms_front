@@ -148,7 +148,7 @@ function AddSession() {
               <Grid item xs={12}>
                 <FormControl fullWidth error={!!errors.selectedUsers}>
                   <InputLabel id="select-user-label">
-                    <span style={{ color: "red" }}>*</span> Select Users
+                    <span style={{ color: "red" }}>*</span>Select Users 
                   </InputLabel>
                   <Select
                     labelId="select-user-label"
@@ -156,7 +156,7 @@ function AddSession() {
                     multiple
                     value={selectedUsers}
                     onChange={handleUserChange}
-                    input={<OutlinedInput />}
+                    input={<OutlinedInput label="Select Users" />}
                     renderValue={(selected) =>
                       selected
                         .map((userId) => {
