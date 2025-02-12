@@ -45,9 +45,8 @@ const TrainingListing = () => {
     navigate("/questions", { state: { rowData } });
     // You can implement additional logic here, such as opening a modal, navigating to another page, etc.
   };
-  const handleQuizClick = (row) => {
-    navigate("/quiz-list", { state: { row } });
-    console.log("-----------------------------------------",row)
+  const handleQuizClick = (DataQuiz) => {
+    navigate("/quiz-list", { state: { DataQuiz } });
   };
   const handleAssessmentClick = (rowData) => {
     navigate("/mcq-module", { state: { rowData } });

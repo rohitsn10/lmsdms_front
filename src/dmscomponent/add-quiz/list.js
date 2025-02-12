@@ -14,9 +14,8 @@ const QuizListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const { row } = location.state || {}; 
-  console.log("row data++++++++++++++++++++++++++++",row);
-  const { data: response, isLoading, isError, refetch } = useGetTrainingQuizzesQuery();
+  const { DataQuiz } = location.state || {}; 
+  const { data: response, isLoading, isError, refetch } = useGetTrainingQuizzesQuery(DataQuiz.id);
 
   useEffect(() => {
     refetch();
@@ -35,19 +34,20 @@ const QuizListing = () => {
   const filteredData = quizzes
     .filter(
       (quiz) =>
-        quiz.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        quiz.type.toLowerCase().includes(searchTerm.toLowerCase())
+        quiz.quiz_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        quiz.quiz_type.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .map((quiz, index) => ({
       ...quiz,
       serial_number: index + 1,
-      quiz_time: `${quiz.time} mins`, // Format quiz time
+      quiz_time: `${quiz.quiz_time} mins`, // Format quiz time
+      pass_criteria: quiz.pass_criteria,  // Add pass criteria to the list
     }));
 
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-    { field: "name", headerName: "Quiz Name", flex: 1, headerAlign: "center" },
-    { field: "type", headerName: "Quiz Type", flex: 1, headerAlign: "center" },
+    { field: "quiz_name", headerName: "Quiz Name", flex: 1, headerAlign: "center" },
+    { field: "quiz_type", headerName: "Quiz Type", flex: 1, headerAlign: "center" },
     { field: "quiz_time", headerName: "Quiz Time", flex: 1, headerAlign: "center" },
     { field: "pass_criteria", headerName: "Pass Criteria", flex: 1, headerAlign: "center" },
     {
@@ -89,7 +89,7 @@ const QuizListing = () => {
           <MDButton
             variant="contained"
             color="primary"
-            onClick={() => navigate("/add-quiz")}
+            onClick={() => navigate("/add-quiz",{state:{DataQuiz}})}
             sx={{ ml: 2 }}
           >
             Add Quiz
