@@ -18,7 +18,7 @@ export const quizapi = createApi({
     // POST method for creating a quiz
     createTrainingQuiz: builder.mutation({
       query: ({
-        training_id,
+        document_id,
         name,
         pass_criteria,
         quiz_time,
@@ -30,7 +30,7 @@ export const quizapi = createApi({
         url: 'lms_module/create_training_quiz',
         method: 'POST',
         body: {
-          training_id,
+          document_id,
           name,
           pass_criteria,
           quiz_time,
@@ -45,13 +45,13 @@ export const quizapi = createApi({
 
     // GET method for retrieving quizzes
     getTrainingQuizzes: builder.query({
-      query: () => ({
-        url: 'lms_module/create_training_quiz',
+      query: (id) => ({
+        url: `lms_module/list_training_quiz/${id}`, // Include the ID in the URL
         method: 'GET',
       }),
       transformResponse: (response) => response, // Handle raw response
     }),
-
+    
     // PUT method for updating or deleting a quiz
     updateDeleteQuiz: builder.mutation({
       query: ({

@@ -47,7 +47,10 @@ const UsersListing = () => {
         email: item.email || "N/A",
         username: item.username || "N/A",
         created_at: new Date(item.created_at).toLocaleDateString(),
-        UserRole: item.groups_list?.map((group) => group.name).join(", ") || "N/A", // Join role names into a single string
+        UserRole: item.groups_list?.map((group) => group.name).join(", ") || "N/A", 
+        is_department_assigned: item.is_department_assigned || false,  
+        is_description: item.is_description || false,  
+        is_jr_approve: item.is_jr_approve || false 
       }))
     : [];
 
@@ -106,7 +109,7 @@ const UsersListing = () => {
             renderCell: (params) =>
               hasPermission(userPermissions, "customuser", "isChange") ? (
                 <IconButton color="success" onClick={() => handleAssignDepartmentClick(params.row)}
-                disabled={params.row.is_description}>
+                disabled={params.row.is_department_assigned}>
                   <AssignmentIndIcon />
                 </IconButton>
               ) : null,
@@ -122,7 +125,9 @@ const UsersListing = () => {
             headerAlign: "center",
             renderCell: (params) =>
               hasPermission(userPermissions, "customuser", "isChange") ? (
-                <IconButton color="warning" onClick={() => handleAssignJDClick(params.row)}>
+                <IconButton color="warning" onClick={() => handleAssignJDClick(params.row)}
+                disabled={params.row.is_description}
+                >
                   <AssignmentIcon />
                 </IconButton>
               ) : null,
@@ -138,7 +143,8 @@ const UsersListing = () => {
             headerAlign: "center",
             renderCell: (params) =>
               hasPermission(userPermissions, "customuser", "isChange") ? (
-                <IconButton color="inherit" onClick={() => handleTaskDescriptionClick(params.row)}>
+                <IconButton color="inherit" onClick={() => handleTaskDescriptionClick(params.row)}
+                disabled={params.row.is_jr_approve}>
                   <AddTaskIcon />
                 </IconButton>
               ) : null,
