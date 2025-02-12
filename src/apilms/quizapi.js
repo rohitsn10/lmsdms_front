@@ -80,11 +80,21 @@ export const quizapi = createApi({
       }),
       transformResponse: (response) => response, // Handle raw response
     }),
+    attemptQuiz: builder.mutation({
+  query: (quizPayload) => ({
+    url: 'lms_module/attempted_quiz',
+    method: 'POST',
+    body: quizPayload,
+  }),
+  transformResponse: (response) => response, // Handle raw response
+}),
   }),
 });
 
 export const {
   useCreateTrainingQuizMutation, // Hook for the create_training_quiz POST API
   useGetTrainingQuizzesQuery,    // Hook for the create_training_quiz GET API
-  useUpdateDeleteQuizMutation,   // Hook for the update_delete_quiz PUT API
+  useUpdateDeleteQuizMutation,
+  useAttemptQuizMutation
+  // Hook for the update_delete_quiz PUT API
 } = quizapi;

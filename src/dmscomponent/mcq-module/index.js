@@ -2,49 +2,61 @@ import React, { useEffect, useState } from "react";
 import CounterIndicator from "./counterIndicator";
 import MDButton from "components/MDButton";
 import QuestionSection from "./questionSection";
-import Pagination from "@mui/material/Pagination";
-import Stack from "@mui/material/Stack";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
-
+import { 
+  Pagination, 
+  Stack, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  Button, 
+  CircularProgress,
+  Box,
+  Container 
+} from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useFetchTrainingWiseQuestionsQuery } from "apilms/questionApi";
+import { useGetTrainingQuizzesQuery } from "apilms/quizapi";
+import { useAttemptQuizMutation } from "apilms/quizapi";
+import { useAuth } from "hooks/use-auth";
 
 function MultiChoiceQuestionsSection() {
   const navigate = useNavigate();
   const location = useLocation();
   const id = location?.state?.rowData;
-
-  const { data, isLoading, isError } = useFetchTrainingWiseQuestionsQuery(id, {
-    skip: !id, // Skip the query if id is not available
+  // console.log(useAuth)
+  const { user, role } = useAuth();
+  // console.log("User details",user?.id)
+  const { data: questionsData, isLoading, isError } = useGetTrainingQuizzesQuery(id, {
+    skip: !id,
   });
-
-  const [counter, setCounter] = useState(0);
+  const quiz_id=questionsData?.data[0]?.id || 0;
+  // console.log("QuestionsIDDD:",)
+  const [attemptQuiz]  = useAttemptQuizMutation()
+  // console.log(questionsData)
   const [questions, setQuestions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [answers, setAnswers] = useState({});
   const [correctAnswers, setCorrectAnswers] = useState({});
   const [pageCount, setPageCount] = useState(1);
-  const [timerLimit, setTimerLimit] = useState(10 * 60);
+  const [counter, setCounter] = useState(0);
   const [openModal, setOpenModal] = useState(false);
   const [resultMessage, setResultMessage] = useState("");
-
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  
   useEffect(() => {
-    if (data?.data?.length > 0) {
-      setQuestions(data.data);
-      setPageCount(data.data.length);
+    if (questionsData?.data?.[0]) {
+      const quizData = questionsData.data[0];
+      setQuestions(quizData.questions || []);
+      setPageCount(quizData.questions?.length || 0);
+      setCounter(quizData.quiz_time * 60);
 
-      const initialCorrectAnswers = data.data.reduce((acc, item) => {
+      const initialCorrectAnswers = (quizData.questions || []).reduce((acc, item) => {
         acc[item.id] = (item.correct_answer || "").toLowerCase();
         return acc;
       }, {});
       setCorrectAnswers(initialCorrectAnswers);
     }
-  }, [data]);
+  }, [questionsData]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -57,32 +69,70 @@ function MultiChoiceQuestionsSection() {
   };
 
   const handleAnswerChange = (questionId, answer) => {
-    setAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [questionId]: answer,
-    }));
+    if (!hasSubmitted) {
+      setAnswers(prev => ({
+        ...prev,
+        [questionId]: answer.toLowerCase(),
+      }));
+    }
   };
 
-  const handleSubmit = () => {
+  const calculateResults = () => {
     let totalMarks = 0;
     let marksObtained = 0;
+    const userResponseList = [];
 
     questions.forEach((question) => {
       totalMarks += question.marks;
       const userAnswer = (answers[question.id] || "").toLowerCase();
       const correctAnswer = correctAnswers[question.id] || "";
 
+      userResponseList.push({
+        question_id: question.id,
+        question_text: question.question_text,
+        user_answer: userAnswer || "No Answer",
+      });
+
       if (userAnswer === correctAnswer) {
         marksObtained += question.marks;
       }
     });
 
-    const timeTaken = counter;
-    const message = `You scored ${marksObtained} out of ${totalMarks} marks.\n Time taken: ${formatTime(
-      timeTaken
-    )}`;
+    return {
+      totalMarks,
+      marksObtained,
+      userResponseList,
+      timeTaken: questionsData.data[0].quiz_time * 60 - counter
+    };
+  };
+
+  const handleSubmit = async() => {
+    if (hasSubmitted) return;
+
+    const results = calculateResults();
+    const message = `You scored ${results.marksObtained} out of ${results.totalMarks} marks.\nTime taken: ${formatTime(results.timeTaken)}`;
+
+    const quizPayload = {
+      document_id: id,
+      quiz_id: quiz_id,
+      user_id: user?.id, // Should come from auth context
+      questions: results.userResponseList,
+      obtain_marks: results.marksObtained,
+      total_marks: results.totalMarks,
+      total_taken_time: results.timeTaken
+    };
+
     setResultMessage(message);
     setOpenModal(true);
+    setHasSubmitted(true);
+
+    try {
+      await attemptQuiz(quizPayload).unwrap();
+      console.log("Quiz submitted successfully");
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
+    }
+
   };
 
   const handleModalClose = () => {
@@ -90,66 +140,65 @@ function MultiChoiceQuestionsSection() {
     navigate("/trainingListing");
   };
 
-  // Styles
-  const mcqSection = {
-    width: "900px",
-    marginLeft: "400px",
-    marginTop: "100px",
-    backgroundColor: "white",
-    padding: "20px",
-    borderRadius: "10px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-  };
-
-  const topSection = {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  };
-
-  const paginationStyles = {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: "20px",
-    marginBottom: "20px",
-  };
-
-  // Loading and error states
   if (isLoading) {
     return (
-      <div style={{ ...mcqSection, justifyContent: "center", alignItems: "center" }}>
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="100vh"
+      >
         <CircularProgress />
-      </div>
+      </Box>
     );
   }
 
   if (isError || !id || questions.length === 0) {
     return (
-      <div style={{ ...mcqSection, justifyContent: "center", alignItems: "center" }}>
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="100vh"
+      >
         <p>No questions available or an error occurred.</p>
-      </div>
+      </Box>
     );
   }
 
+  const isQuizComplete = Object.keys(answers).length === questions.length;
+
   return (
-    <div style={mcqSection}>
-      <div style={topSection}>
-        <CounterIndicator counter={counter} setCounter={setCounter} timerLimit={timerLimit} />
-        <MDButton
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          sx={{ height: "30px" }}
-          disabled={Object.keys(answers).length !== questions.length} // Disable button if not all questions are answered
-        >
-          Submit
-        </MDButton>
-      </div>
-      <div>
+    <Container maxWidth="md" sx={{ mt: 12, mb: 4 }}>
+      <Box 
+        sx={{ 
+          bgcolor: 'background.paper',
+          borderRadius: 1,
+          p: 2.5,
+          boxShadow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <CounterIndicator
+            counter={counter}
+            setCounter={setCounter}
+            timerLimit={questionsData.data[0].quiz_time * 60}
+            handleSubmit={handleSubmit}
+          />
+          <MDButton
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            sx={{ height: "30px" }}
+            disabled={!isQuizComplete || hasSubmitted}
+          >
+            {hasSubmitted ? 'Submitted' : 'Submit'}
+          </MDButton>
+        </Box>
+
         {questions[currentPage - 1] && (
           <QuestionSection
             question={questions[currentPage - 1]}
@@ -157,34 +206,37 @@ function MultiChoiceQuestionsSection() {
             pageCount={pageCount}
             onAnswerChange={handleAnswerChange}
             answers={answers}
+            disabled={hasSubmitted}
           />
         )}
-      </div>
-      <div style={paginationStyles}>
-        <Stack spacing={2}>
-          <Pagination
-            onChange={handlePageChange}
-            count={pageCount}
-            page={currentPage}
-            variant="outlined"
-            size="large"
-            color="primary"
-            shape="rounded"
-          />
-        </Stack>
-      </div>
-      <Dialog open={openModal} onClose={handleModalClose}>
-        <DialogTitle>Quiz Results</DialogTitle>
-        <DialogContent>
-          <p>{resultMessage}</p>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleModalClose} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 2.5 }}>
+          <Stack spacing={2}>
+            <Pagination
+              onChange={handlePageChange}
+              count={pageCount}
+              page={currentPage}
+              variant="outlined"
+              size="large"
+              color="primary"
+              shape="rounded"
+            />
+          </Stack>
+        </Box>
+
+        <Dialog open={openModal} onClose={handleModalClose}>
+          <DialogTitle>Quiz Results</DialogTitle>
+          <DialogContent>
+            <p>{resultMessage}</p>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleModalClose} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </Container>
   );
 }
 
