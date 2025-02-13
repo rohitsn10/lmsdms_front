@@ -19,14 +19,15 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useCreateTrainingQuizMutation } from "apilms/quizapi";
 import { useFetchTrainingWiseQuestionsQuery } from "apilms/questionApi";
-import { useLocation } from "react-router-dom";
+import { useLocation,useNavigate } from "react-router-dom";
 import { FormControl, InputLabel } from "@mui/material";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 function CreateQuiz() {
   const location = useLocation();
   const { DataQuiz } = location.state || {};
-
+  const navigate = useNavigate();
   const [quizName, setQuizName] = useState("");
   const [passCriteria, setPassCriteria] = useState("");
   const [quizTime, setQuizTime] = useState("");
@@ -36,8 +37,7 @@ function CreateQuiz() {
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [markBreakdown, setMarkBreakdown] = useState([]); // Changed to an array for dynamic entries
   const [availableQuestions, setAvailableQuestions] = useState([]);
-
-  const [createdAt, setCreatedAt] = useState(new Date().toISOString().slice(0, 10));
+ 
 
   const { data, isLoading, isError } = useFetchTrainingWiseQuestionsQuery(DataQuiz?.id);
   const [createQuiz, { isLoading: isQuizLoading, isError: isQuizError }] =
@@ -72,11 +72,9 @@ function CreateQuiz() {
     if (parseFloat(value) <= parseFloat(totalMarks)) {
       setPassCriteria(value); // Only update if valid
     } else {
-      alert("Pass Criteria cannot be greater than Total Marks.");
+      toast("Pass Criteria cannot be greater than Total Marks.");
     }
   };
-
-  // Handle form submission
 
   const handleAddQuestion = (question) => {
     if (!selectedQuestions.includes(question)) {
@@ -94,40 +92,40 @@ function CreateQuiz() {
     if (!quizName || !passCriteria || !quizTime || !totalMarks || !totalQuestions) {
       return true;
     }
-  
+
     // Check if pass criteria is greater than total marks
     if (parseFloat(passCriteria) > parseFloat(totalMarks)) {
       return true;
     }
-  
+
     // Check if quiz type is "auto" and mark breakdown is invalid
     if (quizType === "auto") {
       const totalMarksBreakdown = markBreakdown.reduce((sum, entry) => {
         const { mark, count } = entry;
         return sum + (parseInt(mark) * parseInt(count) || 0);
       }, 0);
-  
+
       // Check if total marks breakdown exceeds total marks
       if (totalMarksBreakdown > parseFloat(totalMarks)) {
         return true;
       }
-  
+
       // Check if there are enough questions for each mark breakdown
       for (const entry of markBreakdown) {
         const { mark, count } = entry;
         const availableForMark = availableQuestions.filter((q) => q.marks === parseInt(mark));
-  
+
         if (availableForMark.length < count) {
           return true;
         }
       }
     }
-  
+
     // Check if quiz type is "manual" and no questions are selected
     if (quizType === "manual" && selectedQuestions.length === 0) {
       return true;
     }
-  
+
     // If all checks pass, enable the button
     return false;
   };
@@ -135,58 +133,64 @@ function CreateQuiz() {
     if (parseFloat(passCriteria) > parseFloat(totalMarks)) {
       toast.error("Pass Criteria cannot be greater than Total Marks!");
     }
-    if (markBreakdown.some(entry => (parseInt(entry.mark) * parseInt(entry.count)) > parseFloat(totalMarks))) {
+    if (
+      markBreakdown.some(
+        (entry) => parseInt(entry.mark) * parseInt(entry.count) > parseFloat(totalMarks)
+      )
+    ) {
       toast.error("Mark breakdown exceeds total quiz marks.");
     }
   }, [passCriteria, totalMarks, markBreakdown]);
-  
 
   // Inside the `handleSubmit` function, replace the `alert` with toast notifications:
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Validate required fields
     if (!quizName || !passCriteria || !quizTime || !totalMarks || !totalQuestions) {
       toast.error("Please fill out all required fields.");
       return;
     }
-  
+
     // Validate pass criteria
     if (parseFloat(passCriteria) > parseFloat(totalMarks)) {
       toast.error("Pass Criteria cannot be greater than Total Marks.");
       return;
     }
-  
+
     // Validate mark breakdown for auto quiz
     if (quizType === "auto") {
       const totalMarksBreakdown = markBreakdown.reduce((sum, entry) => {
         const { mark, count } = entry;
         return sum + (parseInt(mark) * parseInt(count) || 0);
       }, 0);
-  
+
       if (totalMarksBreakdown > parseFloat(totalMarks)) {
         toast.error("Total marks from breakdown exceed total quiz marks.");
         return;
       }
-  
+
       for (const entry of markBreakdown) {
         const { mark, count } = entry;
         const availableForMark = availableQuestions.filter((q) => q.marks === parseInt(mark));
-  
+
         if (availableForMark.length < count) {
           toast.error(`Not enough questions for ${mark} mark. Please adjust your mark breakdown.`);
           return;
         }
       }
     }
-  
+
     // Validate manual quiz
     if (quizType === "manual" && selectedQuestions.length === 0) {
       toast.error("Please select at least one question for the quiz.");
       return;
     }
-  
-    // Prepare quiz data
+    const transformedMarksBreakdown = markBreakdown.reduce((acc, item) => {
+      acc[item.mark] = item.count;
+      return acc;
+    }, {});
+   
     const quizData = {
       document_id: DataQuiz?.id,
       name: quizName,
@@ -195,9 +199,9 @@ function CreateQuiz() {
       quiz_type: quizType,
       total_marks: totalMarks,
       selected_questions: quizType === "auto" ? [] : selectedQuestions.map((q) => q.id),
-      marks_breakdown: quizType === "auto" ? markBreakdown : [],
+      marks_breakdown: quizType === "auto" ? transformedMarksBreakdown : [],
     };
-  
+
     try {
       await createQuiz(quizData).unwrap();
       toast.success("Quiz created successfully!");
@@ -209,6 +213,7 @@ function CreateQuiz() {
       setTotalQuestions("");
       setSelectedQuestions([]);
       setMarkBreakdown([]);
+      navigate("/trainingListing");
     } catch (err) {
       toast.error("Failed to create quiz. Please try again.");
     }

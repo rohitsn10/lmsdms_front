@@ -8,25 +8,35 @@ import {
   OutlinedInput,
   Grid,
   CircularProgress,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog"; // Ensure correct import
+import ESignatureDialog from "layouts/authentication/ESignatureDialog"; 
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import MDInput from "components/MDInput";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { useFetchTrainingsQuery } from "apilms/trainingApi";
+import { useFetchTrainersQuery } from "api/auth/trainerApi";
 function ClassroomTraining() {
   const [trainingType, setTrainingType] = useState("");
+  const { data: alldocument } = useFetchTrainingsQuery();
+  const { data: alltrainers } = useFetchTrainersQuery();
+
+  const [sopdocument, setsopdocument] = useState("");
+  const [trainer, setTrainer] = useState("");
   const [classroomTitle, setClassroomTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("Assigned");
   const [File, setFile] = useState(null);
+  const [onlineOfflineStatus, setOnlineOfflineStatus] = useState("Online");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
@@ -38,6 +48,8 @@ function ClassroomTraining() {
     if (!trainingType) newErrors.trainingType = "Training Type is required.";
     if (!description.trim()) newErrors.description = "Description is required.";
     if (!File) newErrors.File = "File upload is required.";
+    if (!trainer) newErrors.trainer = "Trainer is required.";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -67,11 +79,14 @@ function ClassroomTraining() {
 
     setIsLoading(true);
     const formData = new FormData();
+    formData.append("document_id", sopdocument);
+    formData.append("trainer", trainer);
     formData.append("classroom_name", classroomTitle.trim());
     formData.append("is_assesment", trainingType);
     formData.append("description", description.trim());
     formData.append("status", status);
     formData.append("upload_doc", File);
+    formData.append("online_offline_status",onlineOfflineStatus)
 
     const token = sessionStorage.getItem("token");
     const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/create_classroom`;
@@ -86,13 +101,15 @@ function ClassroomTraining() {
 
       if (response.data.status) {
         toast.success("Classroom training created successfully!");
-        setTimeout(() => navigate("/class-room"), 1500); 
+        setTimeout(() => navigate("/class-room"), 1500);
       } else {
         toast.error(response.data.message || "Failed to create classroom training.");
       }
     } catch (error) {
       toast.error(
-        error.response?.data?.message || error.message || "An error occurred while creating the classroom training."
+        error.response?.data?.message ||
+          error.message ||
+          "An error occurred while creating the classroom training."
       );
     } finally {
       setIsLoading(false);
@@ -101,7 +118,7 @@ function ClassroomTraining() {
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
-    setErrors((prev) => ({ ...prev, File: "" })); 
+    setErrors((prev) => ({ ...prev, File: "" }));
   };
 
   return (
@@ -142,7 +159,11 @@ function ClassroomTraining() {
               <Grid item xs={12}>
                 <MDInput
                   type="text"
-                  label={<><span style={{ color: "red" }}>*</span> Classroom Title</>}
+                  label={
+                    <>
+                      <span style={{ color: "red" }}>*</span> Classroom Title
+                    </>
+                  }
                   fullWidth
                   value={classroomTitle}
                   onChange={(e) => setClassroomTitle(e.target.value)}
@@ -153,14 +174,14 @@ function ClassroomTraining() {
               <Grid item xs={12}>
                 <FormControl fullWidth margin="dense" error={!!errors.trainingType}>
                   <InputLabel id="training-type-label">
-                    <span style={{ color: "red" }}>*</span> Type
+                    <span style={{ color: "red" }}>*</span>Type
                   </InputLabel>
                   <Select
                     labelId="training-type-label"
                     id="training-type"
                     value={trainingType}
                     onChange={(e) => setTrainingType(e.target.value)}
-                    input={<OutlinedInput label="Type" />}
+                    input={<OutlinedInput label=" Type " />}
                     sx={{
                       minWidth: 200,
                       height: "3rem",
@@ -178,8 +199,89 @@ function ClassroomTraining() {
                 )}
               </Grid>
               <Grid item xs={12}>
+                <FormControl fullWidth margin="dense" error={!!errors.trainer}>
+                  <InputLabel id="trainer-type-label">
+                    <span style={{ color: "red" }}>*</span>Select Trainer
+                  </InputLabel>
+                  <Select
+                    labelId="select-trainer-label"
+                    id="select-trainer-doc"
+                    value={trainer}
+                    onChange={(e) => setTrainer(e.target.value)} 
+                    input={<OutlinedInput label="Select Trainer " />}
+                    sx={{
+                      minWidth: 200,
+                      height: "3rem",
+                      ".MuiSelect-select": { padding: "0.5rem" },
+                    }}
+                  >
+                    {/* Add trainers dynamically */}
+                    {alltrainers?.map((trainerItem) => (
+                      <MenuItem key={trainerItem.id} value={trainerItem.id}>
+                        {trainerItem.trainer_name} {/* Display trainer name */}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {/* Display error message for the "trainer" field */}
+                {errors.trainer && (
+                  <MDTypography variant="caption" color="error">
+                    {errors.trainer} {/* Display the error message for the trainer */}
+                  </MDTypography>
+                )}
+              </Grid>
+
+              <Grid item xs={12}>
+                <FormControl fullWidth margin="dense">
+                  <InputLabel id="select-parent-doc-label">SOP Document</InputLabel>
+                  <Select
+                    labelId="select-parent-doc-label"
+                    id="select-parent-doc"
+                    value={sopdocument}
+                    onChange={(e) => setsopdocument(e.target.value)} // Update parent document when selected
+                    input={<OutlinedInput label="SOP Document" />}
+                    sx={{
+                      minWidth: 200,
+                      height: "3rem",
+                      ".MuiSelect-select": { padding: "0.45rem" },
+                    }}
+                  >
+                    {/* Add "N/A" option */}
+                    <MenuItem value="N/A">N/A</MenuItem>
+                    {Array.isArray(alldocument?.document_data) ? (
+                      alldocument.document_data.map((doc) => (
+                        <MenuItem key={doc.id} value={doc.id}>
+                          {doc.document_title} {/* Display document title */}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem disabled>No documents available</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+  <MDTypography variant="h6">Class Mode</MDTypography>
+  <FormControl fullWidth margin="dense">
+    <RadioGroup
+      row
+      value={onlineOfflineStatus}
+      onChange={(e) => setOnlineOfflineStatus(e.target.value)}
+    >
+      <FormControlLabel value="Online" control={<Radio />} label="Online" />
+      <FormControlLabel value="Offline" control={<Radio />} label="Offline" />
+    </RadioGroup>
+  </FormControl>
+</Grid>
+
+              <Grid item xs={12}>
                 <MDInput
-                  label={<><span style={{ color: "red" }}>*</span> Description</>}
+                  label={
+                    <>
+                      <span style={{ color: "red" }}>*</span> Description
+                    </>
+                  }
                   multiline
                   rows={4}
                   fullWidth
@@ -213,7 +315,11 @@ function ClassroomTraining() {
               <Grid item xs={12}>
                 <MDInput
                   type="file"
-                  label={<><span style={{ color: "red" }}>*</span> Upload File</>}
+                  label={
+                    <>
+                      <span style={{ color: "red" }}>*</span> Upload File
+                    </>
+                  }
                   fullWidth
                   onChange={handleFileChange}
                   InputLabelProps={{ shrink: true }}
