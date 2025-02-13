@@ -34,7 +34,7 @@ import { manageSection} from 'apilms/manageSection';
 import { classRoomApi } from "apilms/classRoomApi";
 import { trainerApi } from "api/auth/trainerApi";
 import { classtestApi } from "apilms/classtestApi";
-
+import { WorkflowApi } from 'apilms/workflowapi.js';
 const store = configureStore({
   reducer: {
     userRole:userRoleSlice,
@@ -72,6 +72,7 @@ const store = configureStore({
     [classRoomApi.reducerPath]: classRoomApi.reducer,
     [trainerApi.reducerPath]: trainerApi.reducer,
     [classtestApi.reducerPath]: classtestApi.reducer,
+    [WorkflowApi.reducerPath]: WorkflowApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -108,7 +109,8 @@ const store = configureStore({
       manageSection.middleware,
       classRoomApi.middleware,
       trainerApi.middleware,
-      classtestApi.middleware 
+      classtestApi.middleware,
+      WorkflowApi.middleware
     ),
 });
 

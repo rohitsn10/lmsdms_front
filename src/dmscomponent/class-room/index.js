@@ -12,11 +12,13 @@ import { useGetClassroomsQuery } from "apilms/classRoomApi"; // Import your API 
 import moment from "moment"; // For date formatting
 import { CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
-
+import { useAuth } from "hooks/use-auth";
 const ClassroomListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { user } = useAuth();
   const navigate = useNavigate();
-  
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
 
   // Fetch classrooms using the query hook
   const { data, isLoading, isError, error } = useGetClassroomsQuery();
@@ -43,7 +45,9 @@ const ClassroomListing = () => {
   // Handle loading and error states
   if (isLoading) {
     return (
-      <MDBox sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <MDBox
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
+      >
         <CircularProgress size={50} />
       </MDBox>
     );
@@ -64,7 +68,7 @@ const ClassroomListing = () => {
     .map((classroom, index) => ({
       ...classroom,
       serial_number: index + 1,
-      start_date: moment(classroom.created_at).format("DD/MM/YY HH:mm"), 
+      start_date: moment(classroom.created_at).format("DD/MM/YY HH:mm"),
     }));
 
   // Columns configuration
@@ -78,33 +82,56 @@ const ClassroomListing = () => {
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => (
-        <MDButton variant="outlined" color="primary" onClick={() => handleSession(params.row)}>
+        <MDButton
+          variant="outlined"
+          color="primary"
+          onClick={() => handleSession(params.row)}
+          disabled={params.row.is_assesment === "Without Assessment"} // Disable if 'is_assesment' is 'With Assessment'
+        >
           Start Session
         </MDButton>
       ),
     },
-    {
-      field: "question",
-      headerName: "Question",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <MDButton variant="outlined" color="info" onClick={() => navigate("/class-question", { state: { classroom: params.row } })}>
-          Questions
-        </MDButton>
-      ),
-    },
-    {
-      field: "quiz",
-      headerName: "Quiz",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <MDButton variant="outlined" color="secondary" onClick={() => navigate("/class-quiz", { state: { classroom: params.row } })}>
-          Quiz
-        </MDButton>
-      ),
-    },
+    ...(groupId === 7
+      ? [
+          {
+            field: "question",
+            headerName: "Question",
+            flex: 1,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <MDButton
+                variant="outlined"
+                color="info"
+                onClick={() => navigate("/class-question", { state: { classroom: params.row } })}
+                disabled={params.row.is_assesment === "Without Assessment"} // Disable if 'is_assesment' is 'With Assessment'
+              >
+                Questions
+              </MDButton>
+            ),
+          },
+        ]
+      : []),
+    ...(groupId === 7
+      ? [
+          {
+            field: "quiz",
+            headerName: "Quiz",
+            flex: 1,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <MDButton
+                variant="outlined"
+                color="secondary"
+                onClick={() => navigate("/class-quiz", { state: { classroom: params.row } })}
+                disabled={params.row.is_assesment === "Without Assessment"} // Disable if 'is_assesment' is 'With Assessment'
+              >
+                Quiz
+              </MDButton>
+            ),
+          },
+        ]
+      : []),
     {
       field: "assessment",
       headerName: "Assessment",
