@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 const ClassroomListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  
 
   // Fetch classrooms using the query hook
   const { data, isLoading, isError, error } = useGetClassroomsQuery();
@@ -33,6 +34,10 @@ const ClassroomListing = () => {
   // Handle session button click
   const handleSession = (classroom) => {
     navigate("/session-list", { state: { classroom } });
+  };
+
+  const handleAssessmentClick = (rowData) => {
+    navigate("/exam-mcq-module", { state: { rowData } });
   };
 
   // Handle loading and error states
@@ -106,7 +111,14 @@ const ClassroomListing = () => {
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => (
-        <MDButton variant="outlined" color="warning" onClick={() => navigate("/assessment-list", { state: { classroom: params.row } })}>
+        <MDButton variant="outlined" color="warning"
+        //  onClick={() => navigate("/exam-mcq-module", { state: { classroom: params.row } })}
+         onClick={() => {
+          handleAssessmentClick(params.row);
+          console.log("Params Assesment",params.row)
+          }
+         }
+         >
            Assessment
         </MDButton>
       ),
