@@ -116,7 +116,10 @@ import ViewEmployeeStatus from "dmscomponent/view-employees/index.jsx";
 import TrainerListing from "dmscomponent/trainer-list/index.js";
 import AddTrainer from "dmscomponent/trainer-list/add-trainer/index.js";
 import EditTrainer from "dmscomponent/trainer-list/edit-trainer/index.js";
-
+import ClassQuestion from "dmscomponent/class-room/class-question-list/index.js";
+import QuestionQuiz from "dmscomponent/class-room/class-quiz-list/index.js";
+import ClassAddQuestion from "dmscomponent/class-room/class-question-list/add-class-question/index.js";
+import CreateClassQuiz from "dmscomponent/class-room/class-quiz-list/class-add-quiz/index.js";
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -350,7 +353,7 @@ export default function App() {
       <Route path="/edit-methodology" element={<EditMethodology />} />
       <Route path="/add-methodology" element={<AddMethodology />} />
       <Route path="/trainingType-Listing" element={<TrainingTypeListing />} />
-      <Route path= "/induction-listing" element ={<InductionListing/>}/>
+      <Route path="/induction-listing" element ={<InductionListing/>}/>
       <Route path="/induction-designation" element ={<AddInductionDesignation/>}/>
       <Route path="/edit-trainingtype" element={<EditTrainingType />} />
       <Route path="/trainingListing" element={<TrainingListing />} />
@@ -374,6 +377,11 @@ export default function App() {
       <Route path="/trainer-listing" element={<TrainerListing/>}/>
       <Route path="/add-trainer" element={<AddTrainer/>}/>
       <Route path="/edit-trainer" element={<EditTrainer/>}/>
+      <Route path="/class-question" element={<ClassQuestion/>}/>
+      <Route path="/class-quiz" element={<QuestionQuiz/>}/>
+      <Route path="/class-add-question" element={<ClassAddQuestion/>}/>
+      <Route path="/class-add-quiz" element={<CreateClassQuiz/>}/>
+     
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
     <ToastContainer />
