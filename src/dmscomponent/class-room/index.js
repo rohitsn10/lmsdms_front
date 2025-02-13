@@ -19,6 +19,7 @@ const ClassroomListing = () => {
   const navigate = useNavigate();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
+
   // Fetch classrooms using the query hook
   const { data, isLoading, isError, error } = useGetClassroomsQuery();
 
@@ -35,6 +36,10 @@ const ClassroomListing = () => {
   // Handle session button click
   const handleSession = (classroom) => {
     navigate("/session-list", { state: { classroom } });
+  };
+
+  const handleAssessmentClick = (rowData) => {
+    navigate("/exam-mcq-module", { state: { rowData } });
   };
 
   // Handle loading and error states
@@ -133,13 +138,15 @@ const ClassroomListing = () => {
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => (
-        <MDButton
-          variant="outlined"
-          color="warning"
-          onClick={() => navigate("/assessment-list", { state: { classroom: params.row } })}
-          disabled={params.row.is_assesment === "Without Assessment"} // Disable if 'is_assesment' is 'With Assessment'
-        >
-          Assessment
+        <MDButton variant="outlined" color="warning"
+        //  onClick={() => navigate("/exam-mcq-module", { state: { classroom: params.row } })}
+         onClick={() => {
+          handleAssessmentClick(params.row);
+          console.log("Params Assesment",params.row)
+          }
+         }
+         >
+           Assessment
         </MDButton>
       ),
     },

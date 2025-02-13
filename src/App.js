@@ -120,6 +120,7 @@ import ClassQuestion from "dmscomponent/class-room/class-question-list/index.js"
 import QuestionQuiz from "dmscomponent/class-room/class-quiz-list/index.js";
 import ClassAddQuestion from "dmscomponent/class-room/class-question-list/add-class-question/index.js";
 import CreateClassQuiz from "dmscomponent/class-room/class-quiz-list/class-add-quiz/index.js";
+import ClassMultiChoiceQuestionsSection from "dmscomponent/class-room/classroom-mcq/index.js";
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -263,7 +264,9 @@ export default function App() {
   <CssBaseline />
   <div>
     {/* Always render Sidenav */}
-    {window.location.pathname !== "/login" && !/^\/document-view\/\d+$/.test(pathname) && window.location.pathname !== "/forgotpassword" && window.location.pathname !== "/mcq-module" &&(
+    {window.location.pathname !== "/login" && !/^\/document-view\/\d+$/.test(pathname) && window.location.pathname !== "/forgotpassword" && window.location.pathname !== "/mcq-module" &&
+    window.location.pathname !== "/exam-mcq-module"
+     &&(
       <Sidenav
         color={sidenavColor}
         brand={(transparentSidenav && !darkMode) || whiteSidenav ? Brandlogo : Brandlogo}
@@ -367,6 +370,7 @@ export default function App() {
       <Route path="/jobrole-mapping" element={<JobRoleMapping/>}/>
       <Route path="/exam-module" element={<ExamModule/>}/>
       <Route path="/mcq-module" element={<MultiChoiceQuesionsSection/>}/>
+      <Route path="/exam-mcq-module" element={<ClassMultiChoiceQuestionsSection/>}/>
       <Route path="/training-material/:trainingNumber" element={<MaterialListing/>}/>
       <Route path="/class-room" element={<ClassroomListing/>}/>
       {/* <Route path="/session-list1" element={<SessionListing/>}/>  */}
