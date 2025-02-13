@@ -25,19 +25,11 @@ function ClassMultiChoiceQuestionsSection() {
   const location = useLocation();
   
   const id = location?.state?.rowData?.classroom_id;
-  // console.log("Location:",id)
-  // console.log(useAuth)
   const { user } = useAuth();
-  // console.log("User details",user?.id)
   const { data: questionsData, isLoading, isError } = useClassroomQuizGetQuery(id, {
     skip: !id,
   });
-  // console.log("Questions Data",questionsData)
-  const quiz_id=questionsData?.data[0]?.id || 0;
-  // console.log("Questions Data::::",questionsData);
-  // console.log("QuestionsIDDD:",)
   const [attemptQuiz]  = useAttemptQuizMutation()
-  // console.log(questionsData)
   const [questions, setQuestions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [answers, setAnswers] = useState({});
