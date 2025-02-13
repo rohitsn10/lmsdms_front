@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -6,34 +6,108 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { useUserListQuery } from "api/auth/userApi";
-
+import UserAcknowledgementDialog from "./UserAcknowledgementDialog"; // Import the dialog component
+import { useAuth } from "hooks/use-auth";
 function ViewEmployeeStatus() {
   const { data, error, isLoading } = useUserListQuery();
+  const { user } = useAuth();
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
+  // State for handling the dialog
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null); // State for storing the selected user data
 
   // Function to render tick (green) and cross (red) icons
   const renderStatusIcon = (params) => (
-    <div style={{ display: "flex", justifyContent: "center", alignItems:'center' ,width: "100%",marginTop:'14px' }}>
-      {params.value ? 
-        <CheckCircleIcon style={{ color: "green",width:'22px',height:'22px' }} /> : 
-        <CancelIcon style={{ color: "red",width:'22px',height:'22px' }} />
-      }
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        marginTop: "14px",
+      }}
+    >
+      {params.value ? (
+        <CheckCircleIcon style={{ color: "green", width: "22px", height: "22px" }} />
+      ) : (
+        <CancelIcon
+          style={{
+            color: "red",
+            width: "22px",
+            height: "22px",
+            cursor: groupId === 8 ? "pointer" : "not-allowed", // Change cursor style based on groupId
+          }}
+          onClick={() => {
+            if (groupId === 8) {
+              handleOpenDialog(params.row); // Open the dialog when groupId is 8
+            }
+          }}
+        />
+      )}
     </div>
   );
-  
+
+  // Function to open the dialog and set the selected user
+  const handleOpenDialog = (userData) => {
+    setSelectedUser(userData); // Set the selected user data
+    setOpenDialog(true); // Open the dialog
+  };
+
+  // Function to handle the dialog close
+  const handleCloseDialog = () => {
+    setOpenDialog(false); // Close the dialog
+    setSelectedUser(null); // Reset selected user
+  };
 
   // Define the columns
   const columns = [
     { field: "empNo", headerName: "Emp. No.", width: 80 },
     { field: "name", headerName: "Name", width: 150 },
-    { field: "is_user_created", headerName: "Emp. Created", width: 120, renderCell: renderStatusIcon },
-    { field: "is_department_assigned", headerName: "Dept. Assign", width: 130, renderCell: renderStatusIcon },
-    { field: "is_induction_complete", headerName: "Induction Completed", width: 160, renderCell: renderStatusIcon },
-    { field: "is_induction_certificate", headerName: "Induction Certificate", width: 160, renderCell: renderStatusIcon },
+    {
+      field: "is_user_created",
+      headerName: "Emp. Created",
+      width: 120,
+      renderCell: renderStatusIcon,
+    },
+    {
+      field: "is_department_assigned",
+      headerName: "Dept. Assign",
+      width: 130,
+      renderCell: renderStatusIcon,
+    },
+    {
+      field: "is_induction_complete",
+      headerName: "Induction Completed",
+      width: 160,
+      renderCell: renderStatusIcon,
+    },
+    {
+      field: "is_induction_certificate",
+      headerName: "Induction Certificate",
+      width: 160,
+      renderCell: renderStatusIcon,
+    },
     { field: "is_jr_assign", headerName: "JR Assign", width: 100, renderCell: renderStatusIcon },
     { field: "is_jr_approve", headerName: "JR Approval", width: 120, renderCell: renderStatusIcon },
-    { field: "is_tni_generate", headerName: "TNI Generation", width: 140, renderCell: renderStatusIcon },
-    { field: "is_tni_consent", headerName: "TNI Consent", width: 120, renderCell: renderStatusIcon },
-    { field: "is_qualification", headerName: "Qualification", width: 120, renderCell: renderStatusIcon },
+    {
+      field: "is_tni_generate",
+      headerName: "Document Reading",
+      width: 140,
+      renderCell: renderStatusIcon,
+    },
+    {
+      field: "is_tni_consent",
+      headerName: "In Assesment",
+      width: 120,
+      renderCell: renderStatusIcon,
+    },
+    {
+      field: "is_qualification",
+      headerName: "Qualification",
+      width: 120,
+      renderCell: renderStatusIcon,
+    },
   ];
 
   // Convert API data to rows
@@ -67,7 +141,9 @@ function ViewEmployeeStatus() {
         {isLoading ? (
           <MDTypography textAlign="center">Loading...</MDTypography>
         ) : error ? (
-          <MDTypography color="error" textAlign="center">Error fetching data!</MDTypography>
+          <MDTypography color="error" textAlign="center">
+            Error fetching data!
+          </MDTypography>
         ) : (
           <MDBox display="flex" justifyContent="center" p={2}>
             <DataGrid
@@ -87,6 +163,16 @@ function ViewEmployeeStatus() {
           </MDBox>
         )}
       </Card>
+
+      {/* UserAcknowledgementDialog Component */}
+      {selectedUser && (
+        <UserAcknowledgementDialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          onSubmit={(remark) => console.log("Submitted Remark:", remark)} // Handle the remark submission
+          selectedUserData={selectedUser} // Pass the selected user data
+        />
+      )}
     </MDBox>
   );
 }

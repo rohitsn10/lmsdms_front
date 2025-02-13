@@ -17,7 +17,9 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import JobDescriptionDialog from "./job- description";
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import TaskDescriptionDialog from "./approve-description";
-
+import DownloadIcon from '@mui/icons-material/Download';
+import { useCreateInductionCertificateMutation } from "apilms/workflowapi";
+import { toast } from "react-toastify";
 const UsersListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
@@ -35,10 +37,8 @@ const UsersListing = () => {
     useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
       skip: !groupId, // Ensure it skips if groupId is missing
     });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error fetching users</div>;
-
+    const [downloadInductionCertificate] = useCreateInductionCertificateMutation();
+  
   const formattedData = Array.isArray(data?.data)
     ? data.data.map((item, index) => ({
         id: item.id,
@@ -90,7 +90,27 @@ const UsersListing = () => {
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const handleDownloadICClick = async (user) => {
+    try {
+      // Call the mutation hook with the selected user's ID
+      const response = await downloadInductionCertificate(user.id).unwrap();
+      
+      // Handle the response (e.g., show success toast or download file)
+      toast.success("Induction Certificate downloaded successfully!", {
+      
+      });
 
+      // You might also want to trigger a file download here if the server sends a file
+      // For example, you can handle the file blob if returned from the server
+      if (response?.fileUrl) {
+        window.location.href = response.fileUrl; // Open the file directly
+      }
+    } catch (error) {
+      toast.error("Failed to download induction certificate. Please try again.", {
+       
+      });
+    }
+  };
   // Conditionally render columns based on the groupId
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
@@ -151,6 +171,17 @@ const UsersListing = () => {
           },
         ]
       : []),
+      {
+        field: "download_ic",
+        headerName: "Download IC",
+        flex: 0.5,
+        headerAlign: "center",
+        renderCell: (params) => (
+          <IconButton color="info" onClick={() => handleDownloadICClick(params.row)}>
+            <DownloadIcon />
+          </IconButton>
+        ),
+      },
   ];
 
   return (
