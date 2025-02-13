@@ -19,6 +19,7 @@ const ClassroomListing = () => {
 
   // Fetch classrooms using the query hook
   const { data, isLoading, isError, error } = useGetClassroomsQuery();
+
   // Handle search input change
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -58,10 +59,10 @@ const ClassroomListing = () => {
     .map((classroom, index) => ({
       ...classroom,
       serial_number: index + 1,
-      start_date: moment(classroom.created_at).format("DD/MM/YY HH:mm"), // Use moment for formatting
+      start_date: moment(classroom.created_at).format("DD/MM/YY HH:mm"), 
     }));
 
-  // Define the columns for the DataGrid
+  // Columns configuration
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "classroom_name", headerName: "Class Name", flex: 1, headerAlign: "center" },
@@ -78,6 +79,39 @@ const ClassroomListing = () => {
       ),
     },
     {
+      field: "question",
+      headerName: "Question",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <MDButton variant="outlined" color="info" onClick={() => navigate("/class-question", { state: { classroom: params.row } })}>
+          Questions
+        </MDButton>
+      ),
+    },
+    {
+      field: "quiz",
+      headerName: "Quiz",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <MDButton variant="outlined" color="secondary" onClick={() => navigate("/class-quiz", { state: { classroom: params.row } })}>
+          Quiz
+        </MDButton>
+      ),
+    },
+    {
+      field: "assessment",
+      headerName: "Assessment",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <MDButton variant="outlined" color="warning" onClick={() => navigate("/assessment-list", { state: { classroom: params.row } })}>
+           Assessment
+        </MDButton>
+      ),
+    },
+    {
       field: "action",
       headerName: "Action",
       flex: 0.5,
@@ -89,11 +123,12 @@ const ClassroomListing = () => {
       ),
     },
   ];
+
   const getRowId = (row) => {
     if (row.classroom_name && row.created_at) {
       return `${row.classroom_name}-${row.created_at}`;
     } else {
-      return row.serial_number || Date.now(); 
+      return row.serial_number || Date.now();
     }
   };
 

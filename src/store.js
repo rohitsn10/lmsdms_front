@@ -1,3 +1,4 @@
+import  userRoleSlice from './slices/userRoleSlice.js'
 import { configureStore } from "@reduxjs/toolkit";
 import { userApi } from "./api/auth/userApi";
 import { documentApi } from "./api/auth/documentApi";
@@ -28,12 +29,11 @@ import { timeLineApi } from "api/auth/timeLineApi";
 import { jobroleApi } from "apilms/jobRoleApi";
 import { trainingMappingApi } from "apilms/MappingApi";
 import { archivedListApi } from "api/auth/archivedListApi";
-import {quizapi} from "apilms/quizapi";
-import {manageSection} from 'apilms/manageSection';
-import userRoleSlice from './slices/userRoleSlice.js'
+import { quizapi} from "apilms/quizapi";
+import { manageSection} from 'apilms/manageSection';
 import { classRoomApi } from "apilms/classRoomApi";
 import { trainerApi } from "api/auth/trainerApi";
-
+import { classtestApi } from "apilms/classtestApi";
 
 const store = configureStore({
   reducer: {
@@ -71,7 +71,7 @@ const store = configureStore({
     [manageSection.reducerPath]:manageSection.reducer,
     [classRoomApi.reducerPath]: classRoomApi.reducer,
     [trainerApi.reducerPath]: trainerApi.reducer,
-
+    [classtestApi.reducerPath]: classtestApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -107,7 +107,8 @@ const store = configureStore({
       quizapi.middleware,
       manageSection.middleware,
       classRoomApi.middleware,
-      trainerApi.middleware
+      trainerApi.middleware,
+      classtestApi.middleware 
     ),
 });
 
@@ -115,5 +116,4 @@ if (process.env.NODE_ENV !== "production") {
   const { enableMapSet } = require("immer");
   enableMapSet();
 }
-
 export default store;

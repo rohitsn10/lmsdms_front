@@ -28,8 +28,12 @@ import SubtitlesOffIcon from "@mui/icons-material/SubtitlesOff";
 import ObsoleteDialog from "./obsolete";
 import { useUpdateObsoleteStatusMutation } from "api/auth/documentApi";
 import { toast, ToastContainer } from "react-toastify";
+import EffectiveDialog from "./effectiveDialog";
+import { useDocumentEffectiveMutation } from "api/auth/documentApi";
 const DocumentListing = () => {
   const { user } = useAuth();
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,7 +47,8 @@ const DocumentListing = () => {
   const [ObsoletedialogOpen, setObsoleteDialogOpen] = useState(false);
   const [selectedChildDocuments, setSelectedChildDocuments] = useState([]);
   const [updateObsoleteStatus] = useUpdateObsoleteStatusMutation();
-
+  const [openDialog, setOpenDialog] = useState(false);
+  const [documentEffective, { isLoading: isEffecting, isError: isEffectError }] = useDocumentEffectiveMutation();
   useEffect(() => {
     if (data && data.userGroupIds) {
       setUserGroupIds(data.userGroupIds);
@@ -57,12 +62,6 @@ const DocumentListing = () => {
 
   // Extract revision_month from data
   const revisionMonth = data?.revision_month;
-
-  // console.log("Documents:", data?.documents || []);
-  // console.log("User Group IDs:", data?.userGroupIds || []);
-
-  const group = user?.user_permissions?.group || {};
-  const groupId = group.id;
 
   const documents = data?.documents || [];
 
@@ -143,6 +142,34 @@ const DocumentListing = () => {
     // Add any additional logic here
     handleReviseDialogClose();
   };
+  const handleEffectiveClick = (row) => {
+    setSelectedRow(row); // Set the row data
+    setOpenDialog(true); // Open the dialog
+  };
+  const handleCloseDialog = () => {
+    setOpenDialog(false); // Close the dialog
+    setSelectedRow(null); // Reset row data
+  };
+  const handleConfirmEffective = async () => {
+    if (selectedRow) {
+      try {
+        // Call the mutation with the document ID and status
+        await documentEffective({
+          document: selectedRow.id,
+          status: "7", // Pass the status "7" as requested
+        }).unwrap(); // unwrap to access the response directly
+
+        // On success, show toast notification
+        toast.success(`Document ${selectedRow.document_title} marked as effective!`);
+      } catch (error) {
+        // On failure, show error toast
+        toast.error("Failed to mark the document as effective. Please try again.");
+      }
+    }
+
+    // Close the dialog after the operation
+    handleCloseDialog();
+  };
   const handleViewFile = (url) => {
     navigate("/PreView", { state: { templateDoc: url } }); // Pass the URL as state
   };
@@ -159,7 +186,7 @@ const DocumentListing = () => {
     try {
       await updateObsoleteStatus({
         document_id: documentId,
-        status: "12", 
+        status: "12",
       });
       toast.success("Document marked as obsolete successfully!");
       setObsoleteDialogOpen(false);
@@ -168,14 +195,13 @@ const DocumentListing = () => {
     }
   };
 
-
   const filteredData = documents.filter(
     (doc) =>
       (doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
         doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        doc.document_current_status !== 12
+      doc.document_current_status !== 12
   );
 
   const rows = filteredData.map((doc, index) => ({
@@ -373,6 +399,27 @@ const DocumentListing = () => {
       sortable: false,
       filterable: false,
     },
+    ...(groupId === 5
+      ? [{
+      field: "effective", // New column added
+      headerName: "Effective", // Column name
+      flex: 0.4, // Adjust the flex based on your layout needs
+      headerAlign: "center", // Center-align header
+      renderCell: (params) => (
+        <MDBox display="flex" justifyContent="center">
+          <IconButton
+            color="primary"
+            onClick={() => handleEffectiveClick(params.row)} // Open dialog when clicked
+          >
+            <CheckCircleIcon /> {/* Example icon for 'Effective' */}
+          </IconButton>
+        </MDBox>
+      ),
+      sortable: false,
+      filterable: false,
+    },
+  ]
+  : []),
   ];
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching documents.</div>;
@@ -433,7 +480,7 @@ const DocumentListing = () => {
               }}
             />
           </div>
-         <ToastContainer position="top-right" autoClose={3000} />
+          <ToastContainer position="top-right" autoClose={3000} />
         </MDBox>
       </Card>
       <ConditionalDialog
@@ -456,7 +503,12 @@ const DocumentListing = () => {
         documentTitle={selectedRow?.document_title || "Unknown Document"} // Pass document_title here
         documentId={selectedRow?.id || ""}
       />
-
+      <EffectiveDialog
+        openDialog={openDialog}
+        selectedRow={selectedRow}
+        handleCloseDialog={handleCloseDialog}
+        handleConfirmEffective={handleConfirmEffective}
+      />
       {/* <ReviseDialog
   open={isReviseDialogOpen}
   onClose={() => setReviseDialogOpen(false)}
