@@ -173,8 +173,8 @@ const DocumentListing = () => {
     // Close the dialog after the operation
     handleCloseDialog();
   };
-  const handleViewFile = (url) => {
-    navigate("/PreView", { state: { templateDoc: url } }); // Pass the URL as state
+  const handleViewFile = (url,params) => {
+    navigate("/PreView", { state: { templateDoc: url,templateData:params } }); // Pass the URL as state
   };
 
   const handleEditClick = (rowData) => {
@@ -306,7 +306,10 @@ const DocumentListing = () => {
           )}
           <IconButton
             color="primary"
-            onClick={() => handleViewFile(params.row.selected_template_url)}
+            onClick={() => {
+              handleViewFile(params.row.selected_template_url,params.row)
+              // console.log("Params",params.row)
+              }}
           >
             <VisibilityIcon />
           </IconButton>
@@ -314,10 +317,9 @@ const DocumentListing = () => {
             ? hasPermission(userPermissions, "document", "isView") && (
                 <IconButton
                   color="secondary"
-                  onClick={() => {
-                    console.log("Params passed to handleClick:", params);
-                    handleClick(params);
-                  }}
+                  // onClick={() => {
+                  //   console.log("Params passed to handleClick:", params.row);                    
+                  // }}
                 >
                   <PreviewIcon />
                 </IconButton>

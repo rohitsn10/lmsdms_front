@@ -35,7 +35,7 @@ import apiService from 'services/apiService';
         try {
             const response = await apiService.get(`/lms_module/create_training_section`, {
                 params: {
-                    training_id: trainingId,
+                    document_id: trainingId,
                 },
             });
             // console.log('Training Section Data:', response?.data);
@@ -73,7 +73,7 @@ import apiService from 'services/apiService';
 
         const handleAddSection = async () => {
           const formData = new FormData();
-          formData.append("training_id", trainingIdState); // Make sure trainingId is extracted correctly
+          formData.append("document_id", trainingIdState); // Make sure trainingId is extracted correctly
           formData.append("section_name", sectionNameRef.current.value);
           formData.append("section_description", descriptionRef.current.value);
           formData.append("section_order", "1.0"); // Adjust dynamically if needed
@@ -94,7 +94,7 @@ import apiService from 'services/apiService';
                   try {
                     const response = await apiService.get(`/lms_module/create_training_section`, {
                       params: {
-                        training_id: trainingIdState,
+                        document_id: trainingIdState,
                       },
                     });
                     setSectionData(response?.data);

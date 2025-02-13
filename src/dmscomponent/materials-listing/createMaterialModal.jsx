@@ -98,7 +98,8 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
     // console.log(formData);
 
     try {
-        // Make the POST request using your Axios instance
+        // Make the POST request using your Axios inst
+        // ance
         const response = await apiService.post('/lms_module/create_training_material', formData, {
           headers: {
             'Content-Type': 'multipart/form-data', // Set proper content type
@@ -117,7 +118,7 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
         navigate(0);
 
         handleClose();
-        navigate(0);
+        // navigate(0);
       } catch (error) {
         console.error('Error creating training material:', error);
         setOpenSnackbar(true);
