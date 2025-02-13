@@ -9,12 +9,13 @@ import {
 } from "@mui/material";
 import ReactPlayer from "react-player"; // For video rendering
 import PropTypes from "prop-types";
+import { useAuth } from "hooks/use-auth";
+import axios from "axios";
 
 const ViewFileModal = ({ open, handleClose, material }) => {
   const [pdfBlob, setPdfBlob] = useState(null);
   const pdfContainerRef = useRef(null);
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
-  const timerRef = useRef(null); // Store timer reference
+  const { user } = useAuth();
 
   // Fetch PDF file
   const fetchPdf = async (url) => {
@@ -28,46 +29,12 @@ const ViewFileModal = ({ open, handleClose, material }) => {
     }
   };
 
-  // Start timer when modal opens
+  // Fetch PDF when modal opens
   useEffect(() => {
-    if (open) {
-      setTimeLeft(600); // Reset timer to 10 minutes
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prevTime) => {
-          if (prevTime <= 1) {
-            clearInterval(timerRef.current);
-            sendTimeExceededMessage();
-            return 0;
-          }
-          return prevTime - 1;
-        });
-      }, 1000);
-    } else {
-      clearInterval(timerRef.current); // Stop timer when modal closes
+    if (open && material.material_type === "pdf") {
+      fetchPdf(material.material_file_url);
     }
-    return () => clearInterval(timerRef.current); // Cleanup on unmount
-  }, [open]);
-
-  // Backend request when timer ends
-  const sendTimeExceededMessage = async () => {
-    // try {
-    //   const response = await fetch("https://your-backend-url.com/timer-expired", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({
-    //       message: "User viewed the file for 10 minutes.",
-    //       materialType: material.material_type,
-    //       materialUrl: material.material_file_url,
-    //       timestamp: new Date().toISOString(),
-    //     }),
-    //   });
-
-    //   if (!response.ok) throw new Error("Failed to send timer message.");
-    //   console.log("Timer message sent successfully!");
-    // } catch (error) {
-    //   console.error("Error sending timer message:", error);
-    // }
-  };
+  }, [material, open]);
 
   // Render PDF preview
   useEffect(() => {
@@ -85,20 +52,6 @@ const ViewFileModal = ({ open, handleClose, material }) => {
       fileReader.readAsDataURL(pdfBlob);
     }
   }, [pdfBlob]);
-
-  // Fetch PDF when modal opens
-  useEffect(() => {
-    if (open && material.material_type === "pdf") {
-      fetchPdf(material.material_file_url);
-    }
-  }, [material, open]);
-
-  // Format time MM:SS
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes}:${secs.toString().padStart(2, "0")}`;
-  };
 
   // Render content based on material type
   const renderContent = () => {
@@ -124,14 +77,19 @@ const ViewFileModal = ({ open, handleClose, material }) => {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>View File</DialogTitle>
-      <DialogContent>
-        {/* Timer Display */}
-        <Typography variant="h6" sx={{ textAlign: "center", marginBottom: 2 }}>
-          Time Left: {formatTime(timeLeft)}
-        </Typography>
-        {renderContent()}
-      </DialogContent>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginLeft: "10px",
+          marginRight: "30px",
+        }}
+      >
+        <DialogTitle>File Name: {material?.material_title}</DialogTitle>
+      </div>
+      <DialogContent>{renderContent()}</DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">
           Close
@@ -147,6 +105,9 @@ ViewFileModal.propTypes = {
   material: PropTypes.shape({
     material_type: PropTypes.string.isRequired,
     material_file_url: PropTypes.string.isRequired,
+    material_title: PropTypes.string.isRequired,
+    minimum_reading_time: PropTypes.number.isRequired,
+    // material.id: PropTypes.number
   }).isRequired,
 };
 

@@ -24,12 +24,13 @@ function MultiChoiceQuestionsSection() {
   const location = useLocation();
   const id = location?.state?.rowData;
   // console.log(useAuth)
-  const { user, role } = useAuth();
+  const { user } = useAuth();
   // console.log("User details",user?.id)
   const { data: questionsData, isLoading, isError } = useGetTrainingQuizzesQuery(id, {
     skip: !id,
   });
   const quiz_id=questionsData?.data[0]?.id || 0;
+  console.log("Questions Data::::",questionsData)
   // console.log("QuestionsIDDD:",)
   const [attemptQuiz]  = useAttemptQuizMutation()
   // console.log(questionsData)
@@ -110,6 +111,9 @@ function MultiChoiceQuestionsSection() {
     if (hasSubmitted) return;
 
     const results = calculateResults();
+    const passCriteria = parseFloat(questionsData.data[0].pass_criteria);
+    const passKey = results.marksObtained >= passCriteria;
+    console.log("Pass Criteria:",passCriteria)
     const message = `You scored ${results.marksObtained} out of ${results.totalMarks} marks.\nTime taken: ${formatTime(results.timeTaken)}`;
 
     const quizPayload = {
@@ -119,7 +123,8 @@ function MultiChoiceQuestionsSection() {
       questions: results.userResponseList,
       obtain_marks: results.marksObtained,
       total_marks: results.totalMarks,
-      total_taken_time: results.timeTaken
+      total_taken_time: results.timeTaken,
+      is_pass:passKey
     };
 
     setResultMessage(message);

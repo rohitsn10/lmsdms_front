@@ -10,7 +10,7 @@ import ReactDOM from "react-dom";
 import CommentBankIcon from "@mui/icons-material/CommentBank";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
-import { Box, TextareaAutosize, TextField } from "@mui/material";
+import { Box, IconButton, Paper, TextareaAutosize, TextField } from "@mui/material";
 import MDBox from "components/MDBox";
 import Grid from "@mui/material/Grid";
 import MDButton from "components/MDButton";
@@ -36,7 +36,7 @@ import RemarkDialog from "./remark";
 import SelectUserDialog from "./user-select";
 import { Button, AppBar, Toolbar, Typography, CircularProgress } from "@mui/material";
 import { useAddPathUrlDataForCommentsMutation } from "api/auth/editDocumentApi";
-
+import DeleteIcon from '@mui/icons-material/Delete';
 
 // Import AuthContext
 import { AuthContext } from "context/auth-context";
@@ -99,7 +99,7 @@ const DocumentView = () => {
   const [approver, setApprover] = useState("");
   const [reviewer, setReviewer] = useState([]);
   const [docAdmin, setDocAdmin] = useState("");
-  const [docComments,setDocComments] = useState("");
+  const [docComments,setDocComments] = useState([]);
   const [cacheDocument, setCacheDocument] = useState("");
 
   const [docComments2, setDocComments2] = useState([]);
@@ -132,6 +132,12 @@ const DocumentView = () => {
       docCommentsRef.current = updatedDocComments;
       setDocCurrentComment(""); // Clear input after adding
     }
+  };
+
+  const handleDeleteComment = (commentId) => {
+    const updatedComments = docComments.filter(comment => comment.id !== commentId);
+    setDocComments(updatedComments);
+    docCommentsRef.current = updatedComments;
   };
 
 
@@ -1041,7 +1047,59 @@ const DocumentView = () => {
         Add Comment
       </MDButton>
     </Box>
+    
 
+    <Box sx={{ mt: 4 ,width:'400px',maxWidth:'700px',marginX:'auto'}}>
+        <Typography variant="h6" sx={{ mb: 2 }}>Comments:</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {docComments?.map((comment) => (
+            <Paper 
+              key={comment.id} 
+              elevation={1}
+              sx={{ 
+                p: 2,
+                bgcolor: 'grey.50',
+                position: 'relative'
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {comment.user}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                    {new Date(comment.timestamp).toLocaleString()}
+                  </Typography>
+                  <Typography sx={{ mt: 1 }}>
+                    {comment.text}
+                  </Typography>
+                </Box>
+                <IconButton 
+                  onClick={() => handleDeleteComment(comment.id)}
+                  size="small"
+                  sx={{ 
+                    '&:hover': { 
+                      color: 'error.main',
+                      bgcolor: 'error.light' 
+                    }
+                  }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </Paper>
+          ))}
+          {docComments.length === 0 && (
+            <Typography 
+              color="text.secondary" 
+              align="center"
+              sx={{ py: 2 }}
+            >
+              No comments yet
+            </Typography>
+          )}
+        </Box>
+      </Box>
 
       <MDBox
         sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
