@@ -34,11 +34,23 @@ export const editDocumentApi = createApi({
         },
       }),
     }),
+    addPathUrlDataForComments: builder.mutation({
+      query: (commentData) => ({
+        url: "dms_module/add_path_url_data_for_comments",
+        method: "POST",
+        body: commentData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    }),
     
   }),
 });
 
 export const {
   useFetchDocumentDetailsQuery,
-  useUpdateDocumentMutation, // Export the mutation hook
+  useUpdateDocumentMutation,
+  useAddPathUrlDataForCommentsMutation
+  // Export the mutation hook
 } = editDocumentApi;

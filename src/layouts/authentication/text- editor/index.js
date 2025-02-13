@@ -35,12 +35,19 @@ import { toast, ToastContainer } from "react-toastify";
 import RemarkDialog from "./remark";
 import SelectUserDialog from "./user-select";
 import { Button, AppBar, Toolbar, Typography, CircularProgress } from "@mui/material";
+import { useAddPathUrlDataForCommentsMutation } from "api/auth/editDocumentApi";
+
+
 // Import AuthContext
 import { AuthContext } from "context/auth-context";
+
+
 const DocumentView = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const docEditorRef = useRef(null);
+  const [addPathUrlDataForComments, { isLoading: isAddingComment }] = useAddPathUrlDataForCommentsMutation();
+
 
   const [saving, setSaving] = useState(false);
   const [Error1,setError] = useState(null);
@@ -71,6 +78,9 @@ const DocumentView = () => {
   const document_current_status = searchParams.get("status");
   const trainingRequired = searchParams.get("training_required");
   const approval_status = searchParams.get("approval_status");
+  const version = searchParams.get("version");
+  console.log("Version",version)
+
   // const [dialogeffectiveOpen, setDialogeffectiveOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(""); // State for Assigned To dropdown
@@ -156,8 +166,8 @@ const DocumentView = () => {
     if (templateData?.template_url) {
       const fetchEditorConfig = async () => {
         try {
-          // const response = await fetch(`http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`, {
-            const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
+          const response = await fetch(`http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`, {
+            // const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -191,8 +201,8 @@ const DocumentView = () => {
   useEffect(() => {
     if (docEditorLoaded && editorConfig) {
       const script = document.createElement("script");
-      // script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
-      script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
+      script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
+      // script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
       script.onload = () => {
         try {
           const handleSave = () => {
@@ -269,17 +279,27 @@ const DocumentView = () => {
                     console.log('Cache Url Link:',cacheUrl)
                     console.log("Comment",docCommentsRef?.current)
                     setCacheDocument(cacheUrl);
+                    const newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
                     if (cacheUrl) {                 
                       const draftData = {
-                        documentUrl: cacheUrl,
-                        docComment: docCommentsRef?.current,
-                        docId: data?.select_template,
-                        templateID: data?.select_template,
-                        userEmail: user?.email,
-                        userID: user?.id,
-                        username: user?.first_name,
+                        user: user?.id,
+                        document_id: id,
+                        comment_data: docCommentsRef?.current,
+                        version_no:newVersion,
+                        front_file_url: cacheUrl,
+                        // templateID: data?.select_template,
+                        // userEmail: user?.email,
+                        // username: user?.first_name,
                       };
-                      console.log("Submitting draft:", draftData);      
+                      console.log("Submitting draft:", draftData);   
+                      try {
+                        // Send the comment data to the API
+                        const result = await addPathUrlDataForComments(draftData).unwrap();
+                        console.log('Comment saved successfully:', result);
+                      } catch (apiError) {
+                        console.error('Error saving comment:', apiError);
+                          // You might want to show an error message to the user here
+                    } 
                     }
                     
                     return true; // Allow the normal download to proceed
@@ -933,8 +953,9 @@ const DocumentView = () => {
           <MDButton
             variant="gradient"
             color="submit"
-            onClick={handleSaveDraft}
-            disabled={isLoading} // Disable button when mutation is in progress
+            // onClick={handleSaveDraft}
+            onClick={handleDownloadFeature}
+            disabled={isLoading} 
           >
             Save Draft
           </MDButton>
@@ -958,57 +979,16 @@ const DocumentView = () => {
             Print
           </MDButton>
 
-      <button onClick={handleDownloadFeature}>
+      {/* <button onClick={handleDownloadFeature}>
         Force Save
-      </button>
+      </button> */}
         </MDBox>
       </Box>
-          <Box sx={{ maxWidth: 700, mx: "auto", p: 3, mt: 3, boxShadow: 3,display:'flex',flexDirection:'column',gap:2 }}>
-      {/* <h2>{document.document_title} (Version {latestVersion?.version})</h2>
-      <p><strong>Updated By:</strong> {latestVersion?.updated_by}</p>
-      <p><strong>Last Updated:</strong> {new Date(latestVersion?.updated_at).toLocaleString()}</p> */}
+          {/* <Box sx={{ maxWidth: 700, mx: "auto", p: 3, mt: 3, boxShadow: 3,display:'flex',flexDirection:'column',gap:2 }}>
 
-      {/* Comment Section */}
       <h3>Add Comment</h3>
-      {/* <Box>
-        {latestVersion?.comments?.length > 0 ? (
-          <ul>
-            {latestVersion.comments.map((comment) => (
-              <li key={comment.comment_id}>
-                <strong>{comment.commented_by}:</strong> {comment.comment_text} 
-                <em> ({new Date(comment.commented_at).toLocaleString()})</em>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No comments yet.</p>
-        )}
-      </Box> */}
-
-      {/* Add Comment Input */}
       <MDBox display="flex" gap={2} mt={1}>
-        {/* <TextField
-          label="Add a comment"
-          variant="outlined"
-          fullWidth
-          value={docComments}
-          onChange={(e)=>setDocComments(e.target.value)}
-        /> */}
-                {/* <TextareaAutosize
-          minRows={3}
-          placeholder="Write your comment here..."
-          value={docComments}
-          onChange={(e)=>setDocComments(e.target.value)}
-          style={{
-            width: "400px",
-            padding: "10px",
-            fontSize: "16px",
-            borderRadius: "5px",
-            border: "1px solid #ccc",
-            resize: "vertical",
-          }}
-        /> */}
-        {/* <TextareaAutosize
+        <TextareaAutosize
   minRows={3}
   placeholder="Write your comment here..."
   value={docComments}
@@ -1024,35 +1004,18 @@ const DocumentView = () => {
     border: "1px solid #ccc",
     resize: "vertical",
   }}
-/> */}
-
+/>
       </MDBox>
-      {/* <MDButton variant="gradient" color="primary"
-        //  onClick={handleAddComment}
+      <MDButton variant="gradient" color="primary"
          >
           Add Comment
-        </MDButton> */}
-    </Box>
-  <h2>New Instance:</h2>
-    <Box>
-    <MDBox>
-        {/* Display existing comments */}
-        {/* {docComments?.map((docComment) => (
-          <MDBox 
-            key={docComment.id}
-            sx={{
-              margin: "10px 0",
-              padding: "10px",
-              backgroundColor: "#f5f5f5",
-              borderRadius: "5px",
-            }}
-          >
-            <div><strong>{docComment.user}</strong> - {new Date(docComment.timestamp).toLocaleString()}</div>
-            <div>{docComment.text}</div>
-          </MDBox>
-        ))} */}
+        </MDButton>
+    </Box> */}
 
-        {/* Comment input */}
+    <Box sx={{ maxWidth: 700, mx: "auto", p: 3, mt: 3, boxShadow: 3,display:'flex',flexDirection:'column',gap:2 }}>
+    <h2>Add Comment:</h2>
+    <MDBox>
+
         <TextareaAutosize
           minRows={3}
           placeholder="Write your comment here..."

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation,useSearchParams  } from "react-router-dom";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -35,6 +35,7 @@ const DocumentListing = () => {
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams] = useSearchParams(); 
   const navigate = useNavigate();
   const location = useLocation();
   const { data, refetch, isLoading, isError } = useFetchDocumentsQuery();
@@ -49,6 +50,8 @@ const DocumentListing = () => {
   const [updateObsoleteStatus] = useUpdateObsoleteStatusMutation();
   const [openDialog, setOpenDialog] = useState(false);
   const [documentEffective, { isLoading: isEffecting, isError: isEffectError }] = useDocumentEffectiveMutation();
+  const version = searchParams.get("version");
+  console.log("Versionnon",version)
   useEffect(() => {
     if (data && data.userGroupIds) {
       setUserGroupIds(data.userGroupIds);
@@ -102,8 +105,8 @@ const DocumentListing = () => {
       return; // Exit if params or row is missing
     }
 
-    const { id, document_current_status, training_required, approval_status } = params.row;
-
+    const { id, document_current_status, training_required, approval_status,version } = params.row;
+    console.log("Version",version )
     // Ensure required fields are defined
     if (
       id === undefined ||
@@ -114,9 +117,9 @@ const DocumentListing = () => {
       console.error("Missing data in params.row:", params.row);
       return;
     }
-
+    // console.log("Console.log check for ID:",params?.row?.version)
     navigate(
-      `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}`
+      `/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}`
     );
     // console.log("Navigated with:", {
     //   id,
