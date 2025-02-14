@@ -34,7 +34,7 @@ const JobRoleMapping = () => {
   const [trainingAssignJobrole, { isLoading: isMappingLoading, error: mappingError }] = useTrainingAssignJobroleMutationMutation();
   useEffect(() => {
     if (trainingData) {
-      const sampleToDo = trainingData.document_data.map((doc) => ({
+      const sampleToDo = trainingData.document_data.documents.map((doc) => ({
         id: doc.id.toString(),
         title: doc.document_title,
         description: doc.document_description,
