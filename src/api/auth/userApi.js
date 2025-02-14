@@ -22,28 +22,38 @@ export const userApi = createApi({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: ['UserList'], // Invalidate the user list cache after user creation
+            invalidatesTags: ['UserList'],
         }),
 
         userList: builder.query({
             query: () => 'user_profile/user_list',
-            providesTags: ['UserList'], // Tag the user list data for cache management
+            providesTags: ['UserList'], 
         }),
         reviewerUsers: builder.query({
             query: () => 'user_profile/reviewer_users',
-            providesTags: ['UserList'], // Tag reviewer users data for cache management
+            providesTags: ['UserList'],
         }),
 
         // Fetch approver users
         approverUsers: builder.query({
             query: () => 'user_profile/approver_users',
-            providesTags: ['UserList'], // Tag approver users data for cache management
+            providesTags: ['UserList'], 
         }),
 
         // Fetch document admin users
         docAdminUsers: builder.query({
             query: () => 'user_profile/docadmin_users',
-            providesTags: ['UserList'], // Tag doc admin users data for cache management
+            providesTags: ['UserList'],
+        }),
+        failedUser: builder.query({
+            query: (DocId) => `lms_module/failed_user/${DocId}`, 
+        }),
+        userIdWiseNoOfAttempts: builder.mutation({
+            query: (userId) => ({
+                url: 'lms_module/user_id_wise_no_of_attempts',
+                method: 'POST',
+                body: { user_id: userId }, // Pass user_id in the body of the request
+            }),
         }),
     }),
 });
@@ -53,5 +63,7 @@ export const {
      useUserListQuery,
      useReviewerUsersQuery,
      useApproverUsersQuery,
-     useDocAdminUsersQuery
+     useDocAdminUsersQuery,
+     useFailedUserQuery,
+     useUserIdWiseNoOfAttemptsMutation,
      } = userApi;

@@ -20,6 +20,8 @@ import TaskDescriptionDialog from "./approve-description";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useCreateInductionCertificateMutation } from "apilms/workflowapi";
 import { toast } from "react-toastify";
+import Visibilityicon from "@mui/icons-material/Visibility";
+import SOPDialog from "./Document-listView";
 const UsersListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
@@ -38,6 +40,8 @@ const UsersListing = () => {
       skip: !groupId, // Ensure it skips if groupId is missing
     });
   const [downloadInductionCertificate] = useCreateInductionCertificateMutation();
+  const [isSOPDialogOpen, setSOPDialogOpen] = useState(false);
+  const [sopData, setSopData] = useState([]);
 
   const formattedData = Array.isArray(data?.data)
     ? data.data.map((item, index) => ({
@@ -90,15 +94,26 @@ const UsersListing = () => {
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const handleViewSOPClick = (row) => {
+    if (row) {
+      setSelectedUser(row); // Ensure that row is valid and has necessary data
+      setSOPDialogOpen(true); // Open the dialog
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setSOPDialogOpen(false);
+  };
+
   const handleDownloadICClick = async (user) => {
     try {
       const response = await downloadInductionCertificate(user.id).unwrap();
       toast.success("Induction Certificate downloaded successfully!");
       if (response?.data) {
-        const fileUrl = response.data; 
-        const link = document.createElement('a');
+        const fileUrl = response.data;
+        const link = document.createElement("a");
         link.href = fileUrl;
-        link.download = 'induction_certificate.pdf'; 
+        link.download = "induction_certificate.pdf";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -107,7 +122,6 @@ const UsersListing = () => {
       toast.error("Failed to download induction certificate. Please try again.");
     }
   };
-  
 
   // Conditionally render columns based on the groupId
   const columns = [
@@ -177,6 +191,7 @@ const UsersListing = () => {
           },
         ]
       : []),
+
     {
       field: "download_ic",
       headerName: "Download IC",
@@ -188,6 +203,21 @@ const UsersListing = () => {
         </IconButton>
       ),
     },
+    ...(groupId === 7
+      ? [
+          {
+            field: "view_sop",
+            headerName: "View SOP",
+            flex: 0.5,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <IconButton color="primary" onClick={() => handleViewSOPClick(params.row)}>
+                <Visibilityicon />
+              </IconButton>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -256,6 +286,11 @@ const UsersListing = () => {
         description={selectedTaskDescription}
         onSave={handleSaveTaskDescription}
         userId={selectedUserIdForJD}
+      />
+      <SOPDialog
+        open={isSOPDialogOpen}
+        onClose={handleCloseDialog}
+        selectedUserid={selectedUser ? selectedUser.id : null}
       />
     </MDBox>
   );

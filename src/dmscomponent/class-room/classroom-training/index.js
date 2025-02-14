@@ -17,7 +17,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
-import ESignatureDialog from "layouts/authentication/ESignatureDialog"; 
+import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import MDInput from "components/MDInput";
 import axios from "axios";
@@ -25,12 +25,16 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useFetchTrainingsQuery } from "apilms/trainingApi";
 import { useFetchTrainersQuery } from "api/auth/trainerApi";
+import { useUserListQuery } from "api/auth/userApi";
+import { useFailedUserQuery } from "api/auth/userApi";
 function ClassroomTraining() {
   const [trainingType, setTrainingType] = useState("");
   const { data: alldocument } = useFetchTrainingsQuery();
   const { data: alltrainers } = useFetchTrainersQuery();
-
-  const [sopdocument, setsopdocument] = useState("");
+  const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
+  
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [sopdocument, setsopdocument] = useState("N/A");
   const [trainer, setTrainer] = useState("");
   const [classroomTitle, setClassroomTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -41,7 +45,8 @@ function ClassroomTraining() {
   const [isLoading, setIsLoading] = useState(false);
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const navigate = useNavigate();
-
+  const handleUserChange = (e) => setSelectedUsers(e.target.value);
+  const { data: failedUsersData, isLoading: isFailedUsersLoading } = useFailedUserQuery(sopdocument);
   const validateInputs = () => {
     const newErrors = {};
     if (!classroomTitle.trim()) newErrors.classroomTitle = "Classroom Title is required.";
@@ -86,7 +91,7 @@ function ClassroomTraining() {
     formData.append("description", description.trim());
     formData.append("status", status);
     formData.append("upload_doc", File);
-    formData.append("online_offline_status",onlineOfflineStatus)
+    formData.append("online_offline_status", onlineOfflineStatus);
 
     const token = sessionStorage.getItem("token");
     const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/create_classroom`;
@@ -207,7 +212,7 @@ function ClassroomTraining() {
                     labelId="select-trainer-label"
                     id="select-trainer-doc"
                     value={trainer}
-                    onChange={(e) => setTrainer(e.target.value)} 
+                    onChange={(e) => setTrainer(e.target.value)}
                     input={<OutlinedInput label="Select Trainer " />}
                     sx={{
                       minWidth: 200,
@@ -249,8 +254,8 @@ function ClassroomTraining() {
                   >
                     {/* Add "N/A" option */}
                     <MenuItem value="N/A">N/A</MenuItem>
-                    {Array.isArray(alldocument?.document_data) ? (
-                      alldocument.document_data.map((doc) => (
+                    {Array.isArray(alldocument?.document_data.documents) ? (
+                      alldocument.document_data.documents.map((doc) => (
                         <MenuItem key={doc.id} value={doc.id}>
                           {doc.document_title} {/* Display document title */}
                         </MenuItem>
@@ -261,19 +266,103 @@ function ClassroomTraining() {
                   </Select>
                 </FormControl>
               </Grid>
+              {sopdocument === "N/A" ? (
               <Grid item xs={12}>
-  <MDTypography variant="h6">Class Mode</MDTypography>
-  <FormControl fullWidth margin="dense">
-    <RadioGroup
-      row
-      value={onlineOfflineStatus}
-      onChange={(e) => setOnlineOfflineStatus(e.target.value)}
-    >
-      <FormControlLabel value="Online" control={<Radio />} label="Online" />
-      <FormControlLabel value="Offline" control={<Radio />} label="Offline" />
-    </RadioGroup>
-  </FormControl>
-</Grid>
+                <FormControl fullWidth error={!!errors.selectedUsers}>
+                  <InputLabel id="select-user-label">
+                    <span style={{ color: "red" }}>*</span>All Users
+                  </InputLabel>
+                  <Select
+                    labelId="select-user-label"
+                    id="select-user"
+                    multiple
+                    value={selectedUsers}
+                    onChange={handleUserChange}
+                    input={<OutlinedInput label="Select Users" />}
+                    renderValue={(selected) =>
+                      selected
+                        .map((userId) => {
+                          const user = userData?.data.find((u) => u.id === userId);
+                          return user?.username || userId;
+                        })
+                        .join(", ")
+                    }
+                    sx={{
+                      minWidth: 200,
+                      height: "3rem",
+                      ".MuiSelect-select": { padding: "0.45rem" },
+                    }}
+                  >
+                    {userData?.data.length > 0 ? (
+                      userData.data.map((user) => (
+                        <MenuItem key={user.id} value={user.id}>
+                          {user.username}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem disabled>No users available</MenuItem>
+                    )}
+                  </Select>
+                  {errors.selectedUsers && (
+                    <MDTypography color="error" variant="caption">
+                      {errors.selectedUsers}
+                    </MDTypography>
+                  )}
+                </FormControl>
+              </Grid>
+                ) : (
+                  <Grid item xs={12}>
+                  <FormControl fullWidth margin="dense">
+                    <InputLabel id="select-failed-users-label">
+                      <span style={{ color: "red" }}>*</span>Failed Users
+                    </InputLabel>
+                    <Select
+                      labelId="select-failed-users-label"
+                      id="select-failed-users"
+                      multiple
+                      value={selectedUsers}
+                      onChange={handleUserChange}
+                      input={<OutlinedInput label="Failed Users" />}
+                      renderValue={(selected) =>
+                        selected
+                          .map((userId) => {
+                            const user = failedUsersData?.data.find((u) => u.id === userId);
+                            return user?.username || userId;
+                          })
+                          .join(", ")
+                      }
+                      sx={{
+                        minWidth: 200,
+                        height: "3rem",
+                        ".MuiSelect-select": { padding: "0.45rem" },
+                      }}
+                    >
+                      {isFailedUsersLoading ? (
+                        <CircularProgress />
+                      ) : (
+                        failedUsersData?.data.map((user) => (
+                          <MenuItem key={user.id} value={user.id}>
+                            {user.username}
+                          </MenuItem>
+                        ))
+                      )}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                 )}
+              <Grid item xs={12}>
+                <MDTypography variant="h6">Class Mode</MDTypography>
+                <FormControl fullWidth margin="dense">
+                  <RadioGroup
+                    row
+                    value={onlineOfflineStatus}
+                    onChange={(e) => setOnlineOfflineStatus(e.target.value)}
+                  >
+                    <FormControlLabel value="Online" control={<Radio />} label="Online" />
+                    <FormControlLabel value="Offline" control={<Radio />} label="Offline" />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
 
               <Grid item xs={12}>
                 <MDInput
