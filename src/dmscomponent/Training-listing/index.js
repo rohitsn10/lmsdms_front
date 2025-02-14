@@ -61,7 +61,7 @@ const TrainingListing = () => {
       console.error("training_document is undefined or missing for this item", item);
     }
   };
-  const filteredData = (Array.isArray(data?.document_data) ? data.document_data : [])
+  const filteredData = (Array.isArray(data?.document_data?.documents) ? data.document_data?.documents : [])
     .filter((item) => item.document_title.toLowerCase().includes(searchTerm.toLowerCase())) // Filter by title
     .map((item, index) => {
       // console.log("Created at:", item.created_at); // Log the created_at field to check it

@@ -30,7 +30,7 @@ function MultiChoiceQuestionsSection() {
     skip: !id,
   });
   const quiz_id=questionsData?.data[0]?.id || 0;
-  console.log("Questions Data::::",questionsData)
+  // console.log("Questions Data::::",questionsData)
   // console.log("QuestionsIDDD:",)
   const [attemptQuiz]  = useAttemptQuizMutation()
   // console.log(questionsData)
@@ -82,12 +82,12 @@ function MultiChoiceQuestionsSection() {
     let totalMarks = 0;
     let marksObtained = 0;
     const userResponseList = [];
-
+    const incorrectList=[];
+    const correctList=[];
     questions.forEach((question) => {
       totalMarks += question.marks;
       const userAnswer = (answers[question.id] || "").toLowerCase();
       const correctAnswer = correctAnswers[question.id] || "";
-
       userResponseList.push({
         question_id: question.id,
         question_text: question.question_text,
@@ -96,6 +96,17 @@ function MultiChoiceQuestionsSection() {
 
       if (userAnswer === correctAnswer) {
         marksObtained += question.marks;
+        correctList.push({
+          question_id: question.id,
+          question_text: question.question_text,
+          user_answer: userAnswer || "No Answer",
+        })
+      }else{
+        incorrectList.push({
+          question_id: question.id,
+          question_text: question.question_text,
+          user_answer: userAnswer || "No Answer",
+        })
       }
     });
 
@@ -103,7 +114,9 @@ function MultiChoiceQuestionsSection() {
       totalMarks,
       marksObtained,
       userResponseList,
-      timeTaken: questionsData.data[0].quiz_time * 60 - counter
+      timeTaken: questionsData.data[0].quiz_time * 60 - counter,
+      incorrectList,
+      correctList
     };
   };
 
@@ -113,7 +126,7 @@ function MultiChoiceQuestionsSection() {
     const results = calculateResults();
     const passCriteria = parseFloat(questionsData.data[0].pass_criteria);
     const passKey = results.marksObtained >= passCriteria;
-    console.log("Pass Criteria:",passCriteria)
+    // console.log("Pass Criteria:",passCriteria)
     const message = `You scored ${results.marksObtained} out of ${results.totalMarks} marks.\nTime taken: ${formatTime(results.timeTaken)}`;
 
     const quizPayload = {
@@ -124,9 +137,11 @@ function MultiChoiceQuestionsSection() {
       obtain_marks: results.marksObtained,
       total_marks: results.totalMarks,
       total_taken_time: results.timeTaken,
-      is_pass:passKey
+      is_pass:passKey,
+      incorrect_questions:results.incorrectList,
+      correct_questions:results.correctList
     };
-
+    // console.log("Submit::::",quizPayload)
     setResultMessage(message);
     setOpenModal(true);
     setHasSubmitted(true);
