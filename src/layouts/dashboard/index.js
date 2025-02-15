@@ -19,7 +19,7 @@ import { useGetDocumentDataOfStatusIdElevenQuery } from "api/auth/dashboardApi";
 import { useGetDocumentDataOfStatusIdNineQuery } from "api/auth/dashboardApi";
 import { useGetDocumentDataOfStatusIdThreeQuery } from "api/auth/dashboardApi";
 import { useGetDocumentDataOfStatusIdTwoQuery } from "api/auth/dashboardApi";
-
+import { useGetDocumentDataOfStatusIdFourQuery } from "api/auth/dashboardApi";
 function Dashboard() {
   const { data, error, isLoading } = useGetDashboardCountsQuery(); // Fetch the dashboard counts
   const {
@@ -41,7 +41,15 @@ function Dashboard() {
     startDate: "",
     endDate: "",
   });
-
+  const {
+    data: underapproveData,
+    isLoading: loadingunderApprove,
+    error: approveunderError,
+  } = useGetDocumentDataOfStatusIdFourQuery({
+    departmentId: "",
+    startDate: "",
+    endDate: "",
+  });
   const {
     data: reviewData,
     isLoading: loadingReview,
@@ -202,6 +210,22 @@ function Dashboard() {
                   color: "success",
                 }}
               />
+            </MDBox>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+             <Link to="/under-approve-document">
+             <ComplexStatisticsCard
+                color="success"
+                icon={<TaskIcon />}
+                title="Under Approve"
+                count={underapproveData?.dataCountapprove || 0}
+                percentage={{
+                  color: "success",
+                }}
+              />
+              </Link>
+              
             </MDBox>
           </Grid>
         </Grid>
