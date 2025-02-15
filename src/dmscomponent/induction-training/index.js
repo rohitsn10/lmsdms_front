@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import { Card, MenuItem, Select, InputLabel, FormControl,OutlinedInput } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
@@ -119,17 +119,24 @@ const AddInductionTraining = () => {
 
             <MDBox mb={3}>
               <FormControl fullWidth error={!!errors.department}>
-                <InputLabel>Department</InputLabel>
+                <InputLabel id="department-label"
+                ><span style={{ color: "red" }}>*</span>Department</InputLabel>
                 <Select
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
+                  input={<OutlinedInput label="Department" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem",
+                    ".MuiSelect-select": { padding: "0.5rem" },
+                  }}
                 >
                   {deptLoading ? (
                     <MenuItem disabled>Loading...</MenuItem>
                   ) : (
                     departments?.map((dept) => (
                       <MenuItem key={dept.id} value={dept.id}>
-                        {dept.name}
+                        {dept.department_name}
                       </MenuItem>
                     ))
                   )}
