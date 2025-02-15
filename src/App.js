@@ -63,6 +63,7 @@ import ApprovedDocument from "layouts/authentication/document-listing/approve-do
 import RejectedDocument from "layouts/authentication/document-listing/rejected-document/index.js";
 import SavedraftDocument from "layouts/authentication/document-listing/saved-draft-document/index.js";
 import UnderReviewDocument from "layouts/authentication/document-listing/under-review-document/index.js";
+import UnderApproveDocument from "layouts/authentication/document-listing/under-approve-document/index.js";
 import PDFPreview from "layouts/authentication/document-listing/pdf-preview/index.js";
 import ArchivedListing from "layouts/authentication/archived-listing/index.js";
 import ObsoleteDataListing from "layouts/authentication/document-listing/ObsoleteListing/index.js";
@@ -329,6 +330,7 @@ export default function App() {
       <Route path="/reject-document" element={<RejectedDocument/>}/>
       <Route path="/draft-document" element={<SavedraftDocument/>}/>
       <Route path="/review-document" element={<UnderReviewDocument/>}/>
+      <Route path="/under-approve-document" element={<UnderApproveDocument/>}/>
       <Route path="/PDFPreview" element={<PDFPreview/>}/>
       <Route path="/archived-listing" element={<ArchivedListing/>}/>
       <Route path="/Obsolete-data" element={<ObsoleteDataListing/>}/>
