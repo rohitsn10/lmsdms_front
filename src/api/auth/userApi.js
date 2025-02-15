@@ -55,6 +55,9 @@ export const userApi = createApi({
                 body: { user_id: userId }, // Pass user_id in the body of the request
             }),
         }),
+        userIdWiseResult: builder.query({
+            query: ({ userId, documentId }) => `lms_module/user_id_wise_result/${userId}/${documentId}`,
+        }),
     }),
 });
 
@@ -66,4 +69,5 @@ export const {
      useDocAdminUsersQuery,
      useFailedUserQuery,
      useUserIdWiseNoOfAttemptsMutation,
+     useUserIdWiseResultQuery,
      } = userApi;
