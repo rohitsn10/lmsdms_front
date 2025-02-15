@@ -32,7 +32,7 @@ function ClassroomTraining() {
   const { data: alldocument } = useFetchTrainingsQuery();
   const { data: alltrainers } = useFetchTrainersQuery();
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
-  
+
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [sopdocument, setsopdocument] = useState("N/A");
   const [trainer, setTrainer] = useState("");
@@ -46,7 +46,9 @@ function ClassroomTraining() {
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const navigate = useNavigate();
   const handleUserChange = (e) => setSelectedUsers(e.target.value);
-  const { data: failedUsersData, isLoading: isFailedUsersLoading } = useFailedUserQuery(sopdocument);
+  const { data: failedUsersData, isLoading: isFailedUsersLoading } =
+    useFailedUserQuery(sopdocument);
+
   const validateInputs = () => {
     const newErrors = {};
     if (!classroomTitle.trim()) newErrors.classroomTitle = "Classroom Title is required.";
@@ -267,51 +269,51 @@ function ClassroomTraining() {
                 </FormControl>
               </Grid>
               {sopdocument === "N/A" ? (
-              <Grid item xs={12}>
-                <FormControl fullWidth error={!!errors.selectedUsers}>
-                  <InputLabel id="select-user-label">
-                    <span style={{ color: "red" }}>*</span>All Users
-                  </InputLabel>
-                  <Select
-                    labelId="select-user-label"
-                    id="select-user"
-                    multiple
-                    value={selectedUsers}
-                    onChange={handleUserChange}
-                    input={<OutlinedInput label="Select Users" />}
-                    renderValue={(selected) =>
-                      selected
-                        .map((userId) => {
-                          const user = userData?.data.find((u) => u.id === userId);
-                          return user?.username || userId;
-                        })
-                        .join(", ")
-                    }
-                    sx={{
-                      minWidth: 200,
-                      height: "3rem",
-                      ".MuiSelect-select": { padding: "0.45rem" },
-                    }}
-                  >
-                    {userData?.data.length > 0 ? (
-                      userData.data.map((user) => (
-                        <MenuItem key={user.id} value={user.id}>
-                          {user.username}
-                        </MenuItem>
-                      ))
-                    ) : (
-                      <MenuItem disabled>No users available</MenuItem>
+                <Grid item xs={12}>
+                  <FormControl fullWidth error={!!errors.selectedUsers}>
+                    <InputLabel id="select-user-label">
+                      <span style={{ color: "red" }}>*</span>All Users
+                    </InputLabel>
+                    <Select
+                      labelId="select-user-label"
+                      id="select-user"
+                      multiple
+                      value={selectedUsers}
+                      onChange={handleUserChange}
+                      input={<OutlinedInput label="Select Users" />}
+                      renderValue={(selected) =>
+                        selected
+                          .map((userId) => {
+                            const user = userData?.data.find((u) => u.id === userId);
+                            return user?.username || userId;
+                          })
+                          .join(", ")
+                      }
+                      sx={{
+                        minWidth: 200,
+                        height: "3rem",
+                        ".MuiSelect-select": { padding: "0.45rem" },
+                      }}
+                    >
+                      {userData?.data.length > 0 ? (
+                        userData.data.map((user) => (
+                          <MenuItem key={user.id} value={user.id}>
+                            {user.username}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled>No users available</MenuItem>
+                      )}
+                    </Select>
+                    {errors.selectedUsers && (
+                      <MDTypography color="error" variant="caption">
+                        {errors.selectedUsers}
+                      </MDTypography>
                     )}
-                  </Select>
-                  {errors.selectedUsers && (
-                    <MDTypography color="error" variant="caption">
-                      {errors.selectedUsers}
-                    </MDTypography>
-                  )}
-                </FormControl>
-              </Grid>
-                ) : (
-                  <Grid item xs={12}>
+                  </FormControl>
+                </Grid>
+              ) : (
+                <Grid item xs={12}>
                   <FormControl fullWidth margin="dense">
                     <InputLabel id="select-failed-users-label">
                       <span style={{ color: "red" }}>*</span>Failed Users
@@ -327,7 +329,8 @@ function ClassroomTraining() {
                         selected
                           .map((userId) => {
                             const user = failedUsersData?.data.find((u) => u.id === userId);
-                            return user?.username || userId;
+                            // Return the full name of the user (first name + last name)
+                            return user ? `${user.user_first_name} ${user.user_last_name}` : userId;
                           })
                           .join(", ")
                       }
@@ -342,14 +345,15 @@ function ClassroomTraining() {
                       ) : (
                         failedUsersData?.data.map((user) => (
                           <MenuItem key={user.id} value={user.id}>
-                            {user.username}
+                            {/* Display the full name (first name + last name) */}
+                            {`${user.user_first_name} ${user.user_last_name}`}
                           </MenuItem>
                         ))
                       )}
                     </Select>
                   </FormControl>
                 </Grid>
-                 )}
+              )}
               <Grid item xs={12}>
                 <MDTypography variant="h6">Class Mode</MDTypography>
                 <FormControl fullWidth margin="dense">

@@ -25,9 +25,8 @@ export const trainerApi = createApi({
       }),
       transformResponse: (response) => {
         if (response.status) {
-          return response.message;
+          return response;
         }
-        throw new Error(response.message || "Failed to create trainer");
       },
       invalidatesTags: ["Trainers"],
     }),
