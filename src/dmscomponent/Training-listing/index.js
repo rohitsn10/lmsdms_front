@@ -226,9 +226,9 @@ const TrainingListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Training Listing
           </MDTypography>
-          <MDButton variant="contained" color="primary" onClick={handleAddTraining} sx={{ ml: 2 }}>
+          {/* <MDButton variant="contained" color="primary" onClick={handleAddTraining} sx={{ ml: 2 }}>
             Add Training
-          </MDButton>
+          </MDButton> */}
         </MDBox>
 
         {isLoading ? (

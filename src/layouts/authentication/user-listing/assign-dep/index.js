@@ -18,19 +18,24 @@ import MDButton from "components/MDButton";
 import { useAssignDepartmentMutation } from "api/auth/departmentApi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useUserListQuery } from "api/auth/userApi";
 
 const AssignDepartmentDialog = ({ open, onClose, fullName, selectedUserid }) => {
   const [department, setDepartment] = useState("");
+    const { refetch } = useUserListQuery();
   const { data: departmentsData, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
   const [assignDepartment, { isLoading }] = useAssignDepartmentMutation();
   const handleDepartmentChange = (event) => {
     setDepartment(event.target.value);
   };
+    const { refetch } = useUserListQuery();
+  
 
   const handleAssign = async () => {
     try {
       await assignDepartment({ department_id: department, user_id: selectedUserid }).unwrap();
       toast.success(`Department assigned successfully to ${fullName}!`);
+      refetch();
       onClose(); // Close the dialog
     } catch (error) {
       toast.error(error.message || "Failed to assign department"); // Show error toast
