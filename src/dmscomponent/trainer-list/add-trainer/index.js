@@ -55,7 +55,7 @@ const AddTrainer = () => {
         trainer_name: trainerName.trim(),
         description: description.trim(),
       }).unwrap();
-      console.log(response);
+      console.log("----------------------------",response);
       if (response.status) {
         toast.success("Trainer added successfully!");
         setTimeout(() => {
