@@ -28,7 +28,7 @@ const AssignDepartmentDialog = ({ open, onClose, fullName, selectedUserid }) => 
   const handleDepartmentChange = (event) => {
     setDepartment(event.target.value);
   };
-    const { refetch } = useUserListQuery();
+   
   
 
   const handleAssign = async () => {
