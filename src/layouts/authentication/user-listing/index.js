@@ -27,6 +27,7 @@ const UsersListing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data, error, isLoading } = useUserListQuery();
+  console.log("DATATAT:",data)
   const [selectedUser, setSelectedUser] = useState(null);
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;

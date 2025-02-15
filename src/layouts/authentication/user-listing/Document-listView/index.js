@@ -1,46 +1,86 @@
-import React, { useState, useEffect } from 'react'; // Import useState and useEffect from React
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import MDBox from 'components/MDBox'; // Adjust the import path if necessary
+import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import MDButton from "components/MDButton";
 import { DataGrid } from '@mui/x-data-grid';
-import { useUserIdWiseNoOfAttemptsMutation } from 'api/auth/userApi'; // Import the hook
+import { useUserIdWiseNoOfAttemptsMutation } from 'api/auth/userApi';
+import AnswerDialog from './AnswerDialog'; // Import AnswerDialog
 
 const SOPDialog = ({ open, onClose, selectedUserid }) => {
   const [fetchAttempts, { data, isLoading, isError }] = useUserIdWiseNoOfAttemptsMutation();
-  
-  // State to store SOP data
   const [sopData, setSopData] = useState([]);
 
-  // Fetch data based on userId when the dialog is opened
+  // State to handle AnswerDialog
+  const [answerDialogOpen, setAnswerDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedDocument, setSelectedDocument] = useState(null);
+
   useEffect(() => {
     if (open && selectedUserid) {
-      // Trigger the hook to fetch the data
       fetchAttempts(selectedUserid);
     }
   }, [open, selectedUserid, fetchAttempts]);
 
-  // If data is fetched successfully, format it for the DataGrid
   useEffect(() => {
-    if (data && data.status && data.data) {
-      const formattedData = data.data.map((item, index) => ({
-        id: item.document_id,
-        serial_number: index + 1,
+    if (data?.status && data?.data) {
+      const formattedData = data.data.map((item) => ({
+        id: item.id,
+        user: item.user, // Added user ID
+        document: item.document, // Added document ID
+        serial_number: item.id,
         documentName: item.document_name,
-        attempts: item.attempts,
-        status: item.status,
+        obtainedMarks: item.obtain_marks || '0',
+        totalMarks: item.total_marks || '0',
+        timeTaken: item.total_taken_time ? `${item.total_taken_time} mins` : 'N/A',
+        status: item.is_pass ? "Pass" : "Fail",
+        attemptDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'
       }));
       setSopData(formattedData);
     }
   }, [data]);
 
+  const handleOpenAnswerDialog = (userId, documentId) => {
+    setSelectedUser(userId);
+    setSelectedDocument(documentId);
+    setAnswerDialogOpen(true);
+  };
+
+  const handleCloseAnswerDialog = () => {
+    setAnswerDialogOpen(false);
+  };
+
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-    { field: "documentName", headerName: "Document Name", flex: 1, headerAlign: "center" },
-    { field: "attempts", headerName: "Attempts", flex: 1, headerAlign: "center" },
-    { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
+    { field: "documentName", headerName: "Document Name", flex: 1.5, headerAlign: "center" },
+    { 
+      field: "obtainedMarks", 
+      headerName: "Marks Obtained", 
+      flex: 1, 
+      headerAlign: "center",
+      renderCell: (params) => (
+        <span>{params.row.obtainedMarks}/{params.row.totalMarks}</span>
+      )
+    },
+    { field: "timeTaken", headerName: "Time Taken", flex: 1, headerAlign: "center" },
+    { field: "status", headerName: "Status", flex: 0.8, headerAlign: "center" },
+    { field: "attemptDate", headerName: "Attempt Date", flex: 1, headerAlign: "center" },
+    {
+      field: "answers",
+      headerName: "Answers",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <MDButton
+          color="primary"
+          onClick={() => handleOpenAnswerDialog(params.row.user, params.row.document)}
+        >
+          View Answers
+        </MDButton>
+      ),
+    }
   ];
 
   return (
@@ -65,16 +105,21 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
       <DialogContent>
         <MDBox p={3}>
           <MDTypography variant="h5" fontWeight="medium" sx={{ mb: 3, textAlign: "center" }}>
-            SOP Documents
+            SOP Attempt History
           </MDTypography>
           
-          {/* Show loading state */}
-          {isLoading && <MDTypography variant="h6" color="textSecondary">Loading SOP data...</MDTypography>}
+          {isLoading && (
+            <MDTypography variant="h6" color="textSecondary">
+              Loading SOP data...
+            </MDTypography>
+          )}
           
-          {/* Show error message */}
-          {isError && <MDTypography variant="h6" color="error">Failed to fetch data. Please try again.</MDTypography>}
+          {isError && (
+            <MDTypography variant="h6" color="error">
+              Failed to fetch data. Please try again.
+            </MDTypography>
+          )}
 
-          {/* Display the DataGrid when data is available */}
           {data && !isLoading && !isError && (
             <div style={{ height: 400, width: '100%' }}>
               <DataGrid
@@ -88,11 +133,11 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
                   borderRadius: "4px",
                   "& .MuiDataGrid-columnHeaders": {
                     backgroundColor: "#f5f5f5",
-                    fontWeight: "bold",
+                    fontWeight: "bold"
                   },
                   "& .MuiDataGrid-cell": {
-                    textAlign: "center",
-                  },
+                    textAlign: "center"
+                  }
                 }}
               />
             </div>
@@ -105,6 +150,14 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
           Close
         </MDButton>
       </DialogActions>
+
+      {/* Answer Dialog */}
+      <AnswerDialog
+        open={answerDialogOpen}
+        onClose={handleCloseAnswerDialog}
+        userId={selectedUser}
+        documentId={selectedDocument}
+      />
     </Dialog>
   );
 };
@@ -112,7 +165,7 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
 SOPDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  selectedUserid: PropTypes.string.isRequired, // Ensure this is passed correctly
+  selectedUserid: PropTypes.string.isRequired,
 };
 
 export default SOPDialog;
