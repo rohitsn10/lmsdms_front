@@ -86,7 +86,7 @@ const JobRoleMapping = () => {
 
   const handleMapping = async () => {
     // Get document ids from the "inProgress" column
-    const documentIds = kanbanData.inProgress.map((item) => parseInt(item.id)); // Convert to numbers as expected in API
+    const documentIds = kanbanData.inProgress.map((item) => parseInt(item.id)); 
 
     try {
       await trainingAssignJobrole({
