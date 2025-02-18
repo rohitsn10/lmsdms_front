@@ -22,7 +22,7 @@ function AddUser() {
   const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
   const [userRole, setUserRole] = useState([]);
-  const [department, setDepartment] = useState("");
+  // const [department, setDepartment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userRoles, setUserRoles] = useState([]);
   const [errors, setErrors] = useState({});
@@ -53,7 +53,7 @@ function AddUser() {
     // if (!phone.trim()) newErrors.phone = "Phone is required.";
     if (!username.trim()) newErrors.username = "Username is required.";
     if (!userRole.length) newErrors.userRole = "User Role is required.";
-    if (!department) newErrors.department = "Department is required.";
+    // if (!department) newErrors.department = "Department is required.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -85,7 +85,7 @@ function AddUser() {
       // phone,
       username,
       user_role: userRole,
-      department_id: department,
+      // department_id: department,
     };
 
     try {
@@ -244,7 +244,7 @@ function AddUser() {
                 )}
               </FormControl>
             </MDBox>
-
+{/* 
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-department-label">Department</InputLabel>
@@ -280,7 +280,7 @@ function AddUser() {
                   </p>
                 )}
               </FormControl>
-            </MDBox>
+            </MDBox> */}
 
             <MDBox mt={2} mb={1}>
               <MDButton

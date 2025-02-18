@@ -88,8 +88,9 @@ function ViewEmployeeStatus() {
       width: 160,
       renderCell: renderStatusIcon,
     },
-    { field: "is_jr_approve", headerName: "JR Approval", width: 110, renderCell: renderStatusIcon },
-    { field: "is_jr_assign", headerName: "JD Assign", width: 100, renderCell: renderStatusIcon },
+    { field: "is_jr_assign", headerName: "JR Assign", width: 100, renderCell: renderStatusIcon },
+    { field: "is_jr_approve", headerName: "JD Approval", width: 110, renderCell: renderStatusIcon },
+    
     {
       field: "is_tni_generate",
       headerName: "Document Reading",
