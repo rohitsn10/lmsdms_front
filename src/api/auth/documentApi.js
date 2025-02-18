@@ -195,7 +195,15 @@ export const documentApi = createApi({
         body: { document, status }, 
       }),
       transformResponse: (response) => response,
-    }),    
+    }),   
+    fetchDocumentVersionList: builder.query({
+      query: (documentId) => ({
+        url: `dms_module/document_version_list/${documentId}`,
+        method: "GET",
+      }),
+      transformResponse: (response) => response.data,
+      providesTags: ["Documents"],
+    }),
   }),
 });
 
@@ -217,4 +225,5 @@ export const {
   useUpdateObsoleteStatusMutation,
   useSaveDocumentDraftMutation,
   useDocumentEffectiveMutation,
+  useFetchDocumentVersionListQuery
 } = documentApi;

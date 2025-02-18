@@ -114,13 +114,13 @@ function ClassMultiChoiceQuestionsSection() {
 
     const quizPayload = {
       classroom_id: id,
-      // quiz_id: quiz_id,
       user_id: user?.id, // Should come from auth context
       questions: results.userResponseList,
       obtain_marks: results.marksObtained,
       total_marks: results.totalMarks,
       total_taken_time: results.timeTaken,
-      is_pass:passKey
+      is_pass:passKey,
+      is_assessment_completed:true
     };
 
     setResultMessage(message);
