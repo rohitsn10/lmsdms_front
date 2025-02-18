@@ -22,12 +22,13 @@ import { useUserListQuery } from "api/auth/userApi";
 
 const AssignDepartmentDialog = ({ open, onClose, fullName, selectedUserid }) => {
   const [department, setDepartment] = useState("");
+    const { refetch } = useUserListQuery();
   const { data: departmentsData, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
   const [assignDepartment, { isLoading }] = useAssignDepartmentMutation();
   const handleDepartmentChange = (event) => {
     setDepartment(event.target.value);
   };
-    const { refetch } = useUserListQuery();
+   
   
 
   const handleAssign = async () => {

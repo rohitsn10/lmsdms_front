@@ -24,7 +24,7 @@ const TrainingListing = () => {
   const groupId = group.id;
   // Fetch training data using the API query hook
   const { data, error, isLoading, refetch } = useFetchTrainingsQuery();
- 
+
   useEffect(() => {
     refetch();
   }, [location.key]);
@@ -52,8 +52,7 @@ const TrainingListing = () => {
     navigate("/mcq-module", { state: { rowData } });
   };
   const handleview = (item) => {
-    const documentUrl = item; // Ensure the correct field is used
-
+    const documentUrl = item;
     if (documentUrl) {
       console.log("Passing training_document:", item);
       navigate("/LMS-Document", { state: { documentView: item } });
@@ -61,7 +60,9 @@ const TrainingListing = () => {
       console.error("training_document is undefined or missing for this item", item);
     }
   };
-  const filteredData = (Array.isArray(data?.document_data?.documents) ? data.document_data?.documents : [])
+  const filteredData = (
+    Array.isArray(data?.document_data?.documents) ? data.document_data?.documents : []
+  )
     .filter((item) => item.document_title.toLowerCase().includes(searchTerm.toLowerCase())) // Filter by title
     .map((item, index) => {
       // console.log("Created at:", item.created_at); // Log the created_at field to check it
@@ -76,6 +77,7 @@ const TrainingListing = () => {
         status: item.current_status_name,
         revision_date: item.revision_month, // Revision month
         effective_date: moment(item.created_at).format("DD-MM-YY"), // Use created_at for now
+        selected_template_url:item.selected_template_url,
       };
     });
 
@@ -99,15 +101,16 @@ const TrainingListing = () => {
           {/* Edit button */}
           <IconButton
             color="info"
-            onClick={() => handleEditTraining(params.row)} // Pass the training details
+            onClick={() => handleEditTraining(params.row)} 
           >
             <EditIcon />
           </IconButton>
-
-          {/* Visibility button */}
           <IconButton
             color="success"
-            onClick={() => handleview(params.row.documentView)} // Handle view action
+            onClick={() => {
+              console.log("params.row:", params.row); 
+              handleview(params.row.selected_template_url);
+            }}
           >
             <VisibilityIcon />
           </IconButton>
@@ -223,9 +226,9 @@ const TrainingListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Training Listing
           </MDTypography>
-          <MDButton variant="contained" color="primary" onClick={handleAddTraining} sx={{ ml: 2 }}>
+          {/* <MDButton variant="contained" color="primary" onClick={handleAddTraining} sx={{ ml: 2 }}>
             Add Training
-          </MDButton>
+          </MDButton> */}
         </MDBox>
 
         {isLoading ? (

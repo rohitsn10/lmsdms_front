@@ -15,7 +15,7 @@ const LMSDocument = () => {
   useEffect(() => {
     if (documentView) {
       fetch(documentView)
-        .then((response) => response.blob())
+        .then((response) => response.blob()) 
         .then((blob) => setDocContent(blob))
         .catch((error) => console.error("Error fetching document:", error));
     }

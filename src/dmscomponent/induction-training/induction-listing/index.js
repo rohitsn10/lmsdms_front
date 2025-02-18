@@ -20,10 +20,6 @@ const InductionListing = () => {
   useEffect(() => {
       refetch();
     }, [location.key]);
-  // Debug the API response
-//   console.log("API Response:", response);
-
-  // Extract the `data` array from the response
   const inductions = response?.data || [];
 
   const handleSearch = (event) => {
@@ -49,7 +45,7 @@ const InductionListing = () => {
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "induction_name", headerName: "Induction Name", flex: 1, headerAlign: "center" },
     { field: "date", headerName: "Date", flex: 1, headerAlign: "center" },
-    {
+      {
       field: "action",
       headerName: "Action",
       flex: 0.5,
