@@ -53,6 +53,7 @@ const DocumentListing = () => {
     useDocumentEffectiveMutation();
   const version = searchParams.get("version");
   // console.log("Versionnon", version);
+  // console.log("Versionnon",version)
   useEffect(() => {
     if (data && data.userGroupIds) {
       setUserGroupIds(data.userGroupIds);

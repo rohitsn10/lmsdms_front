@@ -4,106 +4,144 @@ import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
-import { useFetchArchivedItemsQuery } from "api/auth/archivedListApi"; 
 import moment from "moment";
+import { useFetchDocumentsQuery, useFetchDocumentVersionListQuery } from "api/auth/documentApi";
+import { FormLabel } from "@mui/material";
 
 const ArchivedListing = () => {
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedDocumentId, setSelectedDocumentId] = useState("");
     const navigate = useNavigate();
-    const { data: archivedItems = [], isLoading, error } = useFetchArchivedItemsQuery();
 
-    if (isLoading) return <div>Loading archived items...</div>;
-    if (error) return <div>Error loading archived items: {error.message}</div>;
-
-    const formattedData = archivedItems.map((item, index) => ({
-        id: item.id,
-        serial_number: index + 1,
-        title: item.title || "N/A",
-        type: item.type || "N/A",
-        document_no: item.document_no || "N/A",
-        version: item.version || "N/A",
-        created_date: moment(item.created_date).format("DD/MM/YY"),
-        status: item.status || "N/A",
-    }));
+    const { data: documents = [], isLoading: documentsLoading } = useFetchDocumentsQuery();
+    // Always call the hook, but pass null when no document is selected
+    const { data: versions = [], isLoading: versionsLoading } = useFetchDocumentVersionListQuery(
+        selectedDocumentId || null
+    );
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
     };
 
-    const handleViewItem = (item) => {
-        navigate("/view-archived-item", { state: { item } });
+    const handleDocumentSelect = (event) => {
+        setSelectedDocumentId(event.target.value);
     };
 
-    const filteredData = formattedData.filter(
-        (item) =>
-            item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.document_no.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredDocuments = documents?.documents?.filter(doc =>
+        doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.document_number.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
 
-    const columns = [
-        { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-        { field: "title", headerName: "Title", flex: 1, headerAlign: "center" },
-        { field: "type", headerName: "Type", flex: 1, headerAlign: "center" },
-        { field: "document_no", headerName: "Document No.", flex: 1, headerAlign: "center" },
-        { field: "version", headerName: "Version", flex: 0.5, headerAlign: "center" },
-        { field: "created_date", headerName: "Created Date", flex: 0.75, headerAlign: "center" },
-        { field: "status", headerName: "Status", flex: 0.75, headerAlign: "center" },
+    const versionColumns = [
+        { field: "version_no", headerName: "Version", flex: 1, headerAlign: "center" },
+        { field: "department_id", headerName: "Department ID", flex: 1, headerAlign: "center" },
+        { field: "user", headerName: "User ID", flex: 1, headerAlign: "center" },
         {
-            field: "action",
-            headerName: "Action",
-            flex: 0.5,
+            field: "front_file_url",
+            headerName: "Document",
+            flex: 1.5,
             headerAlign: "center",
             renderCell: (params) => (
-                <IconButton color="primary" onClick={() => handleViewItem(params.row)}>
-                    <VisibilityIcon />
-                </IconButton>
+                <a
+                    href={params.value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#1976d2', textDecoration: 'underline' }}
+                >
+                    View Document
+                </a>
             ),
         },
     ];
 
+    const formattedVersions = (selectedDocumentId && versions) ? versions.map((version, index) => ({
+        id: index,
+        ...version
+    })) : [];
+
     return (
         <MDBox p={3}>
             <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
-                <MDBox p={3} display="flex" alignItems="center">
-                    <MDInput
-                        label="Search"
-                        variant="outlined"
-                        size="small"
-                        sx={{ width: "250px", mr: 2 }}
-                        value={searchTerm}
-                        onChange={handleSearch}
-                    />
-                    <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
+                <MDBox p={3}>
+                    <MDTypography variant="h4" fontWeight="medium" sx={{ textAlign: "center", mb: 3 }}>
                         Archived Listing
                     </MDTypography>
-                </MDBox>
-                <MDBox display="flex" justifyContent="center" p={2}>
-                    <div style={{ height: 500, width: "100%" }}>
-                        <DataGrid
-                            rows={filteredData}
-                            columns={columns}
-                            pageSize={5}
-                            rowsPerPageOptions={[5, 10, 20]}
-                            disableSelectionOnClick
-                            sx={{
-                                border: "1px solid #ddd",
-                                borderRadius: "4px",
-                                "& .MuiDataGrid-columnHeaders": {
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    backgroundColor: "#f5f5f5",
-                                    fontWeight: "bold",
-                                },
-                                "& .MuiDataGrid-cell": {
-                                    textAlign: "center",
-                                },
-                            }}
-                        />
-                    </div>
+                    
+                    <MDBox display="flex" alignItems="center" gap={2} mb={3}>
+                        {/* <MDInput
+                            label="Search Documents"
+                            variant="outlined"
+                            size="small"
+                            sx={{ width: "250px" }}
+                            value={searchTerm}
+                            onChange={handleSearch}
+                        /> */}
+                        <FormLabel>Select Document:</FormLabel>
+                        <FormControl sx={{ width: "400px",padding:'10px'}}>
+                            {/* <InputLabel id="document-select-label">Select Document</InputLabel> */}
+                            <Select
+                                labelId="document-select-label"
+                                value={selectedDocumentId}
+                                onChange={handleDocumentSelect}
+                                size="small"
+                                // label="Select Document"
+                                sx={{
+                                    padding:'10px'
+                                }}
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                {filteredDocuments.map((doc) => (
+                                    <MenuItem key={doc.id} value={doc.id}>
+                                        {doc.document_title} ({doc.document_number})
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </MDBox>
+
+                    <MDBox display="flex" justifyContent="center">
+                        <div style={{ height: 400, width: "100%" }}>
+                            <DataGrid
+                                rows={formattedVersions}
+                                columns={versionColumns}
+                                pageSize={5}
+                                rowsPerPageOptions={[5, 10, 20]}
+                                disableSelectionOnClick
+                                loading={versionsLoading}
+                                sx={{
+                                    border: "1px solid #ddd",
+                                    borderRadius: "4px",
+                                    "& .MuiDataGrid-columnHeaders": {
+                                        backgroundColor: "#f5f5f5",
+                                        fontWeight: "bold",
+                                    },
+                                    "& .MuiDataGrid-cell": {
+                                        textAlign: "center",
+                                    },
+                                }}
+                                components={{
+                                    NoRowsOverlay: () => (
+                                        <MDBox display="flex" justifyContent="center" alignItems="center" height="100%">
+                                            <MDTypography>
+                                                {selectedDocumentId 
+                                                    ? "No versions found for this document" 
+                                                    : "Please select a document to view its versions"}
+                                            </MDTypography>
+                                        </MDBox>
+                                    ),
+                                }}
+                            />
+                        </div>
+                    </MDBox>
                 </MDBox>
             </Card>
         </MDBox>

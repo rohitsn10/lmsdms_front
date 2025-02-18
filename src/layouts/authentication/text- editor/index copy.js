@@ -114,7 +114,6 @@ const DocumentView = () => {
   // console.log("User ID",user?.id)
   // console.log("User ID",user?.id)
   // console.log("User ID",user?.first_name)
-  console.log("Department IDD:",user?.department)
   const handleSaveDraftDocument = (cacheUrl,)=>{
     console.log("Console Comment",docCommentsRef.current)
   }
@@ -241,13 +240,13 @@ const DocumentView = () => {
               },
               customization: {
                 autosave: true,
-                forcesave: false, // Enable forced saving
+                forcesave: true, // Enable forced saving
                 features: {
-                  forcesave: false
+                  forcesave: true
                 },
                 saveButton: true, // Enable save button
                 chat: false,
-                comments: true,
+                comments: false,
                 zoom: 100,
                 compactHeader: false,
                 leftMenu: true,
@@ -294,7 +293,6 @@ const DocumentView = () => {
                         comment_data: docCommentsRef?.current,
                         version_no:newVersion,
                         front_file_url: cacheUrl,
-                        department_id:String(user?.department)
                         // templateID: data?.select_template,
                         // userEmail: user?.email,
                         // username: user?.first_name,
