@@ -59,10 +59,10 @@ export const jobroleApi = createApi({
       transformResponse: (response) => response, // Handle raw response
     }),
     hodRemarks: builder.mutation({
-      query: ({ user_id, status,remark }) => ({
+      query: ({ user_id, status,remark,description }) => ({
         url: `lms_module/hod_remarks/${user_id}`, // Endpoint with user_id
         method: 'PUT',
-        body: { status,remark }, // Status to update (e.g., "approved")
+        body: { status,remark,description }, // Status to update (e.g., "approved")
       }),
       transformResponse: (response) => response, // Handle raw response
     })

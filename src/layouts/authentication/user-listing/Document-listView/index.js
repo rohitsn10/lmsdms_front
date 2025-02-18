@@ -8,12 +8,13 @@ import MDButton from "components/MDButton";
 import { DataGrid } from '@mui/x-data-grid';
 import { useUserIdWiseNoOfAttemptsMutation } from 'api/auth/userApi';
 import AnswerDialog from './AnswerDialog'; // Import AnswerDialog
-
+import { useAuth } from 'hooks/use-auth';
 const SOPDialog = ({ open, onClose, selectedUserid }) => {
   const [fetchAttempts, { data, isLoading, isError }] = useUserIdWiseNoOfAttemptsMutation();
   const [sopData, setSopData] = useState([]);
-
-  // State to handle AnswerDialog
+  const { user } = useAuth();
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
   const [answerDialogOpen, setAnswerDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -24,23 +25,45 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
     }
   }, [open, selectedUserid, fetchAttempts]);
 
+  const convertTime = (totalTimeInSeconds) => {
+    if (!totalTimeInSeconds) return 'N/A';
+  
+    const hours = Math.floor(totalTimeInSeconds / 3600); // Calculate hours
+    const minutes = Math.floor((totalTimeInSeconds % 3600) / 60); // Calculate minutes
+    const seconds = totalTimeInSeconds % 60; // Calculate seconds
+  
+    let timeString = '';
+  
+    if (hours > 0) {
+      timeString += `${hours}h `;
+    }
+    if (minutes > 0 || hours > 0) {
+      timeString += `${minutes}m `;
+    }
+    timeString += `${seconds}s`; // Always show seconds
+  
+    return timeString.trim();
+  };
+  
   useEffect(() => {
     if (data?.status && data?.data) {
       const formattedData = data.data.map((item) => ({
         id: item.id,
-        user: item.user, // Added user ID
-        document: item.document, // Added document ID
+        user: item.user,
+        document: item.document,
         serial_number: item.id,
         documentName: item.document_name,
         obtainedMarks: item.obtain_marks || '0',
         totalMarks: item.total_marks || '0',
-        timeTaken: item.total_taken_time ? `${item.total_taken_time} mins` : 'N/A',
-        status: item.is_pass ? "Pass" : "Fail",
+        timeTaken: convertTime(item.total_taken_time), // Use the convertTime function
+        status: item.is_pass ? 'Pass' : 'Fail',
         attemptDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'
       }));
       setSopData(formattedData);
     }
   }, [data]);
+  
+    
 
   const handleOpenAnswerDialog = (userId, documentId) => {
     setSelectedUser(userId);
@@ -67,6 +90,8 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
     { field: "timeTaken", headerName: "Time Taken", flex: 1, headerAlign: "center" },
     { field: "status", headerName: "Status", flex: 0.8, headerAlign: "center" },
     { field: "attemptDate", headerName: "Attempt Date", flex: 1, headerAlign: "center" },
+    ...(groupId === 7
+      ? [
     {
       field: "answers",
       headerName: "Answers",
@@ -74,13 +99,15 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
       headerAlign: "center",
       renderCell: (params) => (
         <MDButton
-          color="primary"
+          color="success"
           onClick={() => handleOpenAnswerDialog(params.row.user, params.row.document)}
         >
-          View Answers
+          View
         </MDButton>
       ),
     }
+  ]
+  : []),
   ];
 
   return (

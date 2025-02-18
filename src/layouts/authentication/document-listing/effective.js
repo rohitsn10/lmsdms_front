@@ -32,7 +32,7 @@ const ConditionalDialog = ({
     // console.log("Document ID:----------------", documentId);
     // console.log("Training Status:-----------------", trainingStatus);
     // console.log("Effective Date:-----------------", effectiveDate);
-    console.log("Revision Month:-----------------", revisionMonth);
+    // console.log("Revision Month:-----------------", revisionMonth);
     // Calculate the revision_date
     let revisionDate = ""; // Default to blank
     if (revisionMonth && revisionMonth !== "0") {

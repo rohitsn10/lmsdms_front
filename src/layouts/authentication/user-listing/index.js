@@ -27,7 +27,6 @@ const UsersListing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data, error, isLoading } = useUserListQuery();
-  console.log("DATATAT:",data)
   const [selectedUser, setSelectedUser] = useState(null);
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
@@ -139,16 +138,15 @@ const UsersListing = () => {
             headerName: "Assign",
             flex: 0.5,
             headerAlign: "center",
-            renderCell: (params) =>
-              hasPermission(userPermissions, "customuser", "isChange") ? (
-                <IconButton
-                  color="success"
-                  onClick={() => handleAssignDepartmentClick(params.row)}
-                  disabled={params.row.is_department_assigned}
-                >
-                  <AssignmentIndIcon />
-                </IconButton>
-              ) : null,
+            renderCell: (params) => (
+              <IconButton
+                color="success"
+                onClick={() => handleAssignDepartmentClick(params.row)}
+                disabled={params.row.is_department_assigned} // Disable if department is assigned
+              >
+                <AssignmentIndIcon />
+              </IconButton>
+            ),
           },
         ]
       : []),
@@ -159,16 +157,15 @@ const UsersListing = () => {
             headerName: "JD Assign",
             flex: 0.5,
             headerAlign: "center",
-            renderCell: (params) =>
-              hasPermission(userPermissions, "customuser", "isChange") ? (
-                <IconButton
-                  color="warning"
-                  onClick={() => handleAssignJDClick(params.row)}
-                  disabled={params.row.is_description}
-                >
-                  <AssignmentIcon />
-                </IconButton>
-              ) : null,
+            renderCell: (params) => (
+              <IconButton
+                color="warning"
+                onClick={() => handleAssignJDClick(params.row)}
+                disabled={params.row.is_jr_assign || !params.row.is_department_assigned} // Enable only if department is assigned
+              >
+                <AssignmentIcon />
+              </IconButton>
+            ),
           },
         ]
       : []),
@@ -179,47 +176,46 @@ const UsersListing = () => {
             headerName: "JD Approve",
             flex: 0.5,
             headerAlign: "center",
-            renderCell: (params) =>
-              hasPermission(userPermissions, "customuser", "isChange") ? (
-                <IconButton
-                  color="inherit"
-                  onClick={() => handleTaskDescriptionClick(params.row)}
-                  disabled={params.row.is_jr_approve}
-                >
-                  <AddTaskIcon />
-                </IconButton>
-              ) : null,
-          },
-        ]
-      : []),
-
-    {
-      field: "download_ic",
-      headerName: "Download IC",
-      flex: 0.5,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <IconButton color="info" onClick={() => handleDownloadICClick(params.row)}>
-          <DownloadIcon />
-        </IconButton>
-      ),
-    },
-    ...(groupId === 7
-      ? [
-          {
-            field: "view_sop",
-            headerName: "View SOP",
-            flex: 0.5,
-            headerAlign: "center",
             renderCell: (params) => (
-              <IconButton color="primary" onClick={() => handleViewSOPClick(params.row)}>
-                <Visibilityicon />
+              <IconButton
+                color="inherit"
+                onClick={() => handleTaskDescriptionClick(params.row)}
+                disabled={params.row.is_jr_approve || !params.row.is_jr_assign} // Enable only if JD is assigned
+              >
+                <AddTaskIcon />
               </IconButton>
             ),
           },
         ]
       : []),
+    ...(groupId === 7
+      ? [
+          {
+            field: "download_ic",
+            headerName: "Download IC",
+            flex: 0.5,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <IconButton color="info" onClick={() => handleDownloadICClick(params.row)}>
+                <DownloadIcon />
+              </IconButton>
+            ),
+          },
+        ]
+      : []),
+    {
+      field: "view_sop",
+      headerName: "View SOP",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <IconButton color="primary" onClick={() => handleViewSOPClick(params.row)}>
+          <Visibilityicon />
+        </IconButton>
+      ),
+    },
   ];
+  
 
   return (
     <MDBox p={3}>

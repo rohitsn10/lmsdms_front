@@ -1,4 +1,3 @@
-// src/api/trainerApi.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import config from "constants/config";
 
@@ -18,10 +17,10 @@ export const trainerApi = createApi({
   tagTypes: ["Trainers"],
   endpoints: (builder) => ({
     trainerCreate: builder.mutation({
-      query: ({ trainer_name, description }) => ({
+      query: ({ trainer_name, description, employee_code, designation, department }) => ({
         url: "lms_module/trainer_create",
         method: "POST",
-        body: { trainer_name, description },
+        body: { trainer_name, description, employee_code, designation, department },
       }),
       transformResponse: (response) => {
         if (response.status) {
@@ -44,10 +43,23 @@ export const trainerApi = createApi({
       providesTags: ["Trainers"],
     }),
     trainerUpdate: builder.mutation({
-      query: ({ trainer_id, trainer_name, description }) => ({
+      query: ({
+        trainer_id,
+        trainer_name,
+        description,
+        employee_code,
+        designation,
+        department,
+      }) => ({
         url: `lms_module/trainer_update/${trainer_id}`,
         method: "PUT",
-        body: { trainer_name, description },
+        body: {
+          trainer_name,
+          description,
+          employee_code,
+          designation,
+          department,
+        },
       }),
       transformResponse: (response) => {
         if (response.status) {
@@ -57,7 +69,26 @@ export const trainerApi = createApi({
       },
       invalidatesTags: ["Trainers"],
     }),
+    trainerActiveDeactive: builder.mutation({
+      query: (trainer_id) => ({
+        url: `lms_module/trainer_active_deactive/${trainer_id}`, // Trainer ID in URL path
+        method: "PUT",
+        // No request body, just passing the trainer_id
+      }),
+      transformResponse: (response) => {
+        if (response.status) {
+          return response.message;
+        }
+        throw new Error(response.message || "Failed to update trainer status");
+      },
+      invalidatesTags: ["Trainers"],
+    }),
   }),
 });
-export const { useTrainerCreateMutation, useFetchTrainersQuery, useTrainerUpdateMutation } =
-  trainerApi;
+
+export const {
+  useTrainerCreateMutation,
+  useFetchTrainersQuery,
+  useTrainerUpdateMutation,
+  useTrainerActiveDeactiveMutation, // Export the new mutation hook
+} = trainerApi;
