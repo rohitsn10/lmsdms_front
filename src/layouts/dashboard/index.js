@@ -15,11 +15,14 @@ import TaskIcon from "@mui/icons-material/Task";
 import CancelPresentationTwoToneIcon from "@mui/icons-material/CancelPresentationTwoTone";
 import RateReviewTwoToneIcon from "@mui/icons-material/RateReviewTwoTone";
 import { Link } from "react-router-dom";
-import { useGetDocumentDataOfStatusIdElevenQuery } from "api/auth/dashboardApi";
-import { useGetDocumentDataOfStatusIdNineQuery } from "api/auth/dashboardApi";
-import { useGetDocumentDataOfStatusIdThreeQuery } from "api/auth/dashboardApi";
-import { useGetDocumentDataOfStatusIdTwoQuery } from "api/auth/dashboardApi";
-import { useGetDocumentDataOfStatusIdFourQuery } from "api/auth/dashboardApi";
+import {
+  useGetDocumentDataOfStatusIdElevenQuery,
+  useGetDocumentDataOfStatusIdNineQuery,
+  useGetDocumentDataOfStatusIdThreeQuery,
+  useGetDocumentDataOfStatusIdTwoQuery,
+  useGetDocumentDataOfStatusIdFourQuery,
+  useGetDocumentDataOfStatusIdnintyQuery,
+} from "api/auth/dashboardApi";
 function Dashboard() {
   const { data, error, isLoading } = useGetDashboardCountsQuery(); // Fetch the dashboard counts
   const {
@@ -65,6 +68,15 @@ function Dashboard() {
     isLoading: loadingSavedraft,
     error: savedraftError,
   } = useGetDocumentDataOfStatusIdTwoQuery({
+    departmentId: "",
+    startDate: "",
+    endDate: "",
+  });
+  const {
+    data: nintyData,
+    isLoading: loadingnintyData,
+    error: nintyDataError,
+  } = useGetDocumentDataOfStatusIdnintyQuery({
     departmentId: "",
     startDate: "",
     endDate: "",
@@ -201,31 +213,32 @@ function Dashboard() {
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="dark"
-                icon={<TaskIcon />}
-                title="Due Sop "
-                count={approveData?.dataCountapprove || 0}
-                percentage={{
-                  color: "success",
-                }}
-              />
+              <Link to="/due-sop-document">
+                <ComplexStatisticsCard
+                  color="dark"
+                  icon={<TaskIcon />}
+                  title="Due Sop "
+                  count={nintyData?.dataCountapprove || 0}
+                  percentage={{
+                    color: "success",
+                  }}
+                />
+              </Link>
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-             <Link to="/under-approve-document">
-             <ComplexStatisticsCard
-                color="success"
-                icon={<TaskIcon />}
-                title="Under Approve"
-                count={underapproveData?.dataCountapprove || 0}
-                percentage={{
-                  color: "success",
-                }}
-              />
+              <Link to="/under-approve-document">
+                <ComplexStatisticsCard
+                  color="success"
+                  icon={<TaskIcon />}
+                  title="Under Approve"
+                  count={underapproveData?.dataCountapprove || 0}
+                  percentage={{
+                    color: "success",
+                  }}
+                />
               </Link>
-              
             </MDBox>
           </Grid>
         </Grid>

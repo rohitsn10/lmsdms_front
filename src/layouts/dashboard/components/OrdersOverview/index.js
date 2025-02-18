@@ -73,13 +73,13 @@ const OrdersOverview = ({ docId }) => {
       };
 
       addItem(data.author_approvals, "Author Approval", <CheckCircleOutlineIcon />, "success");
-      addItem(data.reviewer_actions, "Reviewer Actions", <CheckCircleOutlineIcon />, "info");
-      addItem(data.approver_actions, "Approver Actions", <CheckCircleOutlineIcon />, "primary");
-      addItem(data.doc_admin_actions, "Document Admin Actions", <CheckCircleOutlineIcon />, "secondary");
+      addItem(data.reviewer_actions, "Reviewer Actions", <CheckCircleOutlineIcon />, "success");
+      addItem(data.approver_actions, "Approver Actions", <CheckCircleOutlineIcon />, "success");
+      addItem(data.doc_admin_actions, "Document Admin Actions", <CheckCircleOutlineIcon />, "success");
       addItem(data.release_actions, "Release Actions", <CheckCircleOutlineIcon />, "success");
       addItem(data.effective_actions, "Effective Actions", <CheckCircleOutlineIcon />, "success");
-      addItem(data.revision_actions, "Revision Actions", <CheckCircleOutlineIcon />, "warning");
-      addItem(data.revision_requests, "Revision Requests", <ErrorOutlineIcon />, "error");
+      addItem(data.revision_actions, "Revision Actions", <CheckCircleOutlineIcon />, "success");
+      addItem(data.revision_requests, "Revision Requests", <ErrorOutlineIcon />, "success");
 
       data.send_back_actions.forEach(() => {
         timelineItems.push({

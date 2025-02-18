@@ -15,16 +15,22 @@ import { useTrainerCreateMutation } from "api/auth/trainerApi";
 const AddTrainer = () => {
   const [trainerName, setTrainerName] = useState("");
   const [description, setDescription] = useState("");
+  const [employeeCode, setEmployeeCode] = useState("");  // New state for employee code
+  const [designation, setDesignation] = useState("");  // New state for designation
+  const [department, setDepartment] = useState("");  // New state for department
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [errors, setErrors] = useState({});
   const [createTrainer, { isLoading }] = useTrainerCreateMutation();
   const navigate = useNavigate();
 
-  // Validation function
+  // Validation function for the new fields
   const validateInputs = () => {
     const newErrors = {};
     if (!trainerName.trim()) newErrors.trainerName = "Trainer Name is required.";
     if (!description.trim()) newErrors.description = "Trainer Description is required.";
+    if (!employeeCode.trim()) newErrors.employeeCode = "Employee Code is required."; // Validate employee code
+    if (!designation.trim()) newErrors.designation = "Designation is required."; // Validate designation
+    if (!department.trim()) newErrors.department = "Department is required."; // Validate department
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -39,6 +45,9 @@ const AddTrainer = () => {
   const handleClear = () => {
     setTrainerName("");
     setDescription("");
+    setEmployeeCode("");
+    setDesignation("");
+    setDepartment("");
     setErrors({});
   };
 
@@ -54,8 +63,11 @@ const AddTrainer = () => {
       const response = await createTrainer({
         trainer_name: trainerName.trim(),
         description: description.trim(),
+        employee_code: employeeCode.trim(),  // Include employee code
+        designation: designation.trim(),  // Include designation
+        department: department.trim(),  // Include department
       }).unwrap();
-      console.log("----------------------------",response);
+      console.log("----------------------------", response);
       if (response.status) {
         toast.success("Trainer added successfully!");
         setTimeout(() => {
@@ -133,6 +145,48 @@ const AddTrainer = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 error={!!errors.description}
                 helperText={errors.description}
+              />
+            </MDBox>
+            <MDBox mb={3}>
+              <MDInput
+                label={
+                  <>
+                    <span style={{ color: "red" }}>*</span> Employee Code
+                  </>
+                }
+                fullWidth
+                value={employeeCode}
+                onChange={(e) => setEmployeeCode(e.target.value)}
+                error={!!errors.employeeCode}
+                helperText={errors.employeeCode}
+              />
+            </MDBox>
+            <MDBox mb={3}>
+              <MDInput
+                label={
+                  <>
+                    <span style={{ color: "red" }}>*</span> Designation
+                  </>
+                }
+                fullWidth
+                value={designation}
+                onChange={(e) => setDesignation(e.target.value)}
+                error={!!errors.designation}
+                helperText={errors.designation}
+              />
+            </MDBox>
+            <MDBox mb={3}>
+              <MDInput
+                label={
+                  <>
+                    <span style={{ color: "red" }}>*</span> Department
+                  </>
+                }
+                fullWidth
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                error={!!errors.department}
+                helperText={errors.department}
               />
             </MDBox>
             <MDBox mt={2} mb={1}>

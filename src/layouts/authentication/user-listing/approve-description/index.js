@@ -10,7 +10,7 @@ import { useGetJobDescriptionListQuery, useHodRemarksMutation } from "apilms/job
 import { toast } from "react-toastify"; // Import toast for notifications
 
 const TaskDescriptionDialog = ({ open, onClose, userId, onSave }) => {
-  const [taskDescription, setTaskDescription] = useState("");
+  const [taskDescription, setTaskDescription] = useState(""); // Editable task description
   const [remark, setRemark] = useState(""); // State for remark
   const [hodRemarks, { isLoading, isError, error }] = useHodRemarksMutation(); // Mutation hook for HOD remarks
 
@@ -32,7 +32,7 @@ const TaskDescriptionDialog = ({ open, onClose, userId, onSave }) => {
     if (currentUserId) {
       try {
         // Call HOD remarks mutation with the current user_id, status, and remark
-        await hodRemarks({ user_id: currentUserId, status, remark }).unwrap(); // Trigger HOD remarks mutation
+        await hodRemarks({ user_id: currentUserId, status, remark,description:taskDescription }).unwrap(); // Trigger HOD remarks mutation
         
         // Show success toast notification
         toast.success(`Job description ${status === "approve" ? "approved" : "sent back"} successfully!`);
@@ -56,17 +56,17 @@ const TaskDescriptionDialog = ({ open, onClose, userId, onSave }) => {
         Job Description
       </DialogTitle>
       <DialogContent>
-        <div
-          style={{
-            padding: "12px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            minHeight: "150px",
-            whiteSpace: "pre-line", // To preserve newlines
-          }}
-        >
-          {taskDescription || "No job description available."} {/* Show the description */}
-        </div>
+        {/* Editable TextField for task description */}
+        <TextField
+          label="Job Description"
+          value={taskDescription}
+          onChange={(e) => setTaskDescription(e.target.value)} // Update the task description state
+          fullWidth
+          multiline
+          rows={6} // Adjust rows as needed for better readability
+          variant="outlined"
+          sx={{ marginTop: 2 }}
+        />
 
         {/* Text Field for Add Remark */}
         <TextField
@@ -99,7 +99,7 @@ const TaskDescriptionDialog = ({ open, onClose, userId, onSave }) => {
           Send Back
         </MDButton>
         <MDButton
-          onClick={() => handleSave("approve")}
+          onClick={() => handleSave("approved")}
           color="success"
           sx={{
             textTransform: "none",

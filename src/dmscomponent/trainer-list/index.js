@@ -4,17 +4,54 @@ import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
+import Switch from "@mui/material/Switch"; // Import Switch
+import { styled } from '@mui/system';
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { useFetchTrainersQuery } from "api/auth/trainerApi";
 import moment from "moment";
+import { useTrainerActiveDeactiveMutation } from "api/auth/trainerApi";
+
+const Android12Switch = styled(Switch)(({ theme }) => ({
+  padding: 9,
+  '& .MuiSwitch-track': {
+    borderRadius: 20 / 2,
+    '&::before, &::after': {
+      content: '""',
+      position: 'absolute',
+      top: '43%',
+      transform: 'translateY(-50%)',
+      width: 10,
+      height: 14,
+    },
+    '&::before': {
+      backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 0 24 24"><path fill="${encodeURIComponent(
+        theme.palette.getContrastText(theme.palette.primary.main),
+      )}" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>')`,
+      left: 12,
+    },
+    '&::after': {
+      backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 0 24 24"><path fill="${encodeURIComponent(
+        theme.palette.getContrastText(theme.palette.primary.main),
+      )}" d="M19,13H5V11H19V13Z" /></svg>')`,
+      right: 22,
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxShadow: 'none',
+    width: 14,
+    height: 14,
+    marginY: 1,
+    padding:4
+  },
+}));
 
 const TrainerListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
+  const [trainerActiveDeactive] = useTrainerActiveDeactiveMutation();
   const { data: response, isLoading, isError, refetch } = useFetchTrainersQuery();
 
   useEffect(() => {
@@ -22,11 +59,8 @@ const TrainerListing = () => {
   }, [refetch]);
 
   console.log(response);
-  // Ensure that trainers data is available
   const trainers = response || [];  // Safe access using optional chaining
 
-
-  // If data is being fetched or an error occurs
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -35,17 +69,16 @@ const TrainerListing = () => {
     return <div>Error loading trainers.</div>;
   }
 
-  // Search function to filter trainer list
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  // Handle editing a trainer
   const handleEditTrainer = (trainer) => {
     navigate("/edit-trainer", { state: { trainer } });
   };
 
-  // Filter trainers based on search term
+  
+
   const filteredData = trainers
     .filter(
       (trainer) =>
@@ -53,30 +86,60 @@ const TrainerListing = () => {
         trainer.description.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .map((trainer, index) => ({
-      id: trainer.id,  // Ensure unique id for each row
+      id: trainer.id,
       serial_number: index + 1,
       trainer_name: trainer.trainer_name,
       description: trainer.description,
-      created_at: moment(trainer.created_at).format("DD-MM-YY"),  // Format the date
+      created_at: moment(trainer.created_at).format("DD-MM-YY"),
+      active: trainer.is_active, // Assuming the trainer object has is_active property
     }));
 
-  const columns = [
-    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-    { field: "trainer_name", headerName: "Trainer Name", flex: 1, headerAlign: "center" },
-    { field: "description", headerName: "Trainer Description", flex: 1.5, headerAlign: "center" },
-    { field: "created_at", headerName: "Created At", flex: 1.5, headerAlign: "center" },
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 0.5,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <IconButton color="primary" onClick={() => handleEditTrainer(params.row)}>
-          <EditIcon />
-        </IconButton>
-      ),
-    },
-  ];
+    const columns = [
+      { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
+      { field: "trainer_name", headerName: "Trainer Name", flex: 1, headerAlign: "center" },
+      { field: "description", headerName: "Trainer Description", flex: 1.5, headerAlign: "center" },
+      { field: "created_at", headerName: "Created At", flex: 1.5, headerAlign: "center" },
+      {
+        field: "active",
+        headerName: "Active/Inactive",
+        flex: 1,
+        headerAlign: "center",
+        renderCell: (params) => (
+          <Android12Switch
+            checked={params.row.active}  // This ensures the switch is checked if the trainer is active
+            onChange={(e) => handleSwitchChange(params.row.id, e.target.checked)}
+            color="primary"
+          />
+        ),
+      },
+      {
+        field: "action",
+        headerName: "Action",
+        flex: 0.5,
+        headerAlign: "center",
+        renderCell: (params) => (
+          <IconButton color="primary" onClick={() => handleEditTrainer(params.row)}>
+            <EditIcon />
+          </IconButton>
+        ),
+      },
+    ];
+    
+    const handleSwitchChange = (trainerId, checked) => {
+      // Toggle trainer's active status in the backend
+      trainerActiveDeactive(trainerId)  // Only pass the trainerId to toggle the active status
+        .unwrap()
+        .then((response) => {
+          console.log("Trainer status updated:", response);
+          // After a successful update, you may want to refetch the data or optimistically update the UI
+          refetch();  // This ensures the data is updated from the server
+        })
+        .catch((error) => {
+          console.error("Failed to update trainer status:", error);
+          // Handle error (e.g., reset the switch to its original state if the update fails)
+        });
+    };
+    
 
   return (
     <MDBox p={3}>
@@ -100,7 +163,7 @@ const TrainerListing = () => {
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>
             <DataGrid
-              rows={filteredData} // Ensure the rows are correctly structured
+              rows={filteredData}
               columns={columns}
               pageSize={5}
               rowsPerPageOptions={[5, 10, 20]}

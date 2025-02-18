@@ -29,7 +29,7 @@ function CreateQuiz() {
   const { DataQuiz } = location.state || {};
   const navigate = useNavigate();
   const [quizName, setQuizName] = useState("");
-  const [passCriteria, setPassCriteria] = useState("");
+  const [passCriteria, setPassCriteria] = useState("80");
   const [quizTime, setQuizTime] = useState("");
   const [totalMarks, setTotalMarks] = useState("");
   const [totalQuestions, setTotalQuestions] = useState("");

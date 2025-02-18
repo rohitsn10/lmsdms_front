@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation,useSearchParams  } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -35,7 +35,7 @@ const DocumentListing = () => {
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchParams] = useSearchParams(); 
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { data, refetch, isLoading, isError } = useFetchDocumentsQuery();
@@ -49,13 +49,15 @@ const DocumentListing = () => {
   const [selectedChildDocuments, setSelectedChildDocuments] = useState([]);
   const [updateObsoleteStatus] = useUpdateObsoleteStatusMutation();
   const [openDialog, setOpenDialog] = useState(false);
-  const [documentEffective, { isLoading: isEffecting, isError: isEffectError }] = useDocumentEffectiveMutation();
+  const [documentEffective, { isLoading: isEffecting, isError: isEffectError }] =
+    useDocumentEffectiveMutation();
   const version = searchParams.get("version");
+  // console.log("Versionnon", version);
   // console.log("Versionnon",version)
   useEffect(() => {
     if (data && data.userGroupIds) {
       setUserGroupIds(data.userGroupIds);
-      console.log("User Group IDssss:", data.userGroupIds); // Corrected property name
+      // console.log("User Group IDssss:", data.userGroupIds); // Corrected property name
     }
   }, [data]);
 
@@ -105,8 +107,8 @@ const DocumentListing = () => {
       return; // Exit if params or row is missing
     }
 
-    const { id, document_current_status, training_required, approval_status,version } = params.row;
-    console.log("Version",version )
+    const { id, document_current_status, training_required, approval_status, version } = params.row;
+    // console.log("Version", version);
     // Ensure required fields are defined
     if (
       id === undefined ||
@@ -138,7 +140,7 @@ const DocumentListing = () => {
     setReviseDocument(null);
   };
   const isButtonVisible = () => {
-    return roles.some((role) => role.id === 4);
+    return roles.some((role) => role.id === 5);
   };
   const handleReviseConfirm = () => {
     console.log("Revise confirmed for document:", reviseDocument);
@@ -173,8 +175,8 @@ const DocumentListing = () => {
     // Close the dialog after the operation
     handleCloseDialog();
   };
-  const handleViewFile = (url,params) => {
-    navigate("/PreView", { state: { templateDoc: url,templateData:params } }); // Pass the URL as state
+  const handleViewFile = (url, params) => {
+    navigate("/PreView", { state: { templateDoc: url, templateData: params } }); // Pass the URL as state
   };
 
   const handleEditClick = (rowData) => {
@@ -210,8 +212,11 @@ const DocumentListing = () => {
   const rows = filteredData.map((doc, index) => ({
     ...doc,
     index,
-    created_at: moment(doc.created_at).format("DD/MM/YY"),
+    created_at: doc.created_at ? moment(doc.created_at).format("DD/MM/YY") : "N/A",
+    effective_date: doc.effective_date ? moment(doc.effective_date).format("DD/MM/YY") : "N/A",
+    revision_date: doc.revision_date ? moment(doc.revision_date).format("DD/MM/YY") : "N/A",
   }));
+
   const columns = [
     {
       field: "index",
@@ -280,15 +285,16 @@ const DocumentListing = () => {
       flex: 0.6,
       headerAlign: "center",
     },
+
     {
-      field: "revision_date",
-      headerName: "Revision Date",
+      field: "effective_date",
+      headerName: "Effective Date",
       flex: 0.6,
       headerAlign: "center",
     },
     {
-      field: "effective_date",
-      headerName: "Effective Date",
+      field: "revision_date",
+      headerName: "Revision Date",
       flex: 0.6,
       headerAlign: "center",
     },
@@ -307,9 +313,9 @@ const DocumentListing = () => {
           <IconButton
             color="primary"
             onClick={() => {
-              handleViewFile(params.row.selected_template_url,params.row)
+              handleViewFile(params.row.selected_template_url, params.row);
               // console.log("Params",params.row)
-              }}
+            }}
           >
             <VisibilityIcon />
           </IconButton>
@@ -318,7 +324,7 @@ const DocumentListing = () => {
                 <IconButton
                   color="secondary"
                   // onClick={() => {
-                  //   console.log("Params passed to handleClick:", params.row);                    
+                  //   console.log("Params passed to handleClick:", params.row);
                   // }}
                 >
                   <PreviewIcon />
@@ -383,48 +389,53 @@ const DocumentListing = () => {
       sortable: false,
       filterable: false,
     },
-    {
-      field: "obsolete",
-      headerName: "Obsolete",
-      flex: 0.4,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <MDBox display="block">
-          <IconButton
-            color="warning"
-            onClick={() => {
-              // Open ObsoleteDialog with row data (pass document_title)
-              handleObsoleteDialogOpen(params.row);
-            }}
-          >
-            <SubtitlesOffIcon />
-          </IconButton>
-        </MDBox>
-      ),
-      sortable: false,
-      filterable: false,
-    },
     ...(groupId === 5
-      ? [{
-      field: "effective", // New column added
-      headerName: "Effective", // Column name
-      flex: 0.4, // Adjust the flex based on your layout needs
-      headerAlign: "center", // Center-align header
-      renderCell: (params) => (
-        <MDBox display="flex" justifyContent="center">
-          <IconButton
-            color="primary"
-            onClick={() => handleEffectiveClick(params.row)} // Open dialog when clicked
-          >
-            <CheckCircleIcon /> {/* Example icon for 'Effective' */}
-          </IconButton>
-        </MDBox>
-      ),
-      sortable: false,
-      filterable: false,
-    },
-  ]
-  : []),
+      ? [
+          {
+            field: "obsolete",
+            headerName: "Obsolete",
+            flex: 0.4,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <MDBox display="block">
+                <IconButton
+                  color="warning"
+                  onClick={() => {
+                    // Open ObsoleteDialog with row data (pass document_title)
+                    handleObsoleteDialogOpen(params.row);
+                  }}
+                >
+                  <SubtitlesOffIcon />
+                </IconButton>
+              </MDBox>
+            ),
+            sortable: false,
+            filterable: false,
+          },
+        ]
+      : []),
+    ...(groupId === 5
+      ? [
+          {
+            field: "effective", // New column added
+            headerName: "Effective", // Column name
+            flex: 0.4, // Adjust the flex based on your layout needs
+            headerAlign: "center", // Center-align header
+            renderCell: (params) => (
+              <MDBox display="flex" justifyContent="center">
+                <IconButton
+                  color="primary"
+                  onClick={() => handleEffectiveClick(params.row)} // Open dialog when clicked
+                >
+                  <CheckCircleIcon /> {/* Example icon for 'Effective' */}
+                </IconButton>
+              </MDBox>
+            ),
+            sortable: false,
+            filterable: false,
+          },
+        ]
+      : []),
   ];
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching documents.</div>;
@@ -443,7 +454,7 @@ const DocumentListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Document Listing
           </MDTypography>
-          {isButtonVisible && (
+          {groupId === 5 && (
             <MDButton variant="contained" color="primary" onClick={handleObsolete} sx={{ ml: 2 }}>
               Obsolete
             </MDButton>

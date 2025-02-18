@@ -122,6 +122,7 @@ import QuestionQuiz from "dmscomponent/class-room/class-quiz-list/index.js";
 import ClassAddQuestion from "dmscomponent/class-room/class-question-list/add-class-question/index.js";
 import CreateClassQuiz from "dmscomponent/class-room/class-quiz-list/class-add-quiz/index.js";
 import ClassMultiChoiceQuestionsSection from "dmscomponent/class-room/classroom-mcq/index.js";
+import DueSOPDocument from "layouts/authentication/document-listing/due-sop/index.js";
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -334,6 +335,7 @@ export default function App() {
       <Route path="/PDFPreview" element={<PDFPreview/>}/>
       <Route path="/archived-listing" element={<ArchivedListing/>}/>
       <Route path="/Obsolete-data" element={<ObsoleteDataListing/>}/>
+      <Route path="/due-sop-document" element={<DueSOPDocument/>}/>
       {/* Lms components */}
       <Route path="/add-area" element={<AddArea />} />
       <Route path="/add-departments" element={<AddDepartments />} />
@@ -387,6 +389,7 @@ export default function App() {
       <Route path="/class-quiz" element={<QuestionQuiz/>}/>
       <Route path="/class-add-question" element={<ClassAddQuestion/>}/>
       <Route path="/class-add-quiz" element={<CreateClassQuiz/>}/>
+     
      
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>

@@ -59,6 +59,14 @@ export const dashboardApi = createApi({
         dataCountreject: response.data_count, 
       }),
     }),
+    getDocumentDataOfStatusIdninty: builder.query({
+      query: ({ departmentId, startDate, endDate }) =>
+        `dms_module/document_ninty_days_data?department_id=${departmentId}&start_date=${startDate}&end_date=${endDate}`,
+      transformResponse: (response) => ({
+        rejectdata: response.data,
+        dataCountreject: response.data_count, 
+      }),
+    }),
   }),
 });
 
@@ -69,4 +77,5 @@ export const {
   useGetDocumentDataOfStatusIdThreeQuery,
   useGetDocumentDataOfStatusIdElevenQuery,
   useGetDocumentDataOfStatusIdFourQuery,
+  useGetDocumentDataOfStatusIdnintyQuery,
 } = dashboardApi;

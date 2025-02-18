@@ -89,7 +89,7 @@ const TrainingListing = () => {
     { field: "version", headerName: "Version", flex: 0.8, headerAlign: "center" },
     { field: "created_date", headerName: "Created Date", flex: 1, headerAlign: "center" },
     { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
-    { field: "revision_date", headerName: "Revision Date", flex: 1, headerAlign: "center" },
+    // { field: "revision_date", headerName: "Revision Date", flex: 1, headerAlign: "center" },
     { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" },
     {
       field: "action",

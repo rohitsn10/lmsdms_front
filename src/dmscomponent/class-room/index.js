@@ -132,24 +132,22 @@ const ClassroomListing = () => {
           },
         ]
       : []),
-    {
-      field: "assessment",
-      headerName: "Assessment",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <MDButton variant="outlined" color="warning"
-        //  onClick={() => navigate("/exam-mcq-module", { state: { classroom: params.row } })}
-         onClick={() => {
-          handleAssessmentClick(params.row);
-          console.log("Params Assesment",params.row)
-          }
-         }
-         >
-           Assessment
-        </MDButton>
-      ),
-    },
+      {
+        field: "assessment",
+        headerName: "Assessment",
+        flex: 1,
+        headerAlign: "center",
+        renderCell: (params) => (
+          <MDButton
+            variant="outlined"
+            color="warning"
+            onClick={() => handleAssessmentClick(params.row)}
+            disabled={params.row.is_assessment_completed} // Disable if 'is_assessment_completed' is true or 'is_assesment' is 'Without Assessment'
+          >
+            Assessment
+          </MDButton>
+        ),
+      },
     {
       field: "action",
       headerName: "Action",

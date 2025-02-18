@@ -118,26 +118,29 @@ const TrainingMapping = () => {
         <MDBox p={3} display="flex" alignItems="center" justifyContent="center">
           {/* User Dropdown */}
           <FormControl fullWidth margin="dense" sx={{ width: "250px", ml: 5 }}>
-            <InputLabel id="select-user-label">Select User</InputLabel>
-            <Select
-              labelId="select-user-label"
-              id="select-user"
-              value={selectedUser}
-              onChange={(e) => setSelectedUser(e.target.value)}
-              input={<OutlinedInput label="Select User" />}
-              sx={{
-                minWidth: 150,
-                height: "2.4rem",
-                ".MuiSelect-select": { padding: "0.45rem" },
-              }}
-            >
-              {userData.data.map((user) => (
-                <MenuItem key={user.id} value={user.id}>
-                  {user.full_name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+  <InputLabel id="select-user-label">Select User</InputLabel>
+  <Select
+    labelId="select-user-label"
+    id="select-user"
+    value={selectedUser}
+    onChange={(e) => setSelectedUser(e.target.value)}
+    input={<OutlinedInput label="Select User" />}
+    sx={{
+      minWidth: 150,
+      height: "2.4rem",
+      ".MuiSelect-select": { padding: "0.45rem" },
+    }}
+  >
+    {userData.data
+      .filter((user) => user.is_jr_approve) // Filter users where is_jr_approve is true
+      .map((user) => (
+        <MenuItem key={user.id} value={user.id}>
+          {user.full_name}
+        </MenuItem>
+      ))}
+  </Select>
+</FormControl>
+
 
           {/* Title */}
           <MDTypography variant="h3" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center", mr: 20 }}>
