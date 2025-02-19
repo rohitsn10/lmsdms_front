@@ -119,7 +119,7 @@ function Login() {
             setFirstName(userFirstName);
             setDialogOpen(false);
             setError("");
-            navigate("/dashboard"); 
+            navigate("/lms-dashboard"); 
           } else {
             setError("Login successful, but missing required information.");
           }

@@ -1,6 +1,6 @@
 // src/components/DashboardNavbar.js
 import { useState, useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate, Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Link as RouterLink } from "react-router-dom";
 import { styled } from '@mui/material/styles';
@@ -74,16 +74,28 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
+  const navigate=useNavigate();
   // Fetch roles using the API hook
   const dispatch2 = useDispatch();
   const { data: rolesData, isLoading, isError } = useRequestUserGroupListQuery();
+  // console.log("RolesData:::",rolesData)
   const { is_dms_user, is_lms_user, is_active } = useSelector((state) => state.userRole);
+
   const handleToggle = (event) => {
     dispatch2(setUserDetails({
       is_dms_user,
       is_lms_user,
       is_active: !is_active         
     }));
+    if(is_active){
+      console.log("Is Active.Toggle Off",is_active)
+      navigate('/dashboard')
+    }else{
+      console.log("Is Active.Toggle On",is_active)
+      navigate('/lms-dashboard')
+    }
+    // console.log("Is DMS USER:,",is_dms_user)
+    // console.log("Is LMS USER:,",is_lms_user)
   };
   // console.log(is_active)
   const [userSwitchRole, { isLoading: isSwitchLoading, isError: isSwitchError, data: switchData, error: switchError }] = useUserSwitchRoleMutation();

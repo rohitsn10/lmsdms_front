@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import { ToastContainer } from "react-toastify";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -139,16 +139,17 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
   const isTextEditor = pathname === "/document-view";
+  const navigate = useNavigate();
   const { is_dms_user, is_lms_user, is_active } = useSelector((state) => state.userRole);
   const [routeItems,setRouteItems]=useState([...routes]);
   useEffect(()=>{
-
       if(is_active){
         setRouteItems([...LmsRoutes])
+        // navigate('/lms-dashboard')
       }else{
         setRouteItems([...DmsRoutes])
+        // navigate('/dms-dashboard')
       }
-    
   },[is_active])
   useMemo(() => {
     const cacheRtl = createCache({

@@ -92,6 +92,7 @@ function MultiChoiceQuestionsSection() {
         question_id: question.id,
         question_text: question.question_text,
         user_answer: userAnswer || "No Answer",
+        correct_answer:correctAnswer || "none"
       });
 
       if (userAnswer === correctAnswer) {
@@ -100,12 +101,14 @@ function MultiChoiceQuestionsSection() {
           question_id: question.id,
           question_text: question.question_text,
           user_answer: userAnswer || "No Answer",
+          correct_answer:correctAnswer || "none"
         })
       }else{
         incorrectList.push({
           question_id: question.id,
           question_text: question.question_text,
           user_answer: userAnswer || "No Answer",
+          correct_answer:correctAnswer || "none"
         })
       }
     });

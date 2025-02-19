@@ -13,7 +13,7 @@ import moment from "moment";
 import { useFetchTrainingsQuery } from "apilms/trainingApi"; // Update this path as needed
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
-import { Button } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import QuizIcon from "@mui/icons-material/Quiz";
 const TrainingListing = () => {
@@ -25,6 +25,11 @@ const TrainingListing = () => {
   // Fetch training data using the API query hook
   const { data, error, isLoading, refetch } = useFetchTrainingsQuery();
 
+  const [startAssessmentModal,setStartAssessmentModal]=useState(false);
+
+  const handleAssesmentModalClose = ()=>{
+    setStartAssessmentModal(false)
+  }
   useEffect(() => {
     refetch();
   }, [location.key]);
@@ -49,8 +54,12 @@ const TrainingListing = () => {
     navigate("/quiz-list", { state: { DataQuiz } });
   };
   const handleAssessmentClick = (rowData) => {
-    navigate("/mcq-module", { state: { rowData } });
+    setStartAssessmentModal(true)
+    // navigate("/mcq-module", { state: { rowData } });
   };
+  const startAssessmentClick =(rowData)=>{
+      navigate("/mcq-module", { state: { rowData } });
+  }
   const handleview = (item) => {
     const documentUrl = item;
     if (documentUrl) {
@@ -270,6 +279,31 @@ const TrainingListing = () => {
           </MDBox>
         )}
       </Card>
+      <Dialog
+        open={startAssessmentModal}
+        onClose={handleAssesmentModalClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Start Assessment?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+              Are you Sure you want to start the assessment?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          {/* <Button onClick={handleAssesmentModalClose}>Disagree</Button> */}
+          <Button onClick={handleAssesmentModalClose} autoFocus>
+            Start Assesment
+          </Button>          
+          {/* <Button onClick={handleClose}>Disagree</Button>
+          <Button onClick={handleClose} autoFocus>
+            Agree
+          </Button> */}
+        </DialogActions>
+      </Dialog>
     </MDBox>
   );
 };
