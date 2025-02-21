@@ -50,6 +50,11 @@ const AnswerSection = ({ title, questions, icon: Icon, color }) => {
                       <Typography variant="body2" color="text.secondary">
                         Your Answer: {question?.user_answer || "No answer provided"}
                       </Typography>
+                      {question?.correct_answer && (
+                        <Typography variant="body2" color="success.main">
+                          Correct Answer: {question.correct_answer}
+                        </Typography>
+                      )}
                       <Typography variant="caption" color="text.secondary">
                         Question ID: {question?.question_id || "N/A"} | 
                         Attempt ID: {question?.attempted_quiz || "N/A"}

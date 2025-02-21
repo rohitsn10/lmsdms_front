@@ -217,7 +217,6 @@ const DocumentView = () => {
               console.log("Save button clicked, triggering save...");
             }
           };
-
            docEditorRef.current = new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
             width: "100%",
             height: "100%",
@@ -246,6 +245,8 @@ const DocumentView = () => {
                   forcesave: false
                 },
                 saveButton: true, // Enable save button
+                // showReviewChanges:true,
+                trackChanges: true, 
                 chat: false,
                 comments: true,
                 zoom: 100,
@@ -270,11 +271,31 @@ const DocumentView = () => {
                     }
                 }
             },
-              onAppReady: () => {
+              onAppReady: async() => {
                 // Store the editor instance globally
+                // window.docEditor = docEditorRef.current;
+                // console.log("Window Editor is ready");
+                // console.log("WIndow Editor log:",window.docEditor.openDocument())
                 window.docEditor = docEditorRef.current;
-                console.log("Window Editor is ready");
-                console.log("WIndow Editor log:",window.docEditor.openDocument())
+                console.log("ONLYOFFICE Editor is Ready");
+                const editorInstance = window.docEditor;
+                // const document = editorInstance.getDocument();
+                // console.log("Document Data:",document)
+                console.log("Document Data:XXXXXXXXXXXXXXXXXXXXXXXXXXX",editorInstance )
+              
+                try {
+                  // Ensure editor is loaded before modifying
+                  const editorInstance = window.docEditor;
+                  
+                  // Get the header of the document
+                  const headerData = "await fetchHeaderData();" // Function to fetch data if needed
+                  console.log("Inserting Header Data:", headerData);
+              
+                  // Insert into the header
+                  editorInstance.insertText(`Header Data: ${headerData?.company_name}`, "CompanyName");
+                } catch (error) {
+                  console.error("Error inserting header:", error);
+                }
             },
               onError: (event) => {
                 console.error("Editor error:", event);
