@@ -17,6 +17,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useUserListQuery } from "api/auth/userApi";
 import { useGetJobRoleQuery } from "apilms/jobRoleApi";
 import { useJobroleAssignTrainingMutation } from "apilms/MappingApi"; 
+import { useJobroleAssignTrainingListQuery } from "apilms/MappingApi"; // Import this query
 import { toast } from "react-toastify"; 
 
 const TrainingMapping = () => {
@@ -26,10 +27,14 @@ const TrainingMapping = () => {
     toDo: [],
     inProgress: [],
   });
+  
   const { data: userData, error: userError, isLoading: userLoading } = useUserListQuery();
   const { data: jobRoleData, error: jobRoleError, isLoading: jobRoleLoading } = useGetJobRoleQuery();
   const [jobroleAssignTraining, { isLoading: isMappingLoading }] = useJobroleAssignTrainingMutation();
-
+  
+  // New query for fetching assigned job roles based on selected user
+  const { data: assignedRolesData, isLoading: isAssignedRolesLoading, error: assignedRolesError } = useJobroleAssignTrainingListQuery(selectedUser,{skip: !selectedUser,});
+  
   useEffect(() => {
     if (jobRoleData) {
       // Initialize the 'toDo' list with job roles when fetched
@@ -42,7 +47,21 @@ const TrainingMapping = () => {
       }));
     }
   }, [jobRoleData]);
-
+  
+  // UseEffect for fetching assigned roles when selectedUser changes
+  useEffect(() => {
+    if (selectedUser && assignedRolesData) {
+      const assignedRoles = assignedRolesData.data?.[0]?.job_roles.map((role) => ({
+        id: role.id.toString(),
+        title: role.name,
+      }));
+      setKanbanData((prev) => ({
+        ...prev,
+        inProgress: assignedRoles || [],
+      }));
+    }
+  }, [selectedUser, assignedRolesData]);
+  
   const handleDragEnd = (result) => {
     const { destination, source } = result;
 
@@ -100,11 +119,11 @@ const TrainingMapping = () => {
     }
   };
 
-  if (userLoading || jobRoleLoading) {
+  if (userLoading || jobRoleLoading || isAssignedRolesLoading) {
     return <div>Loading...</div>;
   }
 
-  if (userError || jobRoleError) {
+  if (userError || jobRoleError || assignedRolesError) {
     return <div>Error occurred while fetching data</div>;
   }
 
@@ -114,29 +133,28 @@ const TrainingMapping = () => {
         <MDBox p={3} display="flex" alignItems="center" justifyContent="center">
           {/* User Dropdown */}
           <FormControl fullWidth margin="dense" sx={{ width: "250px", ml: 5 }}>
-  <InputLabel id="select-user-label">Select User</InputLabel>
-  <Select
-    labelId="select-user-label"
-    id="select-user"
-    value={selectedUser}
-    onChange={(e) => setSelectedUser(e.target.value)}
-    input={<OutlinedInput label="Select User" />}
-    sx={{
-      minWidth: 150,
-      height: "2.4rem",
-      ".MuiSelect-select": { padding: "0.45rem" },
-    }}
-  >
-    {userData.data
-      .filter((user) => user.is_jr_approve) // Filter users where is_jr_approve is true
-      .map((user) => (
-        <MenuItem key={user.id} value={user.id}>
-          {user.full_name}
-        </MenuItem>
-      ))}
-  </Select>
-</FormControl>
-
+            <InputLabel id="select-user-label">Select User</InputLabel>
+            <Select
+              labelId="select-user-label"
+              id="select-user"
+              value={selectedUser}
+              onChange={(e) => setSelectedUser(e.target.value)}
+              input={<OutlinedInput label="Select User" />}
+              sx={{
+                minWidth: 150,
+                height: "2.4rem",
+                ".MuiSelect-select": { padding: "0.45rem" },
+              }}
+            >
+              {userData.data
+                .filter((user) => user.is_jr_approve) // Filter users where is_jr_approve is true
+                .map((user) => (
+                  <MenuItem key={user.id} value={user.id}>
+                    {user.full_name}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
 
           {/* Title */}
           <MDTypography variant="h3" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center", mr: 20 }}>
@@ -165,18 +183,7 @@ const TrainingMapping = () => {
             {/* To Do Column (Job Role List) */}
             <Droppable droppableId="toDo">
               {(provided) => (
-                <Card
-                  sx={{
-                    width: "43%",
-                    ml: 5,
-                    p: 2,
-                    mb: 2,
-                    borderRadius: 5,
-                    boxShadow: 5,
-                  }}
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                >
+                <Card sx={{ width: "43%", ml: 5, p: 2, mb: 2, borderRadius: 5, boxShadow: 5 }} ref={provided.innerRef} {...provided.droppableProps}>
                   <MDTypography variant="h4" sx={{ textAlign: "center" }}>
                     Job Role
                   </MDTypography>
@@ -184,12 +191,7 @@ const TrainingMapping = () => {
                     {kanbanData.toDo.map((item, index) => (
                       <Draggable key={item.id} draggableId={item.id} index={index}>
                         {(provided) => (
-                          <Card
-                            sx={{ marginBottom: 2, padding: 2, boxShadow: 1 }}
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
+                          <Card sx={{ marginBottom: 2, padding: 2, boxShadow: 1 }} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                             <MDTypography variant="body1">{item.title}</MDTypography>
                           </Card>
                         )}
@@ -206,17 +208,7 @@ const TrainingMapping = () => {
             {/* In Progress Column (Assigned Roles) */}
             <Droppable droppableId="inProgress">
               {(provided) => (
-                <Card
-                  sx={{
-                    width: "43%",
-                    p: 2,
-                    mb: 2,
-                    borderRadius: 5,
-                    boxShadow: 5,
-                  }}
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                >
+                <Card sx={{ width: "43%", p: 2, mb: 2, borderRadius: 5, boxShadow: 5 }} ref={provided.innerRef} {...provided.droppableProps}>
                   <MDTypography variant="h4" sx={{ textAlign: "center" }}>
                     Assigned Role
                   </MDTypography>
@@ -224,12 +216,7 @@ const TrainingMapping = () => {
                     {kanbanData.inProgress.map((item, index) => (
                       <Draggable key={item.id} draggableId={item.id} index={index}>
                         {(provided) => (
-                          <Card
-                            sx={{ marginBottom: 2, padding: 2, boxShadow: 1 }}
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
+                          <Card sx={{ marginBottom: 2, padding: 2, boxShadow: 1 }} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                             <MDTypography variant="body1">{item.title}</MDTypography>
                           </Card>
                         )}
