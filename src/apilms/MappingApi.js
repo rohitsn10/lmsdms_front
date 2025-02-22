@@ -45,6 +45,13 @@ export const trainingMappingApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    jobroleAssignTrainingList: builder.query({
+      query: (user_id) => ({
+        url: `lms_module/jobrole_assign_training_list/${user_id}`,
+        method: "GET",
+      }),
+      transformResponse: (response) => response,
+    }),
   }),
 });
 
@@ -52,4 +59,5 @@ export const {
   useJobroleAssignTrainingMutation,
   useTrainingAssignJobroleQuery,
   useTrainingAssignJobroleMutationMutation,
+  useJobroleAssignTrainingListQuery,
 } = trainingMappingApi;
