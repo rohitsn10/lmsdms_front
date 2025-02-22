@@ -77,10 +77,11 @@ const JobRoleMapping = () => {
   
     if (assignedTraining && Array.isArray(assignedTraining.documents)) {
       const assignedItems = assignedTraining.documents.map((training) => ({
-        id: training.id,
+        id: training.document_id,
         draggableId: `inprogress-${training.id}`,  // Add prefix
         title: training.document_title,
         description: training.document_description,
+        // documentIds
       }));
       setKanbanData((prev) => ({
         ...prev,

@@ -16,22 +16,18 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useUserListQuery } from "api/auth/userApi";
 import { useGetJobRoleQuery } from "apilms/jobRoleApi";
-import { useJobroleAssignTrainingMutation } from "apilms/MappingApi"; // Ensure correct import
-import { toast } from "react-toastify"; // Import react-toastify
+import { useJobroleAssignTrainingMutation } from "apilms/MappingApi"; 
+import { toast } from "react-toastify"; 
 
 const TrainingMapping = () => {
-  const [selectedUser, setSelectedUser] = useState(""); // Selected user ID
-  const [selectedJobRole, setSelectedJobRole] = useState([]); // Array of selected job role IDs
+  const [selectedUser, setSelectedUser] = useState(""); 
+  const [selectedJobRole, setSelectedJobRole] = useState([]); 
   const [kanbanData, setKanbanData] = useState({
     toDo: [],
     inProgress: [],
   });
-
-  // Fetch user list and job role data using custom hooks
   const { data: userData, error: userError, isLoading: userLoading } = useUserListQuery();
   const { data: jobRoleData, error: jobRoleError, isLoading: jobRoleLoading } = useGetJobRoleQuery();
-  
-  // Fetch mutation hook for assigning job roles to users
   const [jobroleAssignTraining, { isLoading: isMappingLoading }] = useJobroleAssignTrainingMutation();
 
   useEffect(() => {
