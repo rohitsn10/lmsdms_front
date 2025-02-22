@@ -1,4 +1,4 @@
-import  userRoleSlice from './slices/userRoleSlice.js'
+import userRoleSlice from "./slices/userRoleSlice.js";
 import { configureStore } from "@reduxjs/toolkit";
 import { userApi } from "./api/auth/userApi";
 import { documentApi } from "./api/auth/documentApi";
@@ -7,7 +7,7 @@ import { forgotPassApi } from "api/auth/forgotpassApi";
 import { statusApi } from "api/auth/statusApi";
 import { inventoryApi } from "api/auth/inventoryApi";
 import { texteditorApi } from "api/auth/texteditorApi";
-import { departmentApi } from "api/auth/departmentApi"; 
+import { departmentApi } from "api/auth/departmentApi";
 import { dashboardApi } from "api/auth/dashboardApi";
 import { esignatureApi } from "api/auth/esignatureApi";
 import { permissionApi } from "api/auth/permissionApi";
@@ -29,38 +29,39 @@ import { timeLineApi } from "api/auth/timeLineApi";
 import { jobroleApi } from "apilms/jobRoleApi";
 import { trainingMappingApi } from "apilms/MappingApi";
 import { archivedListApi } from "api/auth/archivedListApi";
-import { quizapi} from "apilms/quizapi";
-import { manageSection} from 'apilms/manageSection';
+import { quizapi } from "apilms/quizapi";
+import { manageSection } from "apilms/manageSection";
 import { classRoomApi } from "apilms/classRoomApi";
 import { trainerApi } from "api/auth/trainerApi";
 import { classtestApi } from "apilms/classtestApi";
-import { WorkflowApi } from 'apilms/workflowapi.js';
+import { WorkflowApi } from "apilms/workflowapi.js";
+import { lmsReportsAPI } from "apilms/reportsApi.js";
 const store = configureStore({
   reducer: {
-    userRole:userRoleSlice,
+    userRole: userRoleSlice,
     [userApi.reducerPath]: userApi.reducer,
     [documentApi.reducerPath]: documentApi.reducer,
     [workflowApi.reducerPath]: workflowApi.reducer,
     [forgotPassApi.reducerPath]: forgotPassApi.reducer,
     [statusApi.reducerPath]: statusApi.reducer,
     [inventoryApi.reducerPath]: inventoryApi.reducer,
-    [departmentApi.reducerPath]: departmentApi.reducer, 
+    [departmentApi.reducerPath]: departmentApi.reducer,
     [dashboardApi.reducerPath]: dashboardApi.reducer,
     [texteditorApi.reducerPath]: texteditorApi.reducer,
-    [esignatureApi.reducerPath]:esignatureApi.reducer,
-    [permissionApi.reducerPath]:permissionApi.reducer,
+    [esignatureApi.reducerPath]: esignatureApi.reducer,
+    [permissionApi.reducerPath]: permissionApi.reducer,
     [editDocumentApi.reducerPath]: editDocumentApi.reducer,
     [commentApi.reducerPath]: commentApi.reducer,
     [printApi.reducerPath]: printApi.reducer,
-    [switchRoleApi.reducerPath]:switchRoleApi.reducer,
+    [switchRoleApi.reducerPath]: switchRoleApi.reducer,
     [printerApi.reducerPath]: printerApi.reducer,
-    [reviseApi.reducerPath]:reviseApi.reducer,
-    [retrievalApi.reducerPath]:retrievalApi.reducer,
+    [reviseApi.reducerPath]: reviseApi.reducer,
+    [retrievalApi.reducerPath]: retrievalApi.reducer,
     [plantApi.reducerPath]: plantApi.reducer,
     [areaApi.reducerPath]: areaApi.reducer,
-    [methodologyApi.reducerPath]:methodologyApi.reducer,
+    [methodologyApi.reducerPath]: methodologyApi.reducer,
     [trainingTypeApi.reducerPath]: trainingTypeApi.reducer,
-    [inductionApi.reducerPath]:inductionApi.reducer,
+    [inductionApi.reducerPath]: inductionApi.reducer,
     [trainingApi.reducerPath]: trainingApi.reducer,
     [questionApi.reducerPath]: questionApi.reducer,
     [timeLineApi.reducerPath]: timeLineApi.reducer,
@@ -68,11 +69,12 @@ const store = configureStore({
     [trainingMappingApi.reducerPath]: trainingMappingApi.reducer,
     [quizapi.reducerPath]: quizapi.reducer,
     [archivedListApi.reducerPath]: archivedListApi.reducer,
-    [manageSection.reducerPath]:manageSection.reducer,
+    [manageSection.reducerPath]: manageSection.reducer,
     [classRoomApi.reducerPath]: classRoomApi.reducer,
     [trainerApi.reducerPath]: trainerApi.reducer,
     [classtestApi.reducerPath]: classtestApi.reducer,
     [WorkflowApi.reducerPath]: WorkflowApi.reducer,
+    [lmsReportsAPI.reducerPath]: lmsReportsAPI.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -110,7 +112,8 @@ const store = configureStore({
       classRoomApi.middleware,
       trainerApi.middleware,
       classtestApi.middleware,
-      WorkflowApi.middleware
+      WorkflowApi.middleware,
+      lmsReportsAPI.middleware,
     ),
 });
 

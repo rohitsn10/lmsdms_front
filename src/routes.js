@@ -60,6 +60,8 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import GroupIcon from '@mui/icons-material/Group';
 import SchoolTwoToneIcon from '@mui/icons-material/SchoolTwoTone';
 import Diversity1Icon from '@mui/icons-material/Diversity1';
+import UserReports from "dmscomponent/user-reports";
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 const routes = [
   {
     type: "collapse",
@@ -287,6 +289,14 @@ export const LmsRoutes=[
     icon: <PersonAddIcon />,
     route: "/user-listing",
     component: <UsersListing />,
+  },
+  {
+    type: "collapse",
+    name: "LMS  User Report",
+    key: "user-reports",
+    icon: <AssessmentOutlinedIcon />,
+    route: "/user-reports",
+    component: <UserReports />,
   },
   {
     type: "collapse",

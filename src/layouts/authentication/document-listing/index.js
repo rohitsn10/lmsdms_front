@@ -30,6 +30,8 @@ import { useUpdateObsoleteStatusMutation } from "api/auth/documentApi";
 import { toast, ToastContainer } from "react-toastify";
 import EffectiveDialog from "./effectiveDialog";
 import { useDocumentEffectiveMutation } from "api/auth/documentApi";
+import HowToRegTwoToneIcon from "@mui/icons-material/HowToRegTwoTone";
+import ViewSelectionDialog from "./view-user";
 const DocumentListing = () => {
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
@@ -49,6 +51,10 @@ const DocumentListing = () => {
   const [selectedChildDocuments, setSelectedChildDocuments] = useState([]);
   const [updateObsoleteStatus] = useUpdateObsoleteStatusMutation();
   const [openDialog, setOpenDialog] = useState(false);
+  const [openviewDialog, setOpenviewDialog] = useState(false);
+  const approver = "John Doe";
+  const reviewer = ["Alice Smith", "Bob Johnson"];
+  const docAdmin = "Eve Williams";
   const [documentEffective, { isLoading: isEffecting, isError: isEffectError }] =
     useDocumentEffectiveMutation();
   const version = searchParams.get("version");
@@ -285,7 +291,23 @@ const DocumentListing = () => {
       flex: 0.6,
       headerAlign: "center",
     },
-
+    {
+      field: "view_Users",
+      headerName: "view Users",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => {
+        return (
+          <MDBox display="flex" justifyContent="center">
+            <IconButton color="default" onClick={() => setOpenviewDialog(true)}>
+              <HowToRegTwoToneIcon /> {/* Replace with the desired icon */}
+            </IconButton>
+          </MDBox>
+        );
+      },
+      sortable: false,
+      filterable: false,
+    },
     {
       field: "effective_date",
       headerName: "Effective Date",
@@ -524,6 +546,13 @@ const DocumentListing = () => {
         selectedRow={selectedRow}
         handleCloseDialog={handleCloseDialog}
         handleConfirmEffective={handleConfirmEffective}
+      />
+      <ViewSelectionDialog
+        open={openviewDialog}
+        onClose={() => setOpenviewDialog(false)}
+        approver={approver}
+        reviewer={reviewer}
+        docAdmin={docAdmin}
       />
       {/* <ReviseDialog
   open={isReviseDialogOpen}
