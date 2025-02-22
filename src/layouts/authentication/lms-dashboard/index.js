@@ -1,105 +1,217 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-// @mui material components
-import Grid from "@mui/material/Grid";
-
-// Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-
-// Material Dashboard 2 React example components
+import React from 'react';
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  LinearProgress,
+  Box,
+  Stack,
+} from '@mui/material';
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
-import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
-import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
-import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-import { Link } from "react-router-dom";
-import RateReviewTwoToneIcon from "@mui/icons-material/RateReviewTwoTone";
-import DraftsIcon from "@mui/icons-material/Drafts";
-import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
-import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
+import MDBox from "components/MDBox";
+import {
+  CheckCircle as CheckCircleIcon,
+  Assignment as AssignmentIcon,
+} from '@mui/icons-material';
+import PropTypes from 'prop-types';
 
-// Dashboard components
-import Projects from "layouts/dashboard/components/Projects";
-import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
-import TopicIcon from "@mui/icons-material/Topic";
-import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
-import ApartmentIcon from "@mui/icons-material/Apartment";
-import * as React from "react";
-import { PieChart } from "@mui/x-charts/PieChart";
-// import PieChart from "examples/Charts/PieChart";
+const StatCard = ({ title, value, icon, color }) => {
+  return (
+    <Card sx={{ height: '100%', position: 'relative' }}>
+      <CardContent>
+        <Stack spacing={2}>
+          <Box display="flex" alignItems="center" gap={1}>
+            {icon}
+            <Typography variant="h6" color="text.secondary">
+              {title}
+            </Typography>
+          </Box>
+          
+          <Typography variant="h3" component="div">
+            {value}
+          </Typography>
+          
+          <Box>
+            <LinearProgress 
+              variant="determinate" 
+              value={100} 
+              color={color}
+              sx={{ 
+                height: 10, 
+                borderRadius: 5,
+                [`& .MuiLinearProgress-bar`]: {
+                  borderRadius: 5,
+                },
+              }} 
+            />
+          </Box>
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+};
+
+const ProgressChart = ({ completed, assigned }) => {
+  const percentage = (completed / assigned) * 100;
+  const remaining = assigned - completed;
+
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          SOP Completion Progress
+        </Typography>
+        <Box sx={{ position: 'relative', pt: 2 }}>
+          {/* Main progress circle */}
+          <Box
+            sx={{
+              position: 'relative',
+              display: 'inline-flex',
+              width: '100%',
+              justifyContent: 'center'
+            }}
+          >
+            <Box
+              sx={{
+                position: 'relative',
+                display: 'inline-flex',
+                mx: 'auto'
+              }}
+            >
+              {/* Large circular progress */}
+              <Box
+                sx={{
+                  position: 'relative',
+                  display: 'inline-flex',
+                  borderRadius: '50%',
+                  background: `conic-gradient(
+                    #2e7d32 ${percentage}%,
+                    #e0e0e0 ${percentage}% 100%
+                  )`,
+                  width: 300,
+                  height: 300,
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '10%',
+                    left: '10%',
+                    right: '10%',
+                    bottom: '10%',
+                    borderRadius: '50%',
+                    background: 'white',
+                  }
+                }}
+              />
+              
+              {/* Centered text */}
+              <Box
+                sx={{
+                  top: 0,
+                  left: 0,
+                  bottom: 0,
+                  right: 0,
+                  position: 'absolute',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Typography variant="h2" component="div" color="text.primary">
+                  {percentage.toFixed(0)}%
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+                  {completed} of {assigned} SOPs
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Legend */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, mt: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ width: 16, height: 16, backgroundColor: '#2e7d32', borderRadius: 1 }} />
+              <Typography variant="body2">
+                Completed ({completed})
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ width: 16, height: 16, backgroundColor: '#e0e0e0', borderRadius: 1 }} />
+              <Typography variant="body2">
+                Remaining ({remaining})
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+};
+
 function LMSDashboard() {
-  const { sales, tasks } = reportsLineChartData;
+  const sopsCompleted = 20;
+  const sopsAssigned = 30;
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox py={2}>
-        <Grid container spacing={3} mt={4}>
-          <Grid item xs={20} md={6} lg={4}>
-            <PieChart
-              series={[
-                {
-                  data: [
-                    { id: 0, value: 10, label: "series B" },
-                    { id: 1, value: 15, label: "series B" },
-                    { id: 2, value: 20, label: "series C" },
-                  ],
-                },
-              ]}
-              width={700}
-              height={500}
+      <MDBox py={3}>
+        <Grid container spacing={3}>
+          
+          <Grid item xs={12} md={7}>
+            <ProgressChart 
+              completed={sopsCompleted}
+              assigned={sopsAssigned}
             />
           </Grid>
-          <MDBox py={3}>
-            <Grid item xs={12} md={6} lg={3}>
-              <MDBox mb={1.5}>
-                {/* <Link to="/review-document"> */}
-                <ComplexStatisticsCard
-                  icon={<RateReviewTwoToneIcon />}
-                  color="warning"
-                  title="Under Review"
-                  // count={reviewData?.dataCountreview || 0}
-                  percentage={{
-                    color: "success",
-                  }}
-                />
-                {/* </Link> */}
-              </MDBox>
+          <Grid item xs={12} md={5}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={12}>
+            <StatCard
+              title="Completed SOPs"
+              value={sopsCompleted}
+              icon={<CheckCircleIcon sx={{ color: 'success.main' }} />}
+              color="success"
+            />
             </Grid>
-            <Grid item xs={12} md={6} lg={3}>
-              <MDBox mb={1.5}>
-                {/* <Link to="/draft-document"> */}
-                <ComplexStatisticsCard
-                  color="dark"
-                  icon={<DraftsIcon />}
-                  title="Under Draft"
-                  // count={savedraftData?.dataCountsavedraft || 0}
-                  percentage={{
-                    color: "success",
-                  }}
-                />
-                {/* </Link> */}
-              </MDBox>
+          
+            <Grid item xs={12} md={12}>
+            <StatCard
+              title="Assigned SOPs"
+              value={sopsAssigned}
+              icon={<AssignmentIcon sx={{ color: 'warning.main' }} />}
+              color="warning"
+            />
             </Grid>
-          </MDBox>
+            </Grid>
+
+          {/* <Grid item xs={12} md={12}>
+            <StatCard
+              title="Assigned SOPs"
+              value={sopsAssigned}
+              icon={<AssignmentIcon sx={{ color: 'warning.main' }} />}
+              color="warning"
+            />
+          </Grid> */}
+          </Grid>
         </Grid>
       </MDBox>
-      {/* <Footer /> */}
     </DashboardLayout>
   );
 }
+
+StatCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  icon: PropTypes.node.isRequired,
+  color: PropTypes.string.isRequired,
+};
+
+ProgressChart.propTypes = {
+  completed: PropTypes.number.isRequired,
+  assigned: PropTypes.number.isRequired,
+};
 
 export default LMSDashboard;
