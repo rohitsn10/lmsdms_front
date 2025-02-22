@@ -138,7 +138,7 @@ function ClassMultiChoiceQuestionsSection() {
 
   const handleModalClose = () => {
     setOpenModal(false);
-    navigate("/trainingListing");
+    navigate("/class-room");
   };
 
   if (isLoading) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
@@ -20,15 +20,19 @@ const TrainingListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { user } = useAuth();
+  const location = useLocation();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
   // Fetch training data using the API query hook
   const { data, error, isLoading, refetch } = useFetchTrainingsQuery();
 
   const [startAssessmentModal,setStartAssessmentModal]=useState(false);
+  const [selectedRowData, setSelectedRowData] = useState(null);
+
 
   const handleAssesmentModalClose = ()=>{
-    setStartAssessmentModal(false)
+    setStartAssessmentModal(false);
+    setSelectedRowData(null);
   }
   useEffect(() => {
     refetch();
@@ -54,11 +58,16 @@ const TrainingListing = () => {
     navigate("/quiz-list", { state: { DataQuiz } });
   };
   const handleAssessmentClick = (rowData) => {
+    setSelectedRowData(rowData)
     setStartAssessmentModal(true)
     // navigate("/mcq-module", { state: { rowData } });
   };
-  const startAssessmentClick =(rowData)=>{
-      navigate("/mcq-module", { state: { rowData } });
+  const startAssessmentClick =()=>{
+      // navigate("/mcq-module", { state: { rowData } });
+      if (selectedRowData) {
+        navigate("/mcq-module", { state: { rowData: selectedRowData } });
+        handleAssesmentModalClose();
+      }
   }
   const handleview = (item) => {
     const documentUrl = item;
@@ -296,8 +305,11 @@ const TrainingListing = () => {
         <DialogActions>
           {/* <Button onClick={handleAssesmentModalClose}>Disagree</Button> */}
           <Button onClick={handleAssesmentModalClose} autoFocus>
-            Start Assesment
-          </Button>          
+            Cancel
+          </Button>  
+          <Button onClick={startAssessmentClick} autoFocus>
+            Start Assessment
+          </Button>
           {/* <Button onClick={handleClose}>Disagree</Button>
           <Button onClick={handleClose} autoFocus>
             Agree
