@@ -25,151 +25,79 @@ import Footer from "examples/Footer";
 import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
 import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-import { Link } from 'react-router-dom';
-
-// Data
+import { Link } from "react-router-dom";
+import RateReviewTwoToneIcon from "@mui/icons-material/RateReviewTwoTone";
+import DraftsIcon from "@mui/icons-material/Drafts";
 import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
 import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 
 // Dashboard components
 import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
-import TopicIcon from '@mui/icons-material/Topic';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import ApartmentIcon from '@mui/icons-material/Apartment';
-
+import TopicIcon from "@mui/icons-material/Topic";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import * as React from "react";
+import { PieChart } from "@mui/x-charts/PieChart";
+// import PieChart from "examples/Charts/PieChart";
 function LMSDashboard() {
   const { sales, tasks } = reportsLineChartData;
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox py={3}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <Link to="/add-user">
-                <ComplexStatisticsCard
-                  color="primary"
-                  icon="person_add"
-                  title="Add user"
-                  count="91"
-                  percentage={{
-                    color: "success",
-                    amount: "",
-                    label: "Just updated",
-                  }}
-                />
-              </Link>
-            </MDBox>
+      <MDBox py={2}>
+        <Grid container spacing={3} mt={4}>
+          <Grid item xs={20} md={6} lg={4}>
+            <PieChart
+              series={[
+                {
+                  data: [
+                    { id: 0, value: 10, label: "series B" },
+                    { id: 1, value: 15, label: "series B" },
+                    { id: 2, value: 20, label: "series C" },
+                  ],
+                },
+              ]}
+              width={700}
+              height={500}
+            />
           </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}
-            >
-              <Link to="/add-document">
+          <MDBox py={3}>
+            <Grid item xs={12} md={6} lg={3}>
+              <MDBox mb={1.5}>
+                {/* <Link to="/review-document"> */}
                 <ComplexStatisticsCard
-                  icon={<TopicIcon />}
+                  icon={<RateReviewTwoToneIcon />}
                   color="warning"
-                  title="Add Document"
-                  count="2,300"
+                  title="Under Review"
+                  // count={reviewData?.dataCountreview || 0}
                   percentage={{
                     color: "success",
-                    // amount: "+3%",
-                    label: " Updated last month",
                   }}
                 />
-              </Link>
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-            <Link to="/add-department">
-              <ComplexStatisticsCard
-                  color="success"
-                  icon={<ApartmentIcon/>}
-                  title="Add Department"
-                  count="47"
-                  percentage={{
-                    color: "success",
-                    amount: "",
-                    label: "Just updated",
-                  }}
-                />
-            </Link>
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              
-              <Link to="/add-approval">
+                {/* </Link> */}
+              </MDBox>
+            </Grid>
+            <Grid item xs={12} md={6} lg={3}>
+              <MDBox mb={1.5}>
+                {/* <Link to="/draft-document"> */}
                 <ComplexStatisticsCard
                   color="dark"
-                  icon={<AssignmentTurnedInIcon/>}
-                  title="Approved"
-                  count="34"
+                  icon={<DraftsIcon />}
+                  title="Under Draft"
+                  // count={savedraftData?.dataCountsavedraft || 0}
                   percentage={{
                     color: "success",
-                    // amount: "+1%",
-                    label: "Updated yesterday",
                   }}
                 />
-              </Link>
-            </MDBox>
-          </Grid>
+                {/* </Link> */}
+              </MDBox>
+            </Grid>
+          </MDBox>
         </Grid>
-        <MDBox mt={4.5}>
-          <Grid container spacing={3}>
-            {/* <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsBarChart
-                  color="info"
-                  title="website views"
-                  description="Last Campaign Performance"
-                  date="campaign sent 2 days ago"
-                  chart={reportsBarChartData}
-                />
-              </MDBox>
-            </Grid> */}
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="success"
-                  title="daily sales"
-                  description={
-                    <>
-                      (<strong>+15%</strong>) increase in today sales.
-                    </>
-                  }
-                  date="updated 4 min ago"
-                  chart={sales}
-                />
-              </MDBox>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="dark"
-                  title="completed tasks"
-                  description="Last Campaign Performance"
-                  date="just updated"
-                  chart={tasks}
-                />
-              </MDBox>
-            </Grid>
-          </Grid>
-        </MDBox>
-        <MDBox>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={8}>
-              <Projects />
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <OrdersOverview />
-            </Grid>
-          </Grid>
-        </MDBox>
       </MDBox>
-      <Footer />
+      {/* <Footer /> */}
     </DashboardLayout>
   );
 }

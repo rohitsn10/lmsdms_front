@@ -17,23 +17,13 @@ export const lmsReportsAPI = createApi({
   }),
   endpoints: (builder) => ({
     // GET method to fetch employee list based on employee ID
-    getEmployeeList: builder.query({
+    getEmployeeJobRoleReport: builder.query({
       query: (employee_id) => ({
         url: `dms_module/employee_list/${employee_id}`,
         method: 'GET',
       }),
       transformResponse: (response) => response, // Handle raw response
     }),
-
-    // POST method to create an induction certificate based on user ID
-    createInductionCertificate: builder.mutation({
-      query: (user_id) => ({
-        url: `lms_module/inductioncertificate/${user_id}`,
-        method: 'POST',
-      }),
-      transformResponse: (response) => response, // Handle raw response
-    }),
-
     // GET method to fetch employee training need identification by employee ID
     getEmployeeTrainingNeedIdentification: builder.query({
       query: (employee_id) => ({
@@ -42,11 +32,25 @@ export const lmsReportsAPI = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    getTrainingAttendanceSheet: builder.query({
+      query: (document_id) => ({
+        url: `lms_module/training_attendance_sheet/${document_id}`,
+        method: 'GET',
+      }),
+      transformResponse: (response) => response, // Handle raw response
+    }),
+    getemployeeRecordlog:builder.query({
+      query:()=>({
+        url:`dms_module/employee_record_log`,
+      }),
+      transformResponse:(response)=>response,
+    })
   }),
 });
 
 export const {
- useGetEmployeeListQuery,
- useCreateInductionCertificateMutation,
+  useGetEmployeeJobRoleReportQuery,
  useGetEmployeeTrainingNeedIdentificationQuery,
+ useGetTrainingAttendanceSheetQuery,
+ useGetemployeeRecordlogQuery,
 } = lmsReportsAPI;

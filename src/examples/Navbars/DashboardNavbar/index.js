@@ -33,8 +33,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-
-// Custom components
+import { toast } from 'react-toastify';
 import MDBox from "components/MDBox";
 import MDInput from "components/MDInput";
 import Breadcrumbs from "examples/Breadcrumbs";
@@ -45,7 +44,7 @@ import {
   navbarIconButton,
   navbarMobileMenu,
 } from "examples/Navbars/DashboardNavbar/styles";
-
+import axios from 'axios';
 // Material Dashboard 2 React context
 import {
   useMaterialUIController,
@@ -59,12 +58,12 @@ import { useDispatch } from "react-redux";
 // Import the API hook for switching roles
 import { useRequestUserGroupListQuery, useUserSwitchRoleMutation } from "api/auth/switchRoleApi";
 import { setUserDetails } from "slices/userRoleSlice";
-
+import { useGetemployeeRecordlogQuery } from "apilms/reportsApi";
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
-  // const [openMenu, setOpenMenu] = useState(false);
+  const { data, error} = useGetemployeeRecordlogQuery();
   const route = useLocation().pathname.split("/").slice(1);
   const { user, role } = useAuth();
   const [roles, setRoles] = useState([]);
@@ -111,7 +110,40 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleCloseReportSubMenu = () => {
     setAnchorReportEl(null);
   };
+  const handleDownloadReport = async () => {
+    if (isLoading) {
+      toast.info("Generating the report, please wait...");
+      return;
+    }
 
+    if (error) {
+      toast.error("Error fetching employee record log.");
+      return;
+    }
+
+    if (data && data.status && data.data) {
+      const fileUrl = data.data;
+      try {
+        // Download the file using Axios
+        const response = await axios.get(fileUrl, { responseType: 'blob' });
+
+        // Create a link element to trigger the download
+        const link = document.createElement('a');
+        const file = new Blob([response.data], { type: 'application/pdf' });
+        link.href = URL.createObjectURL(file);
+        link.download = fileUrl.split('/').pop(); // Extract filename from URL
+        link.click();
+
+        // Show success toast
+        toast.success("Report downloaded successfully!");
+      } catch (err) {
+        // Show error toast
+        toast.error(`Failed to download report: ${err.message}`);
+      }
+    } else {
+      toast.error("Failed to generate report.");
+    }
+  };
   useEffect(() => {
     if (isLoading) {
       console.log("Loading roles...");
@@ -434,21 +466,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     "aria-labelledby": "report-menu-item",
                   }}
                 >
-                  <MenuItem component={RouterLink} to="/report/financial">
-                  Employee record log Report
-                  </MenuItem>
-                  <MenuItem component={RouterLink} to="/report/employee">
-                  Employee Job role Report
-                  </MenuItem>
-                  <MenuItem component={RouterLink} to="/report/sales">
-                  Employee Training Report
-                  </MenuItem>
-                  <MenuItem component={RouterLink} to="/report/product">
-                  Attendance Sheet
-                  </MenuItem>
-                  <MenuItem component={RouterLink} to="/report/customer">
-                  Pending Training Report
-                  </MenuItem>
+                  <MenuItem onClick={handleDownloadReport}>Employee record log Report</MenuItem>
                 </Menu>
 
                 <MenuItem component={RouterLink} to="/logout">

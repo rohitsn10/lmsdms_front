@@ -6,116 +6,144 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
-import { useUserListQuery } from "api/auth/userApi"; // Fetch user data from userApi
-import { useAuth } from "hooks/use-auth";
+import { useUserListQuery } from "api/auth/userApi"; // Hook for fetching user data
+import { useGetEmployeeTrainingNeedIdentificationQuery } from "apilms/reportsApi"; // Hook for fetching training need report
+import { useGetEmployeeJobRoleReportQuery } from "apilms/reportsApi"; // Hook for fetching job role report (added this hook)
 import { toast } from "react-toastify";
 import DownloadIcon from "@mui/icons-material/Download";
 
-// Import the hooks from your `lmsReportsAPI`
-import {
-  useGetEmployeeListQuery,
-  useCreateInductionCertificateMutation,
-  useGetEmployeeTrainingNeedIdentificationQuery,
-} from "apilms/reportsApi";
-
 const UserReports = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [clickedDownload, setClickedDownload] = useState(false); // Track button click state
-  const [selectedUserId, setSelectedUserId] = useState(null); // Store the selected user ID for report
-
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { data, error, isLoading } = useUserListQuery();
+  const [selectedUserId, setSelectedUserId] = useState(null); // State to store selected user ID
+  const { data, error, isLoading } = useUserListQuery(); // Fetch user data
   const [filteredData, setFilteredData] = useState([]);
 
-  // Conditional hook usage
-  const { data: employeeData, isLoading: employeeLoading } = useGetEmployeeListQuery(
-    selectedUserId, { skip: !clickedDownload }
-  );
+  // Use the hook at the top level of the component
+  const { data: trainingNeedData, isLoading: trainingNeedLoading } = useGetEmployeeTrainingNeedIdentificationQuery(selectedUserId, {
+    skip: !selectedUserId, // Only call the hook when a user ID is selected
+  });
 
-  const { data: trainingNeedData, isLoading: trainingNeedLoading } = useGetEmployeeTrainingNeedIdentificationQuery(
-    selectedUserId, { skip: !clickedDownload }
-  );
+  const { data: jobRoleData, isLoading: jobRoleLoading } = useGetEmployeeJobRoleReportQuery(selectedUserId, {
+    skip: !selectedUserId, // Only call the hook when a user ID is selected
+  });
 
+  // Handle search input change
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  // Format user data when fetched
   useEffect(() => {
     if (data?.data) {
       const formattedData = data.data.map((item, index) => ({
         id: item.id,
         serial_number: index + 1,
-        full_name: item.first_name
-          ? `${item.first_name} ${item.last_name || ""}`.trim()
-          : "N/A",
+        full_name: `${item.first_name} ${item.last_name}`,
       }));
       setFilteredData(formattedData);
     }
   }, [data]);
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
+  // Handler for "Employee Training Need" button
+  const handleTrainingNeedReport = (id) => {
+    setSelectedUserId(id); // Set the selected user ID
 
-  const handleDownloadReport = (reportType, id) => {
-    // Set clickedDownload to true, which will trigger the hooks
-    setClickedDownload(true);
-    setSelectedUserId(id); // Store the selected user ID for the report
+    // Wait for the hook data to be available before triggering download
+    if (trainingNeedLoading) {
+      toast.info("Loading report...");
+      return;
+    }
 
-    // Set a timeout to handle the data after the hooks have been called
-    setTimeout(() => {
-      try {
-        let fileUrl = "";
-        console.log(`Starting download for reportType: ${reportType}, userId: ${id}`);
+    if (trainingNeedData?.status) {
+      const fileUrl = trainingNeedData.data; // Extract the file URL from the response
+      console.log("File URL:", fileUrl); // Check if the URL is correct in the console
 
-        switch (reportType) {
-          case "EmployeeTrainingNeed":
-            if (trainingNeedData) {
-              const trainingData = trainingNeedData.find(item => item.id === id);
-              console.log("Fetched training data:", trainingData);
-              fileUrl = trainingData?.data; // assuming 'data' holds the report URL
+      // Ensure the file URL is valid
+      if (fileUrl) {
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = "Employee_Training_Need_Report.pdf"; // Set default file name for download
+
+        // Check if the file URL is valid and accessible
+        fetch(fileUrl, { method: "HEAD" })
+          .then((response) => {
+            if (response.ok) {
+              // If the file is accessible, trigger the download
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              toast.success("PDF generated successfully!");
+            } else {
+              toast.error("Failed to fetch the file. Please try again later.");
             }
-            break;
-
-          case "EmployeeJobRole":
-            if (employeeData) {
-              const jobRoleData = employeeData.find(item => item.id === id);
-              console.log("Fetched job role data:", jobRoleData);
-              fileUrl = jobRoleData?.data;
-            }
-            break;
-
-          case "TrainingAttendance":
-            if (employeeData) {
-              const attendanceData = employeeData.find(item => item.id === id);
-              console.log("Fetched attendance data:", attendanceData);
-              fileUrl = attendanceData?.data;
-            }
-            break;
-
-          default:
-            throw new Error("Invalid report type");
-        }
-
-        if (fileUrl) {
-          console.log(`Downloading file from URL: ${fileUrl}`);
-          const link = document.createElement("a");
-          link.href = fileUrl;
-          link.download = `${reportType}_Report.pdf`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          toast.success(`${reportType} downloaded successfully!`);
-        } else {
-          console.log("No file URL returned, cannot download report.");
-          toast.error(`No file available for ${reportType}.`);
-        }
-      } catch (error) {
-        console.error("Error in handleDownloadReport:", error);
-        toast.error(`Failed to download ${reportType}. Please try again. Error: ${error.message}`);
-      } finally {
-        // Reset the button click state to false
-        setClickedDownload(false);
+          })
+          .catch((error) => {
+            console.error("Error fetching the file:", error);
+            toast.error("Error occurred while downloading the report.");
+          });
+      } else {
+        toast.error("File URL is missing.");
       }
-    }, 1000); // Add a small delay to ensure the hooks are triggered and data is available
+    } else {
+      toast.error("Failed to generate training need report.");
+    }
   };
+
+  // Handler for "Employee Job Role Report" button
+  const handleJobRoleReport = (id) => {
+    setSelectedUserId(id); // Set the selected user ID
+
+    // Wait for the hook data to be available before triggering download
+    if (jobRoleLoading) {
+      toast.info("Loading report...");
+      return;
+    }
+
+    if (jobRoleData?.status) {
+      const fileUrl = jobRoleData.data; // Extract the file URL from the response
+      console.log("Job Role Report File URL:", fileUrl); // Check if the URL is correct in the console
+
+      // Ensure the file URL is valid
+      if (fileUrl) {
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = "Employee_Job_Role_Report.pdf"; // Set default file name for download
+
+        // Check if the file URL is valid and accessible
+        fetch(fileUrl, { method: "HEAD" })
+          .then((response) => {
+            if (response.ok) {
+              // If the file is accessible, trigger the download
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              toast.success("Job Role Report generated successfully!");
+            } else {
+              toast.error("Failed to fetch the file. Please try again later.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching the file:", error);
+            toast.error("Error occurred while downloading the report.");
+          });
+      } else {
+        toast.error("File URL is missing.");
+      }
+    } else {
+      toast.error("Failed to generate job role report.");
+    }
+  };
+
+  // Handler for "Training Attendance Sheet" button
+  const handleAttendanceSheetReport = (id) => {
+    console.log(`Training Attendance Sheet clicked for User ID: ${id}`);
+    toast.info(`Clicked on Training Attendance Sheet for User ID: ${id}`);
+  };
+
+  // Filter users based on the search term
+  const filteredDataList = filteredData.filter(
+    (user) => user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
@@ -130,7 +158,7 @@ const UserReports = () => {
           variant="outlined"
           color="primary"
           size="small"
-          onClick={() => handleDownloadReport("EmployeeTrainingNeed", params.row.id)} // Pass the row ID
+          onClick={() => handleTrainingNeedReport(params.row.id)} // Pass the row ID
           startIcon={<DownloadIcon />}
         >
           Employee Training
@@ -147,36 +175,31 @@ const UserReports = () => {
           variant="outlined"
           color="primary"
           size="small"
-          onClick={() => handleDownloadReport("EmployeeJobRole", params.row.id)} // Pass the row ID
+          onClick={() => handleJobRoleReport(params.row.id)} // Pass the row ID
           startIcon={<DownloadIcon />}
         >
           Job Role
         </MDButton>
       ),
     },
-    {
-      field: "attendance_sheet",
-      headerName: "Training Attendance Sheet",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <MDButton
-          variant="outlined"
-          color="primary"
-          size="small"
-          onClick={() => handleDownloadReport("TrainingAttendance", params.row.id)} // Pass the row ID
-          startIcon={<DownloadIcon />}
-        >
-          Attendance Sheet
-        </MDButton>
-      ),
-    },
+    // {
+    //   field: "attendance_sheet",
+    //   headerName: "Training Attendance Sheet",
+    //   flex: 1,
+    //   headerAlign: "center",
+    //   renderCell: (params) => (
+    //     <MDButton
+    //       variant="outlined"
+    //       color="primary"
+    //       size="small"
+    //       onClick={() => handleAttendanceSheetReport(params.row.id)} // Pass the row ID
+    //       startIcon={<DownloadIcon />}
+    //     >
+    //       Attendance Sheet
+    //     </MDButton>
+    //   ),
+    // },
   ];
-
-  const filteredDataList = filteredData.filter(
-    (user) =>
-      user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <MDBox p={3}>
