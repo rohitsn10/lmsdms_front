@@ -32,10 +32,40 @@ const JobRoleMapping = () => {
 
   const { data: assignedTraining, error: assignedTrainingError, isLoading: assignedTrainingIsLoading } = useTrainingAssignJobroleQuery(selectedJobRole, { skip: !selectedJobRole });
   const [trainingAssignJobrole, { isLoading: isMappingLoading, error: mappingError }] = useTrainingAssignJobroleMutationMutation();
+  // useEffect(() => {
+  //   if (trainingData) {
+  //     const sampleToDo = trainingData.document_data.documents.map((doc) => ({
+  //       id: doc.id.toString(),
+  //       draggableId: `todo-${doc.id}`,
+  //       title: doc.document_title,
+  //       description: doc.document_description,
+  //     }));
+  //     setKanbanData({
+  //       toDo: sampleToDo,
+  //       inProgress: [],
+  //     });
+  //   }
+
+  //   if (assignedTraining && Array.isArray(assignedTraining.documents)) {
+  //     const assignedItems = assignedTraining.documents.map((training) => ({
+  //       id: training.id,
+  //       draggableId: `inprogress-${training.id}`, 
+  //       title: training.document_title,
+  //       description: training.document_description,
+  //     }));
+  //     setKanbanData((prev) => ({
+  //       ...prev,
+  //       inProgress: assignedItems,
+        
+  //     }));
+  //   }
+  // }, [trainingData, assignedTraining]);
+
   useEffect(() => {
     if (trainingData) {
       const sampleToDo = trainingData.document_data.documents.map((doc) => ({
         id: doc.id.toString(),
+        draggableId: `todo-${doc.id}`,  // Add prefix
         title: doc.document_title,
         description: doc.document_description,
       }));
@@ -44,16 +74,17 @@ const JobRoleMapping = () => {
         inProgress: [],
       });
     }
-
-    if (assignedTraining && Array.isArray(assignedTraining.data)) {
-      const assignedItems = assignedTraining.data.map((training) => ({
-        id: training.id.toString(),
-        title: training.training_title,
-        description: training.training_description,
+  
+    if (assignedTraining && Array.isArray(assignedTraining.documents)) {
+      const assignedItems = assignedTraining.documents.map((training) => ({
+        id: training.id,
+        draggableId: `inprogress-${training.id}`,  // Add prefix
+        title: training.document_title,
+        description: training.document_description,
       }));
       setKanbanData((prev) => ({
         ...prev,
-        inProgress: assignedItems, // Set the assigned training in the "Assigned Training" section
+        inProgress: assignedItems,
       }));
     }
   }, [trainingData, assignedTraining]);
@@ -172,7 +203,7 @@ const JobRoleMapping = () => {
                   </MDTypography>
                   <Box>
                     {kanbanData.toDo.map((item, index) => (
-                      <Draggable key={item.id} draggableId={item.id} index={index}>
+                     <Draggable key={item.draggableId} draggableId={item.draggableId} index={index}>
                         {(provided) => (
                           <Card sx={{ marginBottom: 2, padding: 2, boxShadow: 1 }} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                             <MDTypography variant="body1">{item.title}</MDTypography>
@@ -201,7 +232,7 @@ const JobRoleMapping = () => {
                   </MDTypography>
                   <Box>
                     {kanbanData.inProgress.map((item, index) => (
-                      <Draggable key={item.id} draggableId={item.id} index={index}>
+                      <Draggable key={item.draggableId} draggableId={item.draggableId} index={index}>
                         {(provided) => (
                           <Card sx={{ marginBottom: 2, padding: 2, boxShadow: 1 }} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                             <MDTypography variant="body1">{item.title}</MDTypography>

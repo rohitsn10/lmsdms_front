@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -12,7 +12,9 @@ import { useGetClassroomsQuery } from "apilms/classRoomApi"; // Import your API 
 import moment from "moment"; // For date formatting
 import { CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
+import { useGetTrainingAttendanceSheetQuery } from "apilms/reportsApi";
 import { useAuth } from "hooks/use-auth";
+
 const ClassroomListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuth();
@@ -22,7 +24,15 @@ const ClassroomListing = () => {
 
   // Fetch classrooms using the query hook
   const { data, isLoading, isError, error } = useGetClassroomsQuery();
-
+  const [downloadDocumentId, setDownloadDocumentId] = useState(null);
+  const {
+    data: attendanceSheetData,
+    isFetching: isFetchingAttendanceSheet,
+    isError: isAttendanceSheetError,
+    error: attendanceSheetError,
+  } = useGetTrainingAttendanceSheetQuery(downloadDocumentId, {
+    skip: !downloadDocumentId, // Skip the query if downloadDocumentId is not set
+  });
   // Handle search input change
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -41,8 +51,37 @@ const ClassroomListing = () => {
   const handleAssessmentClick = (rowData) => {
     navigate("/exam-mcq-module", { state: { rowData } });
   };
+  const handleDownloadAttendanceSheet = (documentId) => {
+    setDownloadDocumentId(documentId);
+    toast.info("Downloading attendance sheet...", { autoClose: 2000 }); // Show loading toast
+  };
 
-  // Handle loading and error states
+  useEffect(() => {
+    if (attendanceSheetData && downloadDocumentId) {
+      // Create a Blob URL for the file
+      const url = window.URL.createObjectURL(new Blob([attendanceSheetData]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `attendance_sheet_${downloadDocumentId}.pdf`); // Set the file name
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+  
+      // Reset states after download
+      setDownloadDocumentId(null); // Reset the document ID
+      toast.success("Attendance sheet downloaded successfully!", { autoClose: 3000 }); // Show success toast
+    }
+  }, [attendanceSheetData, downloadDocumentId]);
+
+  // Handle error in attendance sheet download
+  useEffect(() => {
+    if (isAttendanceSheetError) {
+      toast.error(`Failed to download attendance sheet: ${attendanceSheetError?.message}`, {
+        autoClose: 5000,
+      });
+      setDownloadDocumentId(null); // Reset the document ID
+    }
+  }, [isAttendanceSheetError, attendanceSheetError]);
   if (isLoading) {
     return (
       <MDBox
@@ -148,6 +187,26 @@ const ClassroomListing = () => {
           </MDButton>
         ),
       },
+      ...(groupId === 7
+        ? [
+          {
+        field: "attendance",
+        headerName: "Attendance",
+        flex: 1,
+        headerAlign: "center",
+        renderCell: (params) => (
+          <MDButton
+            variant="outlined"
+            color="success"
+            onClick={() => handleDownloadAttendanceSheet(params.row.document)}
+            // disabled={params.row.is_assesment === "Without Assessment"} // Disable if 'is_assesment' is 'Without Assessment'
+          >
+            Attendance Sheet
+          </MDButton>
+        ),
+      },
+    ]
+    : []),
     {
       field: "action",
       headerName: "Action",

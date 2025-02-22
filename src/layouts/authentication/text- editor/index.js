@@ -36,21 +36,20 @@ import RemarkDialog from "./remark";
 import SelectUserDialog from "./user-select";
 import { Button, AppBar, Toolbar, Typography, CircularProgress } from "@mui/material";
 import { useAddPathUrlDataForCommentsMutation } from "api/auth/editDocumentApi";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
 
 // Import AuthContext
 import { AuthContext } from "context/auth-context";
-
 
 const DocumentView = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const docEditorRef = useRef(null);
-  const [addPathUrlDataForComments, { isLoading: isAddingComment }] = useAddPathUrlDataForCommentsMutation();
-
+  const [addPathUrlDataForComments, { isLoading: isAddingComment }] =
+    useAddPathUrlDataForCommentsMutation();
 
   const [saving, setSaving] = useState(false);
-  const [Error1,setError] = useState(null);
+  const [Error1, setError] = useState(null);
   const [docEditorLoaded, setDocEditorLoaded] = useState(false);
   const [editorConfig, setEditorConfig] = useState(null);
   const { data: templateData, isError, error: apiError } = useGetTemplateQuery(id);
@@ -67,7 +66,7 @@ const DocumentView = () => {
   const [createDocument] = useCreateDocumentMutation();
   const [createComment] = useCreateCommentMutation();
   const { data, error, isLoading } = useGetTemplateQuery(id);
-  console.log("Template ID:",data?.select_template)
+  console.log("Template ID:", data?.select_template);
   const [draftDocument] = useDraftDocumentMutation();
   const [documentReviewStatus] = useDocumentReviewStatusMutation();
   const navigate = useNavigate();
@@ -79,7 +78,7 @@ const DocumentView = () => {
   const trainingRequired = searchParams.get("training_required");
   const approval_status = searchParams.get("approval_status");
   const version = searchParams.get("version");
-  console.log("Version",version)
+  console.log("Version", version);
 
   // const [dialogeffectiveOpen, setDialogeffectiveOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
@@ -99,25 +98,25 @@ const DocumentView = () => {
   const [approver, setApprover] = useState("");
   const [reviewer, setReviewer] = useState([]);
   const [docAdmin, setDocAdmin] = useState("");
-  const [docComments,setDocComments] = useState([]);
+  const [docComments, setDocComments] = useState([]);
   const [cacheDocument, setCacheDocument] = useState("");
 
   const [docComments2, setDocComments2] = useState([]);
   const [docCurrentComment, setDocCurrentComment] = useState("");
 
   // const docCommentsRef = useRef("");
-  const docCommentsRef = useRef([]);  
+  const docCommentsRef = useRef([]);
   const commentsRef = useRef([]);
 
-  const {user,setValue}=useContext(AuthContext)
+  const { user, setValue } = useContext(AuthContext);
   // console.log("User Data",user?.email)
   // console.log("User ID",user?.id)
   // console.log("User ID",user?.id)
   // console.log("User ID",user?.first_name)
-  console.log("Department IDD:",user?.department)
-  const handleSaveDraftDocument = (cacheUrl,)=>{
-    console.log("Console Comment",docCommentsRef.current)
-  }
+  console.log("Department IDD:", user?.department);
+  const handleSaveDraftDocument = (cacheUrl) => {
+    console.log("Console Comment", docCommentsRef.current);
+  };
 
   const handleDocComment = () => {
     if (docCurrentComment.trim()) {
@@ -127,7 +126,7 @@ const DocumentView = () => {
         timestamp: new Date().toISOString(),
         user: user?.first_name,
       };
-      
+
       const updatedDocComments = [...docComments, newDocComment];
       setDocComments(updatedDocComments);
       docCommentsRef.current = updatedDocComments;
@@ -136,11 +135,10 @@ const DocumentView = () => {
   };
 
   const handleDeleteComment = (commentId) => {
-    const updatedComments = docComments.filter(comment => comment.id !== commentId);
+    const updatedComments = docComments.filter((comment) => comment.id !== commentId);
     setDocComments(updatedComments);
     docCommentsRef.current = updatedComments;
   };
-
 
   // console.log("-+-+-+-+-+-+-+-+-+-+-++--++--+", docAdmin);
   // Extract userGroupIds directly from documentsData
@@ -166,22 +164,25 @@ const DocumentView = () => {
       setError(apiError?.message || "Failed to fetch template data");
       setLoading(false);
       return;
-    } 
+    }
     // console.log("Template Data:", templateData);
     // console.log("Template URL:", templateData?.template_url);
 
     if (templateData?.template_url) {
       const fetchEditorConfig = async () => {
         try {
-          const response = await fetch(`http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`, {
-            // const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              url: templateData.template_url,
-              user_name: "John Doe",
-            }),
-          });
+          const response = await fetch(
+            `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`,
+            {
+              // const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                url: templateData.template_url,
+                user_name: "John Doe",
+              }),
+            }
+          );
 
           if (!response.ok) {
             throw new Error("Failed to fetch editor configuration");
@@ -217,7 +218,9 @@ const DocumentView = () => {
               console.log("Save button clicked, triggering save...");
             }
           };
+
            docEditorRef.current = new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
+
             width: "100%",
             height: "100%",
             type: "desktop",
@@ -229,7 +232,6 @@ const DocumentView = () => {
                 id: "1",
                 // name: "Rohit Sharma",
                 name: `${user?.first_name}`,
-
               },
               watermark: {
                 text: "Confidential", // The text of the watermark
@@ -242,7 +244,7 @@ const DocumentView = () => {
                 autosave: true,
                 forcesave: false, // Enable forced saving
                 features: {
-                  forcesave: false
+                  forcesave: false,
                 },
                 saveButton: true, // Enable save button
                 // showReviewChanges:true,
@@ -263,20 +265,23 @@ const DocumentView = () => {
               onDocumentStateChange: (event) => {
                 const hasChanges = event.data;
                 console.log("Document has unsaved changes:", hasChanges);
-                
+
                 if (hasChanges) {
-                    // Document has unsaved changes - you could trigger auto-save here
-                    if (window.DocEditor) {
-                        window.DocEditor.execCommand("save");
-                    }
+                  // Document has unsaved changes - you could trigger auto-save here
+                  if (window.DocEditor) {
+                    window.DocEditor.execCommand("save");
+                  }
                 }
+
             },
               onAppReady: async() => {
+
                 // Store the editor instance globally
                 // window.docEditor = docEditorRef.current;
                 // console.log("Window Editor is ready");
                 // console.log("WIndow Editor log:",window.docEditor.openDocument())
                 window.docEditor = docEditorRef.current;
+
                 console.log("ONLYOFFICE Editor is Ready");
                 const editorInstance = window.docEditor;
                 // const document = editorInstance.getDocument();
@@ -297,46 +302,47 @@ const DocumentView = () => {
                   console.error("Error inserting header:", error);
                 }
             },
+
               onError: (event) => {
                 console.error("Editor error:", event);
               },
               onDownloadAs: async (response) => {
                 try {
-                    console.log('Download response:', response);
-                    const cacheUrl = response?.data?.url;
-                    console.log('Cache Url Link:',cacheUrl)
-                    console.log("Comment",docCommentsRef?.current)
-                    setCacheDocument(cacheUrl);
-                    const newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
-                    if (cacheUrl) {                 
-                      const draftData = {
-                        user: user?.id,
-                        document_id: id,
-                        comment_data: docCommentsRef?.current,
-                        version_no:newVersion,
-                        front_file_url: cacheUrl,
-                        department_id:String(user?.department)
-                        // templateID: data?.select_template,
-                        // userEmail: user?.email,
-                        // username: user?.first_name,
-                      };
-                      console.log("Submitting draft:", draftData);   
-                      try {
-                        // Send the comment data to the API
-                        const result = await addPathUrlDataForComments(draftData).unwrap();
-                        console.log('Comment saved successfully:', result);
-                      } catch (apiError) {
-                        console.error('Error saving comment:', apiError);
-                          // You might want to show an error message to the user here
-                    } 
+                  console.log("Download response:", response);
+                  const cacheUrl = response?.data?.url;
+                  console.log("Cache Url Link:", cacheUrl);
+                  console.log("Comment", docCommentsRef?.current);
+                  setCacheDocument(cacheUrl);
+                  const newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
+                  if (cacheUrl) {
+                    const draftData = {
+                      user: user?.id,
+                      document_id: id,
+                      comment_data: docCommentsRef?.current,
+                      version_no: newVersion,
+                      front_file_url: cacheUrl,
+                      department_id: String(user?.department),
+                      // templateID: data?.select_template,
+                      // userEmail: user?.email,
+                      // username: user?.first_name,
+                    };
+                    console.log("Submitting draft:", draftData);
+                    try {
+                      // Send the comment data to the API
+                      const result = await addPathUrlDataForComments(draftData).unwrap();
+                      console.log("Comment saved successfully:", result);
+                    } catch (apiError) {
+                      console.error("Error saving comment:", apiError);
+                      // You might want to show an error message to the user here
                     }
-                    
-                    return true; // Allow the normal download to proceed
+                  }
+
+                  return true; // Allow the normal download to proceed
                 } catch (error) {
-                    console.error('Error saving document:', error);
-                    return true;
+                  console.error("Error saving document:", error);
+                  return true;
                 }
-            }
+              },
             },
             token: editorConfig.token, // Pass the authentication token
           });
@@ -669,42 +675,41 @@ const DocumentView = () => {
     }
   };
 
-  const container = document.getElementById('onlyoffice-editor-container');
+  const container = document.getElementById("onlyoffice-editor-container");
 
   const handleDownloadFeature = async () => {
-  try {
+    try {
       if (docEditorRef.current) {
-          console.log("Debug 1");
+        console.log("Debug 1");
 
-          docEditorRef.current.downloadAs('docx', async (blobUrl) => {
-              console.log("Blob URL:", blobUrl); 
+        docEditorRef.current.downloadAs("docx", async (blobUrl) => {
+          console.log("Blob URL:", blobUrl);
 
-              // try {
-              //     // Fetch the actual file content if blobUrl is a URL
-              //     const response = await fetch(blobUrl);
-              //     const blob = await response.blob();
+          // try {
+          //     // Fetch the actual file content if blobUrl is a URL
+          //     const response = await fetch(blobUrl);
+          //     const blob = await response.blob();
 
-              //     // Create FormData and send to backend
-              //     const formData = new FormData();
-              //     formData.append('file', blob, 'document.docx');
+          //     // Create FormData and send to backend
+          //     const formData = new FormData();
+          //     formData.append('file', blob, 'document.docx');
 
-              //     const uploadResponse = await fetch(editorConfig.callbackUrl, {
-              //         method: 'POST',
-              //         body: formData
-              //     });
+          //     const uploadResponse = await fetch(editorConfig.callbackUrl, {
+          //         method: 'POST',
+          //         body: formData
+          //     });
 
-              //     const data = await uploadResponse.json();
-              //     console.log('Save response:', data);
-              // } catch (fetchError) {
-              //     console.error('Error fetching blob:', fetchError);
-              // }
-          });
+          //     const data = await uploadResponse.json();
+          //     console.log('Save response:', data);
+          // } catch (fetchError) {
+          //     console.error('Error fetching blob:', fetchError);
+          // }
+        });
       }
-  } catch (error) {
+    } catch (error) {
       console.error("Save failed:", error);
-  }
-};
-
+    }
+  };
 
   // const handleDialogConfirm = async () => {
   //   setDialogeffectiveOpen(false); // Close the dialog after confirmation
@@ -815,52 +820,50 @@ const DocumentView = () => {
       console.error("Editor not initialized");
       return;
     }
-  
+
     try {
       setSaving(true);
       console.log("Starting save process...");
-  
+
       // Use direct save command
-      docEditorRef.current.execCommand('save', {
+      docEditorRef.current.execCommand("save", {
         callback: async (response) => {
           console.log("Save command response:", response);
-          
+
           if (response.success) {
             // If the save command returns a URL or content
             if (response.data) {
               const formData = new FormData();
-              formData.append('file', response.data);
-              formData.append('fileName', editorConfig.document.title);
-  
+              formData.append("file", response.data);
+              formData.append("fileName", editorConfig.document.title);
+
               const serverResponse = await fetch(editorConfig.callbackUrl, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                  'Authorization': `Bearer ${editorConfig.token}`,
+                  Authorization: `Bearer ${editorConfig.token}`,
                 },
                 body: formData,
               });
-  
+
               if (serverResponse.ok) {
-                console.log('Document saved successfully');
-                alert('Document saved successfully!');
+                console.log("Document saved successfully");
+                alert("Document saved successfully!");
               } else {
-                throw new Error('Failed to save to server');
+                throw new Error("Failed to save to server");
               }
             }
           } else {
-            throw new Error('Save command failed');
+            throw new Error("Save command failed");
           }
-        }
+        },
       });
-  
     } catch (error) {
-      console.error('Error saving document:', error);
+      console.error("Error saving document:", error);
       alert(`Failed to save document: ${error.message}`);
     } finally {
       setSaving(false);
     }
   };
-
 
   return (
     <MDBox
@@ -984,7 +987,7 @@ const DocumentView = () => {
             color="submit"
             // onClick={handleSaveDraft}
             onClick={handleDownloadFeature}
-            disabled={isLoading} 
+            disabled={isLoading}
           >
             Save Draft
           </MDButton>
@@ -1008,12 +1011,12 @@ const DocumentView = () => {
             Print
           </MDButton>
 
-      {/* <button onClick={handleDownloadFeature}>
+          {/* <button onClick={handleDownloadFeature}>
         Force Save
       </button> */}
         </MDBox>
       </Box>
-          {/* <Box sx={{ maxWidth: 700, mx: "auto", p: 3, mt: 3, boxShadow: 3,display:'flex',flexDirection:'column',gap:2 }}>
+      {/* <Box sx={{ maxWidth: 700, mx: "auto", p: 3, mt: 3, boxShadow: 3,display:'flex',flexDirection:'column',gap:2 }}>
 
       <h3>Add Comment</h3>
       <MDBox display="flex" gap={2} mt={1}>
@@ -1041,70 +1044,85 @@ const DocumentView = () => {
         </MDButton>
     </Box> */}
 
-    <Box sx={{ maxWidth: 700, mx: "auto", p: 3, mt: 3, boxShadow: 3,display:'flex',flexDirection:'column',gap:2 }}>
-    <h2>Add Comment:</h2>
-    <MDBox>
-
-        <TextareaAutosize
-          minRows={3}
-          placeholder="Write your comment here..."
-          value={docCurrentComment}
-          onChange={(e) => setDocCurrentComment(e.target.value)}
-          style={{
-            width: "400px",
-            padding: "10px",
-            fontSize: "16px",
-            borderRadius: "5px",
-            border: "1px solid #ccc",
-            resize: "vertical",
-          }}
-        />
-      </MDBox>
-      
-      <MDButton 
-        variant="gradient" 
-        color="primary"
-        onClick={handleDocComment}
-        disabled={!docCurrentComment.trim()}
+      <Box
+        sx={{
+          maxWidth: 700,
+          mx: "auto",
+          p: 3,
+          mt: 3,
+          boxShadow: 3,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
       >
-        Add Comment
-      </MDButton>
-    </Box>
-    
+        <h2>Add Comment:</h2>
+        <MDBox>
+          <TextareaAutosize
+            minRows={3}
+            placeholder="Write your comment here..."
+            value={docCurrentComment}
+            onChange={(e) => setDocCurrentComment(e.target.value)}
+            style={{
+              width: "400px",
+              padding: "10px",
+              fontSize: "16px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              resize: "vertical",
+            }}
+          />
+        </MDBox>
 
-    <Box sx={{ mt: 4 ,width:'400px',maxWidth:'700px',marginX:'auto'}}>
-        <Typography variant="h6" sx={{ mb: 2 }}>Comments:</Typography>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <MDButton
+          variant="gradient"
+          color="primary"
+          onClick={handleDocComment}
+          disabled={!docCurrentComment.trim()}
+        >
+          Add Comment
+        </MDButton>
+      </Box>
+
+      <Box sx={{ mt: 4, width: "400px", maxWidth: "700px", marginX: "auto" }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Comments:
+        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {docComments?.map((comment) => (
-            <Paper 
-              key={comment.id} 
+            <Paper
+              key={comment.id}
               elevation={1}
-              sx={{ 
+              sx={{
                 p: 2,
-                bgcolor: 'grey.50',
-                position: 'relative'
+                bgcolor: "grey.50",
+                position: "relative",
               }}
             >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}
+              >
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     {comment.user}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mt: 0.5 }}
+                  >
                     {new Date(comment.timestamp).toLocaleString()}
                   </Typography>
-                  <Typography sx={{ mt: 1 }}>
-                    {comment.text}
-                  </Typography>
+                  <Typography sx={{ mt: 1 }}>{comment.text}</Typography>
                 </Box>
-                <IconButton 
+                <IconButton
                   onClick={() => handleDeleteComment(comment.id)}
                   size="small"
-                  sx={{ 
-                    '&:hover': { 
-                      color: 'error.main',
-                      bgcolor: 'error.light' 
-                    }
+                  sx={{
+                    "&:hover": {
+                      color: "error.main",
+                      bgcolor: "error.light",
+                    },
                   }}
                 >
                   <DeleteIcon fontSize="small" />
@@ -1113,11 +1131,7 @@ const DocumentView = () => {
             </Paper>
           ))}
           {docComments.length === 0 && (
-            <Typography 
-              color="text.secondary" 
-              align="center"
-              sx={{ py: 2 }}
-            >
+            <Typography color="text.secondary" align="center" sx={{ py: 2 }}>
               No comments yet
             </Typography>
           )}
@@ -1134,9 +1148,7 @@ const DocumentView = () => {
           </Grid>
         </Grid>
       </MDBox>
-      <div>
-            
-      </div>
+      <div></div>
       <SendBackDialog
         open={dialogOpen}
         onClose={handleCloseDialog}

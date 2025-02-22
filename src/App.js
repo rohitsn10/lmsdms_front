@@ -123,6 +123,7 @@ import ClassAddQuestion from "dmscomponent/class-room/class-question-list/add-cl
 import CreateClassQuiz from "dmscomponent/class-room/class-quiz-list/class-add-quiz/index.js";
 import ClassMultiChoiceQuestionsSection from "dmscomponent/class-room/classroom-mcq/index.js";
 import DueSOPDocument from "layouts/authentication/document-listing/due-sop/index.js";
+import UserReports from "dmscomponent/user-reports/index.js";
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -390,8 +391,8 @@ export default function App() {
       <Route path="/class-quiz" element={<QuestionQuiz/>}/>
       <Route path="/class-add-question" element={<ClassAddQuestion/>}/>
       <Route path="/class-add-quiz" element={<CreateClassQuiz/>}/>
-     
-     
+      <Route path="/user-reports" element={<UserReports/>}/>
+
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
     <ToastContainer />

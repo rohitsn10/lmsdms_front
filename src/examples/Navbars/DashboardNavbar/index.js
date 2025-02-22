@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useLocation, Link, useNavigate, Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Link as RouterLink } from "react-router-dom";
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
 // Material-UI core components
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -33,8 +33,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-
-// Custom components
+import { toast } from 'react-toastify';
 import MDBox from "components/MDBox";
 import MDInput from "components/MDInput";
 import Breadcrumbs from "examples/Breadcrumbs";
@@ -45,7 +44,7 @@ import {
   navbarIconButton,
   navbarMobileMenu,
 } from "examples/Navbars/DashboardNavbar/styles";
-
+import axios from 'axios';
 // Material Dashboard 2 React context
 import {
   useMaterialUIController,
@@ -54,17 +53,17 @@ import {
   setOpenConfigurator,
 } from "context";
 import { useAuth } from "hooks/use-auth";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 // Import the API hook for switching roles
 import { useRequestUserGroupListQuery, useUserSwitchRoleMutation } from "api/auth/switchRoleApi";
 import { setUserDetails } from "slices/userRoleSlice";
-
+import { useGetemployeeRecordlogQuery } from "apilms/reportsApi";
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
-  // const [openMenu, setOpenMenu] = useState(false);
+  const { data, error} = useGetemployeeRecordlogQuery();
   const route = useLocation().pathname.split("/").slice(1);
   const { user, role } = useAuth();
   const [roles, setRoles] = useState([]);
@@ -72,9 +71,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [selectedRole, setSelectedRole] = useState("");
   const [password, setPassword] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorReportEl, setAnchorReportEl] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   // Fetch roles using the API hook
   const dispatch2 = useDispatch();
   const { data: rolesData, isLoading, isError } = useRequestUserGroupListQuery();
@@ -82,24 +82,68 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { is_dms_user, is_lms_user, is_active } = useSelector((state) => state.userRole);
 
   const handleToggle = (event) => {
-    dispatch2(setUserDetails({
-      is_dms_user,
-      is_lms_user,
-      is_active: !is_active         
-    }));
-    if(is_active){
-      console.log("Is Active.Toggle Off",is_active)
-      navigate('/dashboard')
-    }else{
-      console.log("Is Active.Toggle On",is_active)
-      navigate('/lms-dashboard')
+    dispatch2(
+      setUserDetails({
+        is_dms_user,
+        is_lms_user,
+        is_active: !is_active,
+      })
+    );
+    if (is_active) {
+      console.log("Is Active.Toggle Off", is_active);
+      navigate("/dashboard");
+    } else {
+      console.log("Is Active.Toggle On", is_active);
+      navigate("/lms-dashboard");
     }
     // console.log("Is DMS USER:,",is_dms_user)
     // console.log("Is LMS USER:,",is_lms_user)
   };
   // console.log(is_active)
-  const [userSwitchRole, { isLoading: isSwitchLoading, isError: isSwitchError, data: switchData, error: switchError }] = useUserSwitchRoleMutation();
+  const [
+    userSwitchRole,
+    { isLoading: isSwitchLoading, isError: isSwitchError, data: switchData, error: switchError },
+  ] = useUserSwitchRoleMutation();
+  const handleOpenReportSubMenu = (event) => {
+    setAnchorReportEl(event.currentTarget);
+  };
+  const handleCloseReportSubMenu = () => {
+    setAnchorReportEl(null);
+  };
+  const handleDownloadReport = async () => {
+    if (isLoading) {
+      toast.info("Generating the report, please wait...");
+      return;
+    }
 
+    if (error) {
+      toast.error("Error fetching employee record log.");
+      return;
+    }
+
+    if (data && data.status && data.data) {
+      const fileUrl = data.data;
+      try {
+        // Download the file using Axios
+        const response = await axios.get(fileUrl, { responseType: 'blob' });
+
+        // Create a link element to trigger the download
+        const link = document.createElement('a');
+        const file = new Blob([response.data], { type: 'application/pdf' });
+        link.href = URL.createObjectURL(file);
+        link.download = fileUrl.split('/').pop(); // Extract filename from URL
+        link.click();
+
+        // Show success toast
+        toast.success("Report downloaded successfully!");
+      } catch (err) {
+        // Show error toast
+        toast.error(`Failed to download report: ${err.message}`);
+      }
+    } else {
+      toast.error("Failed to generate report.");
+    }
+  };
   useEffect(() => {
     if (isLoading) {
       console.log("Loading roles...");
@@ -110,7 +154,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
 
     if (rolesData && rolesData.data) {
-      console.log('Roles data:', rolesData);
+      console.log("Roles data:", rolesData);
       const fetchedRoles = rolesData.data.map((role) => ({
         id: role.id,
         name: role.name,
@@ -168,10 +212,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
   };
   const isButtonVisible = () => {
-    return roles.some(role => role.id === 1); 
+    return roles.some((role) => role.id === 1);
   };
-  
-  
+
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {
       let colorValue = light || darkMode ? white.main : dark.main;
@@ -186,49 +229,49 @@ function DashboardNavbar({ absolute, light, isMini }) {
     width: 28,
     height: 16,
     padding: 0,
-    display: 'flex',
-    '&:active': {
-      '& .MuiSwitch-thumb': {
+    display: "flex",
+    "&:active": {
+      "& .MuiSwitch-thumb": {
         width: 15,
       },
-      '& .MuiSwitch-switchBase.Mui-checked': {
-        transform: 'translateX(9px)',
+      "& .MuiSwitch-switchBase.Mui-checked": {
+        transform: "translateX(9px)",
       },
     },
-    '& .MuiSwitch-switchBase': {
+    "& .MuiSwitch-switchBase": {
       padding: 2,
-      '&.Mui-checked': {
-        transform: 'translateX(12px)',
-        color: '#fff',
-        '& + .MuiSwitch-track': {
+      "&.Mui-checked": {
+        transform: "translateX(12px)",
+        color: "#fff",
+        "& + .MuiSwitch-track": {
           opacity: 1,
-          backgroundColor: '#1890ff',
-          ...theme.applyStyles('dark', {
-            backgroundColor: '#177ddc',
+          backgroundColor: "#1890ff",
+          ...theme.applyStyles("dark", {
+            backgroundColor: "#177ddc",
           }),
         },
       },
     },
-    '& .MuiSwitch-thumb': {
-      boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+    "& .MuiSwitch-thumb": {
+      boxShadow: "0 2px 4px 0 rgb(0 35 11 / 20%)",
       width: 12,
       height: 12,
       borderRadius: 6,
-      transition: theme.transitions.create(['width'], {
+      transition: theme.transitions.create(["width"], {
         duration: 200,
       }),
     },
-    '& .MuiSwitch-track': {
+    "& .MuiSwitch-track": {
       borderRadius: 16 / 2,
       opacity: 1,
-      backgroundColor: 'rgba(0,0,0,.25)',
-      boxSizing: 'border-box',
-      ...theme.applyStyles('dark', {
-        backgroundColor: 'rgba(255,255,255,.35)',
+      backgroundColor: "rgba(0,0,0,.25)",
+      boxSizing: "border-box",
+      ...theme.applyStyles("dark", {
+        backgroundColor: "rgba(255,255,255,.35)",
       }),
     },
   }));
-  
+
   return (
     <AppBar
       position={absolute ? "absolute" : navbarType}
@@ -242,7 +285,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
         {!isMini && (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
-          {/* <FormControlLabel
+            {/* <FormControlLabel
               control={
                 <Switch checked={false} onChange={()=>{}} name="antoine" />
               }
@@ -253,18 +296,26 @@ function DashboardNavbar({ absolute, light, isMini }) {
               <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} />
               <Typography>LMS</Typography>
             </Stack> */}
-            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Typography sx={{
-            fontSize: '17px'
-          }}>DMS</Typography>
-              <AntSwitch 
-                checked={is_active}  // Switch position based on is_active
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+              <Typography
+                sx={{
+                  fontSize: "17px",
+                }}
+              >
+                DMS
+              </Typography>
+              <AntSwitch
+                checked={is_active} // Switch position based on is_active
                 onChange={handleToggle}
-                inputProps={{ 'aria-label': 'ant design' }} 
+                inputProps={{ "aria-label": "ant design" }}
               />
-            <Typography sx={{
-            fontSize: '17px'
-          }}>LMS</Typography>
+              <Typography
+                sx={{
+                  fontSize: "17px",
+                }}
+              >
+                LMS
+              </Typography>
             </Stack>
             <MDBox pr={1}>
               <Button
@@ -278,28 +329,26 @@ function DashboardNavbar({ absolute, light, isMini }) {
               </Button>
             </MDBox>
             {isButtonVisible() && (
-  <MDBox pr={1}>
-    <Button
-      variant="contained"
-      size="large"
-      sx={{
-        backgroundColor: "#e91e63",
-        color: "white !important", 
-        padding: "6px 16px", 
-        minHeight: "36px", 
-        "&:hover": {
-          backgroundColor: "#d81b60",
-        },
-      }}
-      component={RouterLink}
-      to="/roles-listing"
-    >
-      Roles
-    </Button>
-  </MDBox>
-)}
-
-
+              <MDBox pr={1}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{
+                    backgroundColor: "#e91e63",
+                    color: "white !important",
+                    padding: "6px 16px",
+                    minHeight: "36px",
+                    "&:hover": {
+                      backgroundColor: "#d81b60",
+                    },
+                  }}
+                  component={RouterLink}
+                  to="/roles-listing"
+                >
+                  Roles
+                </Button>
+              </MDBox>
+            )}
 
             <MDBox color={light ? "white" : "inherit"} display="flex" alignItems="center">
               <Dialog
@@ -406,6 +455,20 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 <MenuItem component={RouterLink} to="/update-password">
                   Change Password
                 </MenuItem>
+
+                {/* Report menu item with submenu */}
+                <MenuItem onClick={handleOpenReportSubMenu}>Report</MenuItem>
+                <Menu
+                  anchorEl={anchorReportEl}
+                  open={Boolean(anchorReportEl)}
+                  onClose={handleCloseReportSubMenu}
+                  MenuListProps={{
+                    "aria-labelledby": "report-menu-item",
+                  }}
+                >
+                  <MenuItem onClick={handleDownloadReport}>Employee record log Report</MenuItem>
+                </Menu>
+
                 <MenuItem component={RouterLink} to="/logout">
                   Logout
                 </MenuItem>
