@@ -53,6 +53,7 @@ const DocumentView = () => {
   const [docEditorLoaded, setDocEditorLoaded] = useState(false);
   const [editorConfig, setEditorConfig] = useState(null);
   const { data: templateData, isError, error: apiError } = useGetTemplateQuery(id);
+  console.log("Template Hook",templateData)
   const [docContent, setDocContent] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const quillRef = useRef(null);
@@ -66,7 +67,7 @@ const DocumentView = () => {
   const [createDocument] = useCreateDocumentMutation();
   const [createComment] = useCreateCommentMutation();
   const { data, error, isLoading } = useGetTemplateQuery(id);
-  console.log("Template ID:", data?.select_template);
+  // console.log("Template ID:", data?.select_template);
   const [draftDocument] = useDraftDocumentMutation();
   const [documentReviewStatus] = useDocumentReviewStatusMutation();
   const navigate = useNavigate();
@@ -165,25 +166,27 @@ const DocumentView = () => {
       setLoading(false);
       return;
     }
-    // console.log("Template Data:", templateData);
+
+    console.log("Template Data:", templateData);
     // console.log("Template URL:", templateData?.template_url);
 
-    if (templateData?.template_url) {
+    if (templateData) {
       const fetchEditorConfig = async () => {
         try {
           const response = await fetch(
-            `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`,
+            // `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`,
+            `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${template_ID}`,
+
             {
               // const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                url: templateData.template_url,
+                url: templateData,
                 user_name: "John Doe",
               }),
             }
           );
-
           if (!response.ok) {
             throw new Error("Failed to fetch editor configuration");
           }
