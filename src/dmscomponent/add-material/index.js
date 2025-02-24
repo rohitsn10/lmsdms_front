@@ -32,7 +32,7 @@ function AddMaterial() {
       order: sectionOrder,
       description: sectionDescription,
       status: sectionStatus,
-      files: []
+      files: [],
     };
     setSections([...sections, newSection]);
     // Reset section fields
@@ -47,7 +47,7 @@ function AddMaterial() {
       type: fileType,
       name: fileName,
       minReadingTime: minReadingTime,
-      file: null // This will hold the file object
+      file: null, // This will hold the file object
     };
 
     const updatedSections = [...sections];
@@ -61,7 +61,8 @@ function AddMaterial() {
 
   const handleFileChange = (index, event) => {
     const updatedSections = [...sections];
-    updatedSections[index].files[updatedSections[index].files.length - 1].file = event.target.files[0];
+    updatedSections[index].files[updatedSections[index].files.length - 1].file =
+      event.target.files[0];
     setSections(updatedSections);
   };
 
@@ -170,7 +171,7 @@ function AddMaterial() {
               </TextField>
             </MDBox>
             <MDBox mb={3}>
-              <MDButton variant="gradient" color="success"  onClick={handleAddSection}>
+              <MDButton variant="gradient" color="success" onClick={handleAddSection}>
                 Add Section
               </MDButton>
             </MDBox>
@@ -178,20 +179,26 @@ function AddMaterial() {
 
           <MDBox>
             {sections.map((section, sectionIndex) => (
-              <MDBox key={sectionIndex} sx={{ mb: 3, border: '1px solid #ccc', padding: 2 }}>
-                <MDTypography variant="h6" fontWeight="medium">{section.name}</MDTypography>
+              <MDBox key={sectionIndex} sx={{ mb: 3, border: "1px solid #ccc", padding: 2 }}>
+                <MDTypography variant="h6" fontWeight="medium">
+                  {section.name}
+                </MDTypography>
                 <MDTypography variant="body2">{section.description}</MDTypography>
                 <List>
                   {section.files.map((file, fileIndex) => (
                     <ListItem
                       key={fileIndex}
                       secondaryAction={
-                        <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveFile(sectionIndex, fileIndex)}>
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          onClick={() => handleRemoveFile(sectionIndex, fileIndex)}
+                        >
                           <DeleteIcon />
                         </IconButton>
                       }
                     >
-                      <ListItemText primary={file.name ? file.name : 'No file uploaded'} />
+                      <ListItemText primary={file.name ? file.name : "No file uploaded"} />
                     </ListItem>
                   ))}
                 </List>
@@ -244,7 +251,11 @@ function AddMaterial() {
                     onChange={(e) => handleFileChange(sectionIndex, e)}
                   />
                 </MDBox>
-                <MDButton variant="gradient" color="submit" onClick={() => handleAddFile(sectionIndex)}>
+                <MDButton
+                  variant="gradient"
+                  color="submit"
+                  onClick={() => handleAddFile(sectionIndex)}
+                >
                   Add File
                 </MDButton>
               </MDBox>
@@ -260,10 +271,7 @@ function AddMaterial() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog
-        open={openSignatureDialog}
-        handleClose={handleCloseSignatureDialog}
-      />
+      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
     </BasicLayout>
   );
 }
