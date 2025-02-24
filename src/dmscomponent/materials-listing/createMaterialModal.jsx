@@ -16,7 +16,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/material/styles";
 import apiService from "services/apiService";
 import { useNavigate } from "react-router-dom";
-
+import MDButton from "components/MDButton";
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -218,9 +218,10 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
               
             />
 
-            <Button
+            <MDButton
               component="label"
-              variant="contained"
+              variant="gradient"
+              color="error"
               startIcon={<CloudUploadIcon />}
               sx={{
                 marginTop: 2,
@@ -234,12 +235,13 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
                 onChange={handleFileChange}
                 accept=".pdf,.doc,.docx,.txt,.mp4,.avi,.mov"
               />
-            </Button>
+            </MDButton>
 
-            <Button
+            <MDButton
               type="submit"
               fullWidth
-              variant="contained"
+              variant="gradient"
+              color="submit"
               sx={{
                 marginTop: 2,
                 backgroundColor: "#31AC47",
@@ -249,7 +251,7 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
               }}
             >
               Add Material
-            </Button>
+            </MDButton>
           </form>
         </DialogContent>
       </Dialog>

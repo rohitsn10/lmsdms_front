@@ -36,6 +36,7 @@ import { trainerApi } from "api/auth/trainerApi";
 import { classtestApi } from "apilms/classtestApi";
 import { WorkflowApi } from "apilms/workflowapi.js";
 import { lmsReportsAPI } from "apilms/reportsApi.js";
+import { userProfileApi } from "api/auth/userProfileApi.js";
 const store = configureStore({
   reducer: {
     userRole: userRoleSlice,
@@ -75,6 +76,7 @@ const store = configureStore({
     [classtestApi.reducerPath]: classtestApi.reducer,
     [WorkflowApi.reducerPath]: WorkflowApi.reducer,
     [lmsReportsAPI.reducerPath]: lmsReportsAPI.reducer,
+    [userProfileApi.reducerPath]: userProfileApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -114,6 +116,7 @@ const store = configureStore({
       classtestApi.middleware,
       WorkflowApi.middleware,
       lmsReportsAPI.middleware,
+      userProfileApi.middleware
     ),
 });
 
