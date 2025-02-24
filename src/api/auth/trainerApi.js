@@ -54,20 +54,14 @@ export const trainerApi = createApi({
         url: `lms_module/trainer_update/${trainer_id}`,
         method: "PUT",
         body: {
-          trainer_name,
+          trainer_name, 
           description,
           employee_code,
           designation,
           department,
         },
       }),
-      transformResponse: (response) => {
-        if (response.status) {
-          return response.message;
-        }
-        throw new Error(response.message || "Failed to update trainer");
-      },
-      invalidatesTags: ["Trainers"],
+      transformResponse: (response) => response,
     }),
     trainerActiveDeactive: builder.mutation({
       query: (trainer_id) => ({

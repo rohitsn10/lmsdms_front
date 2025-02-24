@@ -39,8 +39,13 @@ function AddJobRole() {
   const [createJobRole] = useCreateJobRoleMutation();
   const validateInputs = () => {
     const newErrors = {};
-    if (!title.trim()) newErrors.title = "Title is required.";
+
+    if (!title.trim()) newErrors.title = "Job Role Title is required.";
     if (!jobDescription.trim()) newErrors.jobDescription = "Job Description is required.";
+    if (!selectedPlant) newErrors.selectedPlant = "Plant selection is required.";
+    if (!selectedArea) newErrors.selectedArea = "Area selection is required.";
+    if (!selectedDepartment) newErrors.selectedDepartment = "Department selection is required.";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -65,7 +70,6 @@ function AddJobRole() {
         plant: selectedPlant,
         area: selectedArea,
         department: selectedDepartment,
-
       }).unwrap();
 
       toast.success("Job Role added successfully!");
@@ -140,7 +144,7 @@ function AddJobRole() {
               />
             </MDBox>
             <MDBox mb={3}>
-              <FormControl fullWidth  sx={{ width: "100%"}}>
+              <FormControl fullWidth error={!!errors.selectedPlant}>
                 <InputLabel id="select-plant-label">Plant Name</InputLabel>
                 <Select
                   labelId="select-plant-label"
@@ -148,12 +152,12 @@ function AddJobRole() {
                   value={selectedPlant}
                   onChange={(e) => setSelectedPlant(e.target.value)}
                   input={<OutlinedInput label="Plant Name" />}
+                  error={!!errors.selectedPlant}
                   sx={{
                     minWidth: 200,
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                  
                 >
                   {plantData?.data?.map((plant) => (
                     <MenuItem key={plant.id} value={plant.id}>
@@ -163,9 +167,10 @@ function AddJobRole() {
                 </Select>
               </FormControl>
             </MDBox>
+
             {/* Area Dropdown */}
             <MDBox mb={3}>
-              <FormControl fullWidth margin="dense" sx={{ width: "100%", mb: 1 }}>
+              <FormControl fullWidth error={!!errors.selectedArea}>
                 <InputLabel id="select-area-label">Select Area</InputLabel>
                 <Select
                   labelId="select-area-label"
@@ -173,12 +178,12 @@ function AddJobRole() {
                   value={selectedArea}
                   onChange={(e) => setSelectedArea(e.target.value)}
                   input={<OutlinedInput label="Select Area" />}
+                  error={!!errors.selectedArea}
                   sx={{
                     minWidth: 200,
                     height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
-                 
                 >
                   {areaLoading ? (
                     <MenuItem disabled>Loading...</MenuItem>
@@ -196,17 +201,19 @@ function AddJobRole() {
                 </Select>
               </FormControl>
             </MDBox>
+
             {/* Department Dropdown */}
             <MDBox mb={3}>
-            <FormControl fullWidth margin="dense" sx={{ width: "100%", mb: 1 }}>
+              <FormControl fullWidth error={!!errors.selectedDepartment}>
                 <InputLabel>Department</InputLabel>
                 <Select
                   value={selectedDepartment}
                   onChange={(e) => setSelectedDepartment(e.target.value)}
                   label="Department"
+                  error={!!errors.selectedArea}
                   sx={{
                     minWidth: 200,
-                    height: "2.5rem",
+                    height: "3rem",
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
                 >
@@ -218,6 +225,7 @@ function AddJobRole() {
                 </Select>
               </FormControl>
             </MDBox>
+
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit">
                 Submit

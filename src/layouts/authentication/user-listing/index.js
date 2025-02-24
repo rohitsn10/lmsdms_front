@@ -18,10 +18,11 @@ import JobDescriptionDialog from "./job- description";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import TaskDescriptionDialog from "./approve-description";
 import DownloadIcon from "@mui/icons-material/Download";
-import { useCreateInductionCertificateMutation } from "apilms/workflowapi";
+import { useCreateInductionCertificateMutation,useGetTrainingCompletionCertificateMutation } from "apilms/workflowapi";
 import { toast } from "react-toastify";
 import Visibilityicon from "@mui/icons-material/Visibility";
 import SOPDialog from "./Document-listView";
+// import { useGetTrainingCompletionCertificateQuery } from "apilms/workflowapi";
 const UsersListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
@@ -41,8 +42,8 @@ const UsersListing = () => {
     });
   const [downloadInductionCertificate] = useCreateInductionCertificateMutation();
   const [isSOPDialogOpen, setSOPDialogOpen] = useState(false);
-  const [sopData, setSopData] = useState([]);
 
+  const [downloadTrainingCertificate] = useGetTrainingCompletionCertificateMutation();
   const formattedData = Array.isArray(data?.data)
     ? data.data.map((item, index) => ({
         id: item.id,
@@ -122,8 +123,25 @@ const UsersListing = () => {
       toast.error("Failed to download induction certificate. Please try again.");
     }
   };
+  const handleDownloadTrainingCertificate = async (user) => {
+    try {
+    
+      const response = await downloadTrainingCertificate(user.id).unwrap();
+      if (response?.data) {
+        const fileUrl = response.data; // Extract the certificate URL from the API response
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = "training_completion_certificate.pdf"; // Set the filename for the download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success("Training Certificate downloaded successfully!"); // Notify the user
+      }
+    } catch (error) {
+      toast.error("Error downloading certificate. Please try again."); // Handle errors and notify the user
+    }
+  };
 
-  // Conditionally render columns based on the groupId
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "full_name", headerName: "Full Name", flex: 1, headerAlign: "center" },
@@ -214,8 +232,25 @@ const UsersListing = () => {
         </IconButton>
       ),
     },
+    ...(groupId === 7
+      ? [
+          {
+            field: "download_training_certificate",
+            headerName: "Download Training Certificate",
+            flex: 0.5,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <IconButton
+                color="info"
+                onClick={() => handleDownloadTrainingCertificate(params.row)} 
+              >
+                <DownloadIcon />
+              </IconButton>
+            ),
+          },
+        ]
+      : []),
   ];
-  
 
   return (
     <MDBox p={3}>

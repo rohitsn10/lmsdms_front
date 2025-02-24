@@ -67,8 +67,16 @@ export const dashboardApi = createApi({
         dataCountreject: response.data_count, 
       }),
     }),
+    getDashboardDocument: builder.query({
+      query: (id) => `lms_module/dashboard_document/${id}`,
+      transformResponse: (response) => ({
+        totalAssignDocument: response.total_assign_document,
+        failedDocument: response.failed_document,
+        passedDocument: response.passed_document,
+      }),
+    }),
   }),
-});
+}); 
 
 export const {
   useGetDashboardCountsQuery,
@@ -78,4 +86,5 @@ export const {
   useGetDocumentDataOfStatusIdElevenQuery,
   useGetDocumentDataOfStatusIdFourQuery,
   useGetDocumentDataOfStatusIdnintyQuery,
+  useGetDashboardDocumentQuery,
 } = dashboardApi;

@@ -1,17 +1,17 @@
 // src/apis/areaApi.js
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import config from 'constants/config';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import config from "constants/config";
 
 export const areaApi = createApi({
-  reducerPath: 'areaApi',
+  reducerPath: "areaApi",
   baseQuery: fetchBaseQuery({
     baseUrl: config.BACKEND_API_URL,
     prepareHeaders: (headers) => {
-      const token = sessionStorage.getItem('token');
+      const token = sessionStorage.getItem("token");
       if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
+        headers.set("Authorization", `Bearer ${token}`);
       }
-      headers.set('Content-Type', 'application/json');
+      headers.set("Content-Type", "application/json");
       return headers;
     },
   }),
@@ -19,8 +19,8 @@ export const areaApi = createApi({
     // POST method for creating an area
     createGetArea: builder.mutation({
       query: ({ area_name, department_id, area_description }) => ({
-        url: 'lms_module/create_get_area',
-        method: 'POST',
+        url: "lms_module/create_get_area",
+        method: "POST",
         body: { area_name, department_id, area_description },
       }),
       transformResponse: (response) => response, // Handle raw response
@@ -29,17 +29,17 @@ export const areaApi = createApi({
     // GET method for retrieving area data
     getArea: builder.query({
       query: () => ({
-        url: 'lms_module/create_get_area',
-        method: 'GET',
+        url: "lms_module/create_get_area",
+        method: "GET",
       }),
       transformResponse: (response) => response, // Handle raw response
     }),
 
     // PUT method for updating or deleting an area
     updateDeleteArea: builder.mutation({
-      query: ({ area_id, area_name, department_id, area_description }) => ({
-        url: `lms_module/update_delete_area/${area_id}`,
-        method: 'PUT',
+      query: ({ id, area_name, department_id, area_description }) => ({
+        url: `lms_module/update_delete_area/${id}`,
+        method: "PUT",
         body: { area_name, department_id, area_description },
       }),
       transformResponse: (response) => response, // Handle raw response
@@ -47,8 +47,8 @@ export const areaApi = createApi({
   }),
 });
 
-export const { 
-  useCreateGetAreaMutation,  // Hook for the create_get_area POST API
-  useGetAreaQuery,           // Hook for the create_get_area GET API
+export const {
+  useCreateGetAreaMutation, // Hook for the create_get_area POST API
+  useGetAreaQuery, // Hook for the create_get_area GET API
   useUpdateDeleteAreaMutation,
 } = areaApi;
