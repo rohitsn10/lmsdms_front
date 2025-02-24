@@ -28,6 +28,7 @@ const PrintApprovalListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [openDialog, setOpenDialog] = useState(false); // Approval Dialog state
   const [selectedRequest, setSelectedRequest] = useState(null); // Selected print request data
+  console.log(selectedRequest);
   const [openPrintDialog, setOpenPrintDialog] = useState(false); // Print Document Dialog state
   const [selectedDocumentId, setSelectedDocumentId] = useState(null); // Store document id
   const [Selectedstatus, setSelectedstatus] = useState(""); // State for Parent Document selection
@@ -95,11 +96,16 @@ const PrintApprovalListing = () => {
       window.open(fileUrl, "_blank"); // Open the file URL in a new tab to download
     }
   };
-  const handleOpenPrintDialog = (documentId, noOfRequestByAdmin) => {
+  const handleOpenPrintDialog = (documentId, noOfRequestByAdmin, approvalNumbers) => {
     setSelectedDocumentId(documentId); // Store the document id
-    setSelectedRequest({ ...selectedRequest, no_of_request_by_admin: noOfRequestByAdmin }); // Store no_of_request_by_admin
+    setSelectedRequest((prevRequest) => ({
+      ...prevRequest,
+      no_of_request_by_admin: noOfRequestByAdmin,
+      approval_numbers: approvalNumbers, // Ensure approval_numbers is set
+    }));
     setOpenPrintDialog(true); // Open the print document dialog
   };
+  
 
   const handleClosePrintDialog = () => {
     setOpenPrintDialog(false); // Close the print document dialog
@@ -205,7 +211,7 @@ const PrintApprovalListing = () => {
             <IconButton
               color="primary" // Static color for the print icon
               onClick={() =>
-                handleOpenPrintDialog(params.row.sop_document_id, params.row.no_of_request_by_admin)
+                handleOpenPrintDialog(params.row.sop_document_id, params.row.no_of_request_by_admin, params.row.approval_numbers)
               } // Open PrintDialog with document id
               disabled={params.row.status !== "Approve"} // Disable button if status is not "Approve"
             >
@@ -325,6 +331,7 @@ const PrintApprovalListing = () => {
           onClose={handleClosePrintDialog}
           id={selectedDocumentId}
           noOfRequestByAdmin={selectedRequest?.no_of_request_by_admin}
+          printNumber={selectedRequest?.approval_numbers}
         />
       )}
     </MDBox>
