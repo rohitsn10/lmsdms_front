@@ -24,18 +24,10 @@ function EditMethodology() {
   // Use the mutation hook to update methodology
   const [updateMethodology, { isLoading, error, data }] = useUpdateMethodologyMutation();
 
-  useEffect(() => {
-    if (data && data.status) {
-      toast.success(data.message);
-      navigate("/methodology-listing"); // Redirect after successful update
-    }
-    if (error) {
-      toast.error("Failed to update methodology.");
-    }
-  }, [data, error, navigate]);
+
 
   const validateInputs = () => {
-    const newErrors = {};
+    const newErrors = {}; 
     if (!methodologyName.trim()) newErrors.methodologyName = "Methodology Name is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -55,23 +47,28 @@ function EditMethodology() {
   };
 
   const handleSignatureComplete = async (password) => {
-    setOpenSignatureDialog(false); // Close signature dialog
+    setOpenSignatureDialog(false);
     if (!password) {
       toast.error("E-Signature is required to proceed.");
       return;
     }
-
-    // Proceed with updating methodology
+  
     try {
-      await updateMethodology({ id: item?.id, methodology_name: methodologyName }).unwrap();
-      toast.success("Methodology updated successfully!");
-      setMethodologyName("");
-      setErrors({});
+      const response = await updateMethodology({ id: item?.id, methodology_name: methodologyName }).unwrap();
+      
+      toast.success(response.message || "Methodology updated successfully!");
+  
+      // Delay navigation slightly so the toast is visible
+      setTimeout(() => {
+        navigate("/methodology-listing");
+      }, 1500);
+      
     } catch (error) {
       const errorMessage = error?.data?.message || "Failed to update methodology. Please try again.";
       toast.error(errorMessage);
     }
   };
+  
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>

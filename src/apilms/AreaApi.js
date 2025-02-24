@@ -37,8 +37,8 @@ export const areaApi = createApi({
 
     // PUT method for updating or deleting an area
     updateDeleteArea: builder.mutation({
-      query: ({ area_id, area_name, department_id, area_description }) => ({
-        url: `lms_module/update_delete_area/${area_id}`,
+      query: ({ id, area_name, department_id, area_description }) => ({
+        url: `lms_module/update_delete_area/${id}`,
         method: 'PUT',
         body: { area_name, department_id, area_description },
       }),

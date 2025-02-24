@@ -56,6 +56,8 @@ function AddDocument() {
     isLoading: workflowsLoading,
     error: workflowsError,
   } = useFetchWorkflowsQuery();
+  const [equipmentId, setEquipmentId] = useState("");
+  const [productCode, setProductCode] = useState("");
 
   // const { data: userdata, isLoading, error } = useDepartmentWiseReviewerQuery();
   // const users = userdata || [];
@@ -183,6 +185,8 @@ function AddDocument() {
         training_required: trainingRequired.toLowerCase() === "yes", // Convert to boolean
         // visible_to_users: selectedUsers, // Assuming selectedUsers is an array
         parent_document: parentDocument,
+        equipment_id: equipmentId,
+        product_code: productCode,
       };
 
       // Make the API call to create the document
@@ -311,6 +315,35 @@ function AddDocument() {
                 )}
               </FormControl>
             </MDBox>
+            {/* Equipment ID (Shown when type === 4) */}
+            {type === 4 && (
+              <MDBox mb={3}>
+                <MDInput
+                  type="text"
+                  label="Equipment ID"
+                  value={equipmentId}
+                  onChange={(e) => setEquipmentId(e.target.value)}
+                  error={Boolean(errors.equipmentId)}
+                  helperText={errors.equipmentId}
+                  fullWidth
+                />
+              </MDBox>
+            )}
+
+            {/* Product Code (Shown when type === 5, 6, or 7) */}
+            {[5, 6, 7].includes(type) && (
+              <MDBox mb={3}>
+                <MDInput
+                  type="text"
+                  label="Product Code"
+                  value={productCode}
+                  onChange={(e) => setProductCode(e.target.value)}
+                  error={Boolean(errors.productCode)}
+                  helperText={errors.productCode}
+                  fullWidth
+                />
+              </MDBox>
+            )}
 
             {/* <MDBox mb={3}>
               <MDInput

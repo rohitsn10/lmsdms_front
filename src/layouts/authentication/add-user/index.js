@@ -109,7 +109,7 @@ function AddUser() {
     setPhone("");
     setUsername("");
     setUserRole([]);
-    setDepartment("");
+   
     setErrors({});
   };
 

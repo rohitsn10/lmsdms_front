@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import Card from "@mui/material/Card";
 import MenuItem from "@mui/material/MenuItem";
 import MDBox from "components/MDBox";
@@ -10,7 +11,7 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { FormControl, InputLabel, Select, OutlinedInput } from "@mui/material";
-import { useCreateGetAreaMutation } from "apilms/AreaApi"; // Assuming this is the correct path for your query and mutation
+import { useUpdateDeleteAreaMutation } from "apilms/AreaApi";
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 
 function EditArea() {
@@ -18,36 +19,57 @@ function EditArea() {
   const [departmentName, setDepartmentName] = useState("");
   const [description, setDescription] = useState("");
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const { state } = useLocation();  // Access the state passed through navigate
+  const { state } = useLocation();
+  
   const { data: departments, isLoading, isError } = useFetchDepartmentsQuery();
-  const [updateArea, { isLoading: isUpdating, isSuccess, isError: isUpdateError }] =
-    useCreateGetAreaMutation();  // Assuming this mutation can be used to update area
+  const [updateArea, { isLoading: isUpdating }] = useUpdateDeleteAreaMutation();
 
   useEffect(() => {
-    if (state) {
-      const { area_name, department_id, area_description } = state.area;
+    if (state?.area) {
+      const { id, area_name, department, area_description } = state.area;
       setAreaName(area_name);
-      setDepartmentName(department_id);
+      setDepartmentName(department);
       setDescription(area_description);
     }
-  }, [state]);  // Only run this when state changes
+  }, [state]);
 
-  const handleSubmit = async (e) => {
+  const validateInputs = () => {
+    const newErrors = {};
+    if (!areaName.trim()) newErrors.areaName = "Area Name is required.";
+    if (!departmentName) newErrors.departmentName = "Department Name is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateInputs()) {
+      toast.error("Please fill all required fields.");
+      return;
+    }
+    setOpenSignatureDialog(true);
+  };
 
-    // Trigger the mutation to update the area
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false);
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
     try {
       await updateArea({
+        id: state.area.id, // Ensure the correct area is updated
         area_name: areaName,
-        department_id: departmentName, // Assuming departmentName holds the department ID
+        department_id: departmentName,
         area_description: description,
       }).unwrap();
 
-      setOpenSignatureDialog(true);
-      console.log("Area Details Updated:", { areaName, departmentName, description });
+      toast.success("Area details updated successfully!");
+      navigate("/area-listing");
     } catch (error) {
+      toast.error("Failed to update area. Please try again.");
       console.error("Error updating area:", error);
     }
   };
@@ -56,15 +78,6 @@ function EditArea() {
     setAreaName("");
     setDepartmentName("");
     setDescription("");
-  };
-
-  const handleCloseSignatureDialog = () => {
-    setOpenSignatureDialog(false);
-    navigate("/area-listing");
-  };
-
-  const handleDepartmentChange = (event) => {
-    setDepartmentName(event.target.value);
   };
 
   if (isLoading) return <div>Loading departments...</div>;
@@ -77,7 +90,6 @@ function EditArea() {
           borderRadius="lg"
           sx={{
             background: "linear-gradient(212deg, #d5b282, #f5e0c3)",
-            borderRadius: "lg",
             mx: 2,
             mt: -3,
             p: 2,
@@ -89,17 +101,6 @@ function EditArea() {
             Edit Area
           </MDTypography>
         </MDBox>
-        <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
-          <MDButton
-            variant="outlined"
-            color="error"
-            size="small"
-            onClick={handleClear}
-            sx={{ marginLeft: "10px", marginRight: "10px" }}
-          >
-            Clear
-          </MDButton>
-        </MDBox>
 
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
@@ -110,25 +111,22 @@ function EditArea() {
                 fullWidth
                 value={areaName}
                 onChange={(e) => setAreaName(e.target.value)}
+                error={!!errors.areaName}
+                helperText={errors.areaName}
               />
             </MDBox>
             <MDBox mb={3}>
-              <FormControl fullWidth margin="dense">
+              <FormControl fullWidth margin="dense" error={!!errors.departmentName}>
                 <InputLabel id="select-department-label">Department Name</InputLabel>
                 <Select
                   labelId="select-department-label"
                   id="select-department"
                   value={departmentName}
-                  onChange={handleDepartmentChange}
+                  onChange={(e) => setDepartmentName(e.target.value)}
                   input={<OutlinedInput label="Department Name" />}
-                  sx={{
-                    minWidth: 200,
-                    height: "3rem",
-                    ".MuiSelect-select": { padding: "0.45rem" },
-                  }}
                 >
-                  {departments && departments.data && departments.data.length > 0 ? (
-                    departments.data.map((dept) => (
+                  {departments?.length > 0 ? (
+                    departments.map((dept) => (
                       <MenuItem key={dept.id} value={dept.id}>
                         {dept.department_name}
                       </MenuItem>
@@ -139,7 +137,6 @@ function EditArea() {
                 </Select>
               </FormControl>
             </MDBox>
-
             <MDBox mb={3}>
               <MDInput
                 label="Description"
@@ -151,13 +148,7 @@ function EditArea() {
               />
             </MDBox>
             <MDBox mt={2} mb={1}>
-              <MDButton
-                variant="gradient"
-                color="submit"
-                fullWidth
-                type="submit"
-                disabled={isUpdating}
-              >
+              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isUpdating}>
                 {isUpdating ? "Updating..." : "Update"}
               </MDButton>
             </MDBox>
@@ -166,7 +157,11 @@ function EditArea() {
       </Card>
 
       {/* E-Signature Dialog */}
-      <ESignatureDialog open={openSignatureDialog} handleClose={handleCloseSignatureDialog} />
+      <ESignatureDialog
+        open={openSignatureDialog}
+        onClose={() => setOpenSignatureDialog(false)}
+        onConfirm={handleSignatureComplete}
+      />
     </BasicLayout>
   );
 }
