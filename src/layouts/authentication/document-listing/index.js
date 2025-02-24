@@ -113,7 +113,7 @@ const DocumentListing = () => {
       return; // Exit if params or row is missing
     }
 
-    const { id, document_current_status, training_required, approval_status, version } = params.row;
+    const { id, document_current_status,select_template, training_required, approval_status, version } = params.row;
     // console.log("Version", version);
     // Ensure required fields are defined
     if (
@@ -127,7 +127,7 @@ const DocumentListing = () => {
     }
     // console.log("Console.log check for ID:",params?.row?.version)
     navigate(
-      `/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}`
+      `/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}`
     );
     // console.log("Navigated with:", {
     //   id,
