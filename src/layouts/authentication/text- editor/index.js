@@ -79,6 +79,7 @@ const DocumentView = () => {
   const trainingRequired = searchParams.get("training_required");
   const approval_status = searchParams.get("approval_status");
   const version = searchParams.get("version");
+  const templateIDMain = searchParams.get("templateID")
   console.log("Version", version);
 
   // const [dialogeffectiveOpen, setDialogeffectiveOpen] = useState(false);
@@ -175,7 +176,7 @@ const DocumentView = () => {
         try {
           const response = await fetch(
             // `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`,
-            `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${template_ID}`,
+            `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${templateIDMain}`,
 
             {
               // const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
@@ -1047,7 +1048,7 @@ const DocumentView = () => {
         </MDButton>
     </Box> */}
 
-      <Box
+      {/* <Box
         sx={{
           maxWidth: 700,
           mx: "auto",
@@ -1085,9 +1086,9 @@ const DocumentView = () => {
         >
           Add Comment
         </MDButton>
-      </Box>
+      </Box> */}
 
-      <Box sx={{ mt: 4, width: "400px", maxWidth: "700px", marginX: "auto" }}>
+      {/* <Box sx={{ mt: 4, width: "400px", maxWidth: "700px", marginX: "auto" }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
           Comments:
         </Typography>
@@ -1139,7 +1140,7 @@ const DocumentView = () => {
             </Typography>
           )}
         </Box>
-      </Box>
+      </Box> */}
 
       <MDBox
         sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
