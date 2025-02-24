@@ -22,7 +22,9 @@ function TinyMCEEditorDialog({ open, onClose, title, content, onSave }) {
   const handleSave = () => {
     if (editorRef.current) {
       const plainTextContent = editorContent.replace(/<[^>]*>/g, ''); // Strip HTML tags to get plain text
+    
       onSave(plainTextContent); // Save the plain text content
+
     }
     onClose(); // Close the dialog after saving
   };

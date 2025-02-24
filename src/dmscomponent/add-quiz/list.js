@@ -14,7 +14,7 @@ const QuizListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const { DataQuiz } = location.state || {}; 
+  const { DataQuiz } = location.state || {};
   const { data: response, isLoading, isError, refetch } = useGetTrainingQuizzesQuery(DataQuiz.id);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ const QuizListing = () => {
       ...quiz,
       serial_number: index + 1,
       quiz_time: `${quiz.quiz_time} mins`, // Format quiz time
-      pass_criteria: quiz.pass_criteria,  // Add pass criteria to the list
+      pass_criteria: quiz.pass_criteria, // Add pass criteria to the list
     }));
 
   const columns = [
@@ -50,17 +50,17 @@ const QuizListing = () => {
     { field: "quiz_type", headerName: "Quiz Type", flex: 1, headerAlign: "center" },
     { field: "quiz_time", headerName: "Quiz Time", flex: 1, headerAlign: "center" },
     { field: "pass_criteria", headerName: "Pass Criteria", flex: 1, headerAlign: "center" },
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 0.5,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <IconButton color="primary" onClick={() => handleEditQuiz(params.row)}>
-          <EditIcon />
-        </IconButton>
-      ),
-    },
+    // {
+    //   field: "action",
+    //   headerName: "Action",
+    //   flex: 0.5,
+    //   headerAlign: "center",
+    //   renderCell: (params) => (
+    //     <IconButton color="primary" onClick={() => handleEditQuiz(params.row)}>
+    //       <EditIcon />
+    //     </IconButton>
+    //   ),
+    // },
   ];
 
   if (isLoading) {
@@ -89,7 +89,7 @@ const QuizListing = () => {
           <MDButton
             variant="contained"
             color="primary"
-            onClick={() => navigate("/add-quiz",{state:{DataQuiz}})}
+            onClick={() => navigate("/add-quiz", { state: { DataQuiz } })}
             sx={{ ml: 2 }}
           >
             Add Quiz

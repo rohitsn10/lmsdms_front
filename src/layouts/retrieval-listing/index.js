@@ -91,12 +91,12 @@ const PrintRetrievalListing = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
-          {hasPermission(userPermissions, "retrieval", "isChange") && (
+          {hasPermission(userPermissions, "retrivalnumber", "isChange") && (
             <IconButton color="primary" onClick={() => handleDialogOpen(params.row)}>
               <AssignmentReturnIcon />
             </IconButton>
           )}
-          {hasPermission(userPermissions, "retrieval", "isView") && (
+          {hasPermission(userPermissions, "retrivalnumber", "isView") && (
             <IconButton color="info" onClick={() => handleApprovedDialogOpen(params.row)}>
               <ArticleRoundedIcon />
             </IconButton>

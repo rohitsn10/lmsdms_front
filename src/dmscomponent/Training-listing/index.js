@@ -117,12 +117,12 @@ const TrainingListing = () => {
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
           {/* Edit button */}
-          <IconButton
+          {/* <IconButton
             color="info"
             onClick={() => handleEditTraining(params.row)} 
           >
             <EditIcon />
-          </IconButton>
+          </IconButton> */}
           <IconButton
             color="success"
             onClick={() => {

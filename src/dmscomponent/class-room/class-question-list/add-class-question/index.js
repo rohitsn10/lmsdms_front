@@ -168,12 +168,12 @@ function ClassAddQuestion() {
   };
 
   const handleSaveQuestion = (content) => {
-    setQuestionText(content);
+    setQuestionText(content.trim()); // Trim spaces
   };
-
+  
   const handleSaveAnswer = (content) => {
     const updatedAnswers = [...answers];
-    updatedAnswers[currentAnswerIndex].text = content;
+    updatedAnswers[currentAnswerIndex].text = content.trim(); // Trim spaces
     setAnswers(updatedAnswers);
   };
 
