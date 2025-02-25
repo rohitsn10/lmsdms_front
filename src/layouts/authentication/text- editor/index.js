@@ -21,10 +21,7 @@ import {
   useDocumentDocadminStatusMutation,
 } from "api/auth/texteditorApi";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import CommentDrawer from "./Comments/CommentsDrawer"; // Adjusted import for CommentDrawer
-import CommentModal from "./Comments/CommentDialog"; // Adjusted import for CommentModal
 import { useCreateCommentMutation } from "api/auth/commentsApi";
-import AntiCopyPattern from "layouts/authentication/text- editor/anti-copy/AntiCopyPattern";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDraftDocumentMutation } from "api/auth/texteditorApi";
 import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
@@ -81,7 +78,12 @@ const DocumentView = () => {
   const version = searchParams.get("version");
   const templateIDMain = searchParams.get("templateID")
   console.log("Version", version);
-
+  const [isSaved, setIsSaved] = useState(false);
+  const handleDownloadSave = () => {
+    setIsSaved(true);
+    handleDownloadFeature(); // Existing save function
+  };
+  
   // const [dialogeffectiveOpen, setDialogeffectiveOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(""); // State for Assigned To dropdown
@@ -89,6 +91,16 @@ const DocumentView = () => {
   // console.log("Navigated with data in text Editor :", { id, document_current_status });
   // console.log("Training Required:", trainingRequired)
   const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
+  // const documentFilter = documentsData?.documents?.find(doc => doc.id === id);
+  // console.log("DocXXXXXXXXXXXXXXXX",documentFilter);
+  // if (isDocumentsLoading) {
+  //   console.log("Loading documents...");
+  // } else {
+  //   console.log("Documents RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR:", documentsData);
+  //   const documentFilter = documentsData?.documents?.find(doc => doc.id == id);
+  //   console.log("DocXXXXXXXXXXXXXXXX",documentFilter);
+  // }
+
   // console.log("Document datatat",documentsData);
   const [randomNumber] = useState(Math.floor(Math.random() * 100000));
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
@@ -177,13 +189,13 @@ const DocumentView = () => {
           const response = await fetch(
             // `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`,
             `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${templateIDMain}`,
-
             {
               // const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 url: templateData,
+                // url:documentFilter?.front_file_url,
                 user_name: "John Doe",
               }),
             }
@@ -224,7 +236,6 @@ const DocumentView = () => {
           };
 
            docEditorRef.current = new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
-
             width: "100%",
             height: "100%",
             type: "desktop",
@@ -245,12 +256,13 @@ const DocumentView = () => {
                 visibleForAllUsers: true, // Make the watermark visible for all users
               },
               customization: {
-                autosave: true,
+                autosave: false,
                 forcesave: false, // Enable forced saving
                 features: {
                   forcesave: false,
+                  autosave: false,
                 },
-                saveButton: true, // Enable save button
+                saveButton: false, // Enable save button
                 // showReviewChanges:true,
                 trackChanges: true, 
                 chat: false,
@@ -261,21 +273,21 @@ const DocumentView = () => {
                 rightMenu: false,
                 toolbar: true,
                 statusBar: true,
-                autosaveMessage: true,
-                forcesaveMessage: true,
+                autosaveMessage: false,
+                forcesaveMessage: false,
               },
             },
             events: {
               onDocumentStateChange: (event) => {
-                const hasChanges = event.data;
-                console.log("Document has unsaved changes:", hasChanges);
+                // const hasChanges = event.data;
+                // console.log("Document has unsaved changes:", hasChanges);
 
-                if (hasChanges) {
-                  // Document has unsaved changes - you could trigger auto-save here
-                  if (window.DocEditor) {
-                    window.DocEditor.execCommand("save");
-                  }
-                }
+                // if (hasChanges) {
+                //   // Document has unsaved changes - you could trigger auto-save here
+                //   if (window.DocEditor) {
+                //     window.DocEditor.execCommand("save");
+                //   }
+                // }
 
             },
               onAppReady: async() => {
@@ -309,13 +321,14 @@ const DocumentView = () => {
 
               onError: (event) => {
                 console.error("Editor error:", event);
+                return true
               },
               onDownloadAs: async (response) => {
                 try {
                   console.log("Download response:", response);
                   const cacheUrl = response?.data?.url;
-                  console.log("Cache Url Link:", cacheUrl);
-                  console.log("Comment", docCommentsRef?.current);
+                  // console.log("Cache Url Link:", cacheUrl);
+                  // console.log("Comment", docCommentsRef?.current);
                   setCacheDocument(cacheUrl);
                   const newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
                   if (cacheUrl) {
@@ -330,11 +343,12 @@ const DocumentView = () => {
                       // userEmail: user?.email,
                       // username: user?.first_name,
                     };
-                    console.log("Submitting draft:", draftData);
+                    // console.log("Submitting draft:", draftData);
                     try {
                       // Send the comment data to the API
                       const result = await addPathUrlDataForComments(draftData).unwrap();
-                      console.log("Comment saved successfully:", result);
+                      console.log("Data Added", result);
+                      toast.success("Document Saved.")
                     } catch (apiError) {
                       console.error("Error saving comment:", apiError);
                       // You might want to show an error message to the user here
@@ -684,31 +698,13 @@ const DocumentView = () => {
   const handleDownloadFeature = async () => {
     try {
       if (docEditorRef.current) {
-        console.log("Debug 1");
+        // console.log("Debug 1");
 
         docEditorRef.current.downloadAs("docx", async (blobUrl) => {
-          console.log("Blob URL:", blobUrl);
-
-          // try {
-          //     // Fetch the actual file content if blobUrl is a URL
-          //     const response = await fetch(blobUrl);
-          //     const blob = await response.blob();
-
-          //     // Create FormData and send to backend
-          //     const formData = new FormData();
-          //     formData.append('file', blob, 'document.docx');
-
-          //     const uploadResponse = await fetch(editorConfig.callbackUrl, {
-          //         method: 'POST',
-          //         body: formData
-          //     });
-
-          //     const data = await uploadResponse.json();
-          //     console.log('Save response:', data);
-          // } catch (fetchError) {
-          //     console.error('Error fetching blob:', fetchError);
-          // }
+          // console.log("Blob URL:", blobUrl);
         });
+        // console.log("Docc")
+        setIsSaved(true)
       }
     } catch (error) {
       console.error("Save failed:", error);
@@ -917,7 +913,7 @@ const DocumentView = () => {
                   color="submit"
                   type="button" // Set to "button" to prevent default form submission
                   onClick={handleSubmit}
-                  disabled={isLoading} // Disable the button while the API call is in progress
+                  disabled={isLoading || !isSaved} // Disable the button while the API call is in progress
                 >
                   {isLoading ? "Submitting..." : "Submit"}
                 </MDButton>
@@ -939,7 +935,7 @@ const DocumentView = () => {
                   variant="gradient"
                   color="error" // Change color to indicate sending back
                   onClick={handleOpenDialog}
-                  disabled={isLoading}
+                  disabled={isLoading || !isSaved}
                 >
                   Send Back
                 </MDButton>
@@ -961,7 +957,7 @@ const DocumentView = () => {
                   variant="gradient"
                   onClick={handleOpenDialog}
                   color="error"
-                  disabled={isLoading}
+                  disabled={isLoading || !isSaved}
                 >
                   Send Back
                 </MDButton>
@@ -977,7 +973,7 @@ const DocumentView = () => {
                 variant="gradient"
                 color="error"
                 onClick={handleOpenDialog}
-                disabled={isLoading}
+                disabled={isLoading || !isSaved}
               >
                 Send Back
               </MDButton>
@@ -993,7 +989,7 @@ const DocumentView = () => {
             onClick={handleDownloadFeature}
             disabled={isLoading}
           >
-            Save Draft
+            Save
           </MDButton>
           {/* <button
           onClick={handleSave}
@@ -1149,6 +1145,7 @@ const DocumentView = () => {
         <Grid container spacing={3} justifyContent="center" alignItems="center">
           <Grid item xs={12} md={6} lg={4}>
             <OrdersOverview docId={id} />
+
           </Grid>
         </Grid>
       </MDBox>
