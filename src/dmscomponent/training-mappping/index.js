@@ -1,236 +1,384 @@
 import React, { useState, useEffect } from "react";
 import {
   Card,
-  IconButton,
-  Box,
+  CardHeader,
+  CardContent,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  OutlinedInput,
-  Button as MDButton,
+  Checkbox,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Button,
+  Box,
+  Typography,
+  Paper,
+  Divider,
+  IconButton,
+  Chip,
+  Alert,
+  Tooltip,
+  CircularProgress,
 } from "@mui/material";
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import {
+  ArrowForward as ArrowForwardIcon,
+  Delete as DeleteIcon,
+  Save as SaveIcon,
+  Info as InfoIcon,
+} from "@mui/icons-material";
 import { useUserListQuery } from "api/auth/userApi";
 import { useGetJobRoleQuery } from "apilms/jobRoleApi";
-import { useJobroleAssignTrainingMutation } from "apilms/MappingApi"; 
-import { useJobroleAssignTrainingListQuery } from "apilms/MappingApi"; // Import this query
-import { toast } from "react-toastify"; 
+import { useJobroleAssignTrainingMutation, useJobroleAssignTrainingListQuery } from "apilms/MappingApi";
+import { toast } from "react-toastify";
 
 const TrainingMapping = () => {
-  const [selectedUser, setSelectedUser] = useState(""); 
-  const [selectedJobRole, setSelectedJobRole] = useState([]); 
-  const [kanbanData, setKanbanData] = useState({
-    toDo: [],
-    inProgress: [],
+  const [selectedUser, setSelectedUser] = useState("");
+  const [selectedJobRoles, setSelectedJobRoles] = useState([]);
+  const [assignedJobRoles, setAssignedJobRoles] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: userData, isLoading: userLoading } = useUserListQuery();
+  const { data: jobRoleData, isLoading: jobRoleLoading } = useGetJobRoleQuery();
+  const [assignJobRoles] = useJobroleAssignTrainingMutation();
+  
+  // Fetch already assigned job roles when user is selected
+  const { 
+    data: assignedJobRoleData, 
+    isLoading: assignedJobRoleIsLoading 
+  } = useJobroleAssignTrainingListQuery(selectedUser, { 
+    skip: !selectedUser 
   });
-  
-  const { data: userData, error: userError, isLoading: userLoading } = useUserListQuery();
-  const { data: jobRoleData, error: jobRoleError, isLoading: jobRoleLoading } = useGetJobRoleQuery();
-  const [jobroleAssignTraining, { isLoading: isMappingLoading }] = useJobroleAssignTrainingMutation();
-  
-  // New query for fetching assigned job roles based on selected user
-  const { data: assignedRolesData, isLoading: isAssignedRolesLoading, error: assignedRolesError } = useJobroleAssignTrainingListQuery(selectedUser,{skip: !selectedUser,});
-  
+
+  // Initialize assigned job roles when user changes or when fetching completes
+  useEffect(() => {
+    if (selectedUser && assignedJobRoleData?.data?.[0]?.job_roles) {
+      // Extract job role IDs from assigned data
+      const existingAssignments = assignedJobRoleData.data[0].job_roles.map(role => role.id);
+      setAssignedJobRoles(existingAssignments);
+    } else if (selectedUser && !assignedJobRoleIsLoading) {
+      // Clear assignments if no data is found
+      setAssignedJobRoles([]);
+    }
+  }, [selectedUser, assignedJobRoleData, assignedJobRoleIsLoading]);
+
+  // Reset selections when job role data changes
   useEffect(() => {
     if (jobRoleData) {
-      // Initialize the 'toDo' list with job roles when fetched
-      setKanbanData((prev) => ({
-        ...prev,
-        toDo: jobRoleData.data.map((role) => ({
-          id: role.id.toString(),
-          title: role.job_role_name,
-        })),
-      }));
+      setSelectedJobRoles([]);
     }
   }, [jobRoleData]);
+
+  const handleUserChange = (e) => {
+    const newUser = e.target.value;
+    setSelectedUser(newUser);
+    // Reset selections when user changes
+    setSelectedJobRoles([]);
+  };
+
+  const handleAssign = () => {
+    setAssignedJobRoles((prev) => [...prev, ...selectedJobRoles]);
+    setSelectedJobRoles([]);
+  };
+
+  const handleUnassign = (jobRoleId) => {
+    setAssignedJobRoles((prev) => prev.filter((id) => id !== jobRoleId));
+  };
+
+  const handleToggleSelect = (jobRoleId) => {
+    setSelectedJobRoles((prev) => 
+      prev.includes(jobRoleId)
+        ? prev.filter(id => id !== jobRoleId)
+        : [...prev, jobRoleId]
+    );
+  };
   
-  // UseEffect for fetching assigned roles when selectedUser changes
-  useEffect(() => {
-    if (selectedUser && assignedRolesData) {
-      const assignedRoles = assignedRolesData.data?.[0]?.job_roles.map((role) => ({
-        id: role.id.toString(),
-        title: role.name,
-      }));
-      setKanbanData((prev) => ({
-        ...prev,
-        inProgress: assignedRoles || [],
-      }));
-    }
-  }, [selectedUser, assignedRolesData]);
-  
-  const handleDragEnd = (result) => {
-    const { destination, source } = result;
-
-    if (!destination) {
-      return;
-    }
-
-    const sourceColumn = source.droppableId;
-    const destColumn = destination.droppableId;
-
-    if (
-      sourceColumn === destColumn &&
-      source.index === destination.index
-    ) {
-      return;
-    }
-
-    const sourceItems = Array.from(kanbanData[sourceColumn]);
-    const [removed] = sourceItems.splice(source.index, 1);
-
-    const destinationItems = Array.from(kanbanData[destColumn]);
-    destinationItems.splice(destination.index, 0, removed);
-
-    setKanbanData({
-      ...kanbanData,
-      [sourceColumn]: sourceItems,
-      [destColumn]: destinationItems,
-    });
-
-    // If item was moved to the "inProgress" column, set it as the selected job role
-    if (destColumn === "inProgress") {
-      // Ensure job role is set as an integer
-      setSelectedJobRole((prevState) => [...prevState, parseInt(removed.id, 10)]); // Add new ID to selectedJobRole
+  const handleSelectAll = () => {
+    const availableJobRoles = getAvailableJobRoles();
+    const availableIds = availableJobRoles.map(role => role.id);
+    
+    if (availableIds.length === selectedJobRoles.length) {
+      setSelectedJobRoles([]);
+    } else {
+      setSelectedJobRoles(availableIds);
     }
   };
 
-  const handleMapping = async () => {
-    if (!selectedUser || selectedJobRole.length === 0) {
-      toast.error("Please select both a user and at least one job role!");
+  const handleSubmit = async () => {
+    if (!selectedUser) {
+      toast.warning("Please select a user first");
       return;
     }
-
+    
+    if (assignedJobRoles.length === 0) {
+      toast.warning("Please assign at least one job role");
+      return;
+    }
+    
+    setIsSubmitting(true);
     try {
-      // Ensure job_role_ids is passed as an array of integers
-      await jobroleAssignTraining({
-        user_id: selectedUser,
-        job_role_ids: selectedJobRole, // Multiple job role IDs in an array
-      }).unwrap();
-
-      // Success toast notification
-      toast.success(`User ${selectedUser} successfully mapped to Job Roles: ${selectedJobRole.join(", ")}`);
-    } catch (error) {
-      // Error toast notification
-      toast.error("Error occurred while mapping job roles.");
+      await assignJobRoles({ 
+        user_id: selectedUser, 
+        job_role_ids: assignedJobRoles 
+      });
+      toast.success("Job roles assigned successfully!");
+      // Don't reset assigned job roles as they're now persisted
+    } catch (err) {
+      toast.error("Error assigning job roles");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (userLoading || jobRoleLoading || isAssignedRolesLoading) {
-    return <div>Loading...</div>;
-  }
+  // Get the user name for display
+  const getUserName = () => {
+    if (!selectedUser || !userData?.data) return "";
+    const user = userData.data.find(user => user.id === selectedUser);
+    return user?.full_name || "";
+  };
 
-  if (userError || jobRoleError || assignedRolesError) {
-    return <div>Error occurred while fetching data</div>;
-  }
+  // Filter out already assigned job roles from available list
+  const getAvailableJobRoles = () => {
+    if (!jobRoleData?.data) return [];
+    
+    return jobRoleData.data.filter(role => {
+      return !assignedJobRoles.includes(role.id);
+    });
+  };
+
+  // Get job role objects for assigned IDs
+  const getAssignedJobRoleObjects = () => {
+    if (!jobRoleData?.data) return [];
+    
+    return assignedJobRoles.map(id => {
+      const role = jobRoleData.data.find(r => r.id === id);
+      return role;
+    }).filter(Boolean);
+  };
+
+  // Normalize job role object structure
+  const normalizeJobRole = (role) => {
+    return {
+      id: role.id,
+      title: role.job_role_name || role.name,
+      description: role.description || 'Job Role'
+    };
+  };
 
   return (
-    <MDBox p={3}>
-      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
-        <MDBox p={3} display="flex" alignItems="center" justifyContent="center">
-          {/* User Dropdown */}
-          <FormControl fullWidth margin="dense" sx={{ width: "250px", ml: 5 }}>
-            <InputLabel id="select-user-label">Select User</InputLabel>
+    <Paper elevation={3} sx={{ maxWidth: 900, mx: "auto", my: 4, p: 3 }}>
+      <Typography variant="h4" component="h1" gutterBottom align="center" color="primary">
+        User Job Role Mapping
+      </Typography>
+      <Divider sx={{ mb: 4 }} />
+      
+      {/* User Selection */}
+      <Card elevation={2} sx={{ mb: 4 }}>
+        <CardHeader 
+          title="Select User" 
+          subheader="Choose a user to assign job roles to"
+          avatar={
+            <Tooltip title="First select a user before assigning job roles">
+              <InfoIcon color="info" />
+            </Tooltip>
+          }
+        />
+        <CardContent>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel id="user-label">User</InputLabel>
             <Select
-              labelId="select-user-label"
-              id="select-user"
+              labelId="user-label"
               value={selectedUser}
-              onChange={(e) => setSelectedUser(e.target.value)}
-              input={<OutlinedInput label="Select User" />}
-              sx={{
-                minWidth: 150,
-                height: "2.4rem",
-                ".MuiSelect-select": { padding: "0.45rem" },
-              }}
+              onChange={handleUserChange}
+              label="User"
+              disabled={userLoading}
             >
-              {userData.data
-                .filter((user) => user.is_jr_approve) // Filter users where is_jr_approve is true
-                .map((user) => (
-                  <MenuItem key={user.id} value={user.id}>
-                    {user.full_name}
-                  </MenuItem>
-                ))}
+              {userData?.data?.filter(user => user.is_jr_approve).map((user) => (
+                <MenuItem key={user.id} value={user.id}>
+                  {user.full_name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
-
-          {/* Title */}
-          <MDTypography variant="h3" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center", mr: 20 }}>
-            Training Mapping
-          </MDTypography>
-
-          {/* Mapping Button */}
-          <MDButton
-            variant="contained"
-            sx={{
-              ml: 2,
-              backgroundColor: "#e91e63",
-              color: "#fff",
-              "&:hover": { backgroundColor: "#e2185b" },
-            }}
-            onClick={handleMapping}
-            disabled={isMappingLoading} // Disable the button during loading
-          >
-            {isMappingLoading ? "Mapping..." : "Mapping"}
-          </MDButton>
-        </MDBox>
-
-        {/* Drag and Drop Context */}
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <MDBox display="flex" justifyContent="center" alignItems="center">
-            {/* To Do Column (Job Role List) */}
-            <Droppable droppableId="toDo">
-              {(provided) => (
-                <Card sx={{ width: "43%", ml: 5, p: 2, mb: 2, borderRadius: 5, boxShadow: 5 }} ref={provided.innerRef} {...provided.droppableProps}>
-                  <MDTypography variant="h4" sx={{ textAlign: "center" }}>
-                    Job Role
-                  </MDTypography>
-                  <Box>
-                    {kanbanData.toDo.map((item, index) => (
-                      <Draggable key={item.id} draggableId={item.id} index={index}>
-                        {(provided) => (
-                          <Card sx={{ marginBottom: 2, padding: 2, boxShadow: 1 }} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                            <MDTypography variant="body1">{item.title}</MDTypography>
-                          </Card>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </Box>
-                </Card>
-              )}
-            </Droppable>
-            <IconButton sx={{ mx: 2, fontSize: "6rem" }}>
-              <ArrowForwardIcon sx={{ fontSize: "inherit" }} />
-            </IconButton>
-            {/* In Progress Column (Assigned Roles) */}
-            <Droppable droppableId="inProgress">
-              {(provided) => (
-                <Card sx={{ width: "43%", p: 2, mb: 2, borderRadius: 5, boxShadow: 5 }} ref={provided.innerRef} {...provided.droppableProps}>
-                  <MDTypography variant="h4" sx={{ textAlign: "center" }}>
-                    Assigned Role
-                  </MDTypography>
-                  <Box>
-                    {kanbanData.inProgress.map((item, index) => (
-                      <Draggable key={item.id} draggableId={item.id} index={index}>
-                        {(provided) => (
-                          <Card sx={{ marginBottom: 2, padding: 2, boxShadow: 1 }} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                            <MDTypography variant="body1">{item.title}</MDTypography>
-                          </Card>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </Box>
-                </Card>
-              )}
-            </Droppable>
-          </MDBox>
-        </DragDropContext>
+          
+          {selectedUser && (
+            <Chip 
+              label={`Selected: ${getUserName()}`} 
+              color="primary" 
+              sx={{ mt: 2 }}
+            />
+          )}
+        </CardContent>
       </Card>
-    </MDBox>
+      
+      {/* Job Role Assignment Section */}
+      <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
+        {/* Available Job Roles */}
+        <Card elevation={2} sx={{ flex: 1 }}>
+          <CardHeader 
+            title="Available Job Roles" 
+            subheader="Select job roles to assign"
+            action={
+              <Button 
+                size="small" 
+                onClick={handleSelectAll}
+                disabled={jobRoleLoading || getAvailableJobRoles().length === 0}
+              >
+                {selectedJobRoles.length === getAvailableJobRoles().length ? 'Deselect All' : 'Select All'}
+              </Button>
+            }
+          />
+          <Divider />
+          <CardContent sx={{ maxHeight: 400, overflow: 'auto' }}>
+            {jobRoleLoading ? (
+              <Box display="flex" justifyContent="center" p={2}>
+                <CircularProgress size={24} />
+                <Typography ml={2}>Loading job roles...</Typography>
+              </Box>
+            ) : getAvailableJobRoles().length === 0 ? (
+              <Alert severity="info">
+                No available job roles to assign
+              </Alert>
+            ) : (
+              <List dense>
+                {getAvailableJobRoles().map((role) => {
+                  const normalizedRole = normalizeJobRole(role);
+                  return (
+                    <ListItem 
+                      key={normalizedRole.id} 
+                      button 
+                      onClick={() => handleToggleSelect(normalizedRole.id)}
+                      sx={{ 
+                        borderRadius: 1,
+                        mb: 0.5,
+                        '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+                      }}
+                    >
+                      <ListItemIcon>
+                        <Checkbox 
+                          edge="start"
+                          checked={selectedJobRoles.includes(normalizedRole.id)} 
+                          color="primary"
+                        />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={normalizedRole.title} 
+                        secondary={normalizedRole.description}
+                      />
+                    </ListItem>
+                  );
+                })}
+              </List>
+            )}
+          </CardContent>
+          <Divider />
+          <Box p={2} display="flex" justifyContent="flex-end">
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<ArrowForwardIcon />}
+              onClick={handleAssign}
+              disabled={selectedJobRoles.length === 0}
+            >
+              Assign Selected
+            </Button>
+          </Box>
+        </Card>
+        
+        {/* Assigned Job Roles */}
+        <Card elevation={2} sx={{ flex: 1 }}>
+          <CardHeader 
+            title="Assigned Job Roles" 
+            subheader={
+              selectedUser 
+                ? `Job roles assigned to ${getUserName()}`
+                : "Select a user first"
+            }
+          />
+          <Divider />
+          <CardContent sx={{ maxHeight: 400, overflow: 'auto' }}>
+            {!selectedUser ? (
+              <Alert severity="info">
+                Select a user to see assigned job roles
+              </Alert>
+            ) : assignedJobRoleIsLoading ? (
+              <Box display="flex" justifyContent="center" p={2}>
+                <CircularProgress size={24} />
+                <Typography ml={2}>Loading assigned job roles...</Typography>
+              </Box>
+            ) : assignedJobRoles.length === 0 ? (
+              <Alert severity="info">
+                No job roles assigned to this user
+              </Alert>
+            ) : (
+              <List dense>
+                {getAssignedJobRoleObjects().map((role) => {
+                  const normalizedRole = normalizeJobRole(role);
+                  return (
+                    <ListItem 
+                      key={normalizedRole.id}
+                      sx={{ 
+                        borderRadius: 1,
+                        mb: 0.5,
+                        backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                        '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+                      }}
+                    >
+                      <ListItemText 
+                        primary={normalizedRole.title}
+                        sx={{
+                          padding:'10px'
+                        }}
+                        secondary={normalizedRole.description}
+                      />
+                      <IconButton
+                        edge="end"
+                        aria-label="remove"
+                        onClick={() => handleUnassign(normalizedRole.id)}
+                        color="error"
+                        size="small"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            )}
+          </CardContent>
+        </Card>
+      </Box>
+      
+      {/* Submit Button */}
+      <Box display="flex" justifyContent="center" mt={4}>
+        <Button
+          variant="contained"
+          color="success"
+          size="large"
+          startIcon={<SaveIcon />}
+          onClick={handleSubmit}
+          disabled={!selectedUser || assignedJobRoles.length === 0 || isSubmitting}
+          sx={{ px: 4, py: 1 }}
+        >
+          {isSubmitting ? "Saving..." : "Save Mappings"}
+        </Button>
+      </Box>
+      
+      {/* Summary */}
+      {selectedUser && (
+        <Alert severity="info" sx={{ mt: 3 }}>
+          <Typography variant="body2">
+            {assignedJobRoles.length > 0 ? (
+              <>Ready to assign {assignedJobRoles.length} job role{assignedJobRoles.length !== 1 ? 's' : ''} to {getUserName()}</>
+            ) : (
+              <>No job roles currently assigned to {getUserName()}</>
+            )}
+          </Typography>
+        </Alert>
+      )}
+    </Paper>
   );
 };
 
