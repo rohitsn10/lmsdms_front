@@ -17,14 +17,14 @@ const SessionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [attendanceData, setAttendanceData] = useState([]);
   const [openAttendanceDialog, setOpenAttendanceDialog] = useState(false);
-  console.log("----------------------------",openAttendanceDialog)
-  const [selectedSessionId, setSelectedSessionId] = useState(null); 
+  console.log("----------------------------", openAttendanceDialog);
+  const [selectedSessionId, setSelectedSessionId] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const classroom = location.state?.classroom;
   const classroomId = classroom.classroom_id;
   const [markSessionCompleted] = useMarkSessionCompletedMutation();
-  const { data, isLoading, error,refetch } = useGetSessionsQuery(classroomId);
+  const { data, isLoading, error, refetch } = useGetSessionsQuery(classroomId);
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
   const [openViewAttendanceDialog, setOpenViewAttendanceDialog] = useState(false);
   const [viewAttendanceData, setViewAttendanceData] = useState([]);
@@ -32,42 +32,37 @@ const SessionListing = () => {
   const handleSearch = (event) => setSearchTerm(event.target.value);
 
   // Edit session handler
-  const handleEditSession = (session) => navigate("/edit-session", { state: { session } }
-    
-  );
+  const handleEditSession = (session) => navigate("/edit-session", { state: { session } });
   useEffect(() => {
-      refetch();
-    }, [location.key]);
-  
+    refetch();
+  }, [location.key]);
 
   const handleAttendanceClick = (sessionId, isViewAttendance = false) => {
-
-    setSelectedSessionId(sessionId); 
+    setSelectedSessionId(sessionId);
     const session = data?.data?.find((s) => s.session_id === sessionId);
-    console.log("session",session)
+    console.log("session", session);
     if (session && session.user_ids) {
       const userIds = session.user_ids;
       const filteredUsers = userData?.data?.filter((user) => userIds.includes(user.id));
-  
+
       if (isViewAttendance) {
         setViewAttendanceData(filteredUsers);
         setOpenViewAttendanceDialog(true);
       } else {
         setAttendanceData(filteredUsers);
         setOpenAttendanceDialog(true);
-        console.log("Dialog open state:", openAttendanceDialog); 
+        console.log("Dialog open state:", openAttendanceDialog);
       }
       refetch();
     }
   };
-  
 
   const handleMarkCompleted = (sessionId) => {
     markSessionCompleted(sessionId)
       .unwrap()
       .then((response) => {
         console.log("Session marked as completed:", response);
-        refetch(); 
+        refetch();
       })
       .catch((err) => console.error("Failed to mark session as completed:", err));
   };
@@ -81,15 +76,15 @@ const SessionListing = () => {
         .map((session, index) => ({
           ...session,
           id: session.session_id,
-          serial_number: index + 1, 
-          start_date: moment(session.start_date).format("DD/MM/YY HH:mm"), 
+          serial_number: index + 1,
+          start_date: moment(session.start_date).format("DD/MM/YY HH:mm"),
         }))
     : [];
 
-    const handleNewAttendance =()=>{
-      console.log("New Toggle")
-    }
-  
+  const handleNewAttendance = () => {
+    console.log("New Toggle");
+  };
+
   // Columns for the data grid
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
@@ -122,12 +117,10 @@ const SessionListing = () => {
         <MDButton
           variant="outlined"
           color="primary"
-
           onClick={() => {
-            const isViewAttendance = params.row.attend; 
+            const isViewAttendance = params.row.attend;
             // console.log("is view open get or not ",isViewAttendance)
-            handleAttendanceClick(params.row.id, isViewAttendance); 
-
+            handleAttendanceClick(params.row.id, isViewAttendance);
           }}
           // onClick={() => {
           //   const isViewAttendance = params.row.attend; // Check if attendance is available to view
@@ -146,13 +139,16 @@ const SessionListing = () => {
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => handleEditSession(params.row)}>
+        <IconButton
+          color="primary"
+          onClick={() => handleEditSession(params.row)}
+          disabled={!params.row.is_completed}
+        >
           <EditIcon />
         </IconButton>
       ),
     },
   ];
-
 
   return (
     <MDBox p={3}>
@@ -209,14 +205,14 @@ const SessionListing = () => {
         setOpen={setOpenAttendanceDialog}
         attendanceData={attendanceData}
         setAttendanceData={setAttendanceData}
-        sessionId={selectedSessionId} 
+        sessionId={selectedSessionId}
         refetch={refetch}
       />
       <ViewAttendanceDialog
         open={openViewAttendanceDialog}
         setOpen={setOpenViewAttendanceDialog}
         attendanceData={viewAttendanceData}
-         sessionId={selectedSessionId}
+        sessionId={selectedSessionId}
       />
     </MDBox>
   );

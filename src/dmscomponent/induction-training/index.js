@@ -56,12 +56,12 @@ const AddInductionTraining = () => {
     }
 
     try {
-      const formData = new FormData();
-      formData.append("induction_name", inductionTitle.trim());
-      formData.append("department", department);
-      formData.append("document", document);
+      const inductiondata = new FormData();
+      inductiondata.append("induction_name", inductionTitle.trim());
+      inductiondata.append("department", department);
+      inductiondata.append("document", document);
 
-      const response = await createInduction(formData).unwrap();
+      const response = await createInduction(inductiondata).unwrap();
 
       if (response.status) {
         toast.success("Induction Training added successfully!");
@@ -92,7 +92,7 @@ const AddInductionTraining = () => {
             textAlign: "center",
           }}
         >
-          <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
+          <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}> 
             Add Induction Set Name
           </MDTypography>
         </MDBox>

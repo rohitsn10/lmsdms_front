@@ -53,7 +53,7 @@ const ClassroomListing = () => {
   };
   const handleDownloadAttendanceSheet = (documentId) => {
     setDownloadDocumentId(documentId);
-    toast.info("Downloading attendance sheet...", { autoClose: 2000 }); // Show loading toast
+    toast.info("Downloading attendance sheet...", { autoClose: 1000 }); // Show loading toast
   };
 
   useEffect(() => {
@@ -192,7 +192,7 @@ const ClassroomListing = () => {
           {
         field: "attendance",
         headerName: "Attendance",
-        flex: 1,
+        flex: 1.4,
         headerAlign: "center",
         renderCell: (params) => (
           <MDButton

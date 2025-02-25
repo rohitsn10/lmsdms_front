@@ -288,9 +288,9 @@ function AddUser() {
                 color="submit"
                 fullWidth
                 type="submit"
-                disabled={isLoading || isSubmitting}
+                  // disabled={isLoading || isSubmitting}
               >
-                {isLoading || isSubmitting ? "Submitting..." : "Submit"}
+                Submit
               </MDButton>
             </MDBox>
           </MDBox>

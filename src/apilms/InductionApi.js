@@ -11,22 +11,19 @@ export const inductionApi = createApi({
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
-      headers.set('Content-Type', 'application/json');
       return headers;
     },
   }),
   endpoints: (builder) => ({
-    // POST method for creating a induction
     createGetInduction: builder.mutation({
-      query: ({ induction_name}) => ({
+      query: (inductiondata) => ({
         url: 'lms_module/create_induction',
         method: 'POST',
-        body: { induction_name},
+        body: inductiondata,
       }),
-      transformResponse: (response) => response, // Handle raw response
+      transformResponse: (response) => response,
     }),
-
-    // GET method for retrieving induction data
+    
     getInduction: builder.query({
       query: () => ({
         url: 'lms_module/create_induction',
