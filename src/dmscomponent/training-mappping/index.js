@@ -286,7 +286,7 @@ const TrainingMapping = () => {
           <Divider />
           <Box p={2} display="flex" justifyContent="flex-end">
 
-            <Button
+            
 
             <MDButton 
 
@@ -297,9 +297,6 @@ const TrainingMapping = () => {
               disabled={selectedJobRoles.length === 0}
             >
               Assign Selected
-
-            </Button>
-
             </MDButton>
 
           </Box>
@@ -352,7 +349,7 @@ const TrainingMapping = () => {
                         secondary={normalizedRole.description}
                       />
 
-                      <IconButton
+                      {/* <IconButton */}
 
                       {/* <IconButton
 
@@ -380,9 +377,6 @@ const TrainingMapping = () => {
       {/* Submit Button */}
       <Box display="flex" justifyContent="center" mt={4}>
 
-        <Button
-          variant="contained"
-          color="success"
 
         <MDButton
           variant="gradient"
@@ -395,8 +389,6 @@ const TrainingMapping = () => {
           sx={{ px: 4, py: 1 }}
         >
           {isSubmitting ? "Saving..." : "Save Mappings"}
-
-        </Button>
 
         </MDButton>
 
