@@ -127,9 +127,9 @@ const DocumentView = () => {
   // console.log("User ID",user?.id)
   // console.log("User ID",user?.id)
   // console.log("User ID",user?.first_name)
-  console.log("Department IDD:", user?.department);
+  // console.log("Department IDD:", user?.department);
   const handleSaveDraftDocument = (cacheUrl) => {
-    console.log("Console Comment", docCommentsRef.current);
+    // console.log("Console Comment", docCommentsRef.current);
   };
 
   const handleDocComment = () => {
@@ -229,18 +229,18 @@ const DocumentView = () => {
       // script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
       script.onload = () => {
         try {
-          const handleSave = () => {
-            if (docEditorRef.current) {
-              console.log("Save button clicked, triggering save...");
-            }
-          };
+          // const handleSave = () => {
+          //   if (docEditorRef.current) {
+          //     console.log("Save button clicked, triggering save...");
+          //   }
+          // };
 
            docEditorRef.current = new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
             width: "100%",
             height: "100%",
             type: "desktop",
             document: editorConfig.document,
-            editorConfig: {
+            editorConfig: { 
               mode: "edit", // Ensure the document is in edit mode
               callbackUrl: editorConfig.callbackUrl, // Save callback URL
               user: {
@@ -249,8 +249,8 @@ const DocumentView = () => {
                 name: `${user?.first_name}`,
               },
               watermark: {
-                text: "Confidential", // The text of the watermark
-                color: "rgba(192, 192, 192, 0.5)", // Semi-transparent light gray color
+                text: "Confidential nonono", // The text of the watermark
+                color: "rgba(255, 0, 0, 0.5)", // Semi-transparent light gray color
                 fontSize: 50, // Size of the watermark text
                 diagonal: true, // Place the watermark diagonally
                 visibleForAllUsers: true, // Make the watermark visible for all users
@@ -263,7 +263,7 @@ const DocumentView = () => {
                   autosave: false,
                 },
                 saveButton: false, // Enable save button
-                // showReviewChanges:true,
+                showReviewChanges:false,
                 trackChanges: true, 
                 chat: false,
                 comments: true,
@@ -290,70 +290,86 @@ const DocumentView = () => {
                 // }
 
             },
-              onAppReady: async() => {
+            //   onAppReady: async() => {
 
-                // Store the editor instance globally
-                // window.docEditor = docEditorRef.current;
-                // console.log("Window Editor is ready");
-                // console.log("WIndow Editor log:",window.docEditor.openDocument())
-                window.docEditor = docEditorRef.current;
+            //     // Store the editor instance globally
+            //     // window.docEditor = docEditorRef.current;
+            //     // console.log("Window Editor is ready");
+            //     // console.log("WIndow Editor log:",window.docEditor.openDocument())
+            //     window.docEditor = docEditorRef.current;
 
-                console.log("ONLYOFFICE Editor is Ready");
-                const editorInstance = window.docEditor;
-                // const document = editorInstance.getDocument();
-                // console.log("Document Data:",document)
-                console.log("Document Data:XXXXXXXXXXXXXXXXXXXXXXXXXXX",editorInstance )
+            //     // console.log("ONLYOFFICE Editor is Ready");
+            //     // const editorInstance = window.docEditor;
+            //     // const document = editorInstance.getDocument();
+            //     // console.log("Document Data:",document)
+            //     // console.log("Document Data:XXXXXXXXXXXXXXXXXXXXXXXXXXX",editorInstance )
               
-                try {
-                  // Ensure editor is loaded before modifying
-                  const editorInstance = window.docEditor;
+            //     try {
+            //       // Ensure editor is loaded before modifying
+            //       const editorInstance = window.docEditor;
                   
-                  // Get the header of the document
-                  const headerData = "await fetchHeaderData();" // Function to fetch data if needed
-                  console.log("Inserting Header Data:", headerData);
+            //       // Get the header of the document
+            //       const headerData = "await fetchHeaderData();" // Function to fetch data if needed
+            //       console.log("Inserting Header Data:", headerData);
               
-                  // Insert into the header
-                  editorInstance.insertText(`Header Data: ${headerData?.company_name}`, "CompanyName");
-                } catch (error) {
-                  console.error("Error inserting header:", error);
-                }
+            //       // Insert into the header
+            //       editorInstance.insertText(`Header Data: ${headerData?.company_name}`, "CompanyName");
+            //     } catch (error) {
+            //       console.error("Error inserting header:", error);
+            //     }
+            // },
+            onAppReady: async () => {
+              window.docEditor = docEditorRef.current;
+              console.log("ONLYOFFICE Editor is Ready");
+              console.log("Editor Config:", docEditorRef.current.config); // Log the entire config
+        
+              try {
+                const editorInstance = window.docEditor;
+                const headerData = "await fetchHeaderData();";
+                console.log("Inserting Header Data:", headerData);
+                editorInstance.insertText(`Header Data: ${headerData?.company_name}`, "CompanyName");
+              } catch (error) {
+                console.error("Error inserting header:", error);
+              }
             },
-
               onError: (event) => {
                 console.error("Editor error:", event);
                 return true
               },
-              onDownloadAs: async (response) => {
-                try {
-                  console.log("Download response:", response);
-                  const cacheUrl = response?.data?.url;
-                  // console.log("Cache Url Link:", cacheUrl);
-                  // console.log("Comment", docCommentsRef?.current);
-                  setCacheDocument(cacheUrl);
-                  const newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
-                  if (cacheUrl) {
-                    const draftData = {
-                      user: user?.id,
-                      document_id: id,
-                      comment_data: docCommentsRef?.current,
-                      version_no: newVersion,
-                      front_file_url: cacheUrl,
-                      department_id: String(user?.department),
-                      // templateID: data?.select_template,
-                      // userEmail: user?.email,
-                      // username: user?.first_name,
-                    };
-                    // console.log("Submitting draft:", draftData);
-                    try {
-                      // Send the comment data to the API
-                      const result = await addPathUrlDataForComments(draftData).unwrap();
-                      console.log("Data Added", result);
-                      toast.success("Document Saved.")
-                    } catch (apiError) {
-                      console.error("Error saving comment:", apiError);
-                      // You might want to show an error message to the user here
+                onDownloadAs: async (response) => {
+                  try {
+                    // console.log("Download response:", response);
+                    const cacheUrl = response?.data?.url;
+                    console.log("Hit Button ---------->")
+                    // console.log("Cache Url Link:", cacheUrl);
+                    // console.log("Comment", docCommentsRef?.current);
+                    setCacheDocument(cacheUrl);
+                    const newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
+                    if (cacheUrl) {
+                      const draftData = {
+                        user: user?.id,
+                        document_id: id,
+                        comment_data: docCommentsRef?.current,
+                        version_no: newVersion,
+                        front_file_url: cacheUrl,
+                        department_id: String(user?.department),
+                        // templateID: data?.select_template,
+                        // userEmail: user?.email,
+                        // username: user?.first_name,
+                      };
+                      // console.log("Submitting draft:", draftData);
+                      try {
+                        // Send the comment data to the API
+                        console.log("Hit Debugg ---------->")
+                        const result = await addPathUrlDataForComments(draftData).unwrap();
+                        // console.log("Data Added", result);
+                        console.log("HITTTTTTT MANAMANAMAN",result)
+                        toast.success("Document Saved.")
+                      } catch (apiError) {
+                        console.error("Error saving comment:", apiError);
+                        // You might want to show an error message to the user here
+                      }
                     }
-                  }
 
                   return true; // Allow the normal download to proceed
                 } catch (error) {
@@ -695,21 +711,22 @@ const DocumentView = () => {
 
   const container = document.getElementById("onlyoffice-editor-container");
 
-  const handleDownloadFeature = async () => {
-    try {
-      if (docEditorRef.current) {
-        // console.log("Debug 1");
+    const handleDownloadFeature = async () => {
+      try {
+        console.log("Hit Featureeeeeeeeee ---------->")
+        if (docEditorRef.current) {
+          console.log("Debug 1");
 
-        docEditorRef.current.downloadAs("docx", async (blobUrl) => {
-          // console.log("Blob URL:", blobUrl);
-        });
-        // console.log("Docc")
-        setIsSaved(true)
+          docEditorRef.current.downloadAs("docx", async (blobUrl) => {
+            // console.log("Blob URL:", blobUrl);
+          });
+          // console.log("Docc")
+          setIsSaved(true)
+        }
+      } catch (error) {
+        console.error("Save failed:", error);
       }
-    } catch (error) {
-      console.error("Save failed:", error);
-    }
-  };
+    };
 
   // const handleDialogConfirm = async () => {
   //   setDialogeffectiveOpen(false); // Close the dialog after confirmation
@@ -813,56 +830,6 @@ const DocumentView = () => {
 
     setOpenuserDialog(false); // Close the SelectUserDialog
     setOpenRemarkDialog(true); // Now open the RemarkDialog
-  };
-
-  const handleSave = async () => {
-    if (!docEditorRef.current) {
-      console.error("Editor not initialized");
-      return;
-    }
-
-    try {
-      setSaving(true);
-      console.log("Starting save process...");
-
-      // Use direct save command
-      docEditorRef.current.execCommand("save", {
-        callback: async (response) => {
-          console.log("Save command response:", response);
-
-          if (response.success) {
-            // If the save command returns a URL or content
-            if (response.data) {
-              const formData = new FormData();
-              formData.append("file", response.data);
-              formData.append("fileName", editorConfig.document.title);
-
-              const serverResponse = await fetch(editorConfig.callbackUrl, {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${editorConfig.token}`,
-                },
-                body: formData,
-              });
-
-              if (serverResponse.ok) {
-                console.log("Document saved successfully");
-                alert("Document saved successfully!");
-              } else {
-                throw new Error("Failed to save to server");
-              }
-            }
-          } else {
-            throw new Error("Save command failed");
-          }
-        },
-      });
-    } catch (error) {
-      console.error("Error saving document:", error);
-      alert(`Failed to save document: ${error.message}`);
-    } finally {
-      setSaving(false);
-    }
   };
 
   return (
@@ -1145,7 +1112,6 @@ const DocumentView = () => {
         <Grid container spacing={3} justifyContent="center" alignItems="center">
           <Grid item xs={12} md={6} lg={4}>
             <OrdersOverview docId={id} />
-
           </Grid>
         </Grid>
       </MDBox>

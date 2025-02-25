@@ -152,7 +152,7 @@ const TrainingMapping = () => {
   // Get job role objects for assigned IDs
   const getAssignedJobRoleObjects = () => {
     if (!jobRoleData?.data) return [];
-    
+    console.log("Check..",assignedJobRoles);
     return assignedJobRoles.map(id => {
       const role = jobRoleData.data.find(r => r.id === id);
       return role;

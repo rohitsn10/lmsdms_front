@@ -33,6 +33,7 @@ import { useFetchTrainingsQuery } from "apilms/trainingApi";
 import { useGetJobRoleQuery } from "apilms/jobRoleApi";
 import { useTrainingAssignJobroleMutationMutation, useTrainingAssignJobroleQuery } from "apilms/MappingApi";
 import { toast } from "react-toastify";
+import MDButton from "components/MDButton";
 
 const JobRoleMapping = () => {
   const [selectedJobRole, setSelectedJobRole] = useState("");
@@ -150,18 +151,25 @@ const JobRoleMapping = () => {
   };
 
   // Get training objects for assigned IDs
+  // const getAssignedTrainingObjects = () => {
+  //   if (assignedTrainingData?.documents) {
+  //     return assignedTrainingData.documents;
+  //   }
+  //       if (!trainingData?.document_data?.documents) return [];
+  //   console.log("NENENE",assignedTrainings)
+  //   return assignedTrainings.map(id => {
+  //     const training = trainingData.document_data.documents.find(t => 
+  //       (t.id === id || t.document_id === id)
+  //     );
+  //     return training;
+  //   }).filter(Boolean);
+  // };
   const getAssignedTrainingObjects = () => {
-    // If we have assignedTrainingData from the API, use that
-    if (assignedTrainingData?.documents) {
-      return assignedTrainingData.documents;
-    }
-    
-    // Otherwise, fall back to looking up in local training data
     if (!trainingData?.document_data?.documents) return [];
     
     return assignedTrainings.map(id => {
       const training = trainingData.document_data.documents.find(t => 
-        (t.id === id || t.document_id === id)
+        t.id === id || t.document_id === id
       );
       return training;
     }).filter(Boolean);
@@ -204,6 +212,9 @@ const JobRoleMapping = () => {
               onChange={handleJobRoleChange}
               label="Job Role"
               disabled={jobRoleLoading}
+              sx={{
+                padding:'10px'
+              }}
             >
               {jobRoleData?.data?.map((job) => (
                 <MenuItem key={job.id} value={job.id}>
@@ -285,7 +296,7 @@ const JobRoleMapping = () => {
           </CardContent>
           <Divider />
           <Box p={2} display="flex" justifyContent="flex-end">
-            <Button
+            <MDButton
               variant="contained"
               color="primary"
               startIcon={<ArrowForwardIcon />}
@@ -293,7 +304,7 @@ const JobRoleMapping = () => {
               disabled={selectedTrainings.length === 0}
             >
               Assign Selected
-            </Button>
+            </MDButton>
           </Box>
         </Card>
         
@@ -378,9 +389,9 @@ const JobRoleMapping = () => {
       
       {/* Submit Button */}
       <Box display="flex" justifyContent="center" mt={4}>
-        <Button
-          variant="contained"
-          color="success"
+        <MDButton
+          variant="gradient"
+          color="submit"
           size="large"
           startIcon={<SaveIcon />}
           onClick={handleSubmit}
@@ -388,7 +399,7 @@ const JobRoleMapping = () => {
           sx={{ px: 4, py: 1 }}
         >
           {isSubmitting ? "Saving..." : "Save Mappings"}
-        </Button>
+        </MDButton>
       </Box>
       
       {/* Summary */}

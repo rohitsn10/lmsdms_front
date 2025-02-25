@@ -354,7 +354,7 @@ const DocumentListing = () => {
                 </IconButton>
               )
             : hasPermission(userPermissions, "document", "isView") && 
-              params.row.current_status_name !== "Approve" && ( // Hide if status is "Approve"
+              params.row.current_status_name !== "Release" && ( // Hide if status is "Approve"
               <IconButton color="inherit" onClick={() => handleClick(params)}>
                 <EditCalendarIcon />
               </IconButton>
