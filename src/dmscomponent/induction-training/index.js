@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, MenuItem, Select, InputLabel, FormControl,OutlinedInput } from "@mui/material";
+import { Card, MenuItem, Select, InputLabel, FormControl, OutlinedInput } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
@@ -10,8 +10,7 @@ import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
-import { useCreateGetInductionMutation } from "apilms/InductionApi";
-import {useFetchDepartmentsQuery } from "api/auth/departmentApi"; // API call for fetching departments
+import { useFetchDepartmentsQuery } from "api/auth/departmentApi"; // API call for fetching departments
 
 const AddInductionTraining = () => {
   const [inductionTitle, setInductionTitle] = useState("");
@@ -20,7 +19,6 @@ const AddInductionTraining = () => {
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [errors, setErrors] = useState({});
   const { data: departments, isLoading: deptLoading } = useFetchDepartmentsQuery();
-  const [createInduction, { isLoading }] = useCreateGetInductionMutation();
   const navigate = useNavigate();
 
   const validateInputs = () => {
@@ -55,6 +53,7 @@ const AddInductionTraining = () => {
       return;
     }
 
+
     try {
       const inductiondata = new FormData();
       inductiondata.append("induction_name", inductionTitle.trim());
@@ -75,6 +74,7 @@ const AddInductionTraining = () => {
       console.error("Error adding induction training:", error);
       toast.error("An error occurred while adding the Induction Training.");
     }
+
   };
 
   return (
@@ -155,8 +155,8 @@ const AddInductionTraining = () => {
             </MDBox>
 
             <MDBox mt={2} mb={1}>
-              <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
-                {isLoading ? "Submitting..." : "Submit"}
+              <MDButton variant="gradient" color="submit" fullWidth type="submit">
+                Submit
               </MDButton>
             </MDBox>
           </MDBox>

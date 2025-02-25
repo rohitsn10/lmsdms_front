@@ -33,7 +33,10 @@ import { useUserListQuery } from "api/auth/userApi";
 import { useGetJobRoleQuery } from "apilms/jobRoleApi";
 import { useJobroleAssignTrainingMutation, useJobroleAssignTrainingListQuery } from "apilms/MappingApi";
 import { toast } from "react-toastify";
+
+
 import MDButton from "components/MDButton";
+
 
 const TrainingMapping = () => {
   const [selectedUser, setSelectedUser] = useState("");
@@ -152,7 +155,7 @@ const TrainingMapping = () => {
   // Get job role objects for assigned IDs
   const getAssignedJobRoleObjects = () => {
     if (!jobRoleData?.data) return [];
-    
+    console.log("Check..",assignedJobRoles);
     return assignedJobRoles.map(id => {
       const role = jobRoleData.data.find(r => r.id === id);
       return role;
@@ -195,9 +198,12 @@ const TrainingMapping = () => {
               onChange={handleUserChange}
               label="User"
               disabled={userLoading}
+
+
               sx={{
                 padding:'10px'
               }}
+
             >
               {userData?.data?.filter(user => user.is_jr_approve).map((user) => (
                 <MenuItem key={user.id} value={user.id}>
@@ -279,7 +285,11 @@ const TrainingMapping = () => {
           </CardContent>
           <Divider />
           <Box p={2} display="flex" justifyContent="flex-end">
+
+            <Button
+
             <MDButton 
+
               variant="contained"
               color="primary"
               startIcon={<ArrowForwardIcon />}
@@ -287,7 +297,11 @@ const TrainingMapping = () => {
               disabled={selectedJobRoles.length === 0}
             >
               Assign Selected
+
+            </Button>
+
             </MDButton>
+
           </Box>
         </Card>
         
@@ -337,7 +351,11 @@ const TrainingMapping = () => {
                         }}
                         secondary={normalizedRole.description}
                       />
+
+                      <IconButton
+
                       {/* <IconButton
+
                         edge="end"
                         aria-label="remove"
                         onClick={() => handleUnassign(normalizedRole.id)}
@@ -345,7 +363,11 @@ const TrainingMapping = () => {
                         size="small"
                       >
                         <DeleteIcon />
+
+                      </IconButton>
+
                       </IconButton> */}
+
                     </ListItem>
                   );
                 })}
@@ -357,9 +379,15 @@ const TrainingMapping = () => {
       
       {/* Submit Button */}
       <Box display="flex" justifyContent="center" mt={4}>
+
+        <Button
+          variant="contained"
+          color="success"
+
         <MDButton
           variant="gradient"
           color="submit"
+
           size="large"
           startIcon={<SaveIcon />}
           onClick={handleSubmit}
@@ -367,7 +395,11 @@ const TrainingMapping = () => {
           sx={{ px: 4, py: 1 }}
         >
           {isSubmitting ? "Saving..." : "Save Mappings"}
+
+        </Button>
+
         </MDButton>
+
       </Box>
       
       {/* Summary */}

@@ -56,7 +56,9 @@ function TinyMCEEditorDialog({ open, onClose, title, content, onSave }) {
               height: 250,
               menubar: false,
               toolbar: toolbarOptions.join(" "), // Use the toolbar options defined above
-              plugins: "link image lists", // Enable necessary plugins
+              plugins: "link image lists",
+              entity_encoding: "raw"
+               // Enable necessary plugins
             }}
             ref={editorRef} // Assign the editorRef to TinyMCE
           />
