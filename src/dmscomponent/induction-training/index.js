@@ -53,10 +53,28 @@ const AddInductionTraining = () => {
       return;
     }
 
-    console.log("E-Signature Password:", password);
-    console.log("Induction Title:", inductionTitle.trim());
-    console.log("Department:", department);
-    console.log("Document:", document);
+
+    try {
+      const inductiondata = new FormData();
+      inductiondata.append("induction_name", inductionTitle.trim());
+      inductiondata.append("department", department);
+      inductiondata.append("document", document);
+
+      const response = await createInduction(inductiondata).unwrap();
+
+      if (response.status) {
+        toast.success("Induction Training added successfully!");
+        setTimeout(() => {
+          navigate("/induction-listing");
+        }, 1500);
+      } else {
+        toast.error(response.message || "Failed to add Induction Training. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error adding induction training:", error);
+      toast.error("An error occurred while adding the Induction Training.");
+    }
+
   };
 
   return (
@@ -74,7 +92,7 @@ const AddInductionTraining = () => {
             textAlign: "center",
           }}
         >
-          <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
+          <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}> 
             Add Induction Set Name
           </MDTypography>
         </MDBox>

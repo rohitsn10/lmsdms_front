@@ -9,6 +9,7 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { useGetInductionQuery } from "apilms/InductionApi";
+import moment from "moment";
 
 const InductionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,7 +39,7 @@ const InductionListing = () => {
     .map((induction, index) => ({
       ...induction,
       serial_number: index + 1,
-      date: new Date(induction.induction_created_at).toLocaleDateString(),
+        date: moment(induction.created_at).format("DD/MM/YY"),
     }));
 
   const columns = [

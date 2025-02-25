@@ -4,9 +4,9 @@ import AddDepartment from "layouts/authentication/add-department";
 import AddDocument from "layouts/authentication/add-document";
 import Icon from "@mui/material/Icon";
 import LMSDashboard from "layouts/authentication/lms-dashboard";
-import TopicIcon from '@mui/icons-material/Topic';
-import ApartmentIcon from '@mui/icons-material/Apartment';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import TopicIcon from "@mui/icons-material/Topic";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import DocumentListing from "layouts/authentication/document-listing";
 import UsersListing from "layouts/authentication/user-listing";
 import WorkflowListing from "layouts/authentication/workflow-listing";
@@ -18,50 +18,50 @@ import DepartmentListing from "layouts/authentication/department-listing";
 import RolesPermissionsListing from "layouts/authentication/roles-listing";
 import PrintApprovalListing from "layouts/authentication/approval-lisitng";
 import PrinterListing from "layouts/authentication/printer-listing";
-import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+import LocalPrintshopIcon from "@mui/icons-material/LocalPrintshop";
 import ReviseApprovalList from "layouts/authentication/revise-Listing";
 import PrintRetrievalListing from "layouts/retrieval-listing";
-import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import FactoryTwoToneIcon from '@mui/icons-material/FactoryTwoTone';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import WorkspacesIcon from '@mui/icons-material/Workspaces';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import SettingsIcon from '@mui/icons-material/Settings';
-import ApprovalIcon from '@mui/icons-material/ThumbUp';
-import Inventory2Icon from '@mui/icons-material/Inventory2';
-import AssignmentReturnIcon from '@mui/icons-material/Inventory2';
-import ImportContactsTwoToneIcon from '@mui/icons-material/ImportContactsTwoTone';
+import GetAppOutlinedIcon from "@mui/icons-material/GetAppOutlined";
+import FactoryTwoToneIcon from "@mui/icons-material/FactoryTwoTone";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import WorkspacesIcon from "@mui/icons-material/Workspaces";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ApprovalIcon from "@mui/icons-material/ThumbUp";
+import Inventory2Icon from "@mui/icons-material/Inventory2";
+import AssignmentReturnIcon from "@mui/icons-material/Inventory2";
+import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
 import icon from "assets/theme/components/icon";
 import PlantListing from "dmscomponent/plant-listing";
 import AreaListing from "dmscomponent/area-listing";
-import HomeMiniRoundedIcon from '@mui/icons-material/HomeMiniRounded';
+import HomeMiniRoundedIcon from "@mui/icons-material/HomeMiniRounded";
 import MethodologyListing from "dmscomponent/methodology-listing";
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import TrainingTypeListing from "dmscomponent/trainingType-Listing";
-import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
+import AssignmentIndOutlinedIcon from "@mui/icons-material/AssignmentIndOutlined";
 import InductionListing from "dmscomponent/induction-training/induction-listing";
-import QuizListing from "dmscomponent/add-quiz/list"
-import DevicesFoldTwoToneIcon from '@mui/icons-material/DevicesFoldTwoTone';
-import ModelTrainingTwoToneIcon from '@mui/icons-material/ModelTrainingTwoTone';
+import QuizListing from "dmscomponent/add-quiz/list";
+import DevicesFoldTwoToneIcon from "@mui/icons-material/DevicesFoldTwoTone";
+import ModelTrainingTwoToneIcon from "@mui/icons-material/ModelTrainingTwoTone";
 import TrainingListing from "dmscomponent/Training-listing";
 import QuestionListing from "dmscomponent/question-listing";
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import WorkTwoToneIcon from '@mui/icons-material/WorkTwoTone';
+import ManageSearchIcon from "@mui/icons-material/ManageSearch";
+import WorkTwoToneIcon from "@mui/icons-material/WorkTwoTone";
 import JobroleListing from "dmscomponent/job-listing";
 import TrainingMapping from "dmscomponent/training-mappping";
 import JobRoleMapping from "dmscomponent/jobrole-mapping";
-import DisplaySettingsRoundedIcon from '@mui/icons-material/DisplaySettingsRounded';
-import ForkRightTwoToneIcon from '@mui/icons-material/ForkRightTwoTone';
+import DisplaySettingsRoundedIcon from "@mui/icons-material/DisplaySettingsRounded";
+import ForkRightTwoToneIcon from "@mui/icons-material/ForkRightTwoTone";
 import ArchivedListing from "layouts/authentication/archived-listing";
 import ClassroomListing from "dmscomponent/class-room";
 import ViewEmployeeStatus from "dmscomponent/view-employees";
-import ArchiveIcon from '@mui/icons-material/Archive';
-import GroupIcon from '@mui/icons-material/Group';
-import SchoolTwoToneIcon from '@mui/icons-material/SchoolTwoTone';
-import Diversity1Icon from '@mui/icons-material/Diversity1';
+import ArchiveIcon from "@mui/icons-material/Archive";
+import GroupIcon from "@mui/icons-material/Group";
+import SchoolTwoToneIcon from "@mui/icons-material/SchoolTwoTone";
+import Diversity1Icon from "@mui/icons-material/Diversity1";
 import UserReports from "dmscomponent/user-reports";
-import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
+import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
 const routes = [
   {
     type: "collapse",
@@ -171,7 +171,7 @@ const routes = [
     type: "collapse",
     name: "Printer",
     key: "printer-listing",
-    icon: <LocalPrintshopIcon/>,
+    icon: <LocalPrintshopIcon />,
     route: "printer-listing",
     component: <PrinterListing />,
   },
@@ -226,12 +226,12 @@ const routes = [
   {
     type: "collapse",
     name: "Induction Set",
-    key: "Induction-Listing",
+    key: "induction-Listing",
     icon: <AccountTreeIcon />,
     route: "/induction-Listing",
     component: <InductionListing />,
   },
-    {
+  {
     type: "collapse",
     name: "Training Activity",
     key: "trainingListing",
@@ -253,7 +253,7 @@ const routes = [
     key: "trainingMapping-listing",
     icon: <ForkRightTwoToneIcon />,
     route: "/trainingMapping-listing",
-    component:<TrainingMapping/>
+    component: <TrainingMapping />,
   },
   {
     type: "collapse",
@@ -261,7 +261,7 @@ const routes = [
     key: "jobrole-mapping",
     icon: <DisplaySettingsRoundedIcon />,
     route: "/jobrole-mapping",
-    component:<JobRoleMapping/>
+    component: <JobRoleMapping />,
   },
   {
     type: "collapse",
@@ -269,11 +269,10 @@ const routes = [
     key: "quiz-list",
     icon: <ForkRightTwoToneIcon />,
     route: "/quiz-list",
-    component:<QuizListing/>
-
+    component: <QuizListing />,
   },
 ];
-export const LmsRoutes=[
+export const LmsRoutes = [
   {
     type: "collapse",
     name: "LMS Dashboard",
@@ -341,13 +340,13 @@ export const LmsRoutes=[
   {
     type: "collapse",
     name: "Induction Set",
-    key: "Induction-Listing",
+    key: "induction-Listing",
     icon: <AccountTreeIcon />,
     route: "/induction-Listing",
     component: <InductionListing />,
   },
-    {
-    type:"collapse",
+  {
+    type: "collapse",
     name: "Training Activity",
     key: "trainingListing",
     icon: <ModelTrainingTwoToneIcon />,
@@ -355,7 +354,7 @@ export const LmsRoutes=[
     component: <TrainingListing />,
   },
   {
-    type:"collapse",
+    type: "collapse",
     name: "Trainer ",
     key: "trainer-listing",
     icon: <Diversity1Icon />,
@@ -376,7 +375,7 @@ export const LmsRoutes=[
     key: "trainingMapping-listing",
     icon: <ForkRightTwoToneIcon />,
     route: "/trainingMapping-listing",
-    component:<TrainingMapping/>
+    component: <TrainingMapping />,
   },
   {
     type: "collapse",
@@ -384,7 +383,7 @@ export const LmsRoutes=[
     key: "jobrole-mapping",
     icon: <DisplaySettingsRoundedIcon />,
     route: "/jobrole-mapping",
-    component:<JobRoleMapping/>
+    component: <JobRoleMapping />,
   },
   {
     type: "collapse",
@@ -392,10 +391,10 @@ export const LmsRoutes=[
     key: "class-room",
     icon: <SchoolTwoToneIcon />,
     route: "/class-room",
-    component:<ClassroomListing/>
+    component: <ClassroomListing />,
   },
-]
-export const DmsRoutes=[
+];
+export const DmsRoutes = [
   {
     type: "collapse",
     name: "Dashboard",
@@ -460,14 +459,14 @@ export const DmsRoutes=[
     route: "/template-listing",
     component: <TemplateListing />,
   },
-  {
-    type: "collapse",
-    name: "Inventory",
-    key: "inventory-list",
-    icon: <Inventory2Icon />,
-    route: "/inventory-list",
-    component: <InventoryListing />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Inventory",
+  //   key: "inventory-list",
+  //   icon: <Inventory2Icon />,
+  //   route: "/inventory-list",
+  //   component: <InventoryListing />,
+  // },
   {
     type: "collapse",
     name: "Archived",
@@ -496,7 +495,7 @@ export const DmsRoutes=[
     type: "collapse",
     name: "Printer",
     key: "printer-listing",
-    icon: <LocalPrintshopIcon/>,
+    icon: <LocalPrintshopIcon />,
     route: "printer-listing",
     component: <PrinterListing />,
   },
@@ -515,6 +514,6 @@ export const DmsRoutes=[
     icon: <ImportContactsTwoToneIcon />,
     route: "/revise-listing",
     component: <ReviseApprovalList />,
-  }, 
-]
+  },
+];
 export default routes;
