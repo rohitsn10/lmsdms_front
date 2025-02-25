@@ -48,7 +48,7 @@ const UpdateDepartment = () => {
       await updateDeleteDepartment({
         department_id: state.department.id, // Use dynamic department ID
         department_name: departmentName.trim(),
-        department_description: departmentDescription.trim() || null, // Optional description
+        department_description: departmentDescription.trim() || "N/A", // Optional description
       }).unwrap();
 
       toast.success("Department updated successfully!");
