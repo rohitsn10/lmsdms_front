@@ -44,6 +44,14 @@ export const trainingApi = createApi({
       },
       transformResponse: (response) => response,
     }),
+    completeViewDocument: builder.mutation({
+      query: (data) => ({
+        url: 'lms_module/user_complete_view_document',
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response) => response,
+    }),
   }),
 });
 
@@ -51,4 +59,5 @@ export const {
   useCreateTrainingMutation,
   useFetchTrainingsQuery,
   useUpdateTrainingMutation,
+  useCompleteViewDocumentMutation
 } = trainingApi;
