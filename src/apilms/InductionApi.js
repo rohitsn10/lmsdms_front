@@ -16,16 +16,7 @@ export const inductionApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    // POST method for creating a induction
-    createGetInduction: builder.mutation({
-      query: ({ induction_name}) => ({
-        url: 'lms_module/create_induction',
-        method: 'POST',
-        body: { induction_name},
-      }),
-      transformResponse: (response) => response, // Handle raw response
-    }),
-
+    
     // GET method for retrieving induction data
     getInduction: builder.query({
       query: () => ({
@@ -52,11 +43,12 @@ export const inductionApi = createApi({
         }),
         transformResponse: (response) => response,
       }),
+     
   }),
 });
 
 export const { 
-  useCreateGetInductionMutation, // Hook for the create_get_plant POST API
+ 
   useGetInductionQuery, // Hook for the create_get_plant GET API
   useUpdateDeleteInductionMutation,
   useCreateInductionDesignationMutation, 

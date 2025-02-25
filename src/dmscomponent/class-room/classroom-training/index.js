@@ -94,7 +94,7 @@ function ClassroomTraining() {
     formData.append("status", status);
     formData.append("upload_doc", File);
     formData.append("online_offline_status", onlineOfflineStatus);
-
+    formData.append("select_users", selectedUsers);
     const token = sessionStorage.getItem("token");
     const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/create_classroom`;
 
