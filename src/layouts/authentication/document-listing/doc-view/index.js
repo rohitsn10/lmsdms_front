@@ -11,20 +11,22 @@ const DocView = () => {
   const timerRef = useRef(null); // Timer reference
   
   // Retrieve the document URL from the location state
-  const { templateDoc, templateData } = location.state || {}; // Access minimumReadingTime
-  console.log(templateData)
+  const { templateDoc,new_url, templateData } = location.state || {}; // Access minimumReadingTime
+  // console.log(templateData)
+  // console.log("NewNewNewNew",new_url)
   // console.log(location.state)
   // console.log("Template Data",templateData)
   // console.log()
   // Load the .docx file dynamically based on the URL
   useEffect(() => {
-    if (templateDoc) {
-      fetch(templateDoc)
+    const docUrl = new_url || templateDoc;
+    if (docUrl) {
+      fetch(docUrl)
         .then((response) => response.blob())
         .then((blob) => setDocContent(blob))
         .catch((error) => console.error("Error fetching document:", error));
     }
-  }, [templateDoc]);
+  }, [templateDoc, new_url]);
 
   // Start timer when the component loads
   useEffect(() => {

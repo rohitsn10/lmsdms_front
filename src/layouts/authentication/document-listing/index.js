@@ -181,8 +181,8 @@ const DocumentListing = () => {
     // Close the dialog after the operation
     handleCloseDialog();
   };
-  const handleViewFile = (url, params) => {
-    navigate("/PreView", { state: { templateDoc: url, templateData: params } }); // Pass the URL as state
+  const handleViewFile = (url,new_url, params) => {
+    navigate("/PreView", { state: { templateDoc: url,new_url:new_url, templateData: params } }); // Pass the URL as state
   };
 
   const handleEditClick = (rowData) => {
@@ -335,7 +335,8 @@ const DocumentListing = () => {
           <IconButton
             color="primary"
             onClick={() => {
-              handleViewFile(params.row.selected_template_url, params.row);
+              handleViewFile(params.row.selected_template_url,params.row.front_file_url, params.row);
+              // console.log()
               // console.log("Params",params.row)
             }}
           >
@@ -352,17 +353,12 @@ const DocumentListing = () => {
                   <PreviewIcon />
                 </IconButton>
               )
-            : hasPermission(userPermissions, "document", "isView") && (
-                <IconButton
-                  color="inherit"
-                  onClick={() => {
-                    console.log("Params passed to handleClick:", params);
-                    handleClick(params);
-                  }}
-                >
-                  <EditCalendarIcon />
-                </IconButton>
-              )}
+            : hasPermission(userPermissions, "document", "isView") && 
+              params.row.current_status_name !== "Approve" && ( // Hide if status is "Approve"
+              <IconButton color="inherit" onClick={() => handleClick(params)}>
+                <EditCalendarIcon />
+              </IconButton>
+            )}
           {data?.userGroupIds?.includes(5) && ( // Hide CheckCircleIcon when status is 7
             <IconButton
               color="success"
