@@ -369,7 +369,7 @@ const JobRoleMapping = () => {
                           </Box>
                         }
                       />
-                      {/* <IconButton
+                      <IconButton
                         edge="end"
                         aria-label="remove"
                         onClick={() => handleUnassign(normalizedTraining.id)}
@@ -377,7 +377,7 @@ const JobRoleMapping = () => {
                         size="small"
                       >
                         <DeleteIcon />
-                      </IconButton> */}
+                      </IconButton>
                     </ListItem>
                   );
                 })}

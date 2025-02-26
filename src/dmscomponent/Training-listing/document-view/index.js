@@ -27,7 +27,7 @@ const LMSDocument = () => {
   }, [documentView]);
 
   useEffect(() => {
-    setTimeLeft(600);
+    setTimeLeft(10);
     timerRef.current = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {

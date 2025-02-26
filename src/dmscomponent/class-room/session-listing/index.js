@@ -77,7 +77,8 @@ const SessionListing = () => {
           ...session,
           id: session.session_id,
           serial_number: index + 1,
-          start_date: moment(session.start_date).format("DD/MM/YY HH:mm"),
+          start_date: moment(session.start_date).format("DD MMM YYYY"),
+          start_time:moment(session.start_time, "HH:mm:ss").format("HH:mm A")
         }))
     : [];
 
@@ -91,6 +92,8 @@ const SessionListing = () => {
     { field: "session_name", headerName: "Session Name", flex: 1, headerAlign: "center" },
     { field: "venue", headerName: "Venue", flex: 1, headerAlign: "center" },
     { field: "start_date", headerName: "Date & Time", flex: 1, headerAlign: "center" },
+    { field: "start_time", headerName: "Time", flex: 1, headerAlign: "center" },
+
     {
       field: "status",
       headerName: "Status",

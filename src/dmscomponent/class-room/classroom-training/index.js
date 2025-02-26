@@ -34,7 +34,7 @@ function ClassroomTraining() {
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
 
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [sopdocument, setsopdocument] = useState("N/A");
+  const [sopdocument, setsopdocument] = useState("None");
   const [trainer, setTrainer] = useState("");
   const [classroomTitle, setClassroomTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -256,7 +256,7 @@ function ClassroomTraining() {
                     }}
                   >
                     {/* Add "N/A" option */}
-                    <MenuItem value="N/A">None</MenuItem>
+                    <MenuItem value="None">None</MenuItem>
                     {Array.isArray(alldocument?.document_data.documents) ? (
                       alldocument.document_data.documents.map((doc) => (
                         <MenuItem key={doc.id} value={doc.id}>
@@ -269,7 +269,7 @@ function ClassroomTraining() {
                   </Select>
                 </FormControl>
               </Grid>
-              {sopdocument === "N/A" ? (
+              {sopdocument === "None" ? (
                 <Grid item xs={12}>
                   <FormControl fullWidth error={!!errors.selectedUsers}>
                     <InputLabel id="select-user-label">

@@ -351,7 +351,7 @@ const TrainingMapping = () => {
 
                       {/* <IconButton */}
 
-                      {/* <IconButton
+                      <IconButton
 
                         edge="end"
                         aria-label="remove"
@@ -362,8 +362,6 @@ const TrainingMapping = () => {
                         <DeleteIcon />
 
                       </IconButton>
-
-                      </IconButton> */}
 
                     </ListItem>
                   );

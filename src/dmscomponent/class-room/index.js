@@ -40,7 +40,7 @@ const ClassroomListing = () => {
 
   // Handle classroom edit button click
   const handleEditClassroom = (classroom) => {
-    navigate("/edit-classroom", { state: { classroom } });
+    // navigate("/edit-classroom", { state: { classroom } });
   };
 
   // Handle session button click
