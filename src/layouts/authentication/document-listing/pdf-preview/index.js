@@ -44,8 +44,8 @@ const PDFPreview = () => {
         const pdfDataUrl = fileReader.result;
         const embed = document.createElement("embed");
         embed.src = pdfDataUrl;
-        embed.width = "250px";
-        embed.height = "250px"; // Set the desired height for the preview
+        embed.width = "100%";
+        embed.height = "100%"; // Set the desired height for the preview
         pdfContainerRef.current.innerHTML = ""; // Clear previous content
         pdfContainerRef.current.appendChild(embed);
       };
@@ -58,7 +58,7 @@ const PDFPreview = () => {
   }, [pdfBlob]);
 
   return (
-    <Box sx={{ width: "80%",height:"80%",mx: "auto", marginLeft: "auto",marginRight: 4, marginTop: 2 }}>
+    <Box sx={{ width: "100%",height:"100%",mx: "auto", marginLeft: "auto",marginRight: 4, marginTop: 2 }}>
     <Box sx={{ marginTop: 2 }}>
       {isLoading && <Typography>Loading PDF...</Typography>}
       {error && <Typography>Error loading PDF: {error.message}</Typography>}
@@ -66,12 +66,12 @@ const PDFPreview = () => {
       {/* Check if pdfUrl or pdfBlob is available */}
       {pdfUrl || pdfBlob ? (
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Typography variant="h6" sx={{ marginBottom: 2 }}>PDF Preview:</Typography>
+         
           <Box
             ref={pdfContainerRef}
             sx={{
-              width: "500px",  
-              height: "800px", 
+              width: "800px",  
+              height: "1000px", 
               marginBottom: 2,
               border: "1px solid #ccc",
               overflow: "hidden",

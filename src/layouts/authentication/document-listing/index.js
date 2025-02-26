@@ -323,7 +323,7 @@ const DocumentListing = () => {
     {
       field: "actions",
       headerName: "Action",
-      flex: 0.7,
+      flex: 0.9,
       headerAlign: "center",
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>

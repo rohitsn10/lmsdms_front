@@ -256,7 +256,7 @@ function ClassroomTraining() {
                     }}
                   >
                     {/* Add "N/A" option */}
-                    <MenuItem value="N/A">N/A</MenuItem>
+                    <MenuItem value="N/A">None</MenuItem>
                     {Array.isArray(alldocument?.document_data.documents) ? (
                       alldocument.document_data.documents.map((doc) => (
                         <MenuItem key={doc.id} value={doc.id}>
