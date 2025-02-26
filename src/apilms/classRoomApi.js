@@ -88,6 +88,13 @@ export const classRoomApi = createApi({
       }),
       transformResponse: (response) => response.data, 
     }),
+      getselecteduser:builder.query({
+      query: (classroom_id) => ({
+        url:`lms_module/classroom_wise_selected_user/${classroom_id}`,
+        method: 'GET',
+    }),
+    transformResponse: (response) => response.data,
+  }),
   }),
 });
 export const { 
@@ -100,4 +107,5 @@ export const {
   useUpdateSessionMutation,
   useCreateAttendanceMutation,
   useGetAttendanceQuery,
+  useGetselecteduserQuery,
 } = classRoomApi;

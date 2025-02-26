@@ -11,7 +11,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useCreateSessionMutation } from "apilms/classRoomApi";
-import { useUserListQuery } from "api/auth/userApi";
+import { useGetselecteduserQuery } from "apilms/classRoomApi";
 
 function AddSession() {
   const navigate = useNavigate();
@@ -27,8 +27,8 @@ function AddSession() {
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
 
   const [createSession, { isLoading }] = useCreateSessionMutation();
-  const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
-
+  const { data: userData, isLoading: isUserLoading, error: userError } = useGetselecteduserQuery(classroomId);
+  console.log(userData);
   const validateInputs = () => {
     const newErrors = {};
     if (!sessionName.trim()) newErrors.sessionName = "Session Name is required.";
