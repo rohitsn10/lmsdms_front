@@ -7,8 +7,8 @@ const DocView = () => {
   const location = useLocation(); // Access the state passed via navigate
   const [docContent, setDocContent] = useState(null); // Blob for docx-preview
   const docxContainerRef = useRef(null);
-  const [timeLeft, setTimeLeft] = useState(600); // Fixed 10-minute timer (600 seconds)
-  const timerRef = useRef(null); // Timer reference
+  // const [timeLeft, setTimeLeft] = useState(600); // Fixed 10-minute timer (600 seconds)
+  // const timerRef = useRef(null); // Timer reference
   
   // Retrieve the document URL from the location state
   const { templateDoc,new_url, templateData } = location.state || {}; // Access minimumReadingTime
@@ -29,23 +29,23 @@ const DocView = () => {
   }, [templateDoc, new_url]);
 
   // Start timer when the component loads
-  useEffect(() => {
-    // Set a fixed 10-minute timer (600 seconds)
-    setTimeLeft(600);
+  // useEffect(() => {
+  //   // Set a fixed 10-minute timer (600 seconds)
+  //   setTimeLeft(600);
 
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(timerRef.current);
-          sendTimeExceededMessage(); // Call the function to send message when time exceeds
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
+  //   timerRef.current = setInterval(() => {
+  //     setTimeLeft((prevTime) => {
+  //       if (prevTime <= 1) {
+  //         clearInterval(timerRef.current);
+  //         sendTimeExceededMessage(); // Call the function to send message when time exceeds
+  //         return 0;
+  //       }
+  //       return prevTime - 1;
+  //     });
+  //   }, 1000);
 
-    return () => clearInterval(timerRef.current); // Cleanup the timer on unmount
-  }, []);
+  //   return () => clearInterval(timerRef.current); // Cleanup the timer on unmount
+  // }, []);
 
   // Backend request when timer ends
   const sendTimeExceededMessage = async () => {
@@ -65,11 +65,11 @@ const DocView = () => {
   }, [docContent]);
 
   // Format time in MM:SS format
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes}:${secs.toString().padStart(2, "0")}`;
-  };
+  // const formatTime = (seconds) => {
+  //   const minutes = Math.floor(seconds / 60);
+  //   const secs = seconds % 60;
+  //   return `${minutes}:${secs.toString().padStart(2, "0")}`;
+  // };
 
   return (
     <Box sx={{ padding: 2 }}>
@@ -79,7 +79,7 @@ const DocView = () => {
         </Toolbar>
       </AppBar>
 
-      <Box
+      {/* <Box
         sx={{
           marginTop: 2,
           display: "flex",
@@ -94,7 +94,7 @@ const DocView = () => {
       >
         <Typography variant="h5">Document Title: {templateData?.document_title || "Untitled"}</Typography>
         <Typography variant="h5">Time Left: {timeLeft !== null ? formatTime(timeLeft) : "Loading..."}</Typography>
-      </Box>
+      </Box> */}
 
       <Box sx={{ marginTop: 0 }}>
         <Box

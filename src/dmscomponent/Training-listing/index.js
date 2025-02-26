@@ -73,7 +73,7 @@ const TrainingListing = () => {
     const documentUrl = item;
     if (documentUrl) {
       console.log("Passing training_document:", item);
-      navigate("/LMS-Document", { state: { documentView: item } });
+      navigate("/LMS-Document", { state: { documentView: item.selected_template_url,document_id:2 } });
     } else {
       console.error("training_document is undefined or missing for this item", item);
     }
@@ -127,7 +127,9 @@ const TrainingListing = () => {
             color="success"
             onClick={() => {
               console.log("params.row:", params.row); 
-              handleview(params.row.selected_template_url);
+              // handleview(params.row.selected_template_url);
+              handleview(params.row);
+
             }}
           >
             <VisibilityIcon />
