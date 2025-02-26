@@ -77,7 +77,13 @@ function AddSession() {
 
   if (isUserLoading) return <p>Loading users...</p>;
   if (userError) return <p>Error loading users: {userError.message}</p>;
-
+  const getTodayDateString = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto" }}>
@@ -131,6 +137,9 @@ function AddSession() {
                   onChange={(e) => setSessionDate(e.target.value)}
                   error={!!errors.sessionDate}
                   helperText={errors.sessionDate}
+                  inputProps={{
+                      min: getTodayDateString(),
+                    }}
                 />
               </Grid>
               <Grid item xs={6}>

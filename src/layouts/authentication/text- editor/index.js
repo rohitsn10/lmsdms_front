@@ -904,7 +904,7 @@ const DocumentView = () => {
                   variant="gradient"
                   color="submit"
                   onClick={handleReview}
-                  disabled={isLoading || isSaved}
+                  disabled={isLoading || !isSaved}
                 >
                   Review
                 </MDButton>

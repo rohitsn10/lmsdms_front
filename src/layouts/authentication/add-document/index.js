@@ -65,34 +65,69 @@ function AddDocument() {
   const [selectedUser, setSelectedUser] = useState("");
   const [errors, setErrors] = useState({});
 
-  const validateInputs = () => {
-    const newErrors = {};
+  // const validateInputs = () => {
+  //   const newErrors = {};
 
-    if (!title.trim()) newErrors.title = "Title is required.";
-    if (!type || (typeof type === "string" && type.trim() === "")) {
-      newErrors.type = "Type is required.";
+  //   if (!title.trim()) newErrors.title = "Title is required.";
+  //   if (!type || (typeof type === "string" && type.trim() === "")) {
+  //     newErrors.type = "Type is required.";
+  //   }
+  //   // if (!documentNumber.trim()) newErrors.documentNumber = "Document number is required.";
+  //   if (!description.trim()) newErrors.description = "Description is required.";
+  //   if (!revisionMonth || revisionMonth <= 0) {
+  //     newErrors.revisionMonth = "Revision month must be a positive number.";
+  //   }
+
+  //   if (!revisionTime) {
+  //     setErrors({ revisionTime: "Revision Date  is required" });
+  //     return;
+  //   }
+  //   if (!workflow || (typeof workflow === "string" && workflow.trim() === "")) {
+  //     newErrors.workflow = "Workflow is required.";
+  //   }
+  //   if (!template || (typeof template === "string" && template.trim() === "")) {
+  //     newErrors.template = "Template is required.";
+  //   }
+
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
+  const validateInputs = () => {
+    let isValid = true;
+
+    if (!title.trim()) {
+      toast.error("Title is required.");
+      isValid = false;
     }
-    // if (!documentNumber.trim()) newErrors.documentNumber = "Document number is required.";
-    if (!description.trim()) newErrors.description = "Description is required.";
+    if (!type || (typeof type === "string" && type.trim() === "")) {
+      toast.error("Type is required.");
+      isValid = false;
+    }
+    // if (!documentNumber.trim()) toast.error("Document number is required.");
+    if (!description.trim()) {
+      toast.error("Description is required.");
+      isValid = false;
+    }
     if (!revisionMonth || revisionMonth <= 0) {
-      newErrors.revisionMonth = "Revision month must be a positive number.";
+      toast.error("Revision month must be a positive number.");
+      isValid = false;
     }
 
     if (!revisionTime) {
-      setErrors({ revisionTime: "Revision Date  is required" });
-      return;
+      toast.error("Revision Date is required");
+      isValid = false;
     }
     if (!workflow || (typeof workflow === "string" && workflow.trim() === "")) {
-      newErrors.workflow = "Workflow is required.";
+      toast.error("Workflow is required.");
+      isValid = false;
     }
     if (!template || (typeof template === "string" && template.trim() === "")) {
-      newErrors.template = "Template is required.";
+      toast.error("Template is required.");
+      isValid = false;
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return isValid;
   };
-
   const handleDateChange = (e) => {
     const selectedDate = new Date(e.target.value);
     const today = new Date();

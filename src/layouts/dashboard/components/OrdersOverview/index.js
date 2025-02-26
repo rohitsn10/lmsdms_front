@@ -43,7 +43,7 @@ const TimelineDot = styled("div")(({ theme, color }) => ({
 const OrdersOverview = ({ docId }) => {
   const { data, isLoading, error } = useDocTimeLineQuery(docId);
   const [timelineData, setTimelineData] = useState([]);
-
+  console.log("DDDDSDSDSD",data)
   useEffect(() => {
     if (data) {
       const timelineItems = [];
@@ -63,7 +63,7 @@ const OrdersOverview = ({ docId }) => {
 
             timelineItems.push({
               title,
-              notes: action.remarks_reviewer || "No remarks available", // Display remarks_reviewer if available
+              notes: action.remarks_reviewer || action.remarks_author || "No remarks available", // Display remarks_reviewer if available
               dateTime: formattedDate, // Use the formatted date
               icon,
               color,
@@ -90,7 +90,7 @@ const OrdersOverview = ({ docId }) => {
           color: "error",
         });
       });
-
+      console.log("DaDADA",data)
       setTimelineData(timelineItems);
     }
   }, [data]);
@@ -119,7 +119,7 @@ const OrdersOverview = ({ docId }) => {
       </Card>
     );
   }
-
+  console.log("TimelineDADADA",timelineData)
   return (
     <Card sx={{ height: "100%", overflow: "auto" }}>
       <MDBox pt={3} px={3}>
@@ -143,6 +143,7 @@ const OrdersOverview = ({ docId }) => {
                   <MDTypography variant="caption" color="textSecondary">
                     {item.dateTime}
                   </MDTypography>
+
                 </CardContent>
               </Card>
             </TimelineItem>
