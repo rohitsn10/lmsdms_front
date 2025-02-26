@@ -220,6 +220,11 @@ const DocumentView = () => {
       setError("Template URL is missing in the API response");
       setLoading(false);
     }
+    return () => {
+      setEditorConfig(null);
+      setDocEditorLoaded(false);
+      console.log("Cleanup: Resetting editor config");
+    };
   }, [isLoading, isError, templateData, apiError]);
 
   useEffect(() => {
@@ -229,12 +234,6 @@ const DocumentView = () => {
       // script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
       script.onload = () => {
         try {
-          // const handleSave = () => {
-          //   if (docEditorRef.current) {
-          //     console.log("Save button clicked, triggering save...");
-          //   }
-          // };
-
            docEditorRef.current = new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
             width: "100%",
             height: "100%",
@@ -391,6 +390,16 @@ const DocumentView = () => {
         console.error("Script load error");
       };
       document.body.appendChild(script);
+      return () => {
+        if (docEditorRef.current) {
+          docEditorRef.current.destroyEditor(); // Destroy the ONLYOFFICE instance
+          docEditorRef.current = null;
+          console.log("Cleanup: ONLYOFFICE editor destroyed");
+        }
+  
+        document.body.removeChild(script); // Remove script tag
+        console.log("Cleanup: ONLYOFFICE script removed");
+      };
     }
   }, [docEditorLoaded, editorConfig]);
 

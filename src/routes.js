@@ -62,6 +62,7 @@ import SchoolTwoToneIcon from "@mui/icons-material/SchoolTwoTone";
 import Diversity1Icon from "@mui/icons-material/Diversity1";
 import UserReports from "dmscomponent/user-reports";
 import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
+
 const routes = [
   {
     type: "collapse",
@@ -70,6 +71,7 @@ const routes = [
     icon: <DashboardIcon fontSize="small" />,
     route: "/dashboard",
     component: <Dashboard />,
+    routeCat:"lms"
   },
   {
     type: "collapse",
@@ -78,6 +80,8 @@ const routes = [
     icon: <DashboardIcon fontSize="small" />,
     route: "/lms-dashboard",
     component: <LMSDashboard />,
+    routeCat:"lms"
+
   },
   {
     type: "collapse",
@@ -86,6 +90,8 @@ const routes = [
     icon: <PersonAddIcon />,
     route: "/user-listing",
     component: <UsersListing />,
+    routeCat:"lms"
+
   },
   {
     type: "collapse",
@@ -94,6 +100,7 @@ const routes = [
     icon: <ApartmentIcon />,
     route: "/department-listing",
     component: <DepartmentListing />,
+    routeCat:"lms"
   },
   {
     type: "collapse",
@@ -102,6 +109,7 @@ const routes = [
     icon: <LibraryBooksIcon />,
     route: "/document-listing",
     component: <DocumentListing />,
+    routeCat:"lms"
   },
   {
     type: "collapse",
@@ -110,6 +118,7 @@ const routes = [
     icon: <WorkspacesIcon />,
     route: "/workflow-listing",
     component: <WorkflowListing />,
+    routeCat:"lms"
   },
   {
     type: "collapse",
@@ -118,6 +127,7 @@ const routes = [
     icon: <SettingsIcon />,
     route: "/status-list",
     component: <StatusListing />,
+    routeCat:"lms"
   },
   {
     type: "collapse",
@@ -126,6 +136,7 @@ const routes = [
     icon: <AssignmentIcon />,
     route: "/document-typelisting",
     component: <DocumentTypesListing />,
+    routeCat:"lms"
   },
   {
     type: "collapse",
@@ -134,6 +145,7 @@ const routes = [
     icon: <TopicIcon />,
     route: "/template-listing",
     component: <TemplateListing />,
+    routeCat:"lms"
   },
   {
     type: "collapse",
@@ -142,6 +154,7 @@ const routes = [
     icon: <Inventory2Icon />,
     route: "/inventory-list",
     component: <InventoryListing />,
+    routeCat:"lms"
   },
   {
     type: "collapse",
@@ -150,6 +163,7 @@ const routes = [
     icon: <ArchiveIcon />,
     route: "/archived-listing",
     component: <ArchivedListing />,
+    routeCat:"lms"
   },
   // {
   //   type: "collapse",
@@ -166,6 +180,7 @@ const routes = [
     icon: <ApprovalIcon />,
     route: "/approval-listing",
     component: <PrintApprovalListing />,
+    routeCat:"lms"
   },
   {
     type: "collapse",
@@ -174,6 +189,7 @@ const routes = [
     icon: <LocalPrintshopIcon />,
     route: "printer-listing",
     component: <PrinterListing />,
+    routeCat:"lms"
   },
   {
     type: "collapse",
@@ -182,6 +198,7 @@ const routes = [
     icon: <GetAppOutlinedIcon />,
     route: "/retrieval-listing",
     component: <PrintRetrievalListing />,
+    routeCat:"dms"
   },
   {
     type: "collapse",
@@ -190,6 +207,7 @@ const routes = [
     icon: <ImportContactsTwoToneIcon />,
     route: "/revise-listing",
     component: <ReviseApprovalList />,
+    routeCat:"dms"
   },
   {
     type: "collapse",
@@ -198,6 +216,7 @@ const routes = [
     icon: <FactoryTwoToneIcon />,
     route: "/plant-listing",
     component: <PlantListing />,
+    routeCat:"dms"
   },
   {
     type: "collapse",
@@ -206,6 +225,7 @@ const routes = [
     icon: <HomeMiniRoundedIcon />,
     route: "/area-listing",
     component: <AreaListing />,
+    routeCat:"dms"
   },
   {
     type: "collapse",
@@ -214,6 +234,7 @@ const routes = [
     icon: <AccountTreeIcon />,
     route: "/methodology-listing",
     component: <MethodologyListing />,
+    routeCat:"dms"
   },
   {
     type: "collapse",
@@ -222,6 +243,7 @@ const routes = [
     icon: <DevicesFoldTwoToneIcon />,
     route: "/trainingType-Listing",
     component: <TrainingTypeListing />,
+    routeCat:"dms"
   },
   {
     type: "collapse",
@@ -230,6 +252,7 @@ const routes = [
     icon: <AccountTreeIcon />,
     route: "/induction-Listing",
     component: <InductionListing />,
+    routeCat:"dms"
   },
   {
     type: "collapse",
@@ -238,6 +261,7 @@ const routes = [
     icon: <ModelTrainingTwoToneIcon />,
     route: "/trainingListing",
     component: <TrainingListing />,
+    routeCat:"dms"
   },
   {
     type: "collapse",
@@ -246,6 +270,7 @@ const routes = [
     icon: <WorkTwoToneIcon />,
     route: "/jobRole-listing",
     component: <JobroleListing />,
+    routeCat:"dms"
   },
   {
     type: "collapse",
@@ -254,6 +279,7 @@ const routes = [
     icon: <ForkRightTwoToneIcon />,
     route: "/trainingMapping-listing",
     component: <TrainingMapping />,
+    routeCat:"dms"
   },
   {
     type: "collapse",
@@ -262,6 +288,7 @@ const routes = [
     icon: <DisplaySettingsRoundedIcon />,
     route: "/jobrole-mapping",
     component: <JobRoleMapping />,
+    routeCat:"dms"
   },
   {
     type: "collapse",
@@ -270,6 +297,7 @@ const routes = [
     icon: <ForkRightTwoToneIcon />,
     route: "/quiz-list",
     component: <QuizListing />,
+    routeCat:"dms"
   },
 ];
 export const LmsRoutes = [
@@ -369,22 +397,22 @@ export const LmsRoutes = [
     route: "/jobRole-listing",
     component: <JobroleListing />,
   },
-  {
-    type: "collapse",
-    name: "Training Mapping",
-    key: "trainingMapping-listing",
-    icon: <ForkRightTwoToneIcon />,
-    route: "/trainingMapping-listing",
-    component: <TrainingMapping />,
-  },
-  {
-    type: "collapse",
-    name: "Job Role Mapping",
-    key: "jobrole-mapping",
-    icon: <DisplaySettingsRoundedIcon />,
-    route: "/jobrole-mapping",
-    component: <JobRoleMapping />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Training Mapping",
+  //   key: "trainingMapping-listing",
+  //   icon: <ForkRightTwoToneIcon />,
+  //   route: "/trainingMapping-listing",
+  //   component: <TrainingMapping />,
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Job Role Mapping",
+  //   key: "jobrole-mapping",
+  //   icon: <DisplaySettingsRoundedIcon />,
+  //   route: "/jobrole-mapping",
+  //   component: <JobRoleMapping />,
+  // },
   {
     type: "collapse",
     name: "Class Room",
@@ -394,6 +422,7 @@ export const LmsRoutes = [
     component: <ClassroomListing />,
   },
 ];
+
 export const DmsRoutes = [
   {
     type: "collapse",
@@ -516,4 +545,128 @@ export const DmsRoutes = [
     component: <ReviseApprovalList />,
   },
 ];
+
+export const DtcRoutes = [
+  {
+    type: "collapse",
+    name: "LMS Dashboard",
+    key: "lms-dashboard",
+    icon: <DashboardIcon fontSize="small" />,
+    route: "/lms-dashboard",
+    component: <LMSDashboard />,
+  },
+  {
+    type: "collapse",
+    name: "User Management",
+    key: "user-listing",
+    icon: <PersonAddIcon />,
+    route: "/user-listing",
+    component: <UsersListing />,
+  },
+  {
+    type: "collapse",
+    name: "LMS  User Report",
+    key: "user-reports",
+    icon: <AssessmentOutlinedIcon />,
+    route: "/user-reports",
+    component: <UserReports />,
+  },
+  {
+    type: "collapse",
+    name: "Employee Workflow",
+    key: "employee-workflow",
+    icon: <AssignmentIndOutlinedIcon fontSize="small" />,
+    route: "/employee-workflow",
+    component: <ViewEmployeeStatus />,
+  },
+  {
+    type: "collapse",
+    name: "Plants",
+    key: "plant-listing",
+    icon: <FactoryTwoToneIcon />,
+    route: "/plant-listing",
+    component: <PlantListing />,
+  },
+  {
+    type: "collapse",
+    name: "Area",
+    key: "area-listing",
+    icon: <HomeMiniRoundedIcon />,
+    route: "/area-listing",
+    component: <AreaListing />,
+  },
+  {
+    type: "collapse",
+    name: "Methodology",
+    key: "methodology-listing",
+    icon: <AccountTreeIcon />,
+    route: "/methodology-listing",
+    component: <MethodologyListing />,
+  },
+  {
+    type: "collapse",
+    name: "Training Type",
+    key: "trainingType-Listing",
+    icon: <DevicesFoldTwoToneIcon />,
+    route: "/trainingType-Listing",
+    component: <TrainingTypeListing />,
+  },
+  {
+    type: "collapse",
+    name: "Induction Set",
+    key: "induction-Listing",
+    icon: <AccountTreeIcon />,
+    route: "/induction-Listing",
+    component: <InductionListing />,
+  },
+  {
+    type: "collapse",
+    name: "Training Activity",
+    key: "trainingListing",
+    icon: <ModelTrainingTwoToneIcon />,
+    route: "/trainingListing",
+    component: <TrainingListing />,
+  },
+  {
+    type: "collapse",
+    name: "Trainer ",
+    key: "trainer-listing",
+    icon: <Diversity1Icon />,
+    route: "/trainer-listing",
+    component: <TrainingListing />,
+  },
+  {
+    type: "collapse",
+    name: "Job Role",
+    key: "jobRole-listing",
+    icon: <WorkTwoToneIcon />,
+    route: "/jobRole-listing",
+    component: <JobroleListing />,
+  },
+  {
+    type: "collapse",
+    name: "Training Mapping",
+    key: "trainingMapping-listing",
+    icon: <ForkRightTwoToneIcon />,
+    route: "/trainingMapping-listing",
+    component: <TrainingMapping />,
+  },
+  {
+    type: "collapse",
+    name: "Job Role Mapping",
+    key: "jobrole-mapping",
+    icon: <DisplaySettingsRoundedIcon />,
+    route: "/jobrole-mapping",
+    component: <JobRoleMapping />,
+  },
+  {
+    type: "collapse",
+    name: "Class Room",
+    key: "class-room",
+    icon: <SchoolTwoToneIcon />,
+    route: "/class-room",
+    component: <ClassroomListing />,
+  },
+];
+
 export default routes;
