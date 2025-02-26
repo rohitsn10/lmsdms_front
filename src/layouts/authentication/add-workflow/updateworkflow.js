@@ -52,7 +52,7 @@ const UpdateWorkflow = () => {
       const response = await updateWorkflow({
         workflow_id: state.workflow.id,
         workflow_name: workflowName.trim(),
-        workflow_description: workflowDescription.trim(),
+        workflow_description: workflowDescription.trim() || "N/A",
       }).unwrap();
 
       console.log("API Response:", response);
