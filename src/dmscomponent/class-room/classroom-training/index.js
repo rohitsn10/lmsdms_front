@@ -256,7 +256,7 @@ function ClassroomTraining() {
                     }}
                   >
                     {/* Add "N/A" option */}
-                    <MenuItem value="N/A">None</MenuItem>
+                    <MenuItem value="None">None</MenuItem>
                     {Array.isArray(alldocument?.document_data.documents) ? (
                       alldocument.document_data.documents.map((doc) => (
                         <MenuItem key={doc.id} value={doc.id}>
@@ -269,7 +269,7 @@ function ClassroomTraining() {
                   </Select>
                 </FormControl>
               </Grid>
-              {sopdocument === "N/A" ? (
+              {sopdocument === "None" ? (
                 <Grid item xs={12}>
                   <FormControl fullWidth error={!!errors.selectedUsers}>
                     <InputLabel id="select-user-label">

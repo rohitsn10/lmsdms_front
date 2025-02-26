@@ -17,7 +17,6 @@ function AddSession() {
   const navigate = useNavigate();
   const location = useLocation();
   const classroomId = location.state?.classroomId;
-
   const [sessionName, setSessionName] = useState("");
   const [sessionVenue, setSessionVenue] = useState("");
   const [sessionDate, setSessionDate] = useState("");
@@ -25,10 +24,15 @@ function AddSession() {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-
   const [createSession, { isLoading }] = useCreateSessionMutation();
-  const { data: userData, isLoading: isUserLoading, error: userError } = useGetselecteduserQuery(classroomId);
-  console.log(userData);
+  
+  const {
+    data: userData,
+    isLoading: isUserLoading,
+    error: userError,
+  } = useGetselecteduserQuery(classroomId);
+  const users = Array.isArray(userData) ? userData : userData?.data ?? [];
+
   const validateInputs = () => {
     const newErrors = {};
     if (!sessionName.trim()) newErrors.sessionName = "Session Name is required.";
@@ -80,8 +84,8 @@ function AddSession() {
   const getTodayDateString = () => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
   return (
@@ -109,7 +113,11 @@ function AddSession() {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  label={<><span style={{ color: "red" }}>*</span> Session Name</>}
+                  label={
+                    <>
+                      <span style={{ color: "red" }}>*</span> Session Name
+                    </>
+                  }
                   fullWidth
                   value={sessionName}
                   onChange={(e) => setSessionName(e.target.value)}
@@ -119,7 +127,11 @@ function AddSession() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label={<><span style={{ color: "red" }}>*</span> Session Venue</>}
+                  label={
+                    <>
+                      <span style={{ color: "red" }}>*</span> Session Venue
+                    </>
+                  }
                   fullWidth
                   value={sessionVenue}
                   onChange={(e) => setSessionVenue(e.target.value)}
@@ -130,7 +142,11 @@ function AddSession() {
               <Grid item xs={6}>
                 <TextField
                   type="date"
-                  label={<><span style={{ color: "red" }}>*</span> Session Date</>}
+                  label={
+                    <>
+                      <span style={{ color: "red" }}>*</span> Session Date
+                    </>
+                  }
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   value={sessionDate}
@@ -138,14 +154,18 @@ function AddSession() {
                   error={!!errors.sessionDate}
                   helperText={errors.sessionDate}
                   inputProps={{
-                      min: getTodayDateString(),
-                    }}
+                    min: getTodayDateString(),
+                  }}
                 />
               </Grid>
               <Grid item xs={6}>
                 <TextField
                   type="time"
-                  label={<><span style={{ color: "red" }}>*</span> Session Time</>}
+                  label={
+                    <>
+                      <span style={{ color: "red" }}>*</span> Session Time
+                    </>
+                  }
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   value={sessionTime}
@@ -157,7 +177,7 @@ function AddSession() {
               <Grid item xs={12}>
                 <FormControl fullWidth error={!!errors.selectedUsers}>
                   <InputLabel id="select-user-label">
-                    <span style={{ color: "red" }}>*</span>Select Users 
+                    <span style={{ color: "red" }}>*</span> Select Users
                   </InputLabel>
                   <Select
                     labelId="select-user-label"
@@ -169,8 +189,8 @@ function AddSession() {
                     renderValue={(selected) =>
                       selected
                         .map((userId) => {
-                          const user = userData?.data.find((u) => u.id === userId);
-                          return user?.username || userId;
+                          const user = users.find((u) => u.id === userId);
+                          return user ? `${user.first_name} ${user.last_name}` : userId;
                         })
                         .join(", ")
                     }
@@ -180,10 +200,10 @@ function AddSession() {
                       ".MuiSelect-select": { padding: "0.45rem" },
                     }}
                   >
-                    {userData?.data.length > 0 ? (
-                      userData.data.map((user) => (
+                    {users.length > 0 ? (
+                      users.map((user) => (
                         <MenuItem key={user.id} value={user.id}>
-                          {user.username}
+                          {user.first_name} {user.last_name} ({user.email})
                         </MenuItem>
                       ))
                     ) : (
