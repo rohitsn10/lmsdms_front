@@ -143,7 +143,7 @@ export default function App() {
   const isTextEditor = pathname === "/document-view";
   const navigate = useNavigate();
   const { is_dms_user, is_lms_user, is_active } = useSelector((state) => state.userRole);
-  console.log("New Activiviviv",is_active);
+  // console.log("New Activiviviv",is_active);
   const [routeItems,setRouteItems]=useState([...routes]);
   useEffect(()=>{
       if(is_active){

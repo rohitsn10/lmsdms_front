@@ -25,7 +25,7 @@ const TrainingListing = () => {
   const groupId = group.id;
   // Fetch training data using the API query hook
   const { data, error, isLoading, refetch } = useFetchTrainingsQuery();
-
+  // console.log(user)
   const [startAssessmentModal,setStartAssessmentModal]=useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
 
@@ -73,7 +73,7 @@ const TrainingListing = () => {
     const documentUrl = item;
     if (documentUrl) {
       console.log("Passing training_document:", item);
-      navigate("/LMS-Document", { state: { documentView: item.selected_template_url,document_id:2 } });
+      navigate("/LMS-Document", { state: { documentView: item.selected_template_url,document_id:item.id } });
     } else {
       console.error("training_document is undefined or missing for this item", item);
     }
@@ -96,6 +96,7 @@ const TrainingListing = () => {
         revision_date: item.revision_month, // Revision month
         effective_date: moment(item.created_at).format("DD-MM-YY"), // Use created_at for now
         selected_template_url:item.selected_template_url,
+        user_view:item.user_view
       };
     });
 
@@ -218,14 +219,19 @@ const TrainingListing = () => {
       headerName: "Assessment",
       flex: 0.8,
       headerAlign: "center",
-      renderCell: (params) => (
+      renderCell: (params) =>{
+        // console.log(user.id);
+        // console.log(params.row)
+        const isUserInView = params.row?.user_view?.some(view => view.user === user.id);
+        // console.log("Toggle",isUserInView)
+        return(
         <MDBox display="flex" justifyContent="center">
           {/* Question Icon */}
-          <IconButton color="error" onClick={() => handleAssessmentClick(params.row.id)}>
+          <IconButton disabled={!isUserInView} color="error" onClick={() => handleAssessmentClick(params.row.id)}>
             <ChecklistIcon />{" "}
           </IconButton>
         </MDBox>
-      ),
+      )},
       sortable: false,
       filterable: false,
     },
