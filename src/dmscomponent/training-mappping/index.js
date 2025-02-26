@@ -174,7 +174,7 @@ const TrainingMapping = () => {
   return (
     <Paper elevation={3} sx={{ maxWidth: 900, mx: "auto", my: 4, p: 3 }}>
       <Typography variant="h4" component="h1" gutterBottom align="center" color="primary">
-        User Job Role Mapping
+        Job Role Mapping
       </Typography>
       <Divider sx={{ mb: 4 }} />
       
