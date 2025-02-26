@@ -109,7 +109,7 @@ import MultiChoiceQuesionsSection from "dmscomponent/mcq-module/index.js";
 import MaterialListing from "dmscomponent/materials-listing/index.jsx";
 import AddSession from "dmscomponent/class-room/session-listing/add-session/index.js";
 import EditSession from "dmscomponent/class-room/session-listing/edit-session/index.js";
-import {LmsRoutes,DmsRoutes} from './routes.js';
+import {LmsRoutes,DmsRoutes,DtcRoutes} from './routes.js';
 import { useSelector } from "react-redux";
 import ClassroomListing from "dmscomponent/class-room/index.js";
 import SessionListing from "dmscomponent/class-room/session-listing/index.js";
@@ -125,6 +125,8 @@ import ClassMultiChoiceQuestionsSection from "dmscomponent/class-room/classroom-
 import DueSOPDocument from "layouts/authentication/document-listing/due-sop/index.js";
 import UserReports from "dmscomponent/user-reports/index.js";
 import EditInduction from "dmscomponent/induction-training/edit-induction/index.js";
+import { useAuth } from "hooks/use-auth";
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -142,18 +144,31 @@ export default function App() {
   const { pathname } = useLocation();
   const isTextEditor = pathname === "/document-view";
   const navigate = useNavigate();
+  const {user}=useAuth();
+  const userGroupId=user?.user_permissions?.group.id;
+  // console.log()
+// console.log("Useruseruser::::::",user?.user_permissions?.group.id)
   const { is_dms_user, is_lms_user, is_active } = useSelector((state) => state.userRole);
   // console.log("New Activiviviv",is_active);
+  
   const [routeItems,setRouteItems]=useState([...routes]);
   useEffect(()=>{
       if(is_active){
-        setRouteItems([...LmsRoutes])
+        if(userGroupId==7){
+          // console.log("DTC Check")
+          setRouteItems([...DtcRoutes])
+        }else{
+          console.log("LMS Check")
+          setRouteItems([...LmsRoutes])
+        }
         // navigate('/lms-dashboard')
       }else{
-        setRouteItems([...DmsRoutes])
+          console.log("DMS Check")
+          setRouteItems([...DmsRoutes])
+        // console.log("Check")
         // navigate('/dms-dashboard')
       }
-  },[is_active])
+  },[is_active,userGroupId])
   useMemo(() => {
     const cacheRtl = createCache({
       key: "rtl",

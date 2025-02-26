@@ -903,7 +903,7 @@ const DocumentView = () => {
                   variant="gradient"
                   color="submit"
                   onClick={handleReview}
-                  disabled={isLoading}
+                  disabled={isLoading || isSaved}
                 >
                   Review
                 </MDButton>
@@ -925,7 +925,7 @@ const DocumentView = () => {
                   variant="gradient"
                   color="submit"
                   onClick={handleApprove}
-                  disabled={isLoading}
+                  disabled={isLoading || !isSaved}
                 >
                   Approve
                 </MDButton>
