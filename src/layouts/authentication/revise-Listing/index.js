@@ -100,7 +100,7 @@ const ReviseApprovalList = () => {
     { field: "documentType", headerName: "Document Type", flex: 1, headerAlign: "center" },
     { field: "requestedUser", headerName: "Requested User", flex: 1, headerAlign: "center" },
     { field: "requestedDate", headerName: "Requested Date", flex: 1, headerAlign: "center" },
-    { field: "reviseStatus", headerName: "Revise Status", flex: 1, headerAlign: "center" },
+    { field: "status", headerName: "Revise Status", flex: 1, headerAlign: "center" },
     {
       field: "action",
       headerName: "Action",
@@ -116,17 +116,17 @@ const ReviseApprovalList = () => {
 
         return (
           <MDBox display="flex" justifyContent="center" alignItems="center" gap={1}>
-            {showReviseButton && (
+            {/* {showReviseButton && ( */}
               <IconButton color="warning" onClick={() => handleReviseDialogOpen(params.row)}>
                 <BackHandSharpIcon />
               </IconButton>
-            )}
+            {/*  )} */}
 
-            {showApproveButton && (
+            {/* {showApproveButton && ( */}
               <IconButton color="primary" onClick={() => handleApproveDialogOpen(params.row)}>
                 <ImportContactsTwoToneIcon />
               </IconButton>
-            )}
+            {/* )} */}
           </MDBox>
         );
       },
@@ -157,7 +157,7 @@ const ReviseApprovalList = () => {
           ) : (
             <div style={{ height: 500, width: "100%" }}>
               <DataGrid
-                rows={displayedData}
+                rows={displayedData} 
                 columns={columns}
                 pageSize={5}
                 rowsPerPageOptions={[5, 10, 20]}
