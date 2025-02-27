@@ -180,7 +180,7 @@ function ClassroomTraining() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControl fullWidth margin="dense" error={!!errors.trainingType}>
+                <FormControl fullWidth margin="dense" >
                   <InputLabel id="training-type-label">
                     <span style={{ color: "red" }}>*</span>Type
                   </InputLabel>
@@ -201,15 +201,15 @@ function ClassroomTraining() {
                   </Select>
                 </FormControl>
                 {errors.trainingType && (
-                  <MDTypography variant="caption" color="error">
+                  <MDTypography variant="caption" >
                     {errors.trainingType}
                   </MDTypography>
                 )}
               </Grid>
               <Grid item xs={12}>
-                <FormControl fullWidth margin="dense" error={!!errors.trainer}>
+                <FormControl fullWidth margin="dense" >
                   <InputLabel id="trainer-type-label">
-                    <span style={{ color: "red" }}>*</span>Select Trainer
+                    <span style={{color:"red"}}>*</span>Select Trainer
                   </InputLabel>
                   <Select
                     labelId="select-trainer-label"
@@ -234,7 +234,7 @@ function ClassroomTraining() {
 
                 {/* Display error message for the "trainer" field */}
                 {errors.trainer && (
-                  <MDTypography variant="caption" color="error">
+                  <MDTypography variant="caption" >
                     {errors.trainer} {/* Display the error message for the trainer */}
                   </MDTypography>
                 )}

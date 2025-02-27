@@ -19,19 +19,21 @@ function EditSession() {
   const [sessionVenue, setSessionVenue] = useState(sessionData?.venue || "");
   const [sessionDate, setSessionDate] = useState(formatDate(sessionData?.start_date || ""));
   const [sessionTime, setSessionTime] = useState(formatTime(sessionData?.start_time || ""));
-  const [selectedUser, setSelectedUser] = useState(sessionData?.user_ids?.[0] || "");
+  const [selectedUsers, setSelectedUsers] = useState(sessionData?.user_ids || []);
   function formatDate(date) {
-    return moment(date, "DD/MM/YY HH:mm").format("DD/MM/YY"); 
+    return moment(date, "DD/MM/YY HH:mm").format("DD/MM/YY");
   }
   function formatTime(time) {
-    return moment(time, "HH:mm:ss").format("HH:mm"); 
+    return moment(time, "HH:mm:ss").format("HH:mm");
   }
-// console.log("----------------daata in edit session",sessionData);
+  // console.log("----------------daata in edit session",sessionData);
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
 
   // Use the update session mutation hook
   const [updateSession, { isLoading: isUpdating, error: updateError }] = useUpdateSessionMutation();
-
+  const handleUserChange = (event) => {
+    setSelectedUsers(event.target.value); // MUI Select returns an array when `multiple` is enabled
+  };
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +46,7 @@ function EditSession() {
 
       start_time: sessionTime,
 
-      user_ids: [selectedUser], // If you want to handle multiple users, adjust the logic
+      user_ids: selectedUsers,
       classroom_id: sessionData?.classroom_id,
     };
 
@@ -128,13 +130,20 @@ function EditSession() {
               <Grid item xs={12}>
                 <MDBox mb={3}>
                   <FormControl fullWidth margin="dense">
-                    <InputLabel id="select-user-label">Select User</InputLabel>
+                    <InputLabel id="select-user-label">Select Users</InputLabel>
                     <Select
                       labelId="select-user-label"
                       id="select-user"
-                      value={selectedUser}
-                      onChange={(e) => setSelectedUser(e.target.value)}
-                      input={<OutlinedInput label="Select User" />}
+                      multiple
+                      value={selectedUsers}
+                      onChange={handleUserChange}
+                      input={<OutlinedInput label="Select Users" />}
+                      renderValue={(selected) =>
+                        userData?.data
+                          ?.filter((user) => selected.includes(user.id))
+                          .map((user) => user.username)
+                          .join(", ")
+                      }
                       sx={{
                         minWidth: 200,
                         height: "3rem",
@@ -144,7 +153,7 @@ function EditSession() {
                       {userData?.data?.length > 0 ? (
                         userData.data.map((user) => (
                           <MenuItem key={user.id} value={user.id}>
-                            {user.username} {/* Display username */}
+                            {user.username}
                           </MenuItem>
                         ))
                       ) : (
