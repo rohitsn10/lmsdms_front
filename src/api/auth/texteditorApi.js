@@ -41,7 +41,7 @@ export const texteditorApi = createApi({
     }),
     documentApproveStatus: builder.mutation({
       query: ({ document_id, documentdetails_id, status,remark,visible_to_users,approver,doc_admin }) => ({
-        url: `dms_module/document_approve_status`,
+        url: `dms_module/document_approver_status`,
         method: "POST",
         body: { document_id, documentdetails_id, status, remark,visible_to_users,approver,doc_admin },
       }),

@@ -126,6 +126,7 @@ import DueSOPDocument from "layouts/authentication/document-listing/due-sop/inde
 import UserReports from "dmscomponent/user-reports/index.js";
 import EditInduction from "dmscomponent/induction-training/edit-induction/index.js";
 import { useAuth } from "hooks/use-auth";
+import EditQuiz from "dmscomponent/edit-quiz/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -366,6 +367,7 @@ export default function App() {
       <Route path="/add-material" element={<AddMaterial />} />
       <Route path="/add-question" element={<AddQuestion />} />
       <Route path="/add-quiz" element={<CreateQuiz />} />
+      <Route path="/edit-quiz" element={<EditQuiz />} />
       <Route path="/quiz-list" element={<QuizListing />} />
       <Route path="/classroom-training" element={<ClassroomTraining />} />
       <Route path="/training-matrix" element={<TrainingMatrix />} />

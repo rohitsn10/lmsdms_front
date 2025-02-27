@@ -50,17 +50,17 @@ const QuizListing = () => {
     { field: "quiz_type", headerName: "Quiz Type", flex: 1, headerAlign: "center" },
     { field: "quiz_time", headerName: "Quiz Time", flex: 1, headerAlign: "center" },
     { field: "pass_criteria", headerName: "Pass Criteria", flex: 1, headerAlign: "center" },
-    // {
-    //   field: "action",
-    //   headerName: "Action",
-    //   flex: 0.5,
-    //   headerAlign: "center",
-    //   renderCell: (params) => (
-    //     <IconButton color="primary" onClick={() => handleEditQuiz(params.row)}>
-    //       <EditIcon />
-    //     </IconButton>
-    //   ),
-    // },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <IconButton color="primary" onClick={() => handleEditQuiz(params.row)}>
+          <EditIcon />
+        </IconButton>
+      ),
+    },
   ];
 
   if (isLoading) {
