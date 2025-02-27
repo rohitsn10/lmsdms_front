@@ -645,7 +645,7 @@ export const DtcRoutes = [
   },
   {
     type: "collapse",
-    name: "Training Mapping",
+    name: "Job Role Mapping",
     key: "trainingMapping-listing",
     icon: <ForkRightTwoToneIcon />,
     route: "/trainingMapping-listing",
@@ -653,7 +653,7 @@ export const DtcRoutes = [
   },
   {
     type: "collapse",
-    name: "Job Role Mapping",
+    name: "Training Mapping",
     key: "jobrole-mapping",
     icon: <DisplaySettingsRoundedIcon />,
     route: "/jobrole-mapping",

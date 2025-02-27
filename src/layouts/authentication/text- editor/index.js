@@ -279,15 +279,6 @@ const DocumentView = () => {
             },
             events: {
               onDocumentStateChange: (event) => {
-                // const hasChanges = event.data;
-                // console.log("Document has unsaved changes:", hasChanges);
-
-                // if (hasChanges) {
-                //   // Document has unsaved changes - you could trigger auto-save here
-                //   if (window.DocEditor) {
-                //     window.DocEditor.execCommand("save");
-                //   }
-                // }
 
             },
             //   onAppReady: async() => {
@@ -324,10 +315,10 @@ const DocumentView = () => {
               console.log("Editor Config:", docEditorRef.current.config); // Log the entire config
         
               try {
-                const editorInstance = window.docEditor;
-                const headerData = "await fetchHeaderData();";
-                console.log("Inserting Header Data:", headerData);
-                editorInstance.insertText(`Header Data: ${headerData?.company_name}`, "CompanyName");
+                // const editorInstance = window.docEditor;
+                // const headerData = "await fetchHeaderData();";
+                // console.log("Inserting Header Data:", headerData);
+                // editorInstance.insertText(`Header Data: ${headerData?.company_name}`, "CompanyName");
               } catch (error) {
                 console.error("Error inserting header:", error);
               }
@@ -340,9 +331,6 @@ const DocumentView = () => {
                   try {
                     // console.log("Download response:", response);
                     const cacheUrl = response?.data?.url;
-                    console.log("Hit Button ---------->")
-                    // console.log("Cache Url Link:", cacheUrl);
-                    // console.log("Comment", docCommentsRef?.current);
                     setCacheDocument(cacheUrl);
                     const newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
                     if (cacheUrl) {
@@ -360,10 +348,8 @@ const DocumentView = () => {
                       // console.log("Submitting draft:", draftData);
                       try {
                         // Send the comment data to the API
-                        console.log("Hit Debugg ---------->")
                         const result = await addPathUrlDataForComments(draftData).unwrap();
                         // console.log("Data Added", result);
-                        console.log("HITTTTTTT MANAMANAMAN",result)
                         toast.success("Document Saved.")
                       } catch (apiError) {
                         console.error("Error saving comment:", apiError);
@@ -529,14 +515,6 @@ const DocumentView = () => {
     }
   };
 
-  // const handleSaveComment = () => {
-  //   if (currentComment.trim() === "") return;
-  //   const quill = quillRef.current;
-  //   quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
-  //   setComments([...comments, { id: Date.now(), range: selectedRange, comment: currentComment }]);
-  //   setCurrentComment("");
-  //   setOpencommentDialog(false); // Close modal after saving
-  // };
   const handleSaveComment = async () => {
     if (currentComment.trim() === "") return;
 
@@ -988,133 +966,9 @@ const DocumentView = () => {
             Print
           </MDButton>
 
-          {/* <button onClick={handleDownloadFeature}>
-        Force Save
-      </button> */}
         </MDBox>
       </Box>
-      {/* <Box sx={{ maxWidth: 700, mx: "auto", p: 3, mt: 3, boxShadow: 3,display:'flex',flexDirection:'column',gap:2 }}>
-
-      <h3>Add Comment</h3>
-      <MDBox display="flex" gap={2} mt={1}>
-        <TextareaAutosize
-  minRows={3}
-  placeholder="Write your comment here..."
-  value={docComments}
-  onChange={(e) => {
-    setDocComments(e.target.value);
-    docCommentsRef.current = e.target.value; // Keep ref updated
-  }}
-  style={{
-    width: "400px",
-    padding: "10px",
-    fontSize: "16px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-    resize: "vertical",
-  }}
-/>
-      </MDBox>
-      <MDButton variant="gradient" color="primary"
-         >
-          Add Comment
-        </MDButton>
-    </Box> */}
-
-      {/* <Box
-        sx={{
-          maxWidth: 700,
-          mx: "auto",
-          p: 3,
-          mt: 3,
-          boxShadow: 3,
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
-        <h2>Add Comment:</h2>
-        <MDBox>
-          <TextareaAutosize
-            minRows={3}
-            placeholder="Write your comment here..."
-            value={docCurrentComment}
-            onChange={(e) => setDocCurrentComment(e.target.value)}
-            style={{
-              width: "400px",
-              padding: "10px",
-              fontSize: "16px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              resize: "vertical",
-            }}
-          />
-        </MDBox>
-
-        <MDButton
-          variant="gradient"
-          color="primary"
-          onClick={handleDocComment}
-          disabled={!docCurrentComment.trim()}
-        >
-          Add Comment
-        </MDButton>
-      </Box> */}
-
-      {/* <Box sx={{ mt: 4, width: "400px", maxWidth: "700px", marginX: "auto" }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Comments:
-        </Typography>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {docComments?.map((comment) => (
-            <Paper
-              key={comment.id}
-              elevation={1}
-              sx={{
-                p: 2,
-                bgcolor: "grey.50",
-                position: "relative",
-              }}
-            >
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}
-              >
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {comment.user}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ display: "block", mt: 0.5 }}
-                  >
-                    {new Date(comment.timestamp).toLocaleString()}
-                  </Typography>
-                  <Typography sx={{ mt: 1 }}>{comment.text}</Typography>
-                </Box>
-                <IconButton
-                  onClick={() => handleDeleteComment(comment.id)}
-                  size="small"
-                  sx={{
-                    "&:hover": {
-                      color: "error.main",
-                      bgcolor: "error.light",
-                    },
-                  }}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </Paper>
-          ))}
-          {docComments.length === 0 && (
-            <Typography color="text.secondary" align="center" sx={{ py: 2 }}>
-              No comments yet
-            </Typography>
-          )}
-        </Box>
-      </Box> */}
-
+ 
       <MDBox
         sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
       >
