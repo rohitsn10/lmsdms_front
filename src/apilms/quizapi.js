@@ -96,5 +96,5 @@ export const {
   useGetTrainingQuizzesQuery,    // Hook for the create_training_quiz GET API
   useUpdateDeleteQuizMutation,
   useAttemptQuizMutation
-  // Hook for the update_delete_quiz PUT API
+  
 } = quizapi;
