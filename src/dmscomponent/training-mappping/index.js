@@ -116,10 +116,10 @@ const TrainingMapping = () => {
       return;
     }
     
-    if (assignedJobRoles.length === 0) {
-      toast.warning("Please assign at least one job role");
-      return;
-    }
+    // if (assignedJobRoles.length === 0) {
+    //   toast.warning("Please assign at least one job role");
+    //   return;
+    // }
     
     setIsSubmitting(true);
     try {
@@ -383,7 +383,7 @@ const TrainingMapping = () => {
           size="large"
           startIcon={<SaveIcon />}
           onClick={handleSubmit}
-          disabled={!selectedUser || assignedJobRoles.length === 0 || isSubmitting}
+          disabled={!selectedUser  || isSubmitting}
           sx={{ px: 4, py: 1 }}
         >
           {isSubmitting ? "Saving..." : "Save Mappings"}

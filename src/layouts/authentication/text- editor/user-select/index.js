@@ -57,8 +57,8 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
 
       <form onSubmit={(e) => e.preventDefault()}>
         <DialogContent>
-          {/* Approver Dropdown */}
-          <MDBox mb={3}>
+                  {/* Reviewer Dropdown (Multiple Selection) */}
+                  <MDBox mb={3}>
             <FormControl fullWidth margin="dense" variant="outlined">
               <InputLabel id="select-reviewer-label">Select Reviewer</InputLabel>
               <Select
@@ -97,6 +97,7 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
             </FormControl>
           </MDBox>
           
+          {/* Approver Dropdown */}
           <MDBox mb={3}>
             <FormControl fullWidth margin="dense" variant="outlined">
               <InputLabel id="select-approver-label">Select Approver</InputLabel>
@@ -127,8 +128,6 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
             </FormControl>
           </MDBox>
 
-          {/* Reviewer Dropdown (Multiple Selection) */}
-          
 
           {/* Doc Admin Dropdown */}
           <MDBox mb={3}>

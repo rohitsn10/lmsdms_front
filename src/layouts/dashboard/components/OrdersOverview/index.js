@@ -62,7 +62,7 @@ const OrdersOverview = ({ docId }) => {
 
             timelineItems.push({
               title,
-              notes: action.remarks_reviewer || action.remarks_author || "No remarks available", // Display remarks_reviewer if available
+              notes: action.remarks_reviewer || action.remarks_author || action.remarks_approver || "No remarks available", // Display remarks_reviewer if available
               dateTime: formattedDate, // Use the formatted date
               icon,
               color,

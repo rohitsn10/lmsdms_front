@@ -38,6 +38,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 // Import AuthContext
 import { AuthContext } from "context/auth-context";
+import { useDocTimeLineQuery } from "api/auth/timeLineApi";
 
 const DocumentView = () => {
   const { id } = useParams();
@@ -45,7 +46,7 @@ const DocumentView = () => {
   const docEditorRef = useRef(null);
   const [addPathUrlDataForComments, { isLoading: isAddingComment }] =
     useAddPathUrlDataForCommentsMutation();
-
+  const { refetch } = useDocTimeLineQuery(id);
   const [saving, setSaving] = useState(false);
   const [Error1, setError] = useState(null);
   const [docEditorLoaded, setDocEditorLoaded] = useState(false);
@@ -470,7 +471,7 @@ const DocumentView = () => {
         default:
           throw new Error("Invalid action");
       }
-
+      refetch()
       // Navigate after success
       setTimeout(() => {
         navigate("/document-listing");

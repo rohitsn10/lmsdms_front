@@ -5,6 +5,7 @@ import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { useDocumentreleaseEffectiveStatusMutation } from "api/auth/texteditorApi"; // import the API hook
+import { useFetchDocumentsQuery } from "api/auth/documentApi";
 
 const ConditionalDialog = ({
   open,
@@ -16,6 +17,7 @@ const ConditionalDialog = ({
 }) => {
   // Destructure the mutation hook
   const [documentReleaseEffectiveStatus] = useDocumentreleaseEffectiveStatusMutation();
+  const { refetch } = useFetchDocumentsQuery();
 
   const heading =
     trainingStatus === true
@@ -61,7 +63,8 @@ const ConditionalDialog = ({
         ...(status === 7 && { effective_date: effectiveDate }), // Include effective_date only if status_id is 7
         ...(status === 7 && effectiveDate && { revision_date: revisionDate }), // Include revision_date only if effective_date is present
       });
-      onConfirm(); // Trigger the onConfirm callback if needed
+      refetch();
+ // Trigger the onConfirm callback if needed
     } catch (error) {
       console.error("Error submitting the document release:", error);
     }
