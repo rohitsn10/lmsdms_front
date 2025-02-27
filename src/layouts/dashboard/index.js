@@ -92,58 +92,66 @@ function Dashboard() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
+            <Link to="/user-listing">
               <ComplexStatisticsCard
                 color="primary"
                 icon={<PersonAddIcon />}
                 title="User"
-                count={data?.user_count || 0} // Assuming user_count comes from your main `data`
+                count={data?.user_count || 0}
                 percentage={{
                   color: "success",
                   label: "Updated yesterday",
                 }}
               />
+               </Link>
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
+            <Link to="/document-listing">
               <ComplexStatisticsCard
                 icon={<TopicIcon />}
                 color="warning"
                 title="Document"
-                count={data?.document_count || 0} // Assuming document_count comes from your main `data`
+                count={data?.document_count || 0}
                 percentage={{
                   color: "success",
                   label: "Just updated",
                 }}
               />
+              </Link>
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
+            <Link to="/department-listing">
               <ComplexStatisticsCard
                 color="success"
                 icon={<ApartmentIcon />}
                 title="Department"
-                count={data?.department_count || 0} // Assuming department_count comes from your main `data`
+                count={data?.department_count || 0}
                 percentage={{
                   color: "success",
                   label: "Just updated",
                 }}
               />
+              </Link>
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
+            <Link to="/workflow-listing">
               <ComplexStatisticsCard
                 color="dark"
                 icon={<AssignmentTurnedInIcon />}
                 title="WorkFlow"
-                count={data?.workflow_count || 0} // Assuming workflow_count comes from your main `data`
+                count={data?.workflow_count || 0}
                 percentage={{
                   color: "success",
                   label: "Updated yesterday",
                 }}
               />
+              </Link>
             </MDBox>
           </Grid>
         </Grid>

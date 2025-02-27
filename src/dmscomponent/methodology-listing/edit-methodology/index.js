@@ -40,7 +40,7 @@ function EditMethodology() {
   };
 
   const handleClear = () => {
-    setMethodologyName(item?.methodology_name || ""); // Reset to the original value
+    setMethodologyName(""); // Reset to the original value
     setErrors({});
   };
 
@@ -97,7 +97,7 @@ function EditMethodology() {
             onClick={handleClear}
             sx={{ marginLeft: "10px", marginRight: "10px" }}
           >
-            Reset
+            clear
           </MDButton>
         </MDBox>
         <MDBox pb={3} px={3}>

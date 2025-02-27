@@ -113,6 +113,7 @@ ConditionalDialog.propTypes = {
   trainingStatus: PropTypes.string.isRequired,
   documentId: PropTypes.string.isRequired,
   revisionMonth: PropTypes.string, // Update PropTypes to include revisionMonth
+  
 };
 
 export default ConditionalDialog;

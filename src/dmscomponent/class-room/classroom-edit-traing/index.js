@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   MenuItem,
@@ -12,7 +12,7 @@ import {
   RadioGroup,
   FormControlLabel,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
@@ -27,36 +27,45 @@ import { useFetchTrainingsQuery } from "apilms/trainingApi";
 import { useFetchTrainersQuery } from "api/auth/trainerApi";
 import { useUserListQuery } from "api/auth/userApi";
 import { useFailedUserQuery } from "api/auth/userApi";
-function ClassroomTraining() {
-  const [trainingType, setTrainingType] = useState("");
+
+function ClassroomEditTraining() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { classroom } = location.state || {};
+  console.log(classroom);
   const { data: alldocument } = useFetchTrainingsQuery();
   const { data: alltrainers } = useFetchTrainersQuery();
-  const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
+  const { data: userData } = useUserListQuery();
 
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const [sopdocument, setsopdocument] = useState("None");
-  const [trainer, setTrainer] = useState("");
-  const [classroomTitle, setClassroomTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("Assigned");
+  const [classroomTitle, setClassroomTitle] = useState(classroom?.classroom_name || "");
+  const [trainingType, setTrainingType] = useState(classroom?.is_assesment || "");
+  const [description, setDescription] = useState(classroom?.description || "");
+  const [trainer, setTrainer] = useState(classroom?.trainer || "");
+  const [sopdocument, setsopdocument] = useState(classroom?.document_id || "None");
+  const [selectedUsers, setSelectedUsers] = useState(classroom?.user || []);
+  const [onlineOfflineStatus, setOnlineOfflineStatus] = useState(
+    classroom?.online_offline_status || "Online"
+  );
+  const { data: failedUsersData, isLoading: isFailedUsersLoading } =
+    useFailedUserQuery(sopdocument);
+  const [status, setStatus] = useState(classroom?.status || "Assigned");
   const [File, setFile] = useState(null);
-  const [onlineOfflineStatus, setOnlineOfflineStatus] = useState("Online");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const navigate = useNavigate();
   const handleUserChange = (e) => setSelectedUsers(e.target.value);
-  const { data: failedUsersData, isLoading: isFailedUsersLoading } =
-    useFailedUserQuery(sopdocument);
+  useEffect(() => {
+    if (!classroom) {
+      navigate("/class-room");
+    }
+  }, [classroom, navigate]);
 
   const validateInputs = () => {
     const newErrors = {};
     if (!classroomTitle.trim()) newErrors.classroomTitle = "Classroom Title is required.";
     if (!trainingType) newErrors.trainingType = "Training Type is required.";
     if (!description.trim()) newErrors.description = "Description is required.";
-    if (!File) newErrors.File = "File upload is required.";
     if (!trainer) newErrors.trainer = "Trainer is required.";
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -64,19 +73,12 @@ function ClassroomTraining() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
-    setOpenSignatureDialog(true); // Open e-signature dialog
+    setOpenSignatureDialog(true);
   };
-
-  const handleClear = () => {
-    setClassroomTitle("");
-    setTrainingType("");
-    setDescription("");
-    setStatus("Assigned");
-    setFile(null);
-    setErrors({});
-    toast.info("Form cleared successfully.");
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+    setErrors((prev) => ({ ...prev, File: "" }));
   };
-
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
     if (!password) {
@@ -95,12 +97,12 @@ function ClassroomTraining() {
     formData.append("upload_doc", File);
     formData.append("online_offline_status", onlineOfflineStatus);
     formData.append("select_users", JSON.stringify(selectedUsers));
-  
+
     const token = sessionStorage.getItem("token");
-    const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/create_classroom`;
+    const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/update_classroom_training/${classroom.classroom_id}`;
 
     try {
-      const response = await axios.post(apiUrl, formData, {
+      const response = await axios.put(apiUrl, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -108,29 +110,24 @@ function ClassroomTraining() {
       });
 
       if (response.data.status) {
-        toast.success("Classroom training created successfully!");
+        toast.success("Classroom training updated successfully!");
         setTimeout(() => navigate("/class-room"), 1500);
       } else {
-        toast.error(response.data.message || "Failed to create classroom training.");
+        toast.error(response.data.message || "Failed to update classroom training.");
       }
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          "An error occurred while creating the classroom training."
+          "An error occurred while updating the classroom training."
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    setErrors((prev) => ({ ...prev, File: "" }));
-  };
-
   return (
-    <BasicLayout image={bgImage} showNavbarFooter={false}> 
+    <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto" }}>
         <MDBox
           borderRadius="lg"
@@ -145,22 +142,9 @@ function ClassroomTraining() {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Classroom Training
+            Edit Classroom Training
           </MDTypography>
         </MDBox>
-
-        <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
-          <MDButton
-            variant="outlined"
-            color="error"
-            size="small"
-            onClick={handleClear}
-            sx={{ marginLeft: "10px", marginRight: "10px" }}
-          >
-            Clear
-          </MDButton>
-        </MDBox>
-
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             <Grid container spacing={2}>
@@ -180,7 +164,7 @@ function ClassroomTraining() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControl fullWidth margin="dense" >
+                <FormControl fullWidth margin="dense">
                   <InputLabel id="training-type-label">
                     <span style={{ color: "red" }}>*</span>Type
                   </InputLabel>
@@ -201,15 +185,13 @@ function ClassroomTraining() {
                   </Select>
                 </FormControl>
                 {errors.trainingType && (
-                  <MDTypography variant="caption" >
-                    {errors.trainingType}
-                  </MDTypography>
+                  <MDTypography variant="caption">{errors.trainingType}</MDTypography>
                 )}
               </Grid>
               <Grid item xs={12}>
-                <FormControl fullWidth margin="dense" >
+                <FormControl fullWidth margin="dense">
                   <InputLabel id="trainer-type-label">
-                    <span style={{color:"red"}}>*</span>Select Trainer
+                    <span style={{ color: "red" }}>*</span>Select Trainer
                   </InputLabel>
                   <Select
                     labelId="select-trainer-label"
@@ -234,7 +216,7 @@ function ClassroomTraining() {
 
                 {/* Display error message for the "trainer" field */}
                 {errors.trainer && (
-                  <MDTypography variant="caption" >
+                  <MDTypography variant="caption">
                     {errors.trainer} {/* Display the error message for the trainer */}
                   </MDTypography>
                 )}
@@ -423,7 +405,6 @@ function ClassroomTraining() {
                 />
               </Grid>
             </Grid>
-
             <MDBox mt={2} mb={1}>
               <MDButton
                 variant="gradient"
@@ -432,17 +413,13 @@ function ClassroomTraining() {
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? <CircularProgress size={24} /> : "Submit"}
+                {isLoading ? <CircularProgress size={24} /> : "Update"}
               </MDButton>
             </MDBox>
           </MDBox>
         </MDBox>
       </Card>
-
-      {/* Toast Container */}
       <ToastContainer />
-
-      {/* E-Signature Dialog */}
       <ESignatureDialog
         open={openSignatureDialog}
         onClose={() => setOpenSignatureDialog(false)}
@@ -452,4 +429,4 @@ function ClassroomTraining() {
   );
 }
 
-export default ClassroomTraining;
+export default ClassroomEditTraining;

@@ -98,7 +98,7 @@ export const texteditorApi = createApi({
   }),
 });
 
-export const {
+export const { 
   useGetTemplateQuery,
   useCreateDocumentMutation,
   useDraftDocumentMutation,

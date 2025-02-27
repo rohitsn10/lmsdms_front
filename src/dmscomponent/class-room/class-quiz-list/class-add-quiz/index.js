@@ -110,7 +110,6 @@ function CreateClassQuiz() {
     try {
       await createClassQuiz(quizData).unwrap();
       toast.success("Quiz created successfully!");
-      // Reset the form
       setQuizName("");
       setPassCriteria("");
       setQuizTime("");

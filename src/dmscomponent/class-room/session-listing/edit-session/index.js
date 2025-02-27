@@ -45,7 +45,6 @@ function EditSession() {
       start_date: sessionDate, // Only the date part will be used
 
       start_time: sessionTime,
-
       user_ids: selectedUsers,
       classroom_id: sessionData?.classroom_id,
     };

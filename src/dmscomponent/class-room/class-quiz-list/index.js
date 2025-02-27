@@ -28,7 +28,7 @@ const QuestionQuiz = () => {
     };
   
     const handleEditQuiz = (quiz) => {
-      navigate("/edit-quiz", { state: { quiz } });
+      navigate("/class-edit-quiz", { state: { quiz,classroom_id } });
     };
   
     const filteredData = quizzes

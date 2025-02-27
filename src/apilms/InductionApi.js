@@ -24,8 +24,6 @@ export const inductionApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
-    
-
     getInduction: builder.query({
       query: () => ({
         url: 'lms_module/create_induction',
@@ -42,7 +40,6 @@ export const inductionApi = createApi({
         transformResponse: (response) => response, // Handle raw response
       }),
 
-      //for induction designation 
       createInductionDesignation: builder.mutation({
         query: ({ induction_designation_name, designation_code, induction }) => ({
           url: "lms_module/create_induction_designation",
@@ -51,12 +48,11 @@ export const inductionApi = createApi({
         }),
         transformResponse: (response) => response,
       }),
-     
   }),
 });
 
 export const { 
- 
+  useCreateGetInductionMutation,
   useGetInductionQuery, // Hook for the create_get_plant GET API
   useUpdateDeleteInductionMutation,
   useCreateInductionDesignationMutation, 

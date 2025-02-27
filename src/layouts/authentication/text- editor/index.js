@@ -24,7 +24,8 @@ import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useCreateCommentMutation } from "api/auth/commentsApi";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDraftDocumentMutation } from "api/auth/texteditorApi";
-import { useDocumentApproveStatusMutation } from "api/auth/texteditorApi";
+import { useDocumentApproveStatusMutation,useDocumentApproverStatusMutation
+ } from "api/auth/texteditorApi";
 import SendBackDialog from "./sendback";
 import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
@@ -70,6 +71,7 @@ const DocumentView = () => {
   const navigate = useNavigate();
   const [documentApproveStatus] = useDocumentApproveStatusMutation();
   const [documentSendBackStatus] = useDocumentSendBackStatusMutation();
+  const [documentApproverStatus] = useDocumentApproverStatusMutation();
   const [documentDocAdmin] = useDocumentDocadminStatusMutation();
   const searchParams = new URLSearchParams(location.search);
   const document_current_status = searchParams.get("status");
@@ -462,7 +464,7 @@ const DocumentView = () => {
           toast.success("Document Reviewed!");
           break;
         case "approve":
-          response = await documentApproveStatus({ document_id: id, status: "9", remark }).unwrap();
+          response = await documentApproverStatus({ document_id: id, status: "9", remark }).unwrap();
           toast.success("Document Approved!");
           break;
         default:

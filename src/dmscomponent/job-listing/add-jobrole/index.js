@@ -11,6 +11,8 @@ import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useCreateJobRoleMutation } from "apilms/jobRoleApi";
 import { toast, ToastContainer } from "react-toastify";
+import { FormHelperText } from "@mui/material";
+
 import {
   IconButton,
   Box,
@@ -144,7 +146,7 @@ function AddJobRole() {
               />
             </MDBox>
             <MDBox mb={3}>
-              <FormControl fullWidth error={!!errors.selectedPlant}>
+              <FormControl fullWidth>
                 <InputLabel id="select-plant-label">Plant Name</InputLabel>
                 <Select
                   labelId="select-plant-label"
@@ -165,12 +167,13 @@ function AddJobRole() {
                     </MenuItem>
                   ))}
                 </Select>
+                {errors.selectedPlant && <FormHelperText>{errors.selectedPlant}</FormHelperText>}
               </FormControl>
             </MDBox>
 
             {/* Area Dropdown */}
             <MDBox mb={3}>
-              <FormControl fullWidth error={!!errors.selectedArea}>
+              <FormControl fullWidth>
                 <InputLabel id="select-area-label">Select Area</InputLabel>
                 <Select
                   labelId="select-area-label"
@@ -199,18 +202,20 @@ function AddJobRole() {
                     <MenuItem disabled>No areas available</MenuItem>
                   )}
                 </Select>
+                {errors.selectedArea && <FormHelperText>{errors.selectedArea}</FormHelperText>}
               </FormControl>
             </MDBox>
 
             {/* Department Dropdown */}
             <MDBox mb={3}>
-              <FormControl fullWidth error={!!errors.selectedDepartment}>
+              <FormControl fullWidth>
                 <InputLabel>Department</InputLabel>
                 <Select
                   value={selectedDepartment}
                   onChange={(e) => setSelectedDepartment(e.target.value)}
                   label="Department"
-                  error={!!errors.selectedArea}
+                  error={!!errors.selectedDepartment}
+                  helperText={errors.selectedDepartment}
                   sx={{
                     minWidth: 200,
                     height: "3rem",
@@ -223,6 +228,9 @@ function AddJobRole() {
                     </MenuItem>
                   ))}
                 </Select>
+                {errors.selectedDepartment && (
+                  <FormHelperText>{errors.selectedDepartment}</FormHelperText>
+                )}
               </FormControl>
             </MDBox>
 
