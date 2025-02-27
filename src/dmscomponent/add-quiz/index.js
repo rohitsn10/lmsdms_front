@@ -8,6 +8,13 @@ import {
   ListItem,
   Select,
   OutlinedInput,
+  Checkbox,
+  ListItemText,
+  Divider,
+  FormHelperText,
+  Box,
+  Paper,
+  Chip,
 } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -19,7 +26,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useCreateTrainingQuizMutation } from "apilms/quizapi";
 import { useFetchTrainingWiseQuestionsQuery } from "apilms/questionApi";
-import { useLocation,useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FormControl, InputLabel } from "@mui/material";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -28,202 +35,259 @@ function CreateQuiz() {
   const location = useLocation();
   const { DataQuiz } = location.state || {};
   const navigate = useNavigate();
+  
+  // Form state
   const [quizName, setQuizName] = useState("");
-  const [passCriteria, setPassCriteria] = useState("80");
   const [quizTime, setQuizTime] = useState("");
   const [totalMarks, setTotalMarks] = useState("");
   const [totalQuestions, setTotalQuestions] = useState("");
-  const [quizType, setQuizType] = useState("Auto");
+  const [quizType, setQuizType] = useState("auto");
   const [selectedQuestions, setSelectedQuestions] = useState([]);
-  const [markBreakdown, setMarkBreakdown] = useState([]); // Changed to an array for dynamic entries
+  const [markBreakdown, setMarkBreakdown] = useState([]);
   const [availableQuestions, setAvailableQuestions] = useState([]);
- 
+  const [errors, setErrors] = useState({});
 
+  // Calculate 80% of total marks for pass criteria (automatically)
+  const passCriteria = totalMarks ? (parseFloat(totalMarks) * 0.8).toFixed(1) : "";
+
+  // Fetch questions data
   const { data, isLoading, isError } = useFetchTrainingWiseQuestionsQuery(DataQuiz?.id);
-  const [createQuiz, { isLoading: isQuizLoading, isError: isQuizError }] =
-    useCreateTrainingQuizMutation();
+  const [createQuiz, { isLoading: isQuizLoading }] = useCreateTrainingQuizMutation();
 
   // Set available questions from API response
   useEffect(() => {
-    if (data && data.status) {
+    if (data?.status && data?.data) {
       setAvailableQuestions(data.data);
     }
   }, [data]);
+
+  // Validate form on change
+  useEffect(() => {
+    validateForm();
+  }, [totalMarks, markBreakdown, quizType, selectedQuestions, totalQuestions]);
+
+  // Form validation
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Mark breakdown validation for auto quiz
+    if (quizType === "auto" && markBreakdown.length > 0) {
+      // Calculate total questions from breakdown
+      const totalQuestionsFromBreakdown = markBreakdown.reduce(
+        (sum, entry) => sum + (parseInt(entry.count) || 0), 0
+      );
+      
+      // Calculate total marks from breakdown
+      const totalMarksFromBreakdown = markBreakdown.reduce(
+        (sum, entry) => sum + ((parseInt(entry.mark) || 0) * (parseInt(entry.count) || 0)), 0
+      );
+      
+      // Check if we have enough questions of each mark value
+      markBreakdown.forEach((entry) => {
+        const { mark, count } = entry;
+        if (!mark || !count) return;
+        
+        const availableForMark = availableQuestions.filter(
+          (q) => parseInt(q.marks) === parseInt(mark)
+        );
+        
+        if (availableForMark.length < parseInt(count)) {
+          newErrors.markBreakdown = `Not enough ${mark}-mark questions available. Need ${count}, have ${availableForMark.length}.`;
+        }
+      });
+      
+      // Verify total questions matches
+      if (totalQuestions && totalQuestionsFromBreakdown !== parseInt(totalQuestions)) {
+        newErrors.totalQuestions = `Total questions (${totalQuestions}) doesn't match the sum from mark breakdown (${totalQuestionsFromBreakdown})`;
+      }
+      
+      // Verify total marks matches
+      if (totalMarks && totalMarksFromBreakdown !== parseInt(totalMarks)) {
+        newErrors.totalMarks = `Total marks (${totalMarks}) doesn't match the sum from mark breakdown (${totalMarksFromBreakdown})`;
+      }
+    }
+    
+    // Manual quiz validation
+    if (quizType === "manual") {
+      // Verify selected questions match total questions
+      if (totalQuestions && selectedQuestions.length !== parseInt(totalQuestions)) {
+        newErrors.totalQuestions = `You've selected ${selectedQuestions.length} questions, but specified ${totalQuestions} total questions`;
+      }
+      
+      // Verify selected questions match total marks
+      const selectedMarksTotal = selectedQuestions.reduce(
+        (sum, q) => sum + parseInt(q.marks || 0), 0
+      );
+      
+      if (totalMarks && selectedMarksTotal !== parseInt(totalMarks)) {
+        newErrors.totalMarks = `Selected questions total ${selectedMarksTotal} marks, but specified ${totalMarks} total marks`;
+      }
+    }
+    
+    setErrors(newErrors);
+  };
 
   // Handle adding a new mark breakdown entry
   const handleAddMarkBreakdown = () => {
     setMarkBreakdown([...markBreakdown, { mark: "", count: "" }]);
   };
+
   // Handle updating a mark breakdown entry
   const handleMarkBreakdownChange = (index, field, value) => {
     const updatedBreakdown = [...markBreakdown];
     updatedBreakdown[index][field] = value;
     setMarkBreakdown(updatedBreakdown);
+    
+    // Auto-update total questions and marks if all entries are filled
+    if (quizType === "auto") {
+      const allFilled = updatedBreakdown.every(entry => 
+        entry.mark && entry.count
+      );
+      
+      if (allFilled) {
+        // Calculate total questions from breakdown
+        const calculatedTotalQuestions = updatedBreakdown.reduce(
+          (sum, entry) => sum + (parseInt(entry.count) || 0), 0
+        );
+        
+        // Calculate total marks from breakdown
+        const calculatedTotalMarks = updatedBreakdown.reduce(
+          (sum, entry) => sum + ((parseInt(entry.mark) || 0) * (parseInt(entry.count) || 0)), 0
+        );
+        
+        setTotalQuestions(calculatedTotalQuestions.toString());
+        setTotalMarks(calculatedTotalMarks.toString());
+      }
+    }
   };
+
   // Handle removing a mark breakdown entry
   const handleRemoveMarkBreakdown = (index) => {
     const updatedBreakdown = markBreakdown.filter((_, i) => i !== index);
     setMarkBreakdown(updatedBreakdown);
   };
 
-  // Handle Pass Criteria change
-  const handlePassCriteriaChange = (e) => {
-    const value = e.target.value;
-    if (parseFloat(value) <= parseFloat(totalMarks)) {
-      setPassCriteria(value); // Only update if valid
+  // Toggle question selection
+  const handleToggleQuestion = (question) => {
+    const isSelected = selectedQuestions.some(q => q.id === question.id);
+    
+    if (isSelected) {
+      setSelectedQuestions(selectedQuestions.filter(q => q.id !== question.id));
     } else {
-      toast("Pass Criteria cannot be greater than Total Marks.");
-    }
-  };
-
-  const handleAddQuestion = (question) => {
-    if (!selectedQuestions.includes(question)) {
       setSelectedQuestions([...selectedQuestions, question]);
     }
+    
+    // Auto-update total marks and questions when selection changes
+    if (quizType === "manual") {
+      let newSelectedQuestions;
+      
+      if (isSelected) {
+        newSelectedQuestions = selectedQuestions.filter(q => q.id !== question.id);
+      } else {
+        newSelectedQuestions = [...selectedQuestions, question];
+      }
+      
+      // Update total questions
+      setTotalQuestions(newSelectedQuestions.length.toString());
+      
+      // Update total marks
+      const newTotalMarks = newSelectedQuestions.reduce(
+        (sum, q) => sum + parseInt(q.marks || 0), 0
+      );
+      setTotalMarks(newTotalMarks.toString());
+    }
   };
 
-  const handleRemoveQuestion = (question) => {
-    setSelectedQuestions(selectedQuestions.filter((q) => q !== question));
+  // Handle quiz type change
+  const handleQuizTypeChange = (e) => {
+    const newType = e.target.value;
+    setQuizType(newType);
+    
+    // Reset selections and totals when changing quiz type
+    setSelectedQuestions([]);
+    setMarkBreakdown([]);
+    setTotalMarks("");
+    setTotalQuestions("");
   };
-  const [errorMessages, setErrorMessages] = useState([]);
 
+  // Check if form can be submitted
   const isSubmitDisabled = () => {
-    // Check if required fields are empty
-    if (!quizName || !passCriteria || !quizTime || !totalMarks || !totalQuestions) {
+    // Check if required fields are filled
+    if (!quizName || !quizTime || !totalMarks || !totalQuestions) {
       return true;
     }
-
-    // Check if pass criteria is greater than total marks
-    if (parseFloat(passCriteria) > parseFloat(totalMarks)) {
+    
+    // Check if there are any validation errors
+    if (Object.keys(errors).length > 0) {
       return true;
     }
-
-    // Check if quiz type is "auto" and mark breakdown is invalid
-    if (quizType === "auto") {
-      const totalMarksBreakdown = markBreakdown.reduce((sum, entry) => {
-        const { mark, count } = entry;
-        return sum + (parseInt(mark) * parseInt(count) || 0);
-      }, 0);
-
-      // Check if total marks breakdown exceeds total marks
-      if (totalMarksBreakdown > parseFloat(totalMarks)) {
-        return true;
-      }
-
-      // Check if there are enough questions for each mark breakdown
-      for (const entry of markBreakdown) {
-        const { mark, count } = entry;
-        const availableForMark = availableQuestions.filter((q) => q.marks === parseInt(mark));
-
-        if (availableForMark.length < count) {
-          return true;
-        }
-      }
+    
+    // Type-specific validation
+    if (quizType === "auto" && markBreakdown.length === 0) {
+      return true;
     }
-
-    // Check if quiz type is "manual" and no questions are selected
+    
     if (quizType === "manual" && selectedQuestions.length === 0) {
       return true;
     }
-
-    // If all checks pass, enable the button
+    
     return false;
   };
-  useEffect(() => {
-    if (parseFloat(passCriteria) > parseFloat(totalMarks)) {
-      toast.error("Pass Criteria cannot be greater than Total Marks!");
-    }
-    if (
-      markBreakdown.some(
-        (entry) => parseInt(entry.mark) * parseInt(entry.count) > parseFloat(totalMarks)
-      )
-    ) {
-      toast.error("Mark breakdown exceeds total quiz marks.");
-    }
-  }, [passCriteria, totalMarks, markBreakdown]);
 
-  // Inside the `handleSubmit` function, replace the `alert` with toast notifications:
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate required fields
-    if (!quizName || !passCriteria || !quizTime || !totalMarks || !totalQuestions) {
-      toast.error("Please fill out all required fields.");
+    
+    // Final validation
+    if (isSubmitDisabled()) {
+      toast.error("Please fix all errors before submitting.");
       return;
     }
 
-    // Validate pass criteria
-    if (parseFloat(passCriteria) > parseFloat(totalMarks)) {
-      toast.error("Pass Criteria cannot be greater than Total Marks.");
-      return;
-    }
-
-    // Validate mark breakdown for auto quiz
-    if (quizType === "auto") {
-      const totalMarksBreakdown = markBreakdown.reduce((sum, entry) => {
-        const { mark, count } = entry;
-        return sum + (parseInt(mark) * parseInt(count) || 0);
-      }, 0);
-
-      if (totalMarksBreakdown > parseFloat(totalMarks)) {
-        toast.error("Total marks from breakdown exceed total quiz marks.");
-        return;
-      }
-
-      for (const entry of markBreakdown) {
-        const { mark, count } = entry;
-        const availableForMark = availableQuestions.filter((q) => q.marks === parseInt(mark));
-
-        if (availableForMark.length < count) {
-          toast.error(`Not enough questions for ${mark} mark. Please adjust your mark breakdown.`);
-          return;
-        }
-      }
-    }
-
-    // Validate manual quiz
-    if (quizType === "manual" && selectedQuestions.length === 0) {
-      toast.error("Please select at least one question for the quiz.");
-      return;
-    }
+    // Transform mark breakdown for API
     const transformedMarksBreakdown = markBreakdown.reduce((acc, item) => {
       acc[item.mark] = item.count;
       return acc;
     }, {});
-   
+    
+    // Prepare quiz data
     const quizData = {
       document_id: DataQuiz?.id,
       name: quizName,
-      pass_criteria: passCriteria,
+      pass_criteria: parseFloat(totalMarks) * 0.8, // 80% of total marks
       quiz_time: quizTime,
       quiz_type: quizType,
       total_marks: totalMarks,
-      selected_questions: quizType === "auto" ? [] : selectedQuestions.map((q) => q.id),
-      marks_breakdown: quizType === "auto" ? transformedMarksBreakdown : [],
+      selected_questions: quizType === "auto" ? [] : selectedQuestions.map(q => q.id),
+      marks_breakdown: quizType === "auto" ? transformedMarksBreakdown : {},
     };
 
     try {
       await createQuiz(quizData).unwrap();
       toast.success("Quiz created successfully!");
+      
       // Reset the form
       setQuizName("");
-      setPassCriteria("");
       setQuizTime("");
       setTotalMarks("");
       setTotalQuestions("");
       setSelectedQuestions([]);
       setMarkBreakdown([]);
+      
+      // Navigate away
       navigate("/trainingListing");
     } catch (err) {
-      toast.error("Failed to create quiz. Please try again.");
+      toast.error(err?.data?.message || "Failed to create quiz. Please try again.");
     }
   };
+
+  // Loading and error states
   if (isLoading) return <div>Loading available questions...</div>;
   if (isError) return <div>Error fetching available questions.</div>;
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
-      <Card sx={{ width: 600, mx: "auto" }}>
+      <Card sx={{ width: 600, mx: "auto", mb: 3 }}>
         <MDBox
           borderRadius="lg"
           sx={{
@@ -243,24 +307,27 @@ function CreateQuiz() {
 
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
-            {/* Other Fields */}
+            {/* Quiz Name */}
             <MDBox mb={3}>
               <MDInput
                 type="text"
-                label="Quiz Name"
+                label="Quiz Name *"
                 fullWidth
                 value={quizName}
                 onChange={(e) => setQuizName(e.target.value)}
+                error={!quizName && quizName !== ""}
               />
             </MDBox>
+            
+            {/* Quiz Type */}
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
-                <InputLabel id="select-quiz-type-label">Quiz Type</InputLabel>
+                <InputLabel id="select-quiz-type-label">Quiz Type *</InputLabel>
                 <Select
                   labelId="select-quiz-type-label"
                   id="select-quiz-type"
                   value={quizType}
-                  onChange={(e) => setQuizType(e.target.value)}
+                  onChange={handleQuizTypeChange}
                   input={<OutlinedInput label="Quiz Type" />}
                   sx={{
                     minWidth: 200,
@@ -270,167 +337,207 @@ function CreateQuiz() {
                     },
                   }}
                 >
-                  <MenuItem value="auto">Auto</MenuItem>
-                  <MenuItem value="manual">Manual</MenuItem>
+                  <MenuItem value="auto">Auto (System selects questions)</MenuItem>
+                  <MenuItem value="manual">Manual (You select questions)</MenuItem>
                 </Select>
               </FormControl>
             </MDBox>
+            
+            {/* Quiz Time */}
             <MDBox mb={3}>
               <MDInput
                 type="number"
-                label="Total Quiz Marks"
-                fullWidth
-                value={totalMarks}
-                onChange={(e) => setTotalMarks(e.target.value)}
-              />
-            </MDBox>
-            <MDBox mb={3}>
-              <MDInput
-                type="number"
-                label="Total Questions"
-                fullWidth
-                value={totalQuestions}
-                onChange={(e) => setTotalQuestions(e.target.value)}
-              />
-            </MDBox>
-            <MDBox mb={3}>
-              <MDInput
-                type="text"
-                label="Pass Criteria"
-                fullWidth
-                value={passCriteria}
-                onChange={handlePassCriteriaChange}
-              />
-            </MDBox>
-            <MDBox mb={3}>
-              <MDInput
-                type="number"
-                label="Quiz Time (in minutes)"
+                label="Quiz Time (in minutes) *"
                 fullWidth
                 value={quizTime}
                 onChange={(e) => setQuizTime(e.target.value)}
+                error={!quizTime && quizTime !== ""}
               />
             </MDBox>
 
-            {quizType === "manual" && (
+            {/* Auto Quiz - Mark Breakdown Section */}
+            {quizType === "auto" && (
               <MDBox mb={3}>
-                <MDTypography variant="h6" fontWeight="medium">
-                  Select Questions
+                <MDTypography variant="h6" fontWeight="medium" mb={2}>
+                  Mark Breakdown
                 </MDTypography>
-                <List>
-                  {availableQuestions.map((question) => (
-                    <ListItem key={question.id}>
-                      <MDTypography variant="body2">
-                        {question.text} (Marks: {question.marks})
-                      </MDTypography>
-                      <IconButton
-                        edge="end"
-                        aria-label="add"
-                        onClick={() => handleAddQuestion(question)}
-                      >
-                        +
-                      </IconButton>
-                    </ListItem>
-                  ))}
-                </List>
-                <MDTypography variant="h6" fontWeight="medium">
-                  Selected Questions
-                </MDTypography>
-                <List>
-                  {selectedQuestions.map((question) => (
-                    <ListItem key={question.id}>
-                      <MDTypography variant="body2">
-                        {question.text} (Marks: {question.marks})
-                      </MDTypography>
+                <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
+                  {markBreakdown.map((entry, index) => (
+                    <MDBox
+                      key={index}
+                      display="flex"
+                      flexDirection="row"
+                      alignItems="center"
+                      gap={2}
+                      mb={2}
+                    >
+                      <TextField
+                        label="Mark Value"
+                        type="number"
+                        size="small"
+                        value={entry.mark}
+                        onChange={(e) => handleMarkBreakdownChange(index, "mark", e.target.value)}
+                      />
+                      <TextField
+                        label="Number of Questions"
+                        type="number"
+                        size="small"
+                        value={entry.count}
+                        onChange={(e) => handleMarkBreakdownChange(index, "count", e.target.value)}
+                      />
                       <IconButton
                         edge="end"
                         aria-label="delete"
-                        onClick={() => handleRemoveQuestion(question)}
+                        onClick={() => handleRemoveMarkBreakdown(index)}
+                        color="error"
                       >
                         <DeleteIcon />
                       </IconButton>
-                    </ListItem>
+                    </MDBox>
                   ))}
-                </List>
+                  
+                  {/* Mark Breakdown info and validation */}
+                  {markBreakdown.map((entry, index) => {
+                    const { mark, count } = entry;
+                    if (!mark || !count) return null;
+                    
+                    const available = availableQuestions.filter(
+                      (q) => parseInt(q.marks) === parseInt(mark)
+                    );
+                    
+                    const hasEnough = available.length >= parseInt(count);
+                    
+                    return (
+                      <MDTypography
+                        key={`info-${index}`}
+                        variant="body2"
+                        color={hasEnough ? "success" : "error"}
+                        mb={1}
+                      >
+                        {mark}-mark questions: {available.length} available, {count} needed
+                        {!hasEnough && " (NOT ENOUGH)"}
+                      </MDTypography>
+                    );
+                  })}
+                  
+                  <MDButton
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    onClick={handleAddMarkBreakdown}
+                    fullWidth
+                    sx={{ mt: 2 }}
+                  >
+                    Add Mark Breakdown
+                  </MDButton>
+                </Paper>
+                
+                {errors.markBreakdown && (
+                  <FormHelperText error>{errors.markBreakdown}</FormHelperText>
+                )}
               </MDBox>
             )}
 
-            {quizType === "auto" && (
+            {/* Manual Quiz - Question Selection */}
+            {quizType === "manual" && (
               <MDBox mb={3}>
-                <MDTypography variant="h6" fontWeight="medium">
-                  Mark Breakdown
+                <MDTypography variant="h6" fontWeight="medium" mb={2}>
+                  Select Questions
                 </MDTypography>
-                {markBreakdown.map((entry, index) => (
-                  <MDBox
-                    key={index}
-                    display="flex"
-                    flexDirection="row"
-                    alignItems="center"
-                    gap={2}
-                    mb={2}
-                  >
-                    <TextField
-                      label="Mark"
-                      type="number"
-                      value={entry.mark}
-                      onChange={(e) => handleMarkBreakdownChange(index, "mark", e.target.value)}
-                    />
-                    <TextField
-                      label="Number of Questions"
-                      type="number"
-                      value={entry.count}
-                      onChange={(e) => handleMarkBreakdownChange(index, "count", e.target.value)}
-                    />
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={() => handleRemoveMarkBreakdown(index)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </MDBox>
-                ))}
-                <MDButton
-                  variant="gradient"
-                  color="success"
-                  startIcon={<AddIcon />}
-                  onClick={handleAddMarkBreakdown}
-                >
-                  Add Mark Breakdown
-                </MDButton>
-                {markBreakdown.map((entry, index) => {
-                  const { mark, count } = entry;
-                  const available = availableQuestions.filter((q) => q.marks === parseInt(mark));
-                  return (
-                    <MDTypography
-                      key={index}
-                      variant="body2"
-                      color={
-                        Number(count) <= (Array.isArray(available) ? available.length : 0)
-                          ? "error"
-                          : "error"
-                      }
-                    >
-                      Need {count} questions for {mark} mark, available:{" "}
-                      {Array.isArray(available) ? available.length : 0}
-                    </MDTypography>
-                  );
-                })}
+                <Paper elevation={1} sx={{ p: 2, maxHeight: 300, overflow: 'auto' }}>
+                  <List>
+                    {availableQuestions.map((question) => (
+                      <React.Fragment key={question.id}>
+                        <ListItem
+                          secondaryAction={
+                            <Checkbox
+                              edge="end"
+                              checked={selectedQuestions.some(q => q.id === question.id)}
+                              onChange={() => handleToggleQuestion(question)}
+                            />
+                          }
+                        >
+                          <ListItemText
+                            primary={question.question_text}
+                            secondary={
+                              <>
+                                <span>Type: {question.question_type}</span>
+                                <Chip 
+                                  label={`${question.marks} ${question.marks === 1 ? 'mark' : 'marks'}`}
+                                  size="small"
+                                  color="primary"
+                                  sx={{ ml: 1 }}
+                                />
+                              </>
+                            }
+                          />
+                        </ListItem>
+                        <Divider />
+                      </React.Fragment>
+                    ))}
+                  </List>
+                </Paper>
+                
+                {/* Selected Questions Summary */}
+                <Box mt={2}>
+                  <MDTypography variant="body2">
+                    Selected: {selectedQuestions.length} questions, 
+                    Total: {selectedQuestions.reduce((sum, q) => sum + parseInt(q.marks || 0), 0)} marks
+                  </MDTypography>
+                </Box>
               </MDBox>
             )}
-            <MDBox mb={3}>
-              {errorMessages.length > 0 && (
-                <MDTypography variant="body2" color="error" align="left">
-                  {errorMessages.map((error, index) => (
-                    <div key={index}>{error}</div>
-                  ))}
-                </MDTypography>
-              )}
-            </MDBox>
+            
+            {/* Quiz Totals */}
+            <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
+              <MDBox mb={2}>
+                <MDInput
+                  type="number"
+                  label="Total Questions *"
+                  fullWidth
+                  value={totalQuestions}
+                  onChange={(e) => setTotalQuestions(e.target.value)}
+                  error={!!errors.totalQuestions}
+                  helperText={errors.totalQuestions}
+                  disabled={
+                    (quizType === "manual" && selectedQuestions.length > 0) || 
+                    (quizType === "auto" && markBreakdown.every(entry => entry.mark && entry.count))
+                  }
+                />
+              </MDBox>
+              
+              <MDBox mb={2}>
+                <MDInput
+                  type="number"
+                  label="Total Marks *"
+                  fullWidth
+                  value={totalMarks}
+                  onChange={(e) => setTotalMarks(e.target.value)}
+                  error={!!errors.totalMarks}
+                  helperText={errors.totalMarks}
+                  disabled={
+                    (quizType === "manual" && selectedQuestions.length > 0) || 
+                    (quizType === "auto" && markBreakdown.every(entry => entry.mark && entry.count))
+                  }
+                />
+              </MDBox>
+              
+              <MDBox mb={2}>
+                <MDInput
+                  type="text"
+                  label="Pass Criteria (80% of Total Marks)"
+                  fullWidth
+                  value={passCriteria}
+                  disabled
+                />
+              </MDBox>
+            </Paper>
+
+            {/* Submit Button */}
             <MDBox mt={2} mb={1}>
               <MDButton
                 variant="gradient"
-                color="submit"
+                color="info"
                 fullWidth
                 type="submit"
                 disabled={isQuizLoading || isSubmitDisabled()}
