@@ -43,7 +43,6 @@ const TimelineDot = styled("div")(({ theme, color }) => ({
 const OrdersOverview = ({ docId }) => {
   const { data, isLoading, error } = useDocTimeLineQuery(docId);
   const [timelineData, setTimelineData] = useState([]);
-  // console.log("DDDDSDSDSD",data)
   useEffect(() => {
     if (data) {
       const timelineItems = [];
@@ -119,7 +118,6 @@ const OrdersOverview = ({ docId }) => {
       </Card>
     );
   }
-  console.log("TimelineDADADA",timelineData)
   return (
     <Card sx={{ height: "100%", overflow: "auto" }}>
       <MDBox pt={3} px={3}>
