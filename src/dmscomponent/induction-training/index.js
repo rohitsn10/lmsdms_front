@@ -11,16 +11,17 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi"; // API call for fetching departments
+import { useCreateGetInductionMutation } from "apilms/InductionApi";
 
 const AddInductionTraining = () => {
   const [inductionTitle, setInductionTitle] = useState("");
   const [department, setDepartment] = useState("");
   const [document, setDocument] = useState(null);
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({}); 
   const { data: departments, isLoading: deptLoading } = useFetchDepartmentsQuery();
   const navigate = useNavigate();
-
+  const [createInduction]=useCreateGetInductionMutation();
   const validateInputs = () => {
     const newErrors = {};
     if (!inductionTitle.trim()) newErrors.inductionTitle = "Induction Title is required.";
