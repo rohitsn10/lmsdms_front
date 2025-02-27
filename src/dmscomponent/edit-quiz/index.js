@@ -373,7 +373,7 @@ function EditQuiz() {
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
-      <Card sx={{ width: 600, mx: "auto", mb: 3 }}>
+      <Card sx={{ width: 600, mx: "auto", mb: 3,mt:7 }}>
         <MDBox
           borderRadius="lg"
           sx={{
