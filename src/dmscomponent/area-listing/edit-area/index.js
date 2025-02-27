@@ -124,6 +124,13 @@ function EditArea() {
                   value={departmentName}
                   onChange={(e) => setDepartmentName(e.target.value)}
                   input={<OutlinedInput label="Department Name" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "3rem",
+                    ".MuiSelect-select": {
+                      padding: "0.75rem",
+                    },
+                  }}
                 >
                   {departments?.length > 0 ? (
                     departments.map((dept) => (

@@ -126,6 +126,8 @@ import DueSOPDocument from "layouts/authentication/document-listing/due-sop/inde
 import UserReports from "dmscomponent/user-reports/index.js";
 import EditInduction from "dmscomponent/induction-training/edit-induction/index.js";
 import { useAuth } from "hooks/use-auth";
+import ClassroomEditTraining from "dmscomponent/class-room/classroom-edit-traing/index.js";
+import EditClassQuiz from "dmscomponent/class-room/class-quiz-list/class-edit-quiz/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -410,6 +412,8 @@ export default function App() {
       <Route path="/class-add-quiz" element={<CreateClassQuiz/>}/>
       <Route path="/user-reports" element={<UserReports/>}/>
       <Route path="/edit-induction" element={<EditInduction/>}/>
+      <Route path="/class-room-training-edit" element={<ClassroomEditTraining/>}/>
+      <Route path="/class-edit-quiz" element={<EditClassQuiz/>}/>
 
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>

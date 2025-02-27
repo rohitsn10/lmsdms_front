@@ -46,6 +46,14 @@ export const classtestApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    classroomQuizEdit: builder.mutation({
+      query: (quizData) => ({
+        url: `lms_module/classroom_quiz_update/${quizData.id}`,
+        method: "PUT",
+        body: quizData,
+        }),
+        transformResponse: (response) => response,
+        }),
   }),
 });
 
@@ -54,4 +62,5 @@ export const {
   useClassroomQuestionsGetQuery,
   useClassroomQuizPostMutation,
   useClassroomQuizGetQuery,
+  useClassroomQuizEditMutation,
 } = classtestApi;
