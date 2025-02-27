@@ -60,37 +60,6 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
           {/* Approver Dropdown */}
           <MDBox mb={3}>
             <FormControl fullWidth margin="dense" variant="outlined">
-              <InputLabel id="select-approver-label">Select Approver</InputLabel>
-              <Select
-                labelId="select-approver-label"
-                id="select-approver"
-                value={approver}
-                onChange={(e) => setApprover(e.target.value)}
-                input={<OutlinedInput label="Select Approver" />}
-                sx={{
-                  minWidth: 200,
-                  height: "3rem",
-                  ".MuiSelect-select": { padding: "0.45rem" },
-                }}
-              >
-                {isLoadingApprover ? (
-                  <MenuItem disabled>Loading...</MenuItem>
-                ) : approverData?.data.length > 0 ? (
-                  approverData.data.map((user) => (
-                    <MenuItem key={user.id} value={user.id}>
-                      {user.name}
-                    </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem disabled>No approvers available</MenuItem>
-                )}
-              </Select>
-            </FormControl>
-          </MDBox>
-
-          {/* Reviewer Dropdown (Multiple Selection) */}
-          <MDBox mb={3}>
-            <FormControl fullWidth margin="dense" variant="outlined">
               <InputLabel id="select-reviewer-label">Select Reviewer</InputLabel>
               <Select
                 labelId="select-reviewer-label"
@@ -127,6 +96,39 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
               </Select>
             </FormControl>
           </MDBox>
+          
+          <MDBox mb={3}>
+            <FormControl fullWidth margin="dense" variant="outlined">
+              <InputLabel id="select-approver-label">Select Approver</InputLabel>
+              <Select
+                labelId="select-approver-label"
+                id="select-approver"
+                value={approver}
+                onChange={(e) => setApprover(e.target.value)}
+                input={<OutlinedInput label="Select Approver" />}
+                sx={{
+                  minWidth: 200,
+                  height: "3rem",
+                  ".MuiSelect-select": { padding: "0.45rem" },
+                }}
+              >
+                {isLoadingApprover ? (
+                  <MenuItem disabled>Loading...</MenuItem>
+                ) : approverData?.data.length > 0 ? (
+                  approverData.data.map((user) => (
+                    <MenuItem key={user.id} value={user.id}>
+                      {user.name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No approvers available</MenuItem>
+                )}
+              </Select>
+            </FormControl>
+          </MDBox>
+
+          {/* Reviewer Dropdown (Multiple Selection) */}
+          
 
           {/* Doc Admin Dropdown */}
           <MDBox mb={3}>

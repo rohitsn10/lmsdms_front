@@ -73,8 +73,18 @@ function AddQuestion() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+  
+    if (questionType === "MCQ") {
+      const isAnyAnswerChecked = answers.some((answer) => answer.isCorrect);
+      if (!isAnyAnswerChecked) {
+        toast.error("Please select at least one correct answer for MCQ.");
+        return;
+      }
+    }
+  
     setOpenSignatureDialog(true);
   };
+  
 
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);

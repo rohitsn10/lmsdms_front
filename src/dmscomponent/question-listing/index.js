@@ -22,7 +22,7 @@ const QuestionListing = () => {
   const id = location?.state?.rowData || null;
   const { data, isLoading, isError, refetch } = useFetchTrainingWiseQuestionsQuery(id);
   const [deleteTrainingQuestion] = useDeleteTrainingQuestionMutation(id); 
-
+console.log(data)
   useEffect(() => {
     refetch();
   }, [location.key]);
@@ -37,8 +37,8 @@ const QuestionListing = () => {
   };
 
   const handleEditQuestion = (row) => {
-    navigate("/edit-question", { state: { item: row.fullData } });
-    console.log("navigate with this data in edit: -+-+-+-+", row.fullData);
+    navigate("/edit-question", { state: { item: row } });
+    console.log("navigate with this data in edit: -+-+-+-+", row);
   };
 
   const handleDeleteQuestion = (row) => {
@@ -53,7 +53,7 @@ const handleSignatureComplete = async (password) => {
   if (!password) {
     toast.error("E-Signature is required to proceed.");
     return;
-  }
+  } 
 
   try {
     // Proceed with the delete action after successful signature
@@ -80,6 +80,7 @@ const handleSignatureComplete = async (password) => {
       question_type: item.question_type,
       created_at: moment(item.question_created_at).format("DD/MM/YY"), // Adjust the field name
       fullData: item
+      
     }));
 
   const columns = [

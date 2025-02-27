@@ -13,8 +13,17 @@ import {
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
+import { useSelectedUserGetQuery } from "api/auth/documentApi"; // Update with the correct path
 
-const ViewSelectionDialog = ({ open, onClose, approver, reviewer, docAdmin }) => {
+const ViewSelectionDialog = ({ open, onClose, documentId }) => {
+  const { data, isLoading } = useSelectedUserGetQuery({ documentId });
+  
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  
+  const { approver, reviewer, doc_admin: docAdmin } = data?.data || {};
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <MDBox sx={{ textAlign: "center" }}>
@@ -42,7 +51,7 @@ const ViewSelectionDialog = ({ open, onClose, approver, reviewer, docAdmin }) =>
             >
               {approver ? (
                 <MenuItem key={approver} value={approver}>
-                  {approver} {/* Show the selected Approver name */}
+                  {approver}
                 </MenuItem>
               ) : (
                 <MenuItem disabled>No approver selected</MenuItem>
@@ -52,7 +61,7 @@ const ViewSelectionDialog = ({ open, onClose, approver, reviewer, docAdmin }) =>
         </MDBox>
 
         {/* Reviewer Display */}
-        <MDBox mb={3}>
+        <MDBox mb={3}> 
           <FormControl fullWidth margin="dense" variant="outlined" disabled>
             <InputLabel id="view-reviewer-label">Reviewer</InputLabel>
             <Select
@@ -66,10 +75,10 @@ const ViewSelectionDialog = ({ open, onClose, approver, reviewer, docAdmin }) =>
                 height: "3rem",
                 ".MuiSelect-select": { padding: "0.45rem" },
               }}
-              renderValue={(selected) => selected.join(", ")} // Show multiple reviewers as comma-separated
+              renderValue={(selected) => selected.join(", ")}
               disabled
             >
-              {reviewer.length > 0 ? (
+              {reviewer?.length > 0 ? (
                 reviewer.map((reviewerName, index) => (
                   <MenuItem key={index} value={reviewerName}>
                     {reviewerName}
@@ -100,7 +109,7 @@ const ViewSelectionDialog = ({ open, onClose, approver, reviewer, docAdmin }) =>
             >
               {docAdmin ? (
                 <MenuItem key={docAdmin} value={docAdmin}>
-                  {docAdmin} {/* Show the selected Doc Admin name */}
+                  {docAdmin}
                 </MenuItem>
               ) : (
                 <MenuItem disabled>No doc admin selected</MenuItem>
@@ -122,9 +131,7 @@ const ViewSelectionDialog = ({ open, onClose, approver, reviewer, docAdmin }) =>
 ViewSelectionDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  approver: PropTypes.string.isRequired,
-  reviewer: PropTypes.array.isRequired,
-  docAdmin: PropTypes.string.isRequired,
+  documentId: PropTypes.number.isRequired,
 };
 
 export default ViewSelectionDialog;

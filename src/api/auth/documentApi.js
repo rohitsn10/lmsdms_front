@@ -204,6 +204,14 @@ export const documentApi = createApi({
       transformResponse: (response) => response.data,
       providesTags: ["Documents"],
     }),
+    
+    selectedUserGet: builder.query({
+      query: ({ documentId }) => ({
+        url: `dms_module/document_id_wise_author_reviewer_approver_doc_admin/${documentId}`,
+        method: "GET",  
+      }),
+      transformResponse: (response) => response,  
+    }),
   }),
 });
 
@@ -225,5 +233,6 @@ export const {
   useUpdateObsoleteStatusMutation,
   useSaveDocumentDraftMutation,
   useDocumentEffectiveMutation,
-  useFetchDocumentVersionListQuery
+  useFetchDocumentVersionListQuery,
+  useSelectedUserGetQuery,
 } = documentApi;
