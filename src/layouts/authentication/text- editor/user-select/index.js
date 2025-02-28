@@ -96,6 +96,7 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
               </Select>
             </FormControl>
           </MDBox>
+          
           {/* Approver Dropdown */}
           <MDBox mb={3}>
             <FormControl fullWidth margin="dense" variant="outlined">
@@ -126,7 +127,6 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
               </Select>
             </FormControl>
           </MDBox>
-
 
 
           {/* Doc Admin Dropdown */}

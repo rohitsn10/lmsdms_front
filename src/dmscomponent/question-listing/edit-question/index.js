@@ -30,21 +30,20 @@ import { toast, ToastContainer } from "react-toastify";
 function EditQuestion() {
   const { state } = useLocation(); // Get the passed state from location
   const navigate = useNavigate();
+  console.log(state);
   const [answers, setAnswers] = useState(() => {
-    if (typeof state?.item?.options === "string") {
-      try {
-        return JSON.parse(state?.item?.options);
-      } catch (error) {
-        console.error("Error parsing options:", error);
-        return [{ text: "", isCorrect: false }];
-      }
-    }
-    return Array.isArray(state?.item?.options) ? state?.item?.options : [{ text: "", isCorrect: false }];
+    const optionsArray = state?.item?.fullData?.options?.split(",") || [];
+    const correctAnswer = state?.item?.fullData?.correct_answer;
+
+    return optionsArray.map((option) => ({
+      text: option,
+      isCorrect: option.trim() === correctAnswer.trim(), // Mark correct answer
+    }));
   });
- console.log("answer get in edit",answers)
-  const [questionText, setQuestionText] = useState(state?.item?.question_text || "");
+
+  const [questionText, setQuestionText] = useState(state?.item?.fullData?.question_text || "");
   const [questionType, setQuestionType] = useState(state?.item?.question_type || "MCQ");
-  const [questionMarks, setQuestionMarks] = useState(state?.item?.marks || "");
+  const [questionMarks, setQuestionMarks] = useState(state?.item?.fullData?.marks || "");
   const [questionLanguage, setQuestionLanguage] = useState(state?.item?.language || "English");
   const [status, setStatus] = useState(state?.item?.status ? "Active" : "Inactive");
   const [createdAt, setCreatedAt] = useState(
@@ -65,20 +64,26 @@ function EditQuestion() {
   const [updateTrainingQuestion] = useUpdateTrainingQuestionMutation();
 
   useEffect(() => {
-    // Automatically set answers based on the question type
+    const correctAnswer = state?.item?.fullData?.correct_answer || ""; // Get correct answer safely
+  
     if (questionType === "True/False") {
       setAnswers([
-        { text: "True", isCorrect: false },
-        { text: "False", isCorrect: false },
+        { text: "True", isCorrect: correctAnswer === "True" },
+        { text: "False", isCorrect: correctAnswer === "False" },
       ]);
     } else if (questionType === "MCQ") {
-      // Set MCQ answers from the state options (parsing stringified options)
-      setAnswers(state?.item?.options ? JSON.parse(state?.item?.options) : [{ text: "", isCorrect: false }]);
+      const optionsArray = state?.item?.fullData?.options?.split(",") || [];
+      setAnswers(
+        optionsArray.map((option) => ({
+          text: option.trim(),
+          isCorrect: option.trim() === correctAnswer.trim(),
+        }))
+      );
     } else if (questionType === "Fill in the blank") {
-      setAnswers([{ text: questionText, isCorrect: false }]);
+      setAnswers([{ text: correctAnswer || "", isCorrect: true }]);
     }
-  }, [questionType, state?.item?.options]); // Trigger when questionType or options change
-
+  }, [questionType, state?.item?.fullData]);
+  
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
 
@@ -272,11 +277,9 @@ function EditQuestion() {
                     <ListItem key={index}>
                       <MDInput
                         type="text"
-                        placeholder={`Answer ${index + 1}`}
                         value={answer.text}
-                        onClick={() => handleOpenAnswerDialog(index)}
                         onChange={(e) => handleAnswerChange(index, e.target.value)}
-                        sx={{ flex: 1, marginRight: 1 }}
+                        fullWidth
                       />
                       <FormControlLabel
                         control={
@@ -287,11 +290,7 @@ function EditQuestion() {
                         }
                         label="Correct Answer"
                       />
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={() => handleRemoveAnswer(index)}
-                      >
+                      <IconButton onClick={() => handleRemoveAnswer(index)}>
                         <DeleteIcon />
                       </IconButton>
                     </ListItem>

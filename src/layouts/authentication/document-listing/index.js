@@ -52,9 +52,7 @@ const DocumentListing = () => {
   const [updateObsoleteStatus] = useUpdateObsoleteStatusMutation();
   const [openDialog, setOpenDialog] = useState(false);
   const [openviewDialog, setOpenviewDialog] = useState(false);
-  const approver = "John Doe";
-  const reviewer = ["Alice Smith", "Bob Johnson"];
-  const docAdmin = "Eve Williams";
+
   const [documentEffective, { isLoading: isEffecting, isError: isEffectError }] =
     useDocumentEffectiveMutation();
   const version = searchParams.get("version");
@@ -91,6 +89,11 @@ const DocumentListing = () => {
     setOpenChildDialog(true);
   };
 
+  const handleViewUsers = (params) => {
+    setSelectedRow(params.row);
+    setOpenviewDialog(true);
+  };
+
   const handleDialogClose = () => {
     setDialogOpen(false);
     setSelectedRow(null);
@@ -113,7 +116,14 @@ const DocumentListing = () => {
       return; // Exit if params or row is missing
     }
 
-    const { id, document_current_status,select_template, training_required, approval_status, version } = params.row;
+    const {
+      id,
+      document_current_status,
+      select_template,
+      training_required,
+      approval_status,
+      version,
+    } = params.row;
     // console.log("Version", version);
     // Ensure required fields are defined
     if (
@@ -297,14 +307,14 @@ const DocumentListing = () => {
     },
     {
       field: "view_Users",
-      headerName: "view Users",
+      headerName: "View Users",
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => {
         return (
           <MDBox display="flex" justifyContent="center">
-            <IconButton color="default" onClick={() => setOpenviewDialog(true)}>
-              <HowToRegTwoToneIcon /> {/* Replace with the desired icon */}
+            <IconButton color="default" onClick={() => handleViewUsers(params)}>
+              <HowToRegTwoToneIcon />
             </IconButton>
           </MDBox>
         );
@@ -339,7 +349,11 @@ const DocumentListing = () => {
           <IconButton
             color="primary"
             onClick={() => {
-              handleViewFile(params.row.selected_template_url,params.row.front_file_url, params.row);
+              handleViewFile(
+                params.row.selected_template_url,
+                params.row.front_file_url,
+                params.row
+              );
               // console.log()
               console.log("Params",params.row)
             }}
@@ -357,12 +371,12 @@ const DocumentListing = () => {
                   <PreviewIcon />
                 </IconButton>
               )
-            : hasPermission(userPermissions, "document", "isView") && 
+            : hasPermission(userPermissions, "document", "isView") &&
               params.row.current_status_name !== "Release" && ( // Hide if status is "Approve"
-              <IconButton color="inherit" onClick={() => handleClick(params)}>
-                <EditCalendarIcon />
-              </IconButton>
-            )}
+                <IconButton color="inherit" onClick={() => handleClick(params)}>
+                  <EditCalendarIcon />
+                </IconButton>
+              )}
           {data?.userGroupIds?.includes(5) && ( // Hide CheckCircleIcon when status is 7
             <IconButton
               color="success"
@@ -550,9 +564,7 @@ const DocumentListing = () => {
       <ViewSelectionDialog
         open={openviewDialog}
         onClose={() => setOpenviewDialog(false)}
-        approver={approver}
-        reviewer={reviewer}
-        docAdmin={docAdmin}
+        documentId={selectedRow?.id || ""}
       />
       {/* <ReviseDialog
   open={isReviseDialogOpen}
