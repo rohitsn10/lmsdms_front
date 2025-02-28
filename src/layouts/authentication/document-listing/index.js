@@ -182,8 +182,12 @@ const DocumentListing = () => {
     handleCloseDialog();
   };
   const handleViewFile = (url,new_url, params) => {
-    navigate("/PreView", { state: { templateDoc: url,new_url:new_url, templateData: params } }); // Pass the URL as state
-  };
+    // navigate("/PreView", { state: { templateDoc: url,new_url:new_url, templateData: params } }); // Pass the URL as state
+    navigate("/docviewer",{state:{docId:params.id,templateId:params.select_template
+    }})
+    // console.log(params)
+    // console.log(params.id,params.select_template  )
+  };  
 
   const handleEditClick = (rowData) => {
     navigate("/edit-document", { state: { item: rowData } });
@@ -337,7 +341,7 @@ const DocumentListing = () => {
             onClick={() => {
               handleViewFile(params.row.selected_template_url,params.row.front_file_url, params.row);
               // console.log()
-              // console.log("Params",params.row)
+              console.log("Params",params.row)
             }}
           >
             <VisibilityIcon />

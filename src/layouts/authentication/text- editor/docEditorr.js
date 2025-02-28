@@ -91,20 +91,8 @@ const DocumentView = () => {
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(""); // State for Assigned To dropdown
   const [statusSendBack, setStatusSendBack] = useState(""); // State for Status Send Back dropdown
-  // console.log("Navigated with data in text Editor :", { id, document_current_status });
-  // console.log("Training Required:", trainingRequired)
-  const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
-  // const documentFilter = documentsData?.documents?.find(doc => doc.id === id);
-  // console.log("DocXXXXXXXXXXXXXXXX",documentFilter);
-  // if (isDocumentsLoading) {
-  //   console.log("Loading documents...");
-  // } else {
-  //   console.log("Documents RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR:", documentsData);
-  //   const documentFilter = documentsData?.documents?.find(doc => doc.id == id);
-  //   console.log("DocXXXXXXXXXXXXXXXX",documentFilter);
-  // }
 
-  // console.log("Document datatat",documentsData);
+  const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
   const [randomNumber] = useState(Math.floor(Math.random() * 100000));
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [action, setAction] = useState("");
@@ -118,27 +106,9 @@ const DocumentView = () => {
   const [docComments, setDocComments] = useState([]);
   const [cacheDocument, setCacheDocument] = useState("");
   const [docCurrentComment, setDocCurrentComment] = useState("");
-
-  // const docCommentsRef = useRef("");
   const docCommentsRef = useRef([]);
-
   const { user, setValue } = useContext(AuthContext);
-  // console.log("User Data",user?.email)
-  // console.log("User ID",user?.id)
-  // console.log("User ID",user?.id)
-  // console.log("User ID",user?.first_name)
-  // console.log("Department IDD:", user?.department);
-  const handleSaveDraftDocument = (cacheUrl) => {
-    // console.log("Console Comment", docCommentsRef.current);
-  };
-
-  // console.log("-+-+-+-+-+-+-+-+-+-+-++--++--+", docAdmin);
-  // Extract userGroupIds directly from documentsData
   const userGroupIds = documentsData?.userGroupIds || [];
-  // console.log("Extracted User Group IDs:", userGroupIds);
-  // console.log(data)
-  // setDocID(data?.id)
-  // Visibility function using extracted userGroupIds
   const isButtonVisible = (requiredGroupIds) => {
     console.log(
       "Checking visibility for groups:",
@@ -166,8 +136,7 @@ const DocumentView = () => {
         try {
           const response = await fetch(
             // `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`,
-            // `http://127.0.0.1:8000/dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}`,
-            `${process.env.REACT_APP_APIKEY}dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}`,
+            `http://127.0.0.1:8000/dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}`,
             // http://127.0.0.1:8000/dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}
             {
               // const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
@@ -210,8 +179,7 @@ const DocumentView = () => {
   useEffect(() => {
     if (docEditorLoaded && editorConfig) {
       const script = document.createElement("script");
-      script.src = process.env.REACT_APP_ONLYOFFICE_SCRIPT;
-      // script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
+      script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
       // script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
       script.onload = () => {
         try {
@@ -261,21 +229,6 @@ const DocumentView = () => {
               onDocumentStateChange: (event) => {
 
             },
-            //   onAppReady: async() => {
-
-            //     // Store the editor instance globally
-            //     // window.docEditor = docEditorRef.current;
-            //     // console.log("Window Editor is ready");
-            //     // console.log("WIndow Editor log:",window.docEditor.openDocument())
-            //     window.docEditor = docEditorRef.current;
-
-            //     // console.log("ONLYOFFICE Editor is Ready");
-            //     // const editorInstance = window.docEditor;
-            //     // const document = editorInstance.getDocument();
-            //     // console.log("Document Data:",document)
-            //     // console.log("Document Data:XXXXXXXXXXXXXXXXXXXXXXXXXXX",editorInstance )
-              
-            // },
             onAppReady: async () => {
               window.docEditor = docEditorRef.current;
               console.log("ONLYOFFICE Editor is Ready");
@@ -471,62 +424,6 @@ const DocumentView = () => {
   //   setOpenSignatureDialog(true);
   // };
 
-  const handleAddComment = () => {
-    const quill = quillRef.current;
-    const range = quill.getSelection();
-    if (range) {
-      setSelectedRange(range);
-      setOpencommentDialog(true); // Open modal instead of drawer
-    } else {
-      alert("Please select text to add a comment.");
-    }
-  };
-
-  const handleSaveComment = async () => {
-    if (currentComment.trim() === "") return;
-
-    const quill = quillRef.current;
-    const selectedText = quill.getText(selectedRange.index, selectedRange.length).trim();
-    if (!selectedText) return;
-
-    // Highlight the selected text
-    quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
-
-    // Make sure documentId is available
-    if (!id) {
-      console.error("Document ID is missing!");
-      return;
-    }
-
-    const newComment = {
-      document: id, // Make sure document ID is passed correctly
-      selected_word: selectedText, // Store the selected text
-      comment_description: currentComment, // Store the added comment
-    };
-
-    try {
-      const response = await createComment(newComment);
-
-      if (response.status) {
-        setComments([
-          ...comments,
-          {
-            id: Date.now(),
-            selectedWord: selectedText,
-            comment: currentComment,
-            document: id,
-          },
-        ]);
-        setCurrentComment(""); // Clear the comment input
-        setOpencommentDialog(false); // Close the dialog
-      } else {
-        console.error("Failed to save comment:", response.message);
-      }
-    } catch (error) {
-      console.error("Error saving comment:", error);
-    }
-  };
-
   const handlePrint = () => {
     console.log("Id passed:", id);
     navigate(`/print-document/${id}`);
@@ -610,25 +507,6 @@ const DocumentView = () => {
     };
   };
 
-  const handleSaveAsDocx = async () => {
-    const quill = quillRef.current;
-    const htmlContent = quill.root.innerHTML;
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, "text/html");
-    const plainText = doc.body.innerText.split("\n");
-
-    const docxDocument = new Document({
-      sections: [
-        {
-          children: plainText.map((line) => new Paragraph(line)),
-        },
-      ],
-    });
-    Packer.toBlob(docxDocument).then((blob) => {
-      saveAs(blob, "document.docx");
-    });
-  };
   const handleOpenDialog = () => {
     setDialogOpen(true);
   };
@@ -705,51 +583,10 @@ const DocumentView = () => {
   //   }
   // };
 
-  const handleDialogOpen = () => {
-    console.log("Doc Admin Approve clicked - Confirmed");
-    setDialogeffectiveOpen(true); // Open the dialog
-  };
-
   // const handleDialogClose = () => {
   //   setDialogeffectiveOpen(false); // Close the dialog
   // };
 
-  const handleConfirmSave = async () => {
-    const content = quillRef.current.root.innerHTML;
-    const documentData = { document_id: id, document_data: content };
-
-    // Save the document data (existing functionality)
-    await createDocument(documentData);
-
-    // Close the dialog after saving
-    setOpenDialog(false);
-
-    // Save the document as a .docx file if needed
-    handleSaveAsDocx();
-  };
-  const handleEditComment = (id, newComment) => {
-    setComments((prevComments) =>
-      prevComments.map((comment) =>
-        comment.id === id ? { ...comment, comment: newComment } : comment
-      )
-    );
-    console.log("Edit comment clicked");
-  };
-
-  const handleSaveEdit = (id, newComment) => {
-    // Check if the new comment is not empty
-    if (newComment.trim() === "") return;
-
-    // Update the comment in the state
-    setComments((prevComments) =>
-      prevComments.map((comment) =>
-        comment.id === id ? { ...comment, comment: newComment } : comment
-      )
-    );
-
-    // Close the modal or drawer after saving
-    setOpenDrawer(false); // Close the drawer or modal after saving the comment
-  };
 
   if (loading || isLoading) {
     return (
@@ -913,16 +750,6 @@ const DocumentView = () => {
           >
             Save
           </MDButton>
-          {/* <button
-          onClick={handleSave}
-          className={`px-4 py-2 rounded ${
-            saving 
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-blue-500 hover:bg-blue-600'
-          } text-white font-medium`}
-        >
-          {true ? 'Saving...' : 'Save Document'}
-        </button> */}
           <MDButton
             variant="gradient"
             color="submit"
@@ -973,13 +800,6 @@ const DocumentView = () => {
         onClose={handleuserCloseDialog}
         onConfirm={handleConfirmSelection}
       />
-      {/* <ConditionalDialog
-        open={dialogeffectiveOpen}
-        onClose={handleDialogClose} // Handle dialog close
-        onConfirm={handleDialogConfirm} // Handle dialog confirmation
-        trainingStatus={trainingRequired} // Pass trainingRequired as trainingStatus
-        documentId={id}
-      /> */}
       <ToastContainer position="top-right" autoClose={3000} />
     </MDBox>
   );

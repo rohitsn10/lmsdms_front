@@ -129,6 +129,9 @@ import { useAuth } from "hooks/use-auth";
 import ClassroomEditTraining from "dmscomponent/class-room/classroom-edit-traing/index.js";
 import EditClassQuiz from "dmscomponent/class-room/class-quiz-list/class-edit-quiz/index.js";
 import EditQuiz from "dmscomponent/edit-quiz/index.js";
+import DocumentPreviewComponent from "layouts/authentication/document-listing/doc-view-onlyoffice/index.js";
+import TrainingDocumentView from "dmscomponent/Training-listing/onlyofficeDocView/index.js";
+// import DocumentPreviewComponent from "dmscomponent/Training-listing/onlyofficeDocView/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -289,7 +292,7 @@ export default function App() {
   <div>
     {/* Always render Sidenav */}
     {window.location.pathname !== "/login" && !/^\/document-view\/\d+$/.test(pathname) && window.location.pathname !== "/forgotpassword" && window.location.pathname !== "/mcq-module" &&
-    window.location.pathname !== "/exam-mcq-module"
+    window.location.pathname !== "/exam-mcq-module" && window.location.pathname !== '/docviewer' && window.location.pathname  !== '/training-document-view'
      &&(
       <Sidenav
         color={sidenavColor}
@@ -389,6 +392,7 @@ export default function App() {
       <Route path="/trainingListing" element={<TrainingListing />} />
       <Route path="/edit-training" element={<EditTraining />} />
       <Route path="/LMS-Document" element={<LMSDocument />} />
+      <Route path="/lms-document-viewer" element={<LMSDocument />} />
       <Route path="/questions" element={<QuestionListing />} />
       <Route path="/edit-question" element={<EditQuestion />} />
       <Route path="/jobRole-listing" element={<JobroleListing />} />
@@ -416,7 +420,8 @@ export default function App() {
       <Route path="/edit-induction" element={<EditInduction/>}/>
       <Route path="/class-room-training-edit" element={<ClassroomEditTraining/>}/>
       <Route path="/class-edit-quiz" element={<EditClassQuiz/>}/>
-
+      <Route path="/docviewer" element={<DocumentPreviewComponent/>}/>
+      <Route path="/training-document-view" element={<TrainingDocumentView/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
     <ToastContainer />

@@ -70,12 +70,16 @@ const TrainingListing = () => {
       }
   }
   const handleview = (item) => {
+    console.log("Item view:::",item)
     const documentUrl = item;
     if (documentUrl) {
-      console.log("Passing training_document:", item);
-      navigate("/LMS-Document", { state: { documentView: item.selected_template_url,document_id:item.id } });
+      console.log("Passing training_document ID:", item.docId);
+      console.log("Passing training Template :", item.templateId);
+
+      // navigate("/LMS-Document", { state: { documentView: item.selected_template_url,document_id:item.id } });
+      navigate("/training-document-view",{state:{docId:item.docId,templateId:item.templateId}})
     } else {
-      console.error("training_document is undefined or missing for this item", item);
+      // console.error("training_document is undefined or missing for this item", item);
     }
   };
   const filteredData = (
@@ -96,7 +100,9 @@ const TrainingListing = () => {
         revision_date: item.revision_month, // Revision month
         effective_date: moment(item.created_at).format("DD-MM-YY"), // Use created_at for now
         selected_template_url:item.selected_template_url,
-        user_view:item.user_view
+        user_view:item.user_view,
+        docId:item.id,
+        templateId:item.select_template
       };
     });
 
