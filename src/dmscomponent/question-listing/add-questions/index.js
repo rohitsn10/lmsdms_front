@@ -25,7 +25,7 @@ import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TinyMCEEditorDialog from "./question-dialog/index.js"; // Import the new dialog component
-import { useCreateTrainingQuestionMutation } from 'apilms/questionApi.js';
+import { useCreateTrainingQuestionMutation } from "apilms/questionApi.js";
 
 function AddQuestion() {
   const [questions, setQuestions] = useState([]);
@@ -46,7 +46,7 @@ function AddQuestion() {
   const id = location?.state?.id || null;
   const navigate = useNavigate();
   const [createTrainingQuestion, { isLoading }] = useCreateTrainingQuestionMutation();
-  
+
   const handleAddAnswer = () => {
     if (answers.length < 6 && questionType !== "True/False") {
       setAnswers([...answers, { text: "", isCorrect: false }]);
@@ -73,27 +73,86 @@ function AddQuestion() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+
+    // Validation for required fields
+    if (!questionText.trim()) {
+      toast.error("Question text is required.");
+      return;
+    }
+
+    if (!questionType) {
+      toast.error("Please select a question type.");
+      return;
+    }
+
+    if (!questionMarks) {
+      toast.error("Please enter question marks.");
+      return;
+    }
+
+    if (!questionLanguage) {
+      toast.error("Please select a question language.");
+      return;
+    }
+
+    if (!status) {
+      toast.error("Please select a status.");
+      return;
+    }
+
     if (questionType === "MCQ") {
+      if (answers.length < 2) {
+        toast.error("MCQ must have at least two answers.");
+        return;
+      }
+
       const isAnyAnswerChecked = answers.some((answer) => answer.isCorrect);
       if (!isAnyAnswerChecked) {
         toast.error("Please select at least one correct answer for MCQ.");
         return;
       }
+
+      const isAnyAnswerEmpty = answers.some((answer) => !answer.text.trim());
+      if (isAnyAnswerEmpty) {
+        toast.error("All answer fields must be filled.");
+        return;
+      }
     }
-  
+
+    if (questionType === "True/False" && !answers[0]?.text) {
+      toast.error("Please select a correct answer for True/False.");
+      return;
+    }
+
+    if (questionType === "Fill in the blank" && !answers[0]?.text.trim()) {
+      toast.error("Answer cannot be empty for Fill in the blank.");
+      return;
+    }
+
     setOpenSignatureDialog(true);
   };
+  const handleQuestionTypeChange = (event) => {
+    const newType = event.target.value;
+    setQuestionType(newType);
   
-
+    // Reset answers based on question type
+    if (newType === "MCQ") {
+      setAnswers([{ text: "", isCorrect: false }]); 
+    } else if (newType === "True/False") {
+      setAnswers([{ text: "True", isCorrect: false }, { text: "False", isCorrect: false }]);
+    } else if (newType === "Fill in the blank") {
+      setAnswers([{ text: "", isCorrect: true }]); 
+    }
+  };
+  
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
-  
+
     if (!password) {
       toast.error("E-Signature is required to proceed.");
       return;
     }
-  
+
     const formData = new FormData();
     formData.append("document_id", id);
     formData.append("question_text", questionText);
@@ -102,28 +161,31 @@ function AddQuestion() {
     formData.append("status", status);
     formData.append("createdAt", createdAt);
     formData.append("createdBy", createdBy);
-  
+
     let options = null;
     let correct_answer = null;
-  
+
     if (questionType === "MCQ") {
-      options = answers.map((answer) => answer.text).join(","); 
-      correct_answer = answers.filter((answer) => answer.isCorrect).map((answer) => answer.text).join(","); 
+      options = answers.map((answer) => answer.text).join(",");
+      correct_answer = answers
+        .filter((answer) => answer.isCorrect)
+        .map((answer) => answer.text)
+        .join(",");
     } else if (questionType === "True/False") {
       options = "True,False";
-      correct_answer = answers[0]?.text; 
+      correct_answer = answers[0]?.text;
     } else if (questionType === "Fill in the blank") {
       options = "";
-      correct_answer = answers[0]?.text; 
+      correct_answer = answers[0]?.text;
     }
     formData.append("options", options ? options : "");
     formData.append("correct_answer", correct_answer ? correct_answer : "");
     if (mediaFile) {
-      const fileType = mediaFile.type; 
+      const fileType = mediaFile.type;
       if (fileType.startsWith("image")) {
-        formData.append("image_file_url", mediaFile); 
+        formData.append("image_file_url", mediaFile);
       } else if (fileType.startsWith("audio")) {
-        formData.append("audio_file_url", mediaFile); 
+        formData.append("audio_file_url", mediaFile);
       } else if (fileType.startsWith("video")) {
         formData.append("video_file_url", mediaFile);
       } else {
@@ -205,7 +267,7 @@ function AddQuestion() {
                   labelId="select-question-type-label"
                   id="select-question-type"
                   value={questionType}
-                  onChange={(e) => setQuestionType(e.target.value)}
+                  onChange={handleQuestionTypeChange} 
                   input={<OutlinedInput label="Question Type" />}
                   sx={{
                     minWidth: 200,
@@ -242,7 +304,7 @@ function AddQuestion() {
                         value={answer.text}
                         onClick={() => handleOpenAnswerDialog(index)}
                         onChange={(e) => handleAnswerChange(index, e.target.value)}
-                        sx={{ flex: 1, marginRight: 1 }}
+                        sx={{ flex: 1, marginRight: 2 }}
                       />
                       <FormControlLabel
                         control={
@@ -251,7 +313,7 @@ function AddQuestion() {
                             onChange={() => handleCorrectAnswerChange(index)}
                           />
                         }
-                        label="Correct Answer"
+                       
                       />
                       <IconButton
                         edge="end"

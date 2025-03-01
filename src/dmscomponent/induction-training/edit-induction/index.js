@@ -16,7 +16,8 @@ import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 const EditInduction = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  
+  const inductionId=state?.induction?.id
+
   const [inductionTitle, setInductionTitle] = useState(state?.induction?.induction_name || "");
   const [department, setDepartment] = useState(state?.induction?.department || "");
   const [document, setDocument] = useState(null);
@@ -66,7 +67,7 @@ const EditInduction = () => {
       
       const response = await updateInduction(formData).unwrap();
       
-      if (response.status) {
+      if (response.status) { 
         toast.success("Induction updated successfully!");
         setTimeout(() => navigate("/induction-listing"), 1500);
       } else {

@@ -32,11 +32,12 @@ export const inductionApi = createApi({
       transformResponse: (response) => response, // Handle raw response
     }),
     updateDeleteInduction: builder.mutation({
-        query: ({ induction_id, induction_name }) => ({
-          url: `lms_module/update_induction/${induction_id}`,
-          method: 'PUT',
-          body: { induction_name },
-        }),
+      query: (formData) => ({
+        url: `lms_module/update_induction/${formData.get("induction_id")}`,
+        method: 'PUT',
+        body: formData,
+      }),
+      
         transformResponse: (response) => response, // Handle raw response
       }),
 

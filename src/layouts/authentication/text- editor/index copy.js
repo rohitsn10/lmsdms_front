@@ -1147,7 +1147,7 @@ const DocumentView = () => {
         trainingStatus={trainingRequired} // Pass trainingRequired as trainingStatus
         documentId={id}
       /> */}
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
     </MDBox>
   );
 };

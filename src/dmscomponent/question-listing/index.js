@@ -10,19 +10,22 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import moment from "moment";
-import { useFetchTrainingWiseQuestionsQuery, useDeleteTrainingQuestionMutation } from "apilms/questionApi";
+import {
+  useFetchTrainingWiseQuestionsQuery,
+  useDeleteTrainingQuestionMutation,
+} from "apilms/questionApi";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { toast, ToastContainer } from "react-toastify";
 const QuestionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [openSignatureDialog, setOpenSignatureDialog] = useState(false); 
-  const [pendingQuestionId, setPendingQuestionId] = useState(null); 
+  const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
+  const [pendingQuestionId, setPendingQuestionId] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const id = location?.state?.rowData || null;
   const { data, isLoading, isError, refetch } = useFetchTrainingWiseQuestionsQuery(id);
-  const [deleteTrainingQuestion] = useDeleteTrainingQuestionMutation(id); 
-console.log(data)
+  const [deleteTrainingQuestion] = useDeleteTrainingQuestionMutation(id);
+  console.log(data);
   useEffect(() => {
     refetch();
   }, [location.key]);
@@ -37,50 +40,47 @@ console.log(data)
   };
 
   const handleEditQuestion = (row) => {
-    navigate("/edit-question", { state: { item: row } });
-    console.log("navigate with this data in edit: -+-+-+-+", row);
+    navigate("/edit-question", { state: { item: row,id } });
+    console.log("navigate with this data in edit: -+-+-+-+", id);
   };
 
   const handleDeleteQuestion = (row) => {
     setPendingQuestionId(row);
-     console.log("id to delete:",row) 
+    console.log("id to delete:", row);
     setOpenSignatureDialog(true); // Open the ESignatureDialog
-};
+  };
 
-const handleSignatureComplete = async (password) => {
-  setOpenSignatureDialog(false); // Close the dialog
+  const handleSignatureComplete = async (password) => {
+    setOpenSignatureDialog(false); // Close the dialog
 
-  if (!password) {
-    toast.error("E-Signature is required to proceed.");
-    return;
-  } 
+    if (!password) {
+      toast.error("E-Signature is required to proceed.");
+      return;
+    }
 
-  try {
-    // Proceed with the delete action after successful signature
-    const response = await deleteTrainingQuestion({ id: pendingQuestionId }).unwrap(); 
-    toast.success("Question Delete successfully!");
-          setTimeout(() => {
-            navigate("/trainingListing");
-          }, 1500);
-  } catch (error) {
-    console.error("Error deleting question:", error);
-    toast.error("Error deleting question. Please try again.");
-  }
-};
+    try {
+      // Proceed with the delete action after successful signature
+      const response = await deleteTrainingQuestion({ id: pendingQuestionId }).unwrap();
+      toast.success("Question Delete successfully!");
+      setTimeout(() => {
+        navigate("/trainingListing");
+      }, 1500);
+    } catch (error) {
+      console.error("Error deleting question:", error);
+      toast.error("Error deleting question. Please try again.");
+    }
+  };
 
   // Process fetched data and apply search filter
   const filteredData = (data?.data || [])
-    .filter((item) =>
-      item.question_text.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    .filter((item) => item.question_text.toLowerCase().includes(searchTerm.toLowerCase()))
     .map((item, index) => ({
       id: item.id,
       serial_number: index + 1,
       question: item.question_text,
       question_type: item.question_type,
       created_at: moment(item.question_created_at).format("DD/MM/YY"), // Adjust the field name
-      fullData: item
-      
+      fullData: item,
     }));
 
   const columns = [
@@ -119,12 +119,16 @@ const handleSignatureComplete = async (password) => {
   }
 
   if (isError) {
-    return <MDTypography variant="h6" color="error">Failed to fetch data.</MDTypography>;
+    return (
+      <MDTypography variant="h6" color="error">
+        Failed to fetch data.
+      </MDTypography>
+    );
   }
 
   return (
     <MDBox p={3}>
-      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search Question"
@@ -137,12 +141,7 @@ const handleSignatureComplete = async (password) => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Question Listing
           </MDTypography>
-          <MDButton
-            variant="contained"
-            color="primary"
-            onClick={handleAddQuestion}
-            sx={{ ml: 2 }}
-          >
+          <MDButton variant="contained" color="primary" onClick={handleAddQuestion} sx={{ ml: 2 }}>
             Add Question
           </MDButton>
         </MDBox>
@@ -181,7 +180,7 @@ const handleSignatureComplete = async (password) => {
         onClose={() => setOpenSignatureDialog(false)}
         onConfirm={handleSignatureComplete} // Pass the handler for signature completion
       />
-       <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} />
     </MDBox>
   );
 };

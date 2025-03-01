@@ -30,7 +30,7 @@ import { toast, ToastContainer } from "react-toastify";
 function EditQuestion() {
   const { state } = useLocation(); // Get the passed state from location
   const navigate = useNavigate();
-  console.log(state);
+  console.log(state.id);
   const [answers, setAnswers] = useState(() => {
     const optionsArray = state?.item?.fullData?.options?.split(",") || [];
     const correctAnswer = state?.item?.fullData?.correct_answer;
@@ -62,10 +62,13 @@ function EditQuestion() {
   );
 
   const [updateTrainingQuestion] = useUpdateTrainingQuestionMutation();
-
+  const QuestionId = state?.item?.fullData?.id;
+  const training_id = state?.id;
+  // console.log(training_id)
+  // console.log(QuestionId)
   useEffect(() => {
     const correctAnswer = state?.item?.fullData?.correct_answer || ""; // Get correct answer safely
-  
+
     if (questionType === "True/False") {
       setAnswers([
         { text: "True", isCorrect: correctAnswer === "True" },
@@ -83,7 +86,7 @@ function EditQuestion() {
       setAnswers([{ text: correctAnswer || "", isCorrect: true }]);
     }
   }, [questionType, state?.item?.fullData]);
-  
+
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
 
@@ -93,7 +96,7 @@ function EditQuestion() {
     }
 
     const formData = new FormData();
-    formData.append("training_id", id);
+    formData.append("training_id", training_id);
     formData.append("question_text", questionText);
     formData.append("question_type", questionType);
     formData.append("marks", questionMarks);
@@ -103,32 +106,31 @@ function EditQuestion() {
 
     let options = null;
     let correct_answer = null;
-
     if (questionType === "MCQ") {
-      // For MCQ, pass the options and correct_answer
-      options = answers.map((answer) => answer.text); // Only texts of the answers
-      correct_answer = answers.filter((answer) => answer.isCorrect); // The correct answer(s)
+      options = answers.map((answer) => answer.text).join(",");
+      correct_answer = answers
+        .filter((answer) => answer.isCorrect)
+        .map((answer) => answer.text)
+        .join(",");
     } else if (questionType === "True/False") {
-      // For True/False, pass null for options and the correct answer
-      options = null;
-      correct_answer = JSON.stringify([{ text: answers[0]?.text, isCorrect: true }]);
+      options = "True,False";
+      correct_answer = answers[0]?.text;
     } else if (questionType === "Fill in the blank") {
-      // For Fill in the blank, pass null for options and correct_answer
-      options = null;
-      correct_answer = JSON.stringify([{ text: answers[0]?.text, isCorrect: true }]);
+      options = "";
+      correct_answer = answers[0]?.text;
     }
-
-    // Append the options and correct_answer
     formData.append("options", options ? JSON.stringify(options) : null);
-    formData.append("correct_answer", correct_answer);
-
+    formData.append("correct_answer", correct_answer ? correct_answer : "");
     if (mediaFile) {
       formData.append("mediaFile", mediaFile); // Append media file if available
     }
 
     try {
-      const response = await createTrainingQuestion(formData).unwrap();
-      toast.success("Question created successfully!");
+      const response = await updateTrainingQuestion({
+        QuestionId, // Ensure this is correctly assigned
+        formData,
+      }).unwrap();
+      toast.success("Question updated successfully!");
       setTimeout(() => {
         navigate("/trainingListing");
       }, 1500);
@@ -268,6 +270,7 @@ function EditQuestion() {
                   value={answers[0]?.text}
                   onChange={(e) => handleAnswerChange(0, e.target.value)}
                   fullWidth
+                 
                 />
               )}
 
@@ -280,6 +283,7 @@ function EditQuestion() {
                         value={answer.text}
                         onChange={(e) => handleAnswerChange(index, e.target.value)}
                         fullWidth
+                        sx={{ flex: 1, marginRight: 2 }}
                       />
                       <FormControlLabel
                         control={
@@ -288,7 +292,7 @@ function EditQuestion() {
                             onChange={() => handleCorrectAnswerChange(index)}
                           />
                         }
-                        label="Correct Answer"
+                       
                       />
                       <IconButton onClick={() => handleRemoveAnswer(index)}>
                         <DeleteIcon />

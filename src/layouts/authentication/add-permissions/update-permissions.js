@@ -278,7 +278,7 @@ const UpdatePermissionsTable = ({ groupId }) => {
           </div>
         </MDBox>
       </Card>
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
     </MDBox>
   );
 };

@@ -916,6 +916,15 @@ const DocumentView = () => {
           >
             Save
           </MDButton>
+          {/* <MDButton
+            variant="gradient"
+            color="submit"
+            onClick={handleSaveDraft}
+            // onClick={handleDownloadFeature}
+            disabled={isLoading}
+          >
+            Save Draft
+          </MDButton> */}
           {/* <button
           onClick={handleSave}
           className={`px-4 py-2 rounded ${
@@ -983,7 +992,7 @@ const DocumentView = () => {
         trainingStatus={trainingRequired} // Pass trainingRequired as trainingStatus
         documentId={id}
       /> */}
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
     </MDBox>
   );
 };

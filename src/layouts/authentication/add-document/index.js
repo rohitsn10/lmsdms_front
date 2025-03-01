@@ -93,40 +93,20 @@ function AddDocument() {
   //   return Object.keys(newErrors).length === 0;
   // };
   const validateInputs = () => {
-    let isValid = true;
-
-    if (!title.trim()) {
-      toast.error("Title is required.");
-      isValid = false;
+    const newErrors = {};
+    if (!title.trim()) newErrors.title = "Title is required.";
+    if (!type) newErrors.type = "Type is required.";
+    if (!description.trim()) newErrors.description = "Description is required.";
+    if (!revisionMonth || revisionMonth <= 0) newErrors.revisionMonth = "Revision month must be a positive number.";
+    if (!workflow) newErrors.workflow = "Workflow is required.";
+    if (!template) newErrors.template = "Template is required.";
+    
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      toast.error("Please fill all required fields.");
+      return false;
     }
-    if (!type || (typeof type === "string" && type.trim() === "")) {
-      toast.error("Type is required.");
-      isValid = false;
-    }
-    // if (!documentNumber.trim()) toast.error("Document number is required.");
-    if (!description.trim()) {
-      toast.error("Description is required.");
-      isValid = false;
-    }
-    if (!revisionMonth || revisionMonth <= 0) {
-      toast.error("Revision month must be a positive number.");
-      isValid = false;
-    }
-
-    if (!revisionTime) {
-      toast.error("Revision Date is required");
-      isValid = false;
-    }
-    if (!workflow || (typeof workflow === "string" && workflow.trim() === "")) {
-      toast.error("Workflow is required.");
-      isValid = false;
-    }
-    if (!template || (typeof template === "string" && template.trim() === "")) {
-      toast.error("Template is required.");
-      isValid = false;
-    }
-
-    return isValid;
+    return true;
   };
   const handleDateChange = (e) => {
     const selectedDate = new Date(e.target.value);
@@ -170,7 +150,7 @@ function AddDocument() {
     // Set the revisionMonth state to the user input (including 0)
     setRevisionMonth(monthsToAdd);
   };
-
+ 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
@@ -584,7 +564,7 @@ function AddDocument() {
         />
 
         {/* Toast Notifications */}
-        <ToastContainer position="top-right" autoClose={3000} />
+        
       </Card>
     </BasicLayout>
   );

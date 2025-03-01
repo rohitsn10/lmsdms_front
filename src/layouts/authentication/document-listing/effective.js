@@ -73,7 +73,7 @@ const ConditionalDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth> 
       <MDBox sx={{ textAlign: "center" }}>
         <MDTypography variant="h4" fontWeight="medium" color="#344767" mt={1}>
           {heading}

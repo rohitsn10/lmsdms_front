@@ -27,11 +27,11 @@ export const questionApi = createApi({
         url: 'lms_module/create_training_questions',
         method: 'GET',
       }),
-      transformResponse: (response) => response,
+      transformResponse: (response) => response, 
     }),
     updateTrainingQuestion: builder.mutation({
-      query: ({ id, formData }) => ({
-        url: `lms_module/update_training_questions/${id}`,
+      query: ({ QuestionId, formData }) => ({
+        url: `lms_module/update_training_questions/${QuestionId}`,
         method: 'PUT',
         body: formData, 
       }),
