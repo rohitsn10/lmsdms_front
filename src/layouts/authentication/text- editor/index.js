@@ -24,8 +24,10 @@ import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useCreateCommentMutation } from "api/auth/commentsApi";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDraftDocumentMutation } from "api/auth/texteditorApi";
-import { useDocumentApproveStatusMutation,useDocumentApproverStatusMutation
- } from "api/auth/texteditorApi";
+import {
+  useDocumentApproveStatusMutation,
+  useDocumentApproverStatusMutation,
+} from "api/auth/texteditorApi";
 import SendBackDialog from "./sendback";
 import { useDocumentSendBackStatusMutation } from "api/auth/texteditorApi";
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
@@ -52,7 +54,7 @@ const DocumentView = () => {
   const [docEditorLoaded, setDocEditorLoaded] = useState(false);
   const [editorConfig, setEditorConfig] = useState(null);
   const { data: templateData, isError, error: apiError } = useGetTemplateQuery(id);
-  console.log("Template Hook",templateData)
+  console.log("Template Hook", templateData);
   const [docContent, setDocContent] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const quillRef = useRef(null);
@@ -79,14 +81,14 @@ const DocumentView = () => {
   const trainingRequired = searchParams.get("training_required");
   const approval_status = searchParams.get("approval_status");
   const version = searchParams.get("version");
-  const templateIDMain = searchParams.get("templateID")
-  console.log("Version", version);
+  const templateIDMain = searchParams.get("templateID");
+  
   const [isSaved, setIsSaved] = useState(false);
   const handleDownloadSave = () => {
     setIsSaved(true);
     handleDownloadFeature(); // Existing save function
   };
-  
+
   // const [dialogeffectiveOpen, setDialogeffectiveOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(""); // State for Assigned To dropdown
@@ -215,12 +217,12 @@ const DocumentView = () => {
       // script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
       script.onload = () => {
         try {
-           docEditorRef.current = new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
+          docEditorRef.current = new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
             width: "100%",
             height: "100%",
             type: "desktop",
             document: editorConfig.document,
-            editorConfig: { 
+            editorConfig: {
               mode: "edit", // Ensure the document is in edit mode
               callbackUrl: editorConfig.callbackUrl, // Save callback URL
               user: {
@@ -243,8 +245,8 @@ const DocumentView = () => {
                   autosave: false,
                 },
                 saveButton: false, // Enable save button
-                showReviewChanges:false,
-                trackChanges: true, 
+                showReviewChanges: false,
+                trackChanges: true,
                 chat: false,
                 comments: true,
                 zoom: 100,
@@ -258,71 +260,69 @@ const DocumentView = () => {
               },
             },
             events: {
-              onDocumentStateChange: (event) => {
+              onDocumentStateChange: (event) => {},
+              //   onAppReady: async() => {
 
-            },
-            //   onAppReady: async() => {
+              //     // Store the editor instance globally
+              //     // window.docEditor = docEditorRef.current;
+              //     // console.log("Window Editor is ready");
+              //     // console.log("WIndow Editor log:",window.docEditor.openDocument())
+              //     window.docEditor = docEditorRef.current;
 
-            //     // Store the editor instance globally
-            //     // window.docEditor = docEditorRef.current;
-            //     // console.log("Window Editor is ready");
-            //     // console.log("WIndow Editor log:",window.docEditor.openDocument())
-            //     window.docEditor = docEditorRef.current;
+              //     // console.log("ONLYOFFICE Editor is Ready");
+              //     // const editorInstance = window.docEditor;
+              //     // const document = editorInstance.getDocument();
+              //     // console.log("Document Data:",document)
+              //     // console.log("Document Data:XXXXXXXXXXXXXXXXXXXXXXXXXXX",editorInstance )
 
-            //     // console.log("ONLYOFFICE Editor is Ready");
-            //     // const editorInstance = window.docEditor;
-            //     // const document = editorInstance.getDocument();
-            //     // console.log("Document Data:",document)
-            //     // console.log("Document Data:XXXXXXXXXXXXXXXXXXXXXXXXXXX",editorInstance )
-              
-            // },
-            onAppReady: async () => {
-              window.docEditor = docEditorRef.current;
-              console.log("ONLYOFFICE Editor is Ready");
-              console.log("Editor Config:", docEditorRef.current.config); // Log the entire config
-        
-              try {
-                // const editorInstance = window.docEditor;
-                // const headerData = "await fetchHeaderData();";
-                // console.log("Inserting Header Data:", headerData);
-                // editorInstance.insertText(`Header Data: ${headerData?.company_name}`, "CompanyName");
-              } catch (error) {
-                console.error("Error inserting header:", error);
-              }
-            },
+              // },
+              onAppReady: async () => {
+                window.docEditor = docEditorRef.current;
+                console.log("ONLYOFFICE Editor is Ready");
+                console.log("Editor Config:", docEditorRef.current.config); // Log the entire config
+
+                try {
+                  // const editorInstance = window.docEditor;
+                  // const headerData = "await fetchHeaderData();";
+                  // console.log("Inserting Header Data:", headerData);
+                  // editorInstance.insertText(`Header Data: ${headerData?.company_name}`, "CompanyName");
+                } catch (error) {
+                  console.error("Error inserting header:", error);
+                }
+              },
               onError: (event) => {
                 console.error("Editor error:", event);
-                return true
+                return true;
               },
-                onDownloadAs: async (response) => {
-                  try {
-                    // console.log("Download response:", response);
-                    const cacheUrl = response?.data?.url;
-                    setCacheDocument(cacheUrl);
-                    const newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
-                    if (cacheUrl) {
-                      const draftData = {
-                        user: user?.id,
-                        document_id: id,
-                        comment_data: docCommentsRef?.current,
-                        version_no: newVersion,
-                        front_file_url: cacheUrl,
-                        department_id: String(user?.department),
-                        // templateID: data?.select_template,
-                        // userEmail: user?.email,
-                        // username: user?.first_name,
-                      };
-                      // console.log("Submitting draft:", draftData);
-                      try {
-                        // Send the comment data to the API
-                        const result = await addPathUrlDataForComments(draftData).unwrap();
-                        // console.log("Data Added", result);
-                        toast.success("Document Saved.")
-                      } catch (apiError) {
-                        console.error("Error saving comment:", apiError);
-                        // You might want to show an error message to the user here
-                      }
+              onDownloadAs: async (response) => {
+                try {
+                  // console.log("Download response:", response);
+                  const cacheUrl = response?.data?.url;
+                  setCacheDocument(cacheUrl);
+                  const newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
+                  if (cacheUrl) {
+                    const draftData = {
+                      user: user?.id,
+                      document_id: id,
+                      comment_data: docCommentsRef?.current,
+                      version_no: newVersion,
+                      front_file_url: cacheUrl,
+                      department_id: String(user?.department),
+                      // templateID: data?.select_template,
+                      // userEmail: user?.email,
+                      // username: user?.first_name,
+                    };
+                    // console.log("Submitting draft:", draftData);
+                    try {
+                      // Send the comment data to the API
+                      const result = await addPathUrlDataForComments(draftData).unwrap();
+                      // console.log("Data Added", result);
+                      toast.success("Document Saved.");
+                    } catch (apiError) {
+                      console.error("Error saving comment:", apiError);
+                      // You might want to show an error message to the user here
                     }
+                  }
 
                   return true; // Allow the normal download to proceed
                 } catch (error) {
@@ -350,7 +350,7 @@ const DocumentView = () => {
           docEditorRef.current = null;
           console.log("Cleanup: ONLYOFFICE editor destroyed");
         }
-  
+
         document.body.removeChild(script); // Remove script tag
         console.log("Cleanup: ONLYOFFICE script removed");
       };
@@ -429,13 +429,17 @@ const DocumentView = () => {
           toast.success("Document Reviewed!");
           break;
         case "approve":
-          response = await documentApproverStatus({ document_id: id, status: "9", remark }).unwrap();
+          response = await documentApproverStatus({
+            document_id: id,
+            status: "9",
+            remark,
+          }).unwrap();
           toast.success("Document Approved!");
           break;
         default:
           throw new Error("Invalid action");
       }
-      refetch()
+      refetch();
       // Navigate after success
       setTimeout(() => {
         navigate("/document-listing");
@@ -639,19 +643,18 @@ const DocumentView = () => {
 
   // Handle dialog confirm
   const handleConfirmDialog = async () => {
-    console.log("Send Back button clicked");
-
     try {
       // Call the API using the mutation hook and pass the required data directly
       const response = await documentSendBackStatus({
         document_id: id, // Replace with your actual document_id
         assigned_to: assignedTo, // Value from the dialog's state
         status_sendback: "8", // The current status (replace with actual status if needed)
+        remark: remark, // Include the remark field
       }).unwrap();
-
+  
       console.log("API Response:", response);
       if (response.status) {
-        toast.success("Document Send Back Successfully!");
+        toast.success("Document Sent Back Successfully!");
         setTimeout(() => {
           navigate("/document-listing");
         }, 2000);
@@ -660,28 +663,28 @@ const DocumentView = () => {
       }
     } catch (error) {
       console.error("Error calling API:", error);
-      toast.error("Failed to Sendback. Please try again.");
+      toast.error("Failed to Send Back. Please try again.");
     }
   };
-
+  
   const container = document.getElementById("onlyoffice-editor-container");
 
-    const handleDownloadFeature = async () => {
-      try {
-        console.log("Hit Featureeeeeeeeee ---------->")
-        if (docEditorRef.current) {
-          console.log("Debug 1");
+  const handleDownloadFeature = async () => {
+    try {
+      console.log("Hit Featureeeeeeeeee ---------->");
+      if (docEditorRef.current) {
+        console.log("Debug 1");
 
-          docEditorRef.current.downloadAs("docx", async (blobUrl) => {
-            // console.log("Blob URL:", blobUrl);
-          });
-          // console.log("Docc")
-          setIsSaved(true)
-        }
-      } catch (error) {
-        console.error("Save failed:", error);
+        docEditorRef.current.downloadAs("docx", async (blobUrl) => {
+          // console.log("Blob URL:", blobUrl);
+        });
+        // console.log("Docc")
+        setIsSaved(true);
       }
-    };
+    } catch (error) {
+      console.error("Save failed:", error);
+    }
+  };
 
   // const handleDialogConfirm = async () => {
   //   setDialogeffectiveOpen(false); // Close the dialog after confirmation
@@ -932,10 +935,9 @@ const DocumentView = () => {
           >
             Print
           </MDButton>
-
         </MDBox>
       </Box>
- 
+
       <MDBox
         sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
       >
@@ -953,10 +955,11 @@ const DocumentView = () => {
         onConfirm={handleConfirmDialog}
         assignedTo={assignedTo}
         setAssignedTo={setAssignedTo}
-        statusSendBack={statusSendBack}
-        setStatusSendBack={setStatusSendBack}
+        remarks={remark}
+        setRemarks={setRemark}
         documentId={id}
       />
+
       <ESignatureDialog
         open={openSignatureDialog}
         onClose={() => setOpenSignatureDialog(false)}

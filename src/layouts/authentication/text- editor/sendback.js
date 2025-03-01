@@ -9,14 +9,16 @@ import {
   Select,
   OutlinedInput,
   InputLabel,
+  TextField,
 } from "@mui/material";
 import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { useGetApprovedStatusUsersQuery } from "api/auth/texteditorApi";
 
-const handleClear = (setAssignedTo) => {
+const handleClear = (setAssignedTo, setRemarks) => {
   setAssignedTo("");
+  setRemarks(""); // Clear remarks as well
 };
 
 const SendBackDialog = ({
@@ -25,18 +27,12 @@ const SendBackDialog = ({
   onConfirm,
   assignedTo,
   setAssignedTo,
-  statusSendBack,
-  setStatusSendBack,
+  remarks,
+  setRemarks,
   documentId,
 }) => {
   // Fetch approved status users using RTK Query
   const { data: users, isLoading, error } = useGetApprovedStatusUsersQuery(documentId);
-
-  // Debug logs
-  console.log("Document ID:", documentId);
-  console.log("API Loading:", isLoading);
-  console.log("API Error:", error);
-  console.log("API Users Data:", users);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -48,12 +44,13 @@ const SendBackDialog = ({
 
       <form onSubmit={(e) => e.preventDefault()}>
         <DialogContent>
+          {/* Clear Button */}
           <MDBox display="flex" justifyContent="flex-end">
             <MDButton
               variant="outlined"
               color="error"
               size="small"
-              onClick={() => handleClear(setAssignedTo)}
+              onClick={() => handleClear(setAssignedTo, setRemarks)}
               sx={{ marginRight: "20px" }}
             >
               Clear
@@ -78,14 +75,26 @@ const SendBackDialog = ({
               {isLoading && <MenuItem disabled>Loading users...</MenuItem>}
               {error && <MenuItem disabled>Error loading users</MenuItem>}
               {!isLoading &&
-                users?.map((user) => (
+                Array.isArray(users) &&
+                users.map((user) => (
                   <MenuItem key={user.id} value={user.id}>
                     {user.first_name}
                   </MenuItem>
                 ))}
             </Select>
-
           </FormControl>
+
+          {/* Remarks Field */}
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Remarks"
+            variant="outlined"
+            multiline
+            rows={3}
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+          />
         </DialogContent>
 
         <DialogActions>
@@ -109,8 +118,8 @@ SendBackDialog.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   assignedTo: PropTypes.string,
   setAssignedTo: PropTypes.func.isRequired,
-  statusSendBack: PropTypes.string,
-  setStatusSendBack: PropTypes.func.isRequired,
+  remarks: PropTypes.string,
+  setRemarks: PropTypes.func.isRequired,
   documentId: PropTypes.string.isRequired,
 };
 
