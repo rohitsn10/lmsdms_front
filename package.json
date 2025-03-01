@@ -12,7 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/creativetimofficial/material-dashboard-react.git"
   },
-  "proxy": "http://127.0.0.1:8000/",
+  "proxy": "http://13.203.165.129:8080/",
   "dependencies": {
     "@date-io/date-fns": "^3.2.0",
     "@emotion/cache": "11.10.8",
