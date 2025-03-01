@@ -48,7 +48,7 @@ function CreateQuiz() {
   const [errors, setErrors] = useState({});
 
   // Calculate 80% of total marks for pass criteria (automatically)
-  const passCriteria = totalMarks ? (parseFloat(totalMarks) * 0.8).toFixed(1) : "";
+  const passCriteria = totalMarks ? (parseFloat(totalMarks) * 0.8).toFixed(0) : "";
 
   // Fetch questions data
   const { data, isLoading, isError } = useFetchTrainingWiseQuestionsQuery(DataQuiz?.id);
@@ -70,8 +70,31 @@ function CreateQuiz() {
   const validateForm = () => {
     const newErrors = {};
     
+    // Basic validation for negative values
+    if (parseInt(totalQuestions) < 0) {
+      newErrors.totalQuestions = "Total questions cannot be negative";
+    }
+    
+    if (parseInt(totalMarks) < 0) {
+      newErrors.totalMarks = "Total marks cannot be negative";
+    }
+    
+    if (parseInt(quizTime) < 0) {
+      newErrors.quizTime = "Quiz time cannot be negative";
+    }
+    
     // Mark breakdown validation for auto quiz
     if (quizType === "auto" && markBreakdown.length > 0) {
+      // Check for negative values in mark breakdown
+      markBreakdown.forEach((entry, index) => {
+        if (parseInt(entry.mark) < 0) {
+          newErrors[`markBreakdown_${index}_mark`] = "Mark value cannot be negative";
+        }
+        if (parseInt(entry.count) < 0) {
+          newErrors[`markBreakdown_${index}_count`] = "Number of questions cannot be negative";
+        }
+      });
+      
       // Calculate total questions from breakdown
       const totalQuestionsFromBreakdown = markBreakdown.reduce(
         (sum, entry) => sum + (parseInt(entry.count) || 0), 0
@@ -95,6 +118,13 @@ function CreateQuiz() {
           newErrors.markBreakdown = `Not enough ${mark}-mark questions available. Need ${count}, have ${availableForMark.length}.`;
         }
       });
+      
+      // Check for duplicate mark values
+      const markValues = markBreakdown.map(entry => entry.mark);
+      const uniqueMarkValues = new Set(markValues.filter(Boolean));
+      if (markValues.filter(Boolean).length !== uniqueMarkValues.size) {
+        newErrors.duplicateMarks = "Duplicate mark values found. Please combine them into a single entry.";
+      }
       
       // Verify total questions matches
       if (totalQuestions && totalQuestionsFromBreakdown !== parseInt(totalQuestions)) {
@@ -134,8 +164,46 @@ function CreateQuiz() {
 
   // Handle updating a mark breakdown entry
   const handleMarkBreakdownChange = (index, field, value) => {
+    // Prevent negative values
+    if (parseInt(value) < 0) {
+      value = "0";
+    }
+
+    if(field === "mark" && parseInt(value) === 0 && parseInt(markBreakdown[index].count) > 0){
+      toast.error("Mark value cannot be 0");
+      return;
+  }
+    
     const updatedBreakdown = [...markBreakdown];
     updatedBreakdown[index][field] = value;
+    
+    // Check for duplicate mark values when changing mark field
+    if (field === "mark" && value) {
+      const existingIndex = markBreakdown.findIndex(
+        (entry, i) => i !== index && entry.mark === value
+      );
+      
+      if (existingIndex !== -1) {
+        // Found a duplicate - combine them
+        toast.info(`Combined with existing ${value}-mark entry`);
+        
+        // Add counts if the existing entry has a count
+        if (updatedBreakdown[existingIndex].count && updatedBreakdown[index].count) {
+          updatedBreakdown[existingIndex].count = (
+            parseInt(updatedBreakdown[existingIndex].count) + 
+            parseInt(updatedBreakdown[index].count)
+          ).toString();
+        } else if (updatedBreakdown[index].count) {
+          updatedBreakdown[existingIndex].count = updatedBreakdown[index].count;
+        }
+        
+        // Remove the current entry
+        updatedBreakdown.splice(index, 1);
+        setMarkBreakdown(updatedBreakdown);
+        return;
+      }
+    }
+    
     setMarkBreakdown(updatedBreakdown);
     
     // Auto-update total questions and marks if all entries are filled
@@ -350,8 +418,14 @@ function CreateQuiz() {
                 label="Quiz Time (in minutes) *"
                 fullWidth
                 value={quizTime}
-                onChange={(e) => setQuizTime(e.target.value)}
-                error={!quizTime && quizTime !== ""}
+                onChange={(e) => {
+                  // Prevent negative values
+                  const value = parseInt(e.target.value) < 0 ? "0" : e.target.value;
+                  setQuizTime(value);
+                }}
+                error={!!errors.quizTime}
+                helperText={errors.quizTime}
+                inputProps={{ min: "0" }}  // HTML5 validation
               />
             </MDBox>
 
@@ -377,6 +451,9 @@ function CreateQuiz() {
                         size="small"
                         value={entry.mark}
                         onChange={(e) => handleMarkBreakdownChange(index, "mark", e.target.value)}
+                        error={!!errors[`markBreakdown_${index}_mark`]}
+                        helperText={errors[`markBreakdown_${index}_mark`]}
+                        inputProps={{ min: "0" }}  // HTML5 validation
                       />
                       <TextField
                         label="Number of Questions"
@@ -384,6 +461,9 @@ function CreateQuiz() {
                         size="small"
                         value={entry.count}
                         onChange={(e) => handleMarkBreakdownChange(index, "count", e.target.value)}
+                        error={!!errors[`markBreakdown_${index}_count`]}
+                        helperText={errors[`markBreakdown_${index}_count`]}
+                        inputProps={{ min: "0" }}  // HTML5 validation
                       />
                       <IconButton
                         edge="end"
@@ -434,6 +514,10 @@ function CreateQuiz() {
                 
                 {errors.markBreakdown && (
                   <FormHelperText error>{errors.markBreakdown}</FormHelperText>
+                )}
+                
+                {errors.duplicateMarks && (
+                  <FormHelperText error>{errors.duplicateMarks}</FormHelperText>
                 )}
               </MDBox>
             )}
@@ -496,13 +580,18 @@ function CreateQuiz() {
                   label="Total Questions *"
                   fullWidth
                   value={totalQuestions}
-                  onChange={(e) => setTotalQuestions(e.target.value)}
+                  onChange={(e) => {
+                    // Prevent negative values
+                    const value = parseInt(e.target.value) < 0 ? "0" : e.target.value;
+                    setTotalQuestions(value);
+                  }}
                   error={!!errors.totalQuestions}
                   helperText={errors.totalQuestions}
                   disabled={
                     (quizType === "manual" && selectedQuestions.length > 0) || 
                     (quizType === "auto" && markBreakdown.every(entry => entry.mark && entry.count))
                   }
+                  inputProps={{ min: "0" }}  // HTML5 validation
                 />
               </MDBox>
               
@@ -512,13 +601,18 @@ function CreateQuiz() {
                   label="Total Marks *"
                   fullWidth
                   value={totalMarks}
-                  onChange={(e) => setTotalMarks(e.target.value)}
+                  onChange={(e) => {
+                    // Prevent negative values
+                    const value = parseInt(e.target.value) < 0 ? "0" : e.target.value;
+                    setTotalMarks(value);
+                  }}
                   error={!!errors.totalMarks}
                   helperText={errors.totalMarks}
                   disabled={
                     (quizType === "manual" && selectedQuestions.length > 0) || 
                     (quizType === "auto" && markBreakdown.every(entry => entry.mark && entry.count))
                   }
+                  inputProps={{ min: "0" }}  // HTML5 validation
                 />
               </MDBox>
               

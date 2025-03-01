@@ -160,7 +160,7 @@ if (loading || error) {
 >
   {timeLeft > 0 ? `Time Left: ${formatTime(timeLeft)}` : "⏳ SOP Completed"}
 </Typography>
-    <MDButton variant="contained" color="primary" onClick={() => navigate("/document-listing")}>
+    <MDButton variant="contained" color="primary" onClick={() => navigate("/trainingListing")}>
       Go Back
     </MDButton>
   </Toolbar>

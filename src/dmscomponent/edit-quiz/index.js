@@ -30,12 +30,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { FormControl, InputLabel } from "@mui/material";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useFetchTrainingsQuery } from "apilms/trainingApi";
+import { useGetTrainingQuizzesQuery } from "apilms/quizapi";
 
 function EditQuiz() {
   const location = useLocation();
   const { quiz } = location.state || {};
   const navigate = useNavigate();
-  
+  // const {refetch} = useFetchTrainingsQuery()
+  const {refetch}= useGetTrainingQuizzesQuery(quiz.document)
+  // console.log(quiz)
   // Form state
   const [quizName, setQuizName] = useState("");
   const [quizTime, setQuizTime] = useState("");
@@ -172,14 +176,100 @@ function EditQuiz() {
   };
 
   // Handle adding a new mark breakdown entry
+  // const handleAddMarkBreakdown = () => {
+  //   setMarkBreakdown([...markBreakdown, { mark: "", count: "" }]);
+  // };
   const handleAddMarkBreakdown = () => {
+    // First, check if any mark values are already fully utilized
+    const availableMarkValues = new Set();
+    const usedQuestionCounts = {};
+    
+    // Calculate which mark values are currently being used
+    markBreakdown.forEach(entry => {
+      if (entry.mark && entry.count) {
+        usedQuestionCounts[entry.mark] = (usedQuestionCounts[entry.mark] || 0) + parseInt(entry.count);
+      }
+    });
+    
+    // Determine which mark values still have available questions
+    availableQuestions.forEach(question => {
+      const mark = question.marks.toString();
+      const totalAvailable = availableQuestions.filter(q => q.marks.toString() === mark).length;
+      const totalUsed = usedQuestionCounts[mark] || 0;
+      
+      if (totalAvailable > totalUsed) {
+        availableMarkValues.add(mark);
+      }
+    });
+    
+    // If there are no mark values with available questions, show an error
+    if (availableMarkValues.size === 0) {
+      toast.warning("You've used all available questions in your mark breakdown.");
+      return;
+    }
+    
+    // Otherwise, add a new breakdown entry
     setMarkBreakdown([...markBreakdown, { mark: "", count: "" }]);
   };
 
   // Handle updating a mark breakdown entry
+  // const handleMarkBreakdownChange = (index, field, value) => {
+  //   const updatedBreakdown = [...markBreakdown];
+  //   updatedBreakdown[index][field] = value;
+  //   setMarkBreakdown(updatedBreakdown);
+    
+  //   // Auto-update total questions and marks if all entries are filled
+  //   if (quizType === "auto") {
+  //     const allFilled = updatedBreakdown.every(entry => 
+  //       entry.mark && entry.count
+  //     );
+      
+  //     if (allFilled) {
+  //       // Calculate total questions from breakdown
+  //       const calculatedTotalQuestions = updatedBreakdown.reduce(
+  //         (sum, entry) => sum + (parseInt(entry.count) || 0), 0
+  //       );
+        
+  //       // Calculate total marks from breakdown
+  //       const calculatedTotalMarks = updatedBreakdown.reduce(
+  //         (sum, entry) => sum + ((parseInt(entry.mark) || 0) * (parseInt(entry.count) || 0)), 0
+  //       );
+        
+  //       setTotalQuestions(calculatedTotalQuestions.toString());
+  //       setTotalMarks(calculatedTotalMarks.toString());
+  //     }
+  //   }
+  // };
   const handleMarkBreakdownChange = (index, field, value) => {
     const updatedBreakdown = [...markBreakdown];
     updatedBreakdown[index][field] = value;
+    
+    // If both mark and count are filled, validate against available questions
+    if (field === "count" && updatedBreakdown[index].mark) {
+      const mark = updatedBreakdown[index].mark;
+      const count = parseInt(value) || 0;
+      
+      // Count how many questions of this mark value are being used in other entries
+      const otherEntriesCount = updatedBreakdown.reduce((sum, entry, i) => {
+        if (i !== index && entry.mark === mark && entry.count) {
+          return sum + parseInt(entry.count);
+        }
+        return sum;
+      }, 0);
+      
+      // Count available questions of this mark value
+      const availableForMark = availableQuestions.filter(
+        q => q.marks.toString() === mark
+      ).length;
+      
+      // If trying to use more questions than available, limit the count
+      if (count + otherEntriesCount > availableForMark) {
+        const maxAllowed = Math.max(0, availableForMark - otherEntriesCount);
+        updatedBreakdown[index].count = maxAllowed.toString();
+        toast.warning(`Only ${maxAllowed} more ${mark}-mark questions available.`);
+      }
+    }
+    
     setMarkBreakdown(updatedBreakdown);
     
     // Auto-update total questions and marks if all entries are filled
@@ -356,11 +446,17 @@ function EditQuiz() {
     };
 
     try {
-      await updateQuiz(quizData).unwrap();
-      toast.success("Quiz updated successfully!");
-      
-      // Navigate back to list view
-      navigate("/trainingListing");
+      let response = await updateQuiz(quizData).unwrap();
+      if(response.status){
+        toast.success("Quiz updated successfully!");
+        // Navigate back to list view
+        refetch();
+        navigate("/trainingListing");
+      }else{
+        toast.error(response.message);
+        // navigate("/trainingListing");
+      }
+
     } catch (err) {
       toast.error(err?.data?.message || "Failed to update quiz. Please try again.");
     }
@@ -465,6 +561,7 @@ function EditQuiz() {
                         size="small"
                         value={entry.mark}
                         onChange={(e) => handleMarkBreakdownChange(index, "mark", e.target.value)}
+                        inputProps={{ min: 0 }} 
                       />
                       <TextField
                         label="Number of Questions"
@@ -472,6 +569,7 @@ function EditQuiz() {
                         size="small"
                         value={entry.count}
                         onChange={(e) => handleMarkBreakdownChange(index, "count", e.target.value)}
+                          inputProps={{ min: 0 }}
                       />
                       <IconButton
                         edge="end"

@@ -76,26 +76,30 @@ const UnderReviewDocument = () => {
   };
 
   const handleClick = (params) => {
+    console.log("Ree",params.row)
     if (!params || !params.row) {
       console.error("Invalid params object:", params);
       return; // Exit if params or row is missing
     }
-
-    const { id, document_current_status, training_required, approval_status } = params.row;
+    console.log("Params ROOWWWW",params.row)
+    const { id, document_current_status, training_required, approval_status,select_template,version } = params.row;
 
     if (
       id === undefined ||
       document_current_status === undefined ||
       training_required === undefined ||
-      approval_status === undefined
+      approval_status === undefined ||
+      select_template === undefined ||
+      version ==undefined
     ) {
       console.error("Missing data in params.row:", params.row);
       return;
     }
 
-    navigate(
-      `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}`
-    );
+    // navigate(
+    //   `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}`
+    // );
+         navigate(`/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}`)
   };
   const formatDate = (date) => {
     if (date) {
