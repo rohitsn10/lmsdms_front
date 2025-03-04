@@ -54,7 +54,7 @@ const DocumentView = () => {
   const [docEditorLoaded, setDocEditorLoaded] = useState(false);
   const [editorConfig, setEditorConfig] = useState(null);
   const { data: templateData, isError, error: apiError } = useGetTemplateQuery(id);
-  console.log("Template Hook", templateData);
+  // console.log("Template Hook", templateData);
   const [docContent, setDocContent] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const quillRef = useRef(null);
@@ -214,7 +214,8 @@ const DocumentView = () => {
       const script = document.createElement("script");
       script.src = process.env.REACT_APP_ONLYOFFICE_SCRIPT;
       // script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
-      // script.src = "http://43.204.122.158:8081/web-apps/apps/api/documents/api.js"
+      // script.src = "http://13.232.63.196:8080/web-apps/apps/api/documents/api.js"
+      console.log("Callback troubleshoot:::",editorConfig)
       script.onload = () => {
         try {
           docEditorRef.current = new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
@@ -952,7 +953,16 @@ const DocumentView = () => {
       >
         {/* import time line code  */}
         <Grid container spacing={3} justifyContent="center" alignItems="center">
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={6} lg={4}
+            sx={{
+    maxHeight: "500px", // Adjust the height as needed
+    overflowY: "auto",
+    border: "1px solid #ddd", // Optional: Just to visually separate it
+    padding: "10px",
+    backgroundColor: "#fff",
+  }}
+
+          >
             <OrdersOverview docId={id} />
           </Grid>
         </Grid>
