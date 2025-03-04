@@ -28,7 +28,6 @@ const PrintApprovalListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [openDialog, setOpenDialog] = useState(false); // Approval Dialog state
   const [selectedRequest, setSelectedRequest] = useState(null); // Selected print request data
-  console.log(selectedRequest);
   const [openPrintDialog, setOpenPrintDialog] = useState(false); // Print Document Dialog state
   const [selectedDocumentId, setSelectedDocumentId] = useState(null); // Store document id
   const [Selectedstatus, setSelectedstatus] = useState(""); // State for Parent Document selection
@@ -203,7 +202,7 @@ const PrintApprovalListing = () => {
               <IconButton
                 color={color} // Set the color dynamically based on status
                 onClick={() => handleOpenDialog(params.row)}
-                disabled={status === "Approve"} // Disable button if status is "Approve"
+                disabled={status === "Approved"} // Disable button if status is "Approve"
               >
                 <CheckCircleIcon />
               </IconButton>
@@ -213,7 +212,7 @@ const PrintApprovalListing = () => {
               onClick={() =>
                 handleOpenPrintDialog(params.row.sop_document_id, params.row.no_of_request_by_admin, params.row.approval_numbers)
               } // Open PrintDialog with document id
-              disabled={params.row.status !== "Approve"} // Disable button if status is not "Approve"
+              disabled={params.row.status !== "Approved"} // Disable button if status is not "Approve"
             >
               <LocalPrintshopTwoToneIcon />
             </IconButton>

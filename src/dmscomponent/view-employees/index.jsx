@@ -18,37 +18,37 @@ function ViewEmployeeStatus() {
   const [selectedUser, setSelectedUser] = useState(null); // State for storing the selected user data
 
   // Function to render tick (green) and cross (red) icons
-  const renderStatusIcon = (params) =>{
-    return(
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        marginTop: "14px",
-      }}
-    >
-      {params.value ? (
-        <CheckCircleIcon style={{ color: "green", width: "22px", height: "22px" }} />
-      ) : (
-        <CancelIcon
-          style={{
-            color: "red",
-            width: "22px",
-            height: "22px",
-            cursor: groupId === 8 ? "pointer" : "not-allowed", // Change cursor style based on groupId
-          }}
-          onClick={() => {
-            if (groupId === 8 && params?.field =="is_induction_complete"
-            ) {
-              handleOpenDialog(params.row); // Open the dialog when groupId is 8
-            }
-          }}
-        />
-      )}
-    </div>
-  )};
+  const renderStatusIcon = (params) => {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          marginTop: "14px",
+        }}
+      >
+        {params.value ? (
+          <CheckCircleIcon style={{ color: "green", width: "22px", height: "22px" }} />
+        ) : (
+          <CancelIcon
+            style={{
+              color: "red",
+              width: "22px",
+              height: "22px",
+              cursor: groupId === 8 ? "pointer" : "not-allowed", // Change cursor style based on groupId
+            }}
+            onClick={() => {
+              if (groupId === 8 && params?.field == "is_induction_complete") {
+                handleOpenDialog(params.row); // Open the dialog when groupId is 8
+              }
+            }}
+          />
+        )}
+      </div>
+    );
+  };
 
   // Function to open the dialog and set the selected user
   const handleOpenDialog = (userData) => {
@@ -90,9 +90,8 @@ function ViewEmployeeStatus() {
       width: 160,
       renderCell: renderStatusIcon,
     },
-    { field: "is_jr_assign", headerName: "JR Assign", width: 100, renderCell: renderStatusIcon },
     { field: "is_jr_approve", headerName: "JD Approval", width: 110, renderCell: renderStatusIcon },
-    
+    { field: "is_jr_assign", headerName: "JR Assign", width: 100, renderCell: renderStatusIcon },
     {
       field: "is_tni_generate",
       headerName: "Document Reading",

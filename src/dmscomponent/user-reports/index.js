@@ -53,7 +53,7 @@ const UserReports = () => {
     }
   
     if (trainingNeedData?.status) {
-      toast.success(trainingNeedData.message || "Report generated successfully!"); // Show API message
+      toast.success(trainingNeedData.message || "Report generated successfully!"); 
       downloadPDF(trainingNeedData.data, "Employee_Training_Need_Report.pdf");
     } else {
       toast.error(trainingNeedData?.message || "Failed to generate training need report.");
@@ -69,14 +69,12 @@ const UserReports = () => {
     }
   
     if (jobRoleData?.status) {
-      toast.success(jobRoleData.message || "Report generated successfully!"); // Show API message
+      toast.success(jobRoleData.message || "Report generated successfully!"); 
       downloadPDF(jobRoleData.data, "Employee_Job_Role_Report.pdf");
     } else {
       toast.error(jobRoleData?.message || "Failed to generate job role report.");
     }
   };
-  
-  // Helper function to download the PDF
   const downloadPDF = (fileUrl, fileName) => {
     if (!fileUrl) {
       toast.error("File URL is missing.");
@@ -84,8 +82,8 @@ const UserReports = () => {
     }
   
     fetch(fileUrl, { method: "HEAD" })
-      .then((response) => {
-        if (response.ok) {
+      .then((response) => { 
+        if (response.status) {
           const link = document.createElement("a");
           link.href = fileUrl;
           link.download = fileName;
