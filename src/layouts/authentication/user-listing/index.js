@@ -18,7 +18,10 @@ import JobDescriptionDialog from "./job- description";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import TaskDescriptionDialog from "./approve-description";
 import DownloadIcon from "@mui/icons-material/Download";
-import { useCreateInductionCertificateMutation,useGetTrainingCompletionCertificateMutation } from "apilms/workflowapi";
+import {
+  useCreateInductionCertificateMutation,
+  useGetTrainingCompletionCertificateMutation,
+} from "apilms/workflowapi";
 import { toast } from "react-toastify";
 import Visibilityicon from "@mui/icons-material/Visibility";
 import SOPDialog from "./Document-listView";
@@ -56,6 +59,7 @@ const UsersListing = () => {
         is_department_assigned: item.is_department_assigned || false,
         is_description: item.is_description || false,
         is_jr_approve: item.is_jr_approve || false,
+        is_induction_complete:item.is_induction_complete
       }))
     : [];
 
@@ -125,7 +129,6 @@ const UsersListing = () => {
   };
   const handleDownloadTrainingCertificate = async (user) => {
     try {
-    
       const response = await downloadTrainingCertificate(user.id).unwrap();
       if (response?.data) {
         const fileUrl = response.data; // Extract the certificate URL from the API response
@@ -210,11 +213,16 @@ const UsersListing = () => {
       ? [
           {
             field: "download_ic",
-            headerName: "Download IC",
+            headerName: "IC Download",
             flex: 0.5,
             headerAlign: "center",
-            renderCell: (params) => (
-              <IconButton color="info" onClick={() => handleDownloadICClick(params.row)}>
+            renderCell: (params) => 
+              (
+              <IconButton
+                color="info"
+                onClick={() => handleDownloadICClick(params.row)}
+                disabled={!params.row.is_induction_complete}
+              >
                 <DownloadIcon />
               </IconButton>
             ),
@@ -242,7 +250,7 @@ const UsersListing = () => {
             renderCell: (params) => (
               <IconButton
                 color="info"
-                onClick={() => handleDownloadTrainingCertificate(params.row)} 
+                onClick={() => handleDownloadTrainingCertificate(params.row)}
               >
                 <DownloadIcon />
               </IconButton>
