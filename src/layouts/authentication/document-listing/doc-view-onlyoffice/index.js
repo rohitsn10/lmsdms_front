@@ -92,13 +92,17 @@ const DocumentPreviewComponent = () => {
               customization: {
                 autosave: false,
                 forcesave: false,
+                review:{
+                  showReviewChanges: true,
+                  trackChanges: true,
+                },
                 features: {
                   forcesave: false,
                   autosave: false,
                 },
                 saveButton: false,
-                showReviewChanges: false,
-                trackChanges: false,
+                showReviewChanges: true,
+                trackChanges: true,
                 chat: false,
                 comments: true,
                 zoom: 100,
