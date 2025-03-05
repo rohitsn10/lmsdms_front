@@ -52,7 +52,7 @@ const DocumentListing = () => {
   const [updateObsoleteStatus] = useUpdateObsoleteStatusMutation();
   const [openDialog, setOpenDialog] = useState(false);
   const [openviewDialog, setOpenviewDialog] = useState(false);
-
+  console.log("data in document list",data)
   const [documentEffective, { isLoading: isEffecting, isError: isEffectError }] =
     useDocumentEffectiveMutation();
   const version = searchParams.get("version");
@@ -377,16 +377,15 @@ const DocumentListing = () => {
                   <EditCalendarIcon />
                 </IconButton>
               )}
-          {data?.userGroupIds?.includes(5) && ( // Hide CheckCircleIcon when status is 7
+          {groupId===5 && ( 
             <IconButton
               color="success"
               onClick={() => handleDialogOpen(params.row)}
-              disabled={params.row.document_current_status !== 9} // Disable if condition not met
+              disabled={params.row.document_current_status !== 9} 
             >
               <CheckCircleIcon />
             </IconButton>
           )}
-
           {/* {params.row.document_current_status === 7 && ( // Show ImportContactsTwoToneIcon when status is 7
             <IconButton
               color="warning"

@@ -36,9 +36,7 @@ import RemarkDialog from "./remark";
 import SelectUserDialog from "./user-select";
 import { Button, AppBar, Toolbar, Typography, CircularProgress } from "@mui/material";
 import { useAddPathUrlDataForCommentsMutation } from "api/auth/editDocumentApi";
-import DeleteIcon from "@mui/icons-material/Delete";
-
-// Import AuthContext
+import ViewUserDialog from "./view-user";
 import { AuthContext } from "context/auth-context";
 import { useDocTimeLineQuery } from "api/auth/timeLineApi";
 
@@ -114,33 +112,19 @@ const DocumentView = () => {
   const [remark, setRemark] = useState(""); // Store entered remark
   // const [action, setAction] = useState(""); // To store the action like "submit", "approve", etc.
   const [openuserDialog, setOpenuserDialog] = useState(false);
+  const [openviewuserDialog, setopenviewuserDialog] = useState(false);
   const [approver, setApprover] = useState("");
   const [reviewer, setReviewer] = useState([]);
   const [docAdmin, setDocAdmin] = useState("");
   const [docComments, setDocComments] = useState([]);
   const [cacheDocument, setCacheDocument] = useState("");
   const [docCurrentComment, setDocCurrentComment] = useState("");
-
-  // const docCommentsRef = useRef("");
   const docCommentsRef = useRef([]);
-
   const { user, setValue } = useContext(AuthContext);
-  // console.log("User Data",user?.email)
-  // console.log("User ID",user?.id)
-  // console.log("User ID",user?.id)
-  // console.log("User ID",user?.first_name)
-  // console.log("Department IDD:", user?.department);
   const handleSaveDraftDocument = (cacheUrl) => {
     // console.log("Console Comment", docCommentsRef.current);
   };
-
-  // console.log("-+-+-+-+-+-+-+-+-+-+-++--++--+", docAdmin);
-  // Extract userGroupIds directly from documentsData
   const userGroupIds = documentsData?.userGroupIds || [];
-  // console.log("Extracted User Group IDs:", userGroupIds);
-  // console.log(data)
-  // setDocID(data?.id)
-  // Visibility function using extracted userGroupIds
   const isButtonVisible = (requiredGroupIds) => {
     console.log(
       "Checking visibility for groups:",
@@ -458,7 +442,14 @@ const DocumentView = () => {
 
   const handleSubmit = () => {
     setAction("submit");
-    setOpenuserDialog(true);
+  
+    if (document_current_status == 8) {
+      setopenviewuserDialog(true);
+      console.log("1")
+    } else {
+      setOpenuserDialog(true);
+      console.log("2")
+    }
   };
 
   const handleReview = () => {
@@ -781,8 +772,6 @@ const DocumentView = () => {
     setOpenRemarkDialog(true);
   };
   const handleConfirmSelection = (selectedUsers) => {
-    console.log("Selected Users:", selectedUsers);
-    // Store selected users in state
     setApprover(selectedUsers.approver);
     setReviewer(selectedUsers.reviewer);
     setDocAdmin(selectedUsers.docAdmin);
@@ -790,7 +779,18 @@ const DocumentView = () => {
     setOpenuserDialog(false); // Close the SelectUserDialog
     setOpenRemarkDialog(true); // Now open the RemarkDialog
   };
+  const handleviewuserCloseDialog = () => {
+    setopenviewuserDialog(false);
+    setOpenRemarkDialog(true);
+  };
+  const handleConfirmViewSelection = (selectedUsers) => {
+    setApprover(selectedUsers.approver);
+    setReviewer(selectedUsers.reviewer);
+    setDocAdmin(selectedUsers.docAdmin);
 
+    setopenviewuserDialog(false);
+    setOpenRemarkDialog(true);
+  };
   return (
     <MDBox
       sx={{
@@ -994,6 +994,12 @@ const DocumentView = () => {
         open={openuserDialog}
         onClose={handleuserCloseDialog}
         onConfirm={handleConfirmSelection}
+      />
+      <ViewUserDialog
+      open={openviewuserDialog}
+      onClose={handleviewuserCloseDialog}
+      onConfirm={handleConfirmViewSelection}
+      documentId={id}
       />
       {/* <ConditionalDialog
         open={dialogeffectiveOpen}
