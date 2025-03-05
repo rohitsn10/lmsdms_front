@@ -212,6 +212,12 @@ export const documentApi = createApi({
       }),
       transformResponse: (response) => response,  
     }),
+    fetchSendbackData: builder.query({
+      query: (documentId) => ({
+        url: `dms_module/get_sendbackdata?document_id=${documentId}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -235,4 +241,5 @@ export const {
   useDocumentEffectiveMutation,
   useFetchDocumentVersionListQuery,
   useSelectedUserGetQuery,
+  useFetchSendbackDataQuery
 } = documentApi;

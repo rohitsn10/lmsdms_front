@@ -81,7 +81,7 @@ const OrdersOverview = ({ docId }) => {
       addItem(data.send_back_actions, "Send Back Actions", <HourglassTopIcon />, "error");
 
       // Sort timeline items by date in descending order (latest first)
-      timelineItems.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+      timelineItems.sort((a, b) =>  new Date(a.dateTime) - new Date(b.dateTime));
 
       setTimelineData(timelineItems);
     }

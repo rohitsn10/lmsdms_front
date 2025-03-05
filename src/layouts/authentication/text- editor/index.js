@@ -1,14 +1,8 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import Quill from "quill";
 import "quill/dist/quill.snow.css";
-import ImageResize from "quill-image-resize-module-react";
-import Mammoth from "mammoth";
 import { Document, Packer, Paragraph } from "docx";
 import { saveAs } from "file-saver";
 import { useParams } from "react-router-dom";
-import ReactDOM from "react-dom";
-import CommentBankIcon from "@mui/icons-material/CommentBank";
-import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 import { Box, IconButton, Paper, TextareaAutosize, TextField } from "@mui/material";
 import MDBox from "components/MDBox";
@@ -39,22 +33,36 @@ import { useAddPathUrlDataForCommentsMutation } from "api/auth/editDocumentApi";
 import ViewUserDialog from "./view-user";
 import { AuthContext } from "context/auth-context";
 import { useDocTimeLineQuery } from "api/auth/timeLineApi";
+import { useFetchSendbackDataQuery } from "api/auth/documentApi";
 
 const DocumentView = () => {
   const { id } = useParams();
+  const {data:reviewerData ,refetch:reviewerRefetch} = useFetchSendbackDataQuery(id);
+  const { user, setValue } = useContext(AuthContext);
+  const currentUserID = user.id; 
+  const sendBackRequests = reviewerData?.send_back_requests || [];
+
+  const isUserSendBack = sendBackRequests.some(
+    (request) => request.user_id == currentUserID && request.is_send_back
+  );
+  const shouldShowSendBackButton = !isUserSendBack;
+  useEffect(()=>{
+    reviewerRefetch()
+  },[reviewerRefetch])
+  // console.log("Reviewer Data",reviewerData);
   const [loading, setLoading] = useState(true);
   const docEditorRef = useRef(null);
   const [addPathUrlDataForComments, { isLoading: isAddingComment }] =
     useAddPathUrlDataForCommentsMutation();
   const { refetch } = useDocTimeLineQuery(id);
-  const [saving, setSaving] = useState(false);
+  // const [saving, setSaving] = useState(false);
   const [Error1, setError] = useState(null);
   const [docEditorLoaded, setDocEditorLoaded] = useState(false);
   const [editorConfig, setEditorConfig] = useState(null);
   const { data: templateData, isError, error: apiError } = useGetTemplateQuery(id);
   // console.log("Template Hook", templateData);
-  const [docContent, setDocContent] = useState("");
-  const [isLoaded, setIsLoaded] = useState(false);
+  // const [docContent, setDocContent] = useState("");
+  // const [isLoaded, setIsLoaded] = useState(false);
   const quillRef = useRef(null);
   // console.log("Template Data",templateData)
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -86,25 +94,11 @@ const DocumentView = () => {
     setIsSaved(true);
     handleDownloadFeature(); // Existing save function
   };
-
-  // const [dialogeffectiveOpen, setDialogeffectiveOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog visibility
   const [assignedTo, setAssignedTo] = useState(""); // State for Assigned To dropdown
   const [statusSendBack, setStatusSendBack] = useState(""); // State for Status Send Back dropdown
-  // console.log("Navigated with data in text Editor :", { id, document_current_status });
-  // console.log("Training Required:", trainingRequired)
-  const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
-  // const documentFilter = documentsData?.documents?.find(doc => doc.id === id);
-  // console.log("DocXXXXXXXXXXXXXXXX",documentFilter);
-  // if (isDocumentsLoading) {
-  //   console.log("Loading documents...");
-  // } else {
-  //   console.log("Documents RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR:", documentsData);
-  //   const documentFilter = documentsData?.documents?.find(doc => doc.id == id);
-  //   console.log("DocXXXXXXXXXXXXXXXX",documentFilter);
-  // }
 
-  // console.log("Document datatat",documentsData);
+  const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
   const [randomNumber] = useState(Math.floor(Math.random() * 100000));
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [action, setAction] = useState("");
@@ -116,14 +110,14 @@ const DocumentView = () => {
   const [approver, setApprover] = useState("");
   const [reviewer, setReviewer] = useState([]);
   const [docAdmin, setDocAdmin] = useState("");
-  const [docComments, setDocComments] = useState([]);
+  // const [docComments, setDocComments] = useState([]);
   const [cacheDocument, setCacheDocument] = useState("");
-  const [docCurrentComment, setDocCurrentComment] = useState("");
+  // const [docCurrentComment, setDocCurrentComment] = useState("");
   const docCommentsRef = useRef([]);
-  const { user, setValue } = useContext(AuthContext);
-  const handleSaveDraftDocument = (cacheUrl) => {
-    // console.log("Console Comment", docCommentsRef.current);
-  };
+
+  // console.log("User====>",user.id);
+
+
   const userGroupIds = documentsData?.userGroupIds || [];
   const isButtonVisible = (requiredGroupIds) => {
     // console.log(
@@ -246,31 +240,13 @@ const DocumentView = () => {
             },
             events: {
               onDocumentStateChange: (event) => {},
-              //   onAppReady: async() => {
-
-              //     // Store the editor instance globally
-              //     // window.docEditor = docEditorRef.current;
-              //     // console.log("Window Editor is ready");
-              //     // console.log("WIndow Editor log:",window.docEditor.openDocument())
-              //     window.docEditor = docEditorRef.current;
-
-              //     // console.log("ONLYOFFICE Editor is Ready");
-              //     // const editorInstance = window.docEditor;
-              //     // const document = editorInstance.getDocument();
-              //     // console.log("Document Data:",document)
-              //     // console.log("Document Data:XXXXXXXXXXXXXXXXXXXXXXXXXXX",editorInstance )
-
-              // },
               onAppReady: async () => {
                 window.docEditor = docEditorRef.current;
                 // console.log("ONLYOFFICE Editor is Ready");
                 // console.log("Editor Config:", docEditorRef.current.config); // Log the entire config
 
                 try {
-                  // const editorInstance = window.docEditor;
-                  // const headerData = "await fetchHeaderData();";
-                  // console.log("Inserting Header Data:", headerData);
-                  // editorInstance.insertText(`Header Data: ${headerData?.company_name}`, "CompanyName");
+                 
                 } catch (error) {
                   console.error("Error inserting header:", error);
                 }
@@ -281,7 +257,6 @@ const DocumentView = () => {
               },
               onDownloadAs: async (response) => {
                 try {
-                  // console.log("Download response:", response);
                   const cacheUrl = response?.data?.url;
                   setCacheDocument(cacheUrl);
                   const newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
@@ -318,7 +293,6 @@ const DocumentView = () => {
             },
             token: editorConfig.token, // Pass the authentication token
           });
-          // console.log("ONLYOFFICE editor initialized with watermark");
         } catch (initError) {
           setError("Failed to initialize ONLYOFFICE editor");
           // console.error(initError);
@@ -678,36 +652,10 @@ const DocumentView = () => {
     }
   };
 
-  // const handleDialogConfirm = async () => {
-  //   setDialogeffectiveOpen(false); // Close the dialog after confirmation
-
-  //   console.log("Doc Admin Approve clicked - Confirmed");
-  //   try {
-  //     const response = await documentDocadminStatus({
-  //       document_id: id, // Replace with your actual document_id
-  //       status: "6", // Replace with your desired status
-  //     }).unwrap();
-  //     navigate("/document-listing");
-  //     console.log("API Response:", response);
-  //     if (response.status) {
-  //       alert(response.message); // Success message
-  //     } else {
-  //       alert("Action failed");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error calling API:", error);
-  //     alert("An error occurred. Please try again.");
-  //   }
-  // };
-
   const handleDialogOpen = () => {
     // console.log("Doc Admin Approve clicked - Confirmed");
     setDialogeffectiveOpen(true); // Open the dialog
   };
-
-  // const handleDialogClose = () => {
-  //   setDialogeffectiveOpen(false); // Close the dialog
-  // };
 
   const handleConfirmSave = async () => {
     const content = quillRef.current.root.innerHTML;
@@ -857,6 +805,8 @@ const DocumentView = () => {
                 >
                   Review
                 </MDButton>
+
+                {shouldShowSendBackButton && (
                 <MDButton
                   variant="gradient"
                   color="error" // Change color to indicate sending back
@@ -864,7 +814,7 @@ const DocumentView = () => {
                   disabled={isLoading || !isSaved}
                 >
                   Send Back
-                </MDButton>
+                </MDButton>)}
               </>
             )}
           {/* Condition 3: Show Approve button when status is "4" */}
