@@ -85,6 +85,7 @@ const ReviseApprovalList = () => {
     requestedDate: new Date(doc.revision_created_at).toLocaleDateString(),
     reviseStatus: doc.status,
     revisereason: doc.revise_description,
+    document_current_status_name: doc.document_current_status_name,
   }));
 
   // Filter data based on the search term
@@ -100,7 +101,7 @@ const ReviseApprovalList = () => {
     { field: "documentType", headerName: "Document Type", flex: 1, headerAlign: "center" },
     { field: "requestedUser", headerName: "Requested User", flex: 1, headerAlign: "center" },
     { field: "requestedDate", headerName: "Requested Date", flex: 1, headerAlign: "center" },
-    { field: "status", headerName: "Revise Status", flex: 1, headerAlign: "center" },
+    { field: "document_current_status_name", headerName: "Status", flex: 1, headerAlign: "center" },
     {
       field: "action",
       headerName: "Action",
