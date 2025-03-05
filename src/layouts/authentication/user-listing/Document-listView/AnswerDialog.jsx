@@ -81,8 +81,8 @@ const NoDataMessage = () => (
 
 const AnswerDialog = ({ open, onClose, userId, documentId }) => {
   const { data, isLoading, isError } = useUserIdWiseResultQuery({ userId, documentId });
-  console.log(userId,documentId)
-  console.log("DADADADDA",data)
+  // console.log(userId,documentId)
+  // console.log("DADADADDA",data)
   // Handle missing userId or documentId
   if (!userId || !documentId) {
     return (

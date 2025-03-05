@@ -6,7 +6,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { usePrintConvertPdfMutation } from "api/auth/printApi";
 
-const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumber }) => {
+const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumber, document_status }) => {
   const [pdfLink, setPdfLink] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [printCount, setPrintCount] = useState(0);
@@ -21,52 +21,80 @@ const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumbe
   const fetchPdf = async () => {
     setIsLoading(true);
     try {
-      const response = await printConvertPdf(id).unwrap();
-      if (response.status) {
+      const response = await printConvertPdf({
+        sop_document_id: id,
+        approval_numbers: printNumber,
+        document_status: document_status,
+      }).unwrap();
+  
+      if (response && response.pdf_link) {
         setPdfLink(response.pdf_link);
       } else {
-        console.error("Error fetching PDF:", response.message);
+        console.error("Error fetching PDF: No file link received");
+        alert("Failed to retrieve PDF link");
       }
     } catch (err) {
       console.error("Error fetching PDF:", err);
+      alert("Error fetching PDF document");
     }
     setIsLoading(false);
   };
-
+  
   const handlePrint = () => {
     if (!pdfLink || printCount >= noOfRequestByAdmin) {
       alert("Print limit reached or PDF not available!");
       return;
     }
+  
+    try {
+      // Attempt multiple print strategies
+      const printWindow = window.open(pdfLink, '_blank');
+      
+      if (printWindow) {
+        printWindow.addEventListener('load', () => {
+          try {
+            printWindow.print();
+            setPrintCount((prev) => prev + 1);
+          } catch (printError) {
+            console.error("Print error in window:", printError);
+            fallbackPrintMethod();
+          }
+        });
+      } else {
+        alert("Popup blocked! Please allow popups to print the document.");
+        fallbackPrintMethod();
+      }
+    } catch (error) {
+      console.error("Print attempt failed:", error);
+      fallbackPrintMethod();
+    }
+  };
 
-    const printId = printNumber[printCount]; // Get unique print number
-    const printWindow = window.open(pdfLink, "_blank", "width=800,height=600");
-
-    printWindow.document.write(`
-      <html>
-        <head>
-          <style>
-            @media print {
-              body::before {
-                content: "Print ID: ${printId}";
-                position: fixed;
-                top: 10px;
-                right: 10px;
-                font-size: 14px;
-                color: red;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <iframe src="${pdfLink}" width="100%" height="100%"></iframe>
-        </body>
-      </html>
-    `);
-
-    printWindow.document.close();
-    setTimeout(() => printWindow.print(), 1000);
-    setPrintCount((prev) => prev + 1);
+  const fallbackPrintMethod = () => {
+    // Alternative print method using iframe
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.top = '-9999px';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.src = pdfLink;
+    
+    iframe.onload = () => {
+      try {
+        iframe.contentWindow.print();
+        setPrintCount((prev) => prev + 1);
+      } catch (error) {
+        console.error("Fallback print method error:", error);
+        alert("Unable to print document. Please check browser settings.");
+      }
+      
+      // Clean up iframe after a delay
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    };
+    
+    document.body.appendChild(iframe);
   };
 
   return (
@@ -76,7 +104,6 @@ const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumbe
           Print Document
         </MDTypography>
       </MDBox>
-
       <DialogContent sx={{ padding: "20px", backgroundColor: "#fafafa" }}>
         {isLoading ? (
           <MDBox sx={{ display: "flex", justifyContent: "center", padding: 2 }}>
@@ -113,6 +140,7 @@ PrintDocumentDialog.propTypes = {
   id: PropTypes.number.isRequired,
   noOfRequestByAdmin: PropTypes.number.isRequired,
   printNumber: PropTypes.array.isRequired,
+  document_status: PropTypes.string.isRequired,
 };
 
 export default PrintDocumentDialog;

@@ -24,7 +24,7 @@ const JobDescriptionDialog = ({ open, onClose, userId }) => {
 
         onClose(); // Close dialog after successful save
       } catch (error) {
-        console.error("Error creating job description:", error);
+        // console.error("Error creating job description:", error);
 
         // Show error toast notification
         toast.error("Failed to save job description. Please try again.");

@@ -31,6 +31,7 @@ const PrintApprovalListing = () => {
   const [openPrintDialog, setOpenPrintDialog] = useState(false); // Print Document Dialog state
   const [selectedDocumentId, setSelectedDocumentId] = useState(null); // Store document id
   const [Selectedstatus, setSelectedstatus] = useState(""); // State for Parent Document selection
+
   const { data: status, isError } = useViewStatusQuery();
   const {
     data: printRequests,
@@ -95,12 +96,13 @@ const PrintApprovalListing = () => {
       window.open(fileUrl, "_blank"); // Open the file URL in a new tab to download
     }
   };
-  const handleOpenPrintDialog = (documentId, noOfRequestByAdmin, approvalNumbers) => {
+  const handleOpenPrintDialog = (documentId, noOfRequestByAdmin, approvalNumbers, document_status) => {
     setSelectedDocumentId(documentId); // Store the document id
     setSelectedRequest((prevRequest) => ({
       ...prevRequest,
       no_of_request_by_admin: noOfRequestByAdmin,
       approval_numbers: approvalNumbers, // Ensure approval_numbers is set
+      document_status: document_status,
     }));
     setOpenPrintDialog(true); // Open the print document dialog
   };
@@ -169,7 +171,7 @@ const PrintApprovalListing = () => {
       headerName: "Approve Date",
       flex: 0.75,
       headerAlign: "center",
-      renderCell: (params) => params.row.Approve ?? "-",
+      renderCell: (params) => params.row.approved_date ? moment(params.row.created_at).format("DD/MM/YY") : "-",
     },
     {
       field: "first_name",
@@ -210,7 +212,7 @@ const PrintApprovalListing = () => {
             <IconButton
               color="primary" // Static color for the print icon
               onClick={() =>
-                handleOpenPrintDialog(params.row.sop_document_id, params.row.no_of_request_by_admin, params.row.approval_numbers)
+                handleOpenPrintDialog(params.row.sop_document_id, params.row.no_of_request_by_admin, params.row.approval_numbers,params.row.document_status)
               } // Open PrintDialog with document id
               disabled={params.row.status !== "Approved"} // Disable button if status is not "Approve"
             >
@@ -331,6 +333,7 @@ const PrintApprovalListing = () => {
           id={selectedDocumentId}
           noOfRequestByAdmin={selectedRequest?.no_of_request_by_admin}
           printNumber={selectedRequest?.approval_numbers}
+          document_status={selectedRequest?.document_status}
         />
       )}
     </MDBox>

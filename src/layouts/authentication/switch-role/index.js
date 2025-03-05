@@ -70,7 +70,7 @@ function RoleSwitchPopup({ open, handleClose, token, groupOptions }) {
         {message && <div className="success-message">{message}</div>}
         {error && <div className="error-message">{error}</div>}
       </DialogContent>
-      <DialogActions>
+      <DialogActions> 
         <Button onClick={handleClose} color="secondary">
           Cancel
         </Button>

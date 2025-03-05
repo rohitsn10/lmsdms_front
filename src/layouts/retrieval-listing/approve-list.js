@@ -16,7 +16,7 @@ const ApprovedRetrievalListingDialog = ({ open, handleClose, selectedId }) => {
   // Use the API hook to fetch the print retrieval data
   const { data, error, isLoading } = useGetPrintRetrivalQuery(selectedId);
 
-  console.log("==========================in Approveal :::::",selectedId);
+  // console.log("==========================in Approveal :::::",selectedId);
 
   // Columns for DataGrid
   const columns = [

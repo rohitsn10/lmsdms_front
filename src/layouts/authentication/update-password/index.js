@@ -30,7 +30,7 @@ function UpdatePassword() {
     e.preventDefault();
     try {
       const response = await resetPassword({ oldPassword }); // Check for expected API payload format
-      console.log("API response:", response); // Debugging line to check the response
+      // console.log("API response:", response); // Debugging line to check the response
   
       if (response.data?.status) {
         setStep(2); // Move to OTP verification step
@@ -38,7 +38,7 @@ function UpdatePassword() {
         setErrorMessage(response.data?.message || "Old password is incorrect!"); // Show specific message
       }
     } catch (error) {
-      console.error("Error:", error); // Log any error details
+      // console.error("Error:", error); // Log any error details
       setErrorMessage("Failed to verify old password.");
     }
   };

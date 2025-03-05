@@ -55,7 +55,7 @@ function EditDocumentType() {
         navigate("/document-typelisting"); // Navigate after success
       }, 1500);
     } catch (error) {
-      console.error("Error updating document type:", error);
+      // console.error("Error updating document type:", error);
       toast.error("Failed to update document type. Please try again.");
     }
   };

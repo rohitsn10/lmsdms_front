@@ -614,7 +614,7 @@ const DocumentView = () => {
     setOpenRemarkDialog(true);
   };
   const handleConfirmSelection = (selectedUsers) => {
-    console.log("Selected Users:", selectedUsers);
+    // console.log("Selected Users:", selectedUsers);
     // Store selected users in state
     setApprover(selectedUsers.approver);
     setReviewer(selectedUsers.reviewer);
