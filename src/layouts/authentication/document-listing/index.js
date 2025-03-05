@@ -372,7 +372,9 @@ const DocumentListing = () => {
                 </IconButton>
               )
             : hasPermission(userPermissions, "document", "isView") &&
-              params.row.current_status_name !== "Release" && !(groupId === 3 && params.row.current_status_name === "Under Approver") && ( // Hide if status is "Approve"
+              params.row.current_status_name !== "Release" && 
+              !(groupId === 3 && params.row.current_status_name == "Under Approver" || params.row.current_status_name == "Effective" ) &&
+               ( // Hide if status is "Approve"
                 <IconButton color="inherit" onClick={() => handleClick(params)}>
                   <EditCalendarIcon />
                 </IconButton>
