@@ -43,27 +43,26 @@ const TimelineDot = styled("div")(({ theme, color }) => ({
 const OrdersOverview = ({ docId }) => {
   const { data, isLoading, error } = useDocTimeLineQuery(docId);
   const [timelineData, setTimelineData] = useState([]);
+
   useEffect(() => {
     if (data) {
-      const timelineItems = [];
+      let timelineItems = [];
 
       const addItem = (actions, title, icon, color) => {
         if (actions.length > 0) {
           actions.forEach((action) => {
-            // Format the date and time
-            const formattedDate = new Date(action.created_at).toLocaleString('en-GB', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false,
-            });
-
             timelineItems.push({
               title,
-              notes: action.remarks_reviewer || action.remarks_author || action.remarks_approver || "No remarks available", // Display remarks_reviewer if available
-              dateTime: formattedDate, // Use the formatted date
+              notes: action.remarks_sendback || action.remarks_reviewer || action.remarks_author || action.remarks_approver || "No remarks available", 
+              dateTime: action.created_at, // Keep original format for sorting
+              formattedDate: new Date(action.created_at).toLocaleString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              }),
               icon,
               color,
             });
@@ -79,17 +78,11 @@ const OrdersOverview = ({ docId }) => {
       addItem(data.effective_actions, "Effective Actions", <CheckCircleOutlineIcon />, "success");
       addItem(data.revision_actions, "Revision Actions", <CheckCircleOutlineIcon />, "success");
       addItem(data.revision_requests, "Revision Requests", <ErrorOutlineIcon />, "success");
+      addItem(data.send_back_actions, "Send Back Actions", <HourglassTopIcon />, "error");
 
-      data.send_back_actions.forEach(() => {
-        timelineItems.push({
-          title: "Send Back Actions",
-          notes: "This action was sent back for review.",
-          dateTime: "Unknown",
-          icon: <HourglassTopIcon />,
-          color: "error",
-        });
-      });
-      console.log("DaDADA",data)
+      // Sort timeline items by date in descending order (latest first)
+      timelineItems.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+
       setTimelineData(timelineItems);
     }
   }, [data]);
@@ -118,6 +111,7 @@ const OrdersOverview = ({ docId }) => {
       </Card>
     );
   }
+
   return (
     <Card sx={{ height: "100%", overflow: "auto" }}>
       <MDBox pt={3} px={3}>
@@ -139,9 +133,8 @@ const OrdersOverview = ({ docId }) => {
                     {item.notes}
                   </MDTypography>
                   <MDTypography variant="caption" color="textSecondary">
-                    {item.dateTime}
+                    {item.formattedDate}
                   </MDTypography>
-
                 </CardContent>
               </Card>
             </TimelineItem>

@@ -846,7 +846,7 @@ const DocumentView = () => {
               </>
             )}
           {/* Condition 2: Show Review button when status is "3" */}
-          {(document_current_status === "3" || document_current_status === "2") &&
+          {(document_current_status === "3" || document_current_status === "2" || document_current_status === "8") &&
             isButtonVisible([3]) && (
               <>
                 <MDButton
