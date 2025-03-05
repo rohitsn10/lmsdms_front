@@ -11,7 +11,7 @@ const CommentDrawer = ({ onEditCommentClick, handleSaveEdit, documentId }) => {
 
   // Fetch comments filtered by documentId
   const { data, isLoading, isError } = useViewCommentsQuery(documentId);
-  console.log("Document id:", documentId);
+  // console.log("Document id:", documentId);
 
   const startEditing = (id, currentText) => {
     setEditingId(id);
@@ -26,7 +26,7 @@ const CommentDrawer = ({ onEditCommentClick, handleSaveEdit, documentId }) => {
 
   // Parse comments from the API response
   const comments = data?.data || [];
-  console.log("Fetched Comments:", data);
+  // console.log("Fetched Comments:", data);
 
   return (
     <Box

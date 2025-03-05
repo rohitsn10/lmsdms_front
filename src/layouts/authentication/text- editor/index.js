@@ -126,12 +126,12 @@ const DocumentView = () => {
   };
   const userGroupIds = documentsData?.userGroupIds || [];
   const isButtonVisible = (requiredGroupIds) => {
-    console.log(
-      "Checking visibility for groups:",
-      requiredGroupIds,
-      "against user groups:",
-      userGroupIds
-    );
+    // console.log(
+    //   "Checking visibility for groups:",
+    //   requiredGroupIds,
+    //   "against user groups:",
+    //   userGroupIds
+    // );
     return requiredGroupIds.some((id) => userGroupIds.includes(id));
   };
 
@@ -144,7 +144,7 @@ const DocumentView = () => {
       return;
     }
 
-    console.log("Template Data:", templateData);
+    // console.log("Template Data:", templateData);
     // console.log("Template URL:", templateData?.template_url);
 
     if (templateData) {
@@ -175,7 +175,7 @@ const DocumentView = () => {
           setDocEditorLoaded(true);
         } catch (fetchError) {
           setError("Failed to fetch ONLYOFFICE configuration");
-          console.error(fetchError);
+          // console.error(fetchError);
         } finally {
           setLoading(false);
         }
@@ -189,7 +189,7 @@ const DocumentView = () => {
     return () => {
       setEditorConfig(null);
       setDocEditorLoaded(false);
-      console.log("Cleanup: Resetting editor config");
+      // console.log("Cleanup: Resetting editor config");
     };
   }, [isLoading, isError, templateData, apiError]);
 
@@ -199,7 +199,7 @@ const DocumentView = () => {
       script.src = process.env.REACT_APP_ONLYOFFICE_SCRIPT;
       // script.src = "http://127.0.0.1/web-apps/apps/api/documents/api.js"; // ONLYOFFICE API script URL
       // script.src = "http://13.232.63.196:8080/web-apps/apps/api/documents/api.js"
-      console.log("Callback troubleshoot:::",editorConfig)
+      // console.log("Callback troubleshoot:::",editorConfig)
       script.onload = () => {
         try {
           docEditorRef.current = new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
@@ -263,8 +263,8 @@ const DocumentView = () => {
               // },
               onAppReady: async () => {
                 window.docEditor = docEditorRef.current;
-                console.log("ONLYOFFICE Editor is Ready");
-                console.log("Editor Config:", docEditorRef.current.config); // Log the entire config
+                // console.log("ONLYOFFICE Editor is Ready");
+                // console.log("Editor Config:", docEditorRef.current.config); // Log the entire config
 
                 try {
                   // const editorInstance = window.docEditor;
@@ -311,17 +311,17 @@ const DocumentView = () => {
 
                   return true; // Allow the normal download to proceed
                 } catch (error) {
-                  console.error("Error saving document:", error);
+                  // console.error("Error saving document:", error);
                   return true;
                 }
               },
             },
             token: editorConfig.token, // Pass the authentication token
           });
-          console.log("ONLYOFFICE editor initialized with watermark");
+          // console.log("ONLYOFFICE editor initialized with watermark");
         } catch (initError) {
           setError("Failed to initialize ONLYOFFICE editor");
-          console.error(initError);
+          // console.error(initError);
         }
       };
       script.onerror = () => {
@@ -333,11 +333,11 @@ const DocumentView = () => {
         if (docEditorRef.current) {
           docEditorRef.current.destroyEditor(); // Destroy the ONLYOFFICE instance
           docEditorRef.current = null;
-          console.log("Cleanup: ONLYOFFICE editor destroyed");
+          // console.log("Cleanup: ONLYOFFICE editor destroyed");
         }
 
         document.body.removeChild(script); // Remove script tag
-        console.log("Cleanup: ONLYOFFICE script removed");
+        // console.log("Cleanup: ONLYOFFICE script removed");
       };
     }
   }, [docEditorLoaded, editorConfig]);
@@ -377,7 +377,7 @@ const DocumentView = () => {
     // Close RemarkDialog and open E-Signature dialog
     setOpenRemarkDialog(false);
     setRemark(remark);
-    console.log("-+-+-+-+-+-+-+-+-++-+-+-+--+-+", remark);
+    // console.log("-+-+-+-+-+-+-+-+-++-+-+-+--+-+", remark);
     // Now proceed to E-Signature dialog
     setOpenSignatureDialog(true);
   };
@@ -406,7 +406,7 @@ const DocumentView = () => {
             approver,
             doc_admin: docAdmin,
           }).unwrap();
-          console.log("");
+         
           toast.success("Document Submitted!");
           break;
         case "review":
@@ -430,7 +430,7 @@ const DocumentView = () => {
         navigate("/document-listing");
       }, 2000);
     } catch (error) {
-      console.error("API Error:", error);
+      // console.error("API Error:", error);
       toast.error("Failed to process the action. Please try again.");
     }
   };
@@ -445,10 +445,10 @@ const DocumentView = () => {
   
     if (document_current_status == 8) {
       setopenviewuserDialog(true);
-      console.log("1")
+     
     } else {
       setOpenuserDialog(true);
-      console.log("2")
+     
     }
   };
 
@@ -524,7 +524,7 @@ const DocumentView = () => {
   };
 
   const handlePrint = () => {
-    console.log("Id passed:", id);
+   
     navigate(`/print-document/${id}`);
   };
 
@@ -644,7 +644,7 @@ const DocumentView = () => {
         remark: remark, // Include the remark field
       }).unwrap();
   
-      console.log("API Response:", response);
+     
       if (response.status) {
         toast.success("Document Sent Back Successfully!");
         setTimeout(() => {
@@ -654,7 +654,7 @@ const DocumentView = () => {
         alert("Action failed. Please try again."); // Failure alert
       }
     } catch (error) {
-      console.error("Error calling API:", error);
+      // console.error("Error calling API:", error);
       toast.error("Failed to Send Back. Please try again.");
     }
   };
@@ -663,9 +663,9 @@ const DocumentView = () => {
 
   const handleDownloadFeature = async () => {
     try {
-      console.log("Hit Featureeeeeeeeee ---------->");
+      // console.log("Hit Featureeeeeeeeee ---------->");
       if (docEditorRef.current) {
-        console.log("Debug 1");
+     
 
         docEditorRef.current.downloadAs("docx", async (blobUrl) => {
           // console.log("Blob URL:", blobUrl);
@@ -701,7 +701,7 @@ const DocumentView = () => {
   // };
 
   const handleDialogOpen = () => {
-    console.log("Doc Admin Approve clicked - Confirmed");
+    // console.log("Doc Admin Approve clicked - Confirmed");
     setDialogeffectiveOpen(true); // Open the dialog
   };
 
@@ -728,7 +728,7 @@ const DocumentView = () => {
         comment.id === id ? { ...comment, comment: newComment } : comment
       )
     );
-    console.log("Edit comment clicked");
+    // console.log("Edit comment clicked");
   };
 
   const handleSaveEdit = (id, newComment) => {

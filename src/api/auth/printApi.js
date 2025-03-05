@@ -52,13 +52,18 @@ export const printApi = createApi({
       }),
       transformResponse: (response) => response, // Handle raw response
     }),
-    printConvertPdf: builder.mutation({
-      query: (sop_document_id) => ({
+    printConvertPdf: builder.mutation({ 
+      query: ({ sop_document_id, approval_numbers, document_status }) => ({ 
         url: `dms_module/print_convert_pdf/${sop_document_id}`,
-        method: 'PUT',
+        method: "PUT",
+        body: { 
+          approval_numbers, 
+          document_status 
+        },
       }),
       transformResponse: (response) => response,
     }),
+    
   }),
 });
 
