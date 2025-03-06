@@ -417,7 +417,7 @@ const DocumentListing = () => {
                 },
               });
             }}
-            disabled={params.row.document_current_status !== 9}
+            // disabled={params.row.document_current_status !== 9}
           >
             <BrowserUpdatedOutlinedIcon />
           </IconButton>

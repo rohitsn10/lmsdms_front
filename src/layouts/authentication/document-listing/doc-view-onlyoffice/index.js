@@ -92,13 +92,12 @@ const DocumentPreviewComponent = () => {
               customization: {
                 autosave: false,
                 forcesave: false,
-                review:{
-                  showReviewChanges: true,
-                  trackChanges: true,
+                review: {
+                  trackChanges: true,        // Enable track changes
+                  showReviewChanges: true,   // Show review changes panel
                 },
                 features: {
-                  forcesave: false,
-                  autosave: false,
+                  trackChanges: true         // Make sure track changes feature is enabled
                 },
                 saveButton: false,
                 showReviewChanges: true,
@@ -109,7 +108,7 @@ const DocumentPreviewComponent = () => {
                 compactHeader: false,
                 leftMenu: true,
                 rightMenu: false,
-                toolbar: false,
+                toolbar: true,
                 statusBar: false,
                 autosaveMessage: false,
                 forcesaveMessage: false,

@@ -53,6 +53,7 @@ const OrdersOverview = ({ docId }) => {
           actions.forEach((action) => {
             timelineItems.push({
               title,
+              name: action?.name,
               notes: action.remarks_sendback || action.remarks_reviewer || action.remarks_author || action.remarks_approver || "No remarks available", 
               dateTime: action.created_at, // Keep original format for sorting
               formattedDate: new Date(action.created_at).toLocaleString('en-GB', {
@@ -81,7 +82,7 @@ const OrdersOverview = ({ docId }) => {
       addItem(data.send_back_actions, "Send Back Actions", <HourglassTopIcon />, "error");
 
       // Sort timeline items by date in descending order (latest first)
-      timelineItems.sort((a, b) =>  new Date(a.dateTime) - new Date(b.dateTime));
+      timelineItems.sort((a, b) =>  new Date(b.dateTime) - new Date(a.dateTime));
 
       setTimelineData(timelineItems);
     }
@@ -126,14 +127,14 @@ const OrdersOverview = ({ docId }) => {
               <TimelineDot color={item.color}>{item.icon}</TimelineDot>
               <Card sx={{ flexGrow: 1, ml: 3, backgroundColor: "#f9f9f9" }}>
                 <CardContent>
-                  <MDTypography variant="h6" fontWeight="bold">
-                    {item.title}
-                  </MDTypography>
+                <MDTypography variant="h6" fontWeight="bold">
+  {item?.title} - {item?.name?.toUpperCase()} {/* Display the name */}
+</MDTypography>
                   <MDTypography variant="body2" color="textSecondary">
-                    {item.notes}
+                    {item?.notes}
                   </MDTypography>
                   <MDTypography variant="caption" color="textSecondary">
-                    {item.formattedDate}
+                    {item?.formattedDate}
                   </MDTypography>
                 </CardContent>
               </Card>
