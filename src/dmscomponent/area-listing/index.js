@@ -9,17 +9,26 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { useGetAreaQuery } from "apilms/AreaApi";  // Import the correct hook
-
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { useAuth } from "hooks/use-auth";
+import { hasPermission } from "utils/hasPermission"; 
 import moment from "moment"; // To format the date
 
 const AreaListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
+  const { user, role } = useAuth();
+  const group = user?.user_permissions?.group || {};
+    const groupId = group.id;
+   
+    const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+      skip: !groupId, 
+    });
+  
   // Fetching area data
   const { data: response, isLoading, isError, refetch } = useGetAreaQuery();
 
-  useEffect(() => {
+  useEffect(() => { 
     refetch();
   }, []);
   const areas = response?.data || [];
@@ -51,7 +60,22 @@ const AreaListing = () => {
     { field: "department", headerName: "Department", flex: 1, headerAlign: "center" },
     { field: "area_description", headerName: "Area Description", flex: 1.5, headerAlign: "center" },
     { field: "date", headerName: "Date", flex: 1, headerAlign: "center" },
-    {
+    // {
+    //   field: "action",
+    //   headerName: "Action",
+    //   flex: 0.5,
+    //   headerAlign: "center",
+    //   renderCell: (params) => (
+    //      hasPermission(userPermissions, "area", "isChange") ? (
+    //     <IconButton color="primary" onClick={() => handleEditArea(params.row)}>
+    //       <EditIcon />
+    //     </IconButton>
+    //      ): null
+    //   ),
+    // },
+  ];
+  if (hasPermission(userPermissions, "area", "isChange")) {
+    columns.push({
       field: "action",
       headerName: "Action",
       flex: 0.5,
@@ -61,8 +85,8 @@ const AreaListing = () => {
           <EditIcon />
         </IconButton>
       ),
-    },
-  ];
+    });
+  }
 
   // Handle loading and error states
   if (isLoading) {
@@ -85,9 +109,11 @@ const AreaListing = () => {
             value={searchTerm}
             onChange={handleSearch}
           />
+          
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Area Listing
           </MDTypography>
+            {hasPermission(userPermissions, "area", "isAdd") && (
           <MDButton
             variant="contained"
             color="primary"
@@ -96,6 +122,7 @@ const AreaListing = () => {
           >
             Add Area
           </MDButton>
+            )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>

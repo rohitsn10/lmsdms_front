@@ -71,41 +71,55 @@ const PrintRetrievalListing = () => {
         }))
     : [];
 
-  const columns = [
-    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-    { field: "document_title", headerName: "Document Title", flex: 1, headerAlign: "center" },
-    { field: "no_of_print", headerName: "Copies Requested", flex: 1, headerAlign: "center" },
-    { field: "no_of_request_by_admin", headerName: "Copies Approved", flex: 0.5, headerAlign: "center" },
-    { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
-    {
-      field: "Approve",
-      headerName: "Approve Date",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => moment(params.row.created_at).format("DD/MM/YYYY") ?? "-",
-    },
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 0.5,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <MDBox display="flex" gap={1}>
-          {hasPermission(userPermissions, "retrivalnumber", "isChange") && (
-            <IconButton color="primary" onClick={() => handleDialogOpen(params.row)}>
-              <AssignmentReturnIcon />
-            </IconButton>
-          )}
-          {hasPermission(userPermissions, "retrivalnumber", "isView") && (
-            <IconButton color="info" onClick={() => handleApprovedDialogOpen(params.row)}>
-              <ArticleRoundedIcon />
-            </IconButton>
-          )}
-        </MDBox>
-      ),
-    },
-  ];
-
+    const columns = [
+      { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
+      { field: "document_title", headerName: "Document Title", flex: 1, headerAlign: "center" },
+      { field: "no_of_print", headerName: "Copies Requested", flex: 0.7, headerAlign: "center" },
+      { field: "no_of_request_by_admin", headerName: "Copies Approved", flex: 0.7, headerAlign: "center" },
+      { field: "status", headerName: "Status", flex: 0.6, headerAlign: "center" },
+      {
+        field: "Approve",
+        headerName: "Approve Date",
+        flex: 1,
+        headerAlign: "center",
+        renderCell: (params) => moment(params.row.created_at).format("DD/MM/YYYY") ?? "-",
+      },
+      
+      // Column for the "Assign Return" IconButton
+      ...(hasPermission(userPermissions, "retrivalnumber", "isAdd")
+        ? [
+            {
+              field: "assign_return",
+              headerName: "Retrieval",
+              flex: 0.5,
+              headerAlign: "center",
+              renderCell: (params) => (
+                <IconButton color="primary" onClick={() => handleDialogOpen(params.row)}>
+                  <AssignmentReturnIcon />
+                </IconButton>
+              ),
+            },
+          ]
+        : []), // If no permission, this column won't appear
+      
+      // Column for the "Article Rounded" IconButton
+      ...(hasPermission(userPermissions, "retrivalnumber", "isView")
+        ? [
+            {
+              field: "article_rounded",
+              headerName: "Article",
+              flex: 0.5,
+              headerAlign: "center",
+              renderCell: (params) => (
+                <IconButton color="info" onClick={() => handleApprovedDialogOpen(params.row)}>
+                  <ArticleRoundedIcon />
+                </IconButton>
+              ),
+            },
+          ]
+        : []), // If no permission, this column won't appear
+    ];
+    
   if (isLoading) return <div>Loading...</div>;
   if (error || permissionError) return <div>Error loading data or permissions.</div>;
 

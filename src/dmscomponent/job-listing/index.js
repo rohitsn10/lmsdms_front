@@ -9,14 +9,21 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { useGetJobRoleQuery } from "apilms/jobRoleApi"; // Import the correct hook
-
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { useAuth } from "hooks/use-auth";
+import { hasPermission } from "utils/hasPermission"; 
 import moment from "moment"; // To format the date
 
 const JobroleListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
-  // Fetching job role data
+  const { user, role } = useAuth();
+  const group = user?.user_permissions?.group || {};
+    const groupId = group.id;
+   
+    const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+      skip: !groupId, 
+    });
   const { data: response, isLoading, isError, refetch } = useGetJobRoleQuery();
 
   useEffect(() => {
@@ -62,9 +69,12 @@ const JobroleListing = () => {
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
-        <IconButton color="primary" onClick={() => handleEditJobrole(params.row)}>
+        hasPermission(userPermissions, "jobrole", "isChange") ? (
+
+       <IconButton color="primary" onClick={() => handleEditJobrole(params.row)}>
           <EditIcon />
         </IconButton>
+        ) : null
       ),
     },
   ];
@@ -92,6 +102,8 @@ const JobroleListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Job Role Listing
           </MDTypography>
+          {hasPermission(userPermissions, "jobrole", "isAdd") && (
+
           <MDButton
             variant="contained"
             color="primary"
@@ -100,6 +112,7 @@ const JobroleListing = () => {
           >
             Add Job Role
           </MDButton>
+          )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>

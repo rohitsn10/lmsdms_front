@@ -11,7 +11,7 @@ import MDButton from "components/MDButton";
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 import { useAuth } from "hooks/use-auth";
-import { hasPermission } from "utils/hasPermission";
+import { hasPermission } from "utils/hasPermission"; 
 import moment from "moment";  
 
 const DepartmentListing = () => {

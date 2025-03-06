@@ -180,49 +180,65 @@ const PrintApprovalListing = () => {
       headerAlign: "center",
       renderCell: (params) => params.row.first_name ?? "-",
     },
+    // Conditionally add the "Approval" column based on permission
+    ...(hasPermission(userPermissions, "printrequestapproval", "isChange")
+      ? [
+          {
+            field: "check_icon",
+            headerName: "Approval",
+            flex: 0.5,
+            headerAlign: "center",
+            renderCell: (params) => {
+              const status = params.row.status;
+              let color = "default";
+  
+              if (status === "Approve") {
+                color = "success"; // Green for approved
+              } else if (status === "Reject") {
+                color = "error"; // Red for rejected
+              } else {
+                color = "success"; // Default
+              }
+  
+              return (
+                <IconButton
+                  color={color}
+                  onClick={() => handleOpenDialog(params.row)}
+                  disabled={status === "Approved"}
+                >
+                  <CheckCircleIcon />
+                </IconButton>
+              );
+            },
+          },
+        ]
+      : []), // If permission is not granted, do not add this column
     {
       field: "action",
-      headerName: "Action",
-      flex: 1,
+      headerName: "Print",
+      flex: 0.75,
       headerAlign: "center",
-      renderCell: (params) => {
-        const status = params.row.status;
-        let color;
-
-        // Set the button color based on status
-        if (status === "Approve") {
-          color = "success"; // Green color for approved
-        } else if (status === "Reject") {
-          color = "error"; // Red color for rejected
-        } else {
-          color = "success"; // Default color (blue) for null or other statuses
-        }
-
-        return (
-          <MDBox display="flex" gap={1} justifyContent="center" alignItems="center">
-            {hasPermission(userPermissions, "printrequestapproval", "isChange") && (
-              <IconButton
-                color={color} // Set the color dynamically based on status
-                onClick={() => handleOpenDialog(params.row)}
-                disabled={status === "Approved"} // Disable button if status is "Approve"
-              >
-                <CheckCircleIcon />
-              </IconButton>
-            )}
-            <IconButton
-              color="primary" // Static color for the print icon
-              onClick={() =>
-                handleOpenPrintDialog(params.row.sop_document_id, params.row.no_of_request_by_admin, params.row.approval_numbers,params.row.document_status)
-              } // Open PrintDialog with document id
-              disabled={params.row.status !== "Approved"} // Disable button if status is not "Approve"
-            >
-              <LocalPrintshopTwoToneIcon />
-            </IconButton>
-          </MDBox>
-        );
-      },
+      renderCell: (params) => (
+        <MDBox display="flex" gap={1} justifyContent="center" alignItems="center">
+          <IconButton
+            color="primary"
+            onClick={() =>
+              handleOpenPrintDialog(
+                params.row.sop_document_id,
+                params.row.no_of_request_by_admin,
+                params.row.approval_numbers,
+                params.row.document_status
+              )
+            }
+            disabled={params.row.status !== "Approved"}
+          >
+            <LocalPrintshopTwoToneIcon />
+          </IconButton>
+        </MDBox>
+      ),
     },
   ];
+
   return (
     <MDBox p={3}>
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>

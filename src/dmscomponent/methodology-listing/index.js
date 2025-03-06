@@ -10,12 +10,21 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import moment from "moment";
 import { useFetchMethodologiesQuery } from 'apilms/MethodologyApi'; // Import the hook
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { useAuth } from "hooks/use-auth";
+import { hasPermission } from "utils/hasPermission"; 
 
 const MethodologyListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
-  // Using the API hook to fetch methodologies
+  const { user, role } = useAuth();
+  const group = user?.user_permissions?.group || {};
+    const groupId = group.id;
+   
+    const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+      skip: !groupId, 
+    });
+  
   const { data, error, isLoading,refetch } = useFetchMethodologiesQuery();
 
    useEffect(() => {
@@ -51,7 +60,29 @@ const MethodologyListing = () => {
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "methodology_name", headerName: "Methodology Name", flex: 1, headerAlign: "center" },
     { field: "created_at", headerName: "Created Date", flex: 1, headerAlign: "center" },
-    {
+    // {
+    //   field: "action",
+    //   headerName: "Action",
+    //   flex: 0.5,
+    //   headerAlign: "center",
+    //   renderCell: (params) => (
+    //     hasPermission(userPermissions, "methodology", "isChange") ? (
+    //     <MDBox display="flex" gap={1}>
+    //       <IconButton
+    //         color="primary"
+    //         onClick={() => handleEditMethodology(params.row)} // Pass the methodology ID
+    //       >
+    //         <EditIcon />
+    //       </IconButton>
+    //     </MDBox>
+    //       ) : null
+    //   ),
+    //   sortable: false,
+    //   filterable: false,
+    // },
+  ];
+  if (hasPermission(userPermissions, "methodology", "isChange")) {
+    columns.push({
       field: "action",
       headerName: "Action",
       flex: 0.5,
@@ -68,8 +99,9 @@ const MethodologyListing = () => {
       ),
       sortable: false,
       filterable: false,
-    },
-  ];
+    });
+  }
+
 
   // Handle loading and error states
   if (isLoading) {
@@ -90,11 +122,12 @@ const MethodologyListing = () => {
             size="small"
             sx={{ width: "250px", mr: 2 }}
             value={searchTerm}
-            onChange={handleSearch}
+            onChange={handleSearch} 
           />
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Methodology Listing
           </MDTypography>
+          {hasPermission(userPermissions, "methodology", "isAdd") && (
           <MDButton
             variant="contained"
             color="primary"
@@ -103,6 +136,7 @@ const MethodologyListing = () => {
           >
             Add Methodology
           </MDButton>
+          )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>

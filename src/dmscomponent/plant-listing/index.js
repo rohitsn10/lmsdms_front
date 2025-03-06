@@ -11,11 +11,20 @@ import MDButton from "components/MDButton";
 import { useGetPlantQuery } from "apilms/plantApi";
 import moment from "moment";
 import { date } from "yup";
-
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { useAuth } from "hooks/use-auth";
+import { hasPermission } from "utils/hasPermission"; 
 const PlantListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
+  const { user, role } = useAuth();
+  const group = user?.user_permissions?.group || {};
+    const groupId = group.id;
+   
+    const { data: userPermissions = [], isError: permissionError } = useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+      skip: !groupId, 
+    });
+  
   // Fetching plant data
   const { data: response, isLoading, isError,refetch } = useGetPlantQuery();
 
@@ -57,18 +66,34 @@ const PlantListing = () => {
     { field: "plant_location", headerName: "Plant Location", flex: 1, headerAlign: "center" },
     { field: "plant_description", headerName: "Plant Description", flex: 1.5, headerAlign: "center" },
     { field: "date", headerName: "Date", flex: 1, headerAlign: "center" },
-    {
+    // {
+    //   field: "action",
+    //   headerName: "Action",
+    //   flex: 0.5,
+    //   headerAlign: "center",
+    //   renderCell: (params) => (
+    //       hasPermission(userPermissions, "plant", "isChange") ? (
+    //     <IconButton color="primary" onClick={() => handleEditPlant(params.row)}>
+    //       <EditIcon />
+    //     </IconButton>
+    //       ): null
+    //   ),
+    // },
+  ];
+  if (hasPermission(userPermissions, "plant", "isChange")) {
+    columns.push({
       field: "action",
       headerName: "Action",
       flex: 0.5,
       headerAlign: "center",
       renderCell: (params) => (
+         
         <IconButton color="primary" onClick={() => handleEditPlant(params.row)}>
           <EditIcon />
         </IconButton>
       ),
-    },
-  ];
+    });
+  }
 
   // Handle loading and error states
   if (isLoading) {
@@ -94,6 +119,8 @@ const PlantListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Plant Listing
           </MDTypography>
+          {hasPermission(userPermissions, "plant", "isAdd") && (
+
           <MDButton
             variant="contained"
             color="primary"
@@ -102,6 +129,7 @@ const PlantListing = () => {
           >
             Add Plant
           </MDButton>
+           )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>
