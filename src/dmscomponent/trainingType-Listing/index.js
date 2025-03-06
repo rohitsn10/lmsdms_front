@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -10,18 +10,27 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import moment from "moment";
 import { useFetchTrainingTypesQuery } from "apilms/trainingtypeApi"; // Import the API hook
-
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { useAuth } from "hooks/use-auth";
+import { hasPermission } from "utils/hasPermission";
 const TrainingTypeListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const { user, role } = useAuth();
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
 
-  // Fetch training types data using the API
-  const { data, isLoading, isError,refetch } = useFetchTrainingTypesQuery();
-  console.log(data)
+  const { data: userPermissions = [], isError: permissionError } =
+    useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+      skip: !groupId,
+    });
+
+  const { data, isLoading, isError, refetch } = useFetchTrainingTypesQuery();
+  console.log(data);
   useEffect(() => {
-      refetch();
-    }, [location.key]);
-  
+    refetch();
+  }, [location.key]);
+
   const handleAddTrainingType = () => {
     navigate("/training-type");
   };
@@ -36,9 +45,7 @@ const TrainingTypeListing = () => {
 
   // Process fetched data and apply search filter
   const filteredData = (data?.data || [])
-    .filter((item) =>
-      item.training_type_name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    .filter((item) => item.training_type_name.toLowerCase().includes(searchTerm.toLowerCase()))
     .map((item, index) => ({
       id: item.id,
       serial_number: index + 1,
@@ -52,7 +59,30 @@ const TrainingTypeListing = () => {
     { field: "training_type_name", headerName: "Training Type", flex: 1, headerAlign: "center" },
     { field: "created_by", headerName: "Created By", flex: 1, headerAlign: "center" },
     { field: "created_at", headerName: "Created Date", flex: 1, headerAlign: "center" },
-    {
+    // {
+    //   field: "action",
+    //   headerName: "Action",
+    //   flex: 0.5,
+    //   headerAlign: "center",
+    //   renderCell: (params) => (
+    //     hasPermission(userPermissions, "trainingtype", "isChange") ? (
+
+    //     <MDBox display="flex" gap={1}>
+    //       <IconButton
+    //         color="primary"
+    //         onClick={() => handleEditTrainingType(params.row)} // Pass the training type details
+    //       >
+    //         <EditIcon />
+    //       </IconButton>
+    //     </MDBox>
+    //     ):null
+    //   ),
+    //   sortable: false,
+    //   filterable: false,
+    // },
+  ];
+  if (hasPermission(userPermissions, "trainingtype", "isChange")) {
+    columns.push({
       field: "action",
       headerName: "Action",
       flex: 0.5,
@@ -69,20 +99,23 @@ const TrainingTypeListing = () => {
       ),
       sortable: false,
       filterable: false,
-    },
-  ];
-
+    });
+  }
   if (isLoading) {
     return <MDTypography variant="h6">Loading...</MDTypography>;
   }
 
   if (isError) {
-    return <MDTypography variant="h6" color="error">Failed to fetch data.</MDTypography>;
+    return (
+      <MDTypography variant="h6" color="error">
+        Failed to fetch data.
+      </MDTypography>
+    );
   }
 
   return (
     <MDBox p={3}>
-      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: 'auto', marginRight: 0 }}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search Training Type"
@@ -95,14 +128,16 @@ const TrainingTypeListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Training Type Listing
           </MDTypography>
-          <MDButton
-            variant="contained"
-            color="primary"
-            onClick={handleAddTrainingType}
-            sx={{ ml: 2 }}
-          >
-            Add Training Type
-          </MDButton>
+          {hasPermission(userPermissions, "trainingtype", "isAdd") && (
+            <MDButton
+              variant="contained"
+              color="primary"
+              onClick={handleAddTrainingType}
+              sx={{ ml: 2 }}
+            >
+              Add Training Type
+            </MDButton>
+          )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>

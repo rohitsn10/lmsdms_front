@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -10,17 +10,26 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { useGetInductionQuery } from "apilms/InductionApi";
 import moment from "moment";
-
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { useAuth } from "hooks/use-auth";
+import { hasPermission } from "utils/hasPermission";
 const InductionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   // Fetching plant data
-  const { data: response, isLoading, isError,refetch } = useGetInductionQuery();
+  const { data: response, isLoading, isError, refetch } = useGetInductionQuery();
+  const { user, role } = useAuth();
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
 
+  const { data: userPermissions = [], isError: permissionError } =
+    useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+      skip: !groupId,
+    });
   useEffect(() => {
-      refetch();
-    }, [location.key]);
+    refetch();
+  }, [location.key]);
   const inductions = response?.data || [];
 
   const handleSearch = (event) => {
@@ -32,21 +41,34 @@ const InductionListing = () => {
   };
 
   const filteredData = inductions
-    .filter(
-      (induction) =>
-        induction.induction_name.toLowerCase().includes(searchTerm.toLowerCase()) 
+    .filter((induction) =>
+      induction.induction_name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .map((induction, index) => ({
       ...induction,
       serial_number: index + 1,
-        date: moment(induction.created_at).format("DD/MM/YY"),
+      date: moment(induction.created_at).format("DD/MM/YY"),
     }));
 
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "induction_name", headerName: "Induction Name", flex: 1, headerAlign: "center" },
     { field: "date", headerName: "Date", flex: 1, headerAlign: "center" },
-      {
+    // {
+    //   field: "action",
+    //   headerName: "Action",
+    //   flex: 0.5,
+    //   headerAlign: "center",
+    //   renderCell: (params) =>
+    //     hasPermission(userPermissions, "induction", "isChange") ? (
+    //       <IconButton color="primary" onClick={() => handleEditInduction(params.row)}>
+    //         <EditIcon />
+    //       </IconButton>
+    //     ) : null,
+    // },
+  ];
+  if (hasPermission(userPermissions, "induction", "isChange")) {
+    columns.push({
       field: "action",
       headerName: "Action",
       flex: 0.5,
@@ -56,9 +78,8 @@ const InductionListing = () => {
           <EditIcon />
         </IconButton>
       ),
-    },
-  ];
-
+    });
+  }
   // Handle loading and error states
   if (isLoading) {
     return <div>Loading...</div>;
@@ -70,7 +91,7 @@ const InductionListing = () => {
 
   return (
     <MDBox p={3}>
-      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0}}>
+      <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput
             label="Search"
@@ -83,14 +104,17 @@ const InductionListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Induction Set Listing
           </MDTypography>
-          <MDButton
-            variant="contained"
-            color="primary"
-            onClick={() => navigate("/induction-training")}
-            sx={{ ml: 2 }}
-          >
-            Add Induction Set
-          </MDButton>
+
+          {hasPermission(userPermissions, "induction", "isAdd") && (
+            <MDButton
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/induction-training")}
+              sx={{ ml: 2 }}
+            >
+              Add Induction Set
+            </MDButton>
+          )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>

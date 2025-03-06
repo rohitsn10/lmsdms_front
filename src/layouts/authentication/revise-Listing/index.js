@@ -102,36 +102,46 @@ const ReviseApprovalList = () => {
     { field: "requestedUser", headerName: "Requested User", flex: 1, headerAlign: "center" },
     { field: "requestedDate", headerName: "Requested Date", flex: 1, headerAlign: "center" },
     { field: "document_current_status_name", headerName: "Status", flex: 1, headerAlign: "center" },
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => {
-        const showApproveButton = 
-          hasPermission(userPermissions, "revise", "isApprove") && 
-          params.row.reviseRequestId !== null;
-        const showReviseButton = 
-          hasPermission(userPermissions, "revise", "isChange") && 
-          params.row.reviseRequestId === null;
 
-        return (
-          <MDBox display="flex" justifyContent="center" alignItems="center" gap={1}>
-            {/* {showReviseButton && ( */}
-              <IconButton color="warning" onClick={() => handleReviseDialogOpen(params.row)}>
-                <BackHandSharpIcon />
-              </IconButton>
-            {/*  )} */}
+    // Column for Revise Button
+    ...(hasPermission(userPermissions, "documentrevisionrequestaction", "isChange")
+      ? [
+          {
+            field: "revise",
+            headerName: "Revise",
+            flex: 0.75,
+            headerAlign: "center",
+            renderCell: (params) =>
+              // params.row.reviseRequestId === null ? (
+                <IconButton color="warning" onClick={() => handleReviseDialogOpen(params.row)}>
+                  <BackHandSharpIcon />
+                </IconButton>
+              // ) : (
+              //   "-"
+              // ),
+          },
+        ]
+      : []), // Hide column if no permission
 
-            {/* {showApproveButton && ( */}
-              <IconButton color="primary" onClick={() => handleApproveDialogOpen(params.row)}>
-                <ImportContactsTwoToneIcon />
-              </IconButton>
-            {/* )} */}
-          </MDBox>
-        );
-      },
-    },
+    // Column for Approve Button
+    ...(hasPermission(userPermissions, "documentrevisionaction", "isAdd")
+      ? [
+          {
+            field: "approve",
+            headerName: "Approve",
+            flex: 0.75,
+            headerAlign: "center",
+            renderCell: (params) =>
+              // params.row.reviseRequestId !== null ? (
+                <IconButton color="primary" onClick={() => handleApproveDialogOpen(params.row)}>
+                  <ImportContactsTwoToneIcon />
+                </IconButton>
+              // ) : (
+              //   "-"
+              // ),
+          },
+        ]
+      : []), // Hide column if no permission
   ];
 
   return (
@@ -158,7 +168,7 @@ const ReviseApprovalList = () => {
           ) : (
             <div style={{ height: 500, width: "100%" }}>
               <DataGrid
-                rows={displayedData} 
+                rows={displayedData}
                 columns={columns}
                 pageSize={5}
                 rowsPerPageOptions={[5, 10, 20]}

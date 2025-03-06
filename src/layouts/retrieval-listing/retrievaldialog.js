@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
@@ -13,6 +13,8 @@ import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { useGetPrintApprovalDetailsQuery, useAddRetrivalNumbersMutation } from "api/auth/retrievalApi"; 
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import toast styles
 
 function PrintRetrievalDialog({ open, handleClose, onRetrieve, selectedId }) {
   const [selectedRetrievals, setSelectedRetrievals] = useState([]);
@@ -32,97 +34,102 @@ function PrintRetrievalDialog({ open, handleClose, onRetrieve, selectedId }) {
           retrival_numbers: selectedRetrievals,
         }).unwrap();
   
+        toast.success("Retrieval numbers submitted successfully!");
+
         onRetrieve(selectedRetrievals);
         setSelectedRetrievals([]); // Clear the dropdown
-        handleClose();
+        handleClose(); // Close the dialog
       } catch (err) {
+        toast.error("Error submitting retrieval numbers!");
         console.error("Error while submitting retrieval numbers:", err);
       }
     }
   };
-  
 
   // Extract approval numbers from the API response
   const retrievalOptions = data ? data.approval_numbers.map((item) => item.number) : [];
 
+  // Reset selectedRetrievals when the dialog is closed
+  const handleDialogClose = () => {
+    setSelectedRetrievals([]); // Reset the selected retrievals
+    handleClose(); // Call the original handleClose function passed in as a prop
+  };
+
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <MDBox sx={{ textAlign: "center" }}>
-        <MDTypography variant="h4" fontWeight="medium" color="#344767" mt={1}>
-          Print Retrieval
-        </MDTypography>
-      </MDBox>
+    <>
+      <Dialog open={open} onClose={handleDialogClose} maxWidth="sm" fullWidth>
+        <MDBox sx={{ textAlign: "center" }}>
+          <MDTypography variant="h4" fontWeight="medium" color="#344767" mt={1}>
+            Print Retrieval
+          </MDTypography>
+        </MDBox>
 
-      <form onSubmit={(e) => e.preventDefault()}>
-        <DialogContent>
-          <FormControl fullWidth margin="normal">
-            <Select
-              multiple
-              value={selectedRetrievals}
-              onChange={handleRetrievalChange}
-              displayEmpty
-              input={<OutlinedInput />}
-              renderValue={(selected) => {
-                if (selected.length === 0) {
-                  return <em>Select Retrieval Numbers</em>;
-                }
-                return selected.join(", ");
-              }}
-              variant="outlined"
-              sx={{
-                minWidth: 200,
-                height: "3rem",
-                ".MuiSelect-select": {
-                  padding: "0.75rem",
-                },
-              }}
-            >
-              <MenuItem disabled value="">
-                <em>Select Retrieval Numbers</em>
-              </MenuItem>
-              {isLoading ? (
-                <MenuItem disabled>Loading...</MenuItem>
-              ) : error ? (
-                <MenuItem disabled>Error loading data</MenuItem>
-              ) : (
-                retrievalOptions.map((option, index) => (
-                  <MenuItem key={index} value={option}>
-                    {option}
-                  </MenuItem>
-                ))
-              )}
-            </Select>
-          </FormControl>
-          {isError && (
-            <MDTypography color="error" variant="caption">
-              {submitError?.data?.message || "Failed to submit retrieval numbers"}
-            </MDTypography>
-          )}
-          {/* {isSuccess && (
-            <MDTypography color="success" variant="caption">
-              Retrieval numbers submitted successfully!
-            </MDTypography>
-          )} */}
-        </DialogContent>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <DialogContent>
+            <FormControl fullWidth margin="normal">
+              <Select
+                multiple
+                value={selectedRetrievals}
+                onChange={handleRetrievalChange}
+                displayEmpty
+                input={<OutlinedInput />}
+                renderValue={(selected) => {
+                  if (selected.length === 0) {
+                    return <em>Select Retrieval Numbers</em>;
+                  }
+                  return selected.join(", ");
+                }}
+                variant="outlined"
+                sx={{
+                  minWidth: 200,
+                  height: "3rem",
+                  ".MuiSelect-select": {
+                    padding: "0.75rem",
+                  },
+                }}
+              >
+                <MenuItem disabled value="">
+                  <em>Select Retrieval Numbers</em>
+                </MenuItem>
+                {isLoading ? (
+                  <MenuItem disabled>Loading...</MenuItem>
+                ) : error ? (
+                  <MenuItem disabled>Error loading data</MenuItem>
+                ) : (
+                  retrievalOptions.map((option, index) => (
+                    <MenuItem key={index} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))
+                )}
+              </Select>
+            </FormControl>
+            {isError && (
+              <MDTypography color="error" variant="caption">
+                {submitError?.data?.message || "Failed to submit retrieval numbers"}
+              </MDTypography>
+            )}
+          </DialogContent>
 
-        <DialogActions>
-          <MDButton onClick={handleClose} color="error" sx={{ marginRight: "10px" }}>
-            Cancel
-          </MDButton>
-          <MDBox>
-            <MDButton
-              variant="gradient"
-              color="submit"
-              fullWidth
-              onClick={handleRetrieve}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : "Submit"}
+          <DialogActions>
+            <MDButton onClick={handleDialogClose} color="error" sx={{ marginRight: "10px" }}>
+              Cancel
             </MDButton>
-          </MDBox>
-        </DialogActions>
-      </form>
-    </Dialog>
+            <MDBox>
+              <MDButton
+                variant="gradient"
+                color="submit"
+                fullWidth
+                onClick={handleRetrieve}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Submit"}
+              </MDButton>
+            </MDBox>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </>
   );
 }
 
