@@ -55,16 +55,16 @@ export const dashboardApi = createApi({
       query: ({ departmentId, startDate, endDate }) =>
         `dms_module/document_data_of_status_id_four?department_id=${departmentId}&start_date=${startDate}&end_date=${endDate}`,
       transformResponse: (response) => ({
-        rejectdata: response.data,
-        dataCountreject: response.data_count, 
+        approvedata: response.data,
+        dataCountapproved: response.data_count, 
       }),
     }),
     getDocumentDataOfStatusIdninty: builder.query({
       query: ({ departmentId, startDate, endDate }) =>
         `dms_module/document_ninty_days_data?department_id=${departmentId}&start_date=${startDate}&end_date=${endDate}`,
       transformResponse: (response) => ({
-        rejectdata: response.data,
-        dataCountreject: response.data_count, 
+        SOPdata: response.data,
+        dataCountSOP: response.data_count, 
       }),
     }),
     getDashboardDocument: builder.query({

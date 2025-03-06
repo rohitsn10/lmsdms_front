@@ -33,32 +33,7 @@ const ViewSelectionDialog = ({ open, onClose, documentId }) => {
       </MDBox>
 
       <DialogContent>
-        {/* Approver Display */}
-        <MDBox mb={3}>
-          <FormControl fullWidth margin="dense" variant="outlined" disabled>
-            <InputLabel id="view-approver-label">Approver</InputLabel>
-            <Select
-              labelId="view-approver-label"
-              id="view-approver"
-              value={approver || ""}
-              input={<OutlinedInput label="Approver" />}
-              sx={{
-                minWidth: 200,
-                height: "3rem",
-                ".MuiSelect-select": { padding: "0.45rem" },
-              }}
-              disabled
-            >
-              {approver ? (
-                <MenuItem key={approver} value={approver}>
-                  {approver}
-                </MenuItem>
-              ) : (
-                <MenuItem disabled>No approver selected</MenuItem>
-              )}
-            </Select>
-          </FormControl>
-        </MDBox>
+       
 
         {/* Reviewer Display */}
         <MDBox mb={3}> 
@@ -90,7 +65,32 @@ const ViewSelectionDialog = ({ open, onClose, documentId }) => {
             </Select>
           </FormControl>
         </MDBox>
-
+ {/* Approver Display */}
+ <MDBox mb={3}>
+          <FormControl fullWidth margin="dense" variant="outlined" disabled>
+            <InputLabel id="view-approver-label">Approver</InputLabel>
+            <Select
+              labelId="view-approver-label"
+              id="view-approver"
+              value={approver || ""}
+              input={<OutlinedInput label="Approver" />}
+              sx={{
+                minWidth: 200,
+                height: "3rem",
+                ".MuiSelect-select": { padding: "0.45rem" },
+              }}
+              disabled
+            >
+              {approver ? (
+                <MenuItem key={approver} value={approver}>
+                  {approver}
+                </MenuItem>
+              ) : (
+                <MenuItem disabled>No approver selected</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </MDBox>
         {/* Doc Admin Display */}
         <MDBox mb={3}>
           <FormControl fullWidth margin="dense" variant="outlined" disabled>

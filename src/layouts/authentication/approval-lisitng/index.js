@@ -235,7 +235,6 @@ const PrintApprovalListing = () => {
             value={searchTerm}
             onChange={handleSearch}
           />
-
           {/* Conditionally render the status dropdown based on groupId */}
           {groupId !== 5 && groupId !== 6 && (
             <FormControl fullWidth margin="dense" sx={{ width: "250px" }}>
@@ -261,7 +260,6 @@ const PrintApprovalListing = () => {
               </Select>
             </FormControl>
           )}
-
           <MDTypography
             variant="h4"
             fontWeight="medium"
@@ -269,7 +267,6 @@ const PrintApprovalListing = () => {
           >
             Print Approval Listing
           </MDTypography>
-
           <MDButton
             variant="gradient"
             color="submit"
@@ -280,7 +277,6 @@ const PrintApprovalListing = () => {
             {isExcelLoading ? "Generating Excel..." : "Generate Excel"}
           </MDButton>
         </MDBox>
-
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>
             {isLoading && (

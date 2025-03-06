@@ -60,7 +60,7 @@ const DueSOPDocument = () => {
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
 
 
-  const documents = data?.rejectdata || [];// Extract documents from the new API response
+  const documents = data?.SOPdata || [];// Extract documents from the new API response
 
   const handleDialogOpen = (row) => {
     setSelectedRow(row);

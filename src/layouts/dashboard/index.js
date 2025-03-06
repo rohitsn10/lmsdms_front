@@ -226,7 +226,7 @@ function Dashboard() {
                   color="dark"
                   icon={<TaskIcon />}
                   title="Due Sop "
-                  count={nintyData?.dataCountapprove || 0}
+                  count={nintyData?.dataCountSOP || 0}
                   percentage={{
                     color: "success",
                   }}
@@ -241,7 +241,7 @@ function Dashboard() {
                   color="success"
                   icon={<TaskIcon />}
                   title="Under Approve"
-                  count={underapproveData?.dataCountapprove || 0}
+                  count={underapproveData?.dataCountapproved || 0}
                   percentage={{
                     color: "success",
                   }}

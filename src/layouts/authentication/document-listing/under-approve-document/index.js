@@ -40,14 +40,11 @@ const UnderApproveDocument = () => {
     startDate: startDate ? moment(startDate).format("DD-MM-YYYY") : "",
     endDate: endDate ? moment(endDate).format("DD-MM-YYYY") : "",
   });
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-
   const { data: departmentData, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
-
   const { data: userPermissions = [], isError: permissionError } =
     useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
       skip: !groupId,
@@ -57,10 +54,7 @@ const UnderApproveDocument = () => {
       refetch();
     }
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
-
-
-  const documents = data?.reviewdata || [];// Extract documents from the new API response
- 
+  const documents = data?.approvedata || []; // Extract documents from the new API response
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
     setDialogOpen(true);
@@ -231,7 +225,6 @@ const UnderApproveDocument = () => {
             <EditCalendarIcon />
           </IconButton>
         </MDBox>
-
       ),
       sortable: false,
       filterable: false,
@@ -277,7 +270,11 @@ const UnderApproveDocument = () => {
             onChange={handleSearch}
           />
 
-          <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center", mr: 28 }}>
+          <MDTypography
+            variant="h4"
+            fontWeight="medium"
+            sx={{ flexGrow: 1, textAlign: "center", mr: 28 }}
+          >
             Under Approve Listing
           </MDTypography>
 

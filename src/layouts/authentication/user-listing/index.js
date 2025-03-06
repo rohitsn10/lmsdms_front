@@ -201,7 +201,7 @@ const UsersListing = () => {
               <IconButton
                 color="inherit"
                 onClick={() => handleTaskDescriptionClick(params.row)}
-                disabled={params.row.is_jr_approve || !params.row.is_jr_assign} // Enable only if JD is assigned
+                disabled={!params.row.is_description} // Enable only if JD is assigned
               >
                 <AddTaskIcon />
               </IconButton>
