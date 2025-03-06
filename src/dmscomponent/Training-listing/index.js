@@ -16,6 +16,8 @@ import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlin
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import QuizIcon from "@mui/icons-material/Quiz";
+import WarningIcon from "@mui/icons-material/Warning";
+
 const TrainingListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
@@ -25,15 +27,21 @@ const TrainingListing = () => {
   const groupId = group.id;
   // Fetch training data using the API query hook
   const { data, error, isLoading, refetch } = useFetchTrainingsQuery();
-  // console.log(user)
-  const [startAssessmentModal,setStartAssessmentModal]=useState(false);
+  
+  const [startAssessmentModal, setStartAssessmentModal] = useState(false);
+  const [failedAssessmentModal, setFailedAssessmentModal] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
 
-
-  const handleAssesmentModalClose = ()=>{
+  const handleAssesmentModalClose = () => {
     setStartAssessmentModal(false);
     setSelectedRowData(null);
-  }
+  };
+
+  const handleFailedAssessmentModalClose = () => {
+    setFailedAssessmentModal(false);
+    setSelectedRowData(null);
+  };
+
   useEffect(() => {
     refetch();
   }, [location.key]);
@@ -49,45 +57,64 @@ const TrainingListing = () => {
   const handleEditTraining = (item) => {
     navigate("/edit-training", { state: { item } });
   };
+
   const handleQuestionClick = (rowData) => {
-    // console.log("Question icon clicked for row:", rowData);
     navigate("/questions", { state: { rowData } });
-    // You can implement additional logic here, such as opening a modal, navigating to another page, etc.
   };
+
   const handleQuizClick = (DataQuiz) => {
     navigate("/quiz-list", { state: { DataQuiz } });
   };
-  const handleAssessmentClick = (rowData) => {
-    setSelectedRowData(rowData)
-    setStartAssessmentModal(true)
-    // navigate("/mcq-module", { state: { rowData } });
-  };
-  const startAssessmentClick =()=>{
-      // navigate("/mcq-module", { state: { rowData } });
-      if (selectedRowData) {
-        navigate("/mcq-module", { state: { rowData: selectedRowData } });
-        handleAssesmentModalClose();
-      }
-  }
-  const handleview = (item) => {
-    console.log("Item view:::",item)
-    const documentUrl = item;
-    if (documentUrl) {
-      console.log("Passing training_document ID:", item.docId);
-      console.log("Passing training Template :", item.templateId);
 
-      // navigate("/LMS-Document", { state: { documentView: item.selected_template_url,document_id:item.id } });
-      navigate("/training-document-view",{state:{docId:item.docId,templateId:item.templateId}})
+  const handleAssessmentClick = (rowId) => {
+    // Get the document data for the selected row
+    const document = data?.document_data?.documents.find(doc => doc.id === rowId);
+    setSelectedRowData(rowId);
+    
+    // Check if the user has a failed quiz session for this document
+    if (document && document.quiz_sessions) {
+      const userQuizSession = document.quiz_sessions.find(
+        session => session.user === user.id
+      );
+      
+      if (userQuizSession && userQuizSession.status === "Failed") {
+        // Show the failed assessment modal
+        setFailedAssessmentModal(true);
+      } else {
+        // Show the regular assessment modal
+        setStartAssessmentModal(true);
+      }
     } else {
-      // console.error("training_document is undefined or missing for this item", item);
+      // If no quiz sessions exist, show the regular assessment modal
+      setStartAssessmentModal(true);
     }
   };
+
+  const startAssessmentClick = () => {
+    if (selectedRowData) {
+      navigate("/mcq-module", { state: { rowData: selectedRowData } });
+      handleAssesmentModalClose();
+    }
+  };
+
+  const goToClassroomActivities = () => {
+    // Navigate to classroom activities page
+    navigate("/classroom-activities");
+    handleFailedAssessmentModalClose();
+  };
+
+  const handleview = (item) => {
+    const documentUrl = item;
+    if (documentUrl) {
+      navigate("/training-document-view", { state: { docId: item.docId, templateId: item.templateId } });
+    }
+  };
+
   const filteredData = (
     Array.isArray(data?.document_data?.documents) ? data.document_data?.documents : []
   )
-    .filter((item) => item.document_title.toLowerCase().includes(searchTerm.toLowerCase())) // Filter by title
+    .filter((item) => item.document_title.toLowerCase().includes(searchTerm.toLowerCase()))
     .map((item, index) => {
-      // console.log("Created at:", item.created_at); // Log the created_at field to check it
       return {
         id: item.id,
         serial_number: index + 1,
@@ -95,14 +122,15 @@ const TrainingListing = () => {
         document_type: item.document_type_name,
         document_number: item.document_number,
         version: item.version,
-        created_date: moment(item.created_at).format("DD-MM-YY"), // Format the date
+        created_date: moment(item.created_at).format("DD-MM-YY"),
         status: item.current_status_name,
-        revision_date: item.revision_month, // Revision month
-        effective_date: moment(item.created_at).format("DD-MM-YY"), // Use created_at for now
-        selected_template_url:item.selected_template_url,
-        user_view:item.user_view,
-        docId:item.id,
-        templateId:item.select_template
+        revision_date: item.revision_month,
+        effective_date: moment(item.created_at).format("DD-MM-YY"),
+        selected_template_url: item.selected_template_url,
+        user_view: item.user_view,
+        docId: item.id,
+        templateId: item.select_template,
+        quiz_sessions: item.quiz_sessions
       };
     });
 
@@ -114,7 +142,6 @@ const TrainingListing = () => {
     { field: "version", headerName: "Version", flex: 0.8, headerAlign: "center" },
     { field: "created_date", headerName: "Created Date", flex: 1, headerAlign: "center" },
     { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
-    // { field: "revision_date", headerName: "Revision Date", flex: 1, headerAlign: "center" },
     { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" },
     {
       field: "action",
@@ -123,20 +150,10 @@ const TrainingListing = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
-          {/* Edit button */}
-          {/* <IconButton
-            color="info"
-            onClick={() => handleEditTraining(params.row)} 
-          >
-            <EditIcon />
-          </IconButton> */}
           <IconButton
             color="success"
             onClick={() => {
-              console.log("params.row:", params.row); 
-              // handleview(params.row.selected_template_url);
               handleview(params.row);
-
             }}
           >
             <VisibilityIcon />
@@ -187,10 +204,8 @@ const TrainingListing = () => {
             headerAlign: "center",
             renderCell: (params) => (
               <MDBox display="flex" justifyContent="center">
-                {/* Question Icon */}
                 <IconButton color="error" onClick={() => handleQuestionClick(params.row.id)}>
-                  <QuestionAnswerOutlinedIcon />{" "}
-                  {/* Assuming you are using a Question Icon, like 'QuestionAnswerIcon' */}
+                  <QuestionAnswerOutlinedIcon />
                 </IconButton>
               </MDBox>
             ),
@@ -208,10 +223,8 @@ const TrainingListing = () => {
             headerAlign: "center",
             renderCell: (params) => (
               <MDBox display="flex" justifyContent="center">
-                {/* Question Icon */}
                 <IconButton color="secondary" onClick={() => handleQuizClick(params.row)}>
-                  <QuizIcon />{" "}
-                  {/* Assuming you are using a Question Icon, like 'QuestionAnswerIcon' */}
+                  <QuizIcon />
                 </IconButton>
               </MDBox>
             ),
@@ -225,19 +238,26 @@ const TrainingListing = () => {
       headerName: "Assessment",
       flex: 0.8,
       headerAlign: "center",
-      renderCell: (params) =>{
-        // console.log(user.id);
-        // console.log(params.row)
+      renderCell: (params) => {
         const isUserInView = params.row?.user_view?.some(view => view.user === user.id);
-        // console.log("Toggle",isUserInView)
-        return(
-        <MDBox display="flex" justifyContent="center">
-          {/* Question Icon */}
-          <IconButton disabled={!isUserInView} color="error" onClick={() => handleAssessmentClick(params.row.id)}>
-            <ChecklistIcon />{" "}
-          </IconButton>
-        </MDBox>
-      )},
+        
+        // Check if this document has a failed quiz session for the current user
+        const document = data?.document_data?.documents.find(doc => doc.id === params.row.id);
+        const userQuizSession = document?.quiz_sessions?.find(session => session.user === user.id);
+        const hasFailedStatus = userQuizSession?.status === "Failed";
+        
+        return (
+          <MDBox display="flex" justifyContent="center">
+            <IconButton 
+              disabled={!isUserInView} 
+              color={hasFailedStatus ? "warning" : "error"} 
+              onClick={() => handleAssessmentClick(params.row.id)}
+            >
+              {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
+            </IconButton>
+          </MDBox>
+        );
+      },
       sortable: false,
       filterable: false,
     },
@@ -258,9 +278,6 @@ const TrainingListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Training Listing
           </MDTypography>
-          {/* <MDButton variant="contained" color="primary" onClick={handleAddTraining} sx={{ ml: 2 }}>
-            Add Training
-          </MDButton> */}
         </MDBox>
 
         {isLoading ? (
@@ -281,7 +298,7 @@ const TrainingListing = () => {
                 rowsPerPageOptions={[5, 10, 20]}
                 disableSelectionOnClick
                 sx={{
-                  minWidth: 1500, // Ensure the minimum width allows for scrolling
+                  minWidth: 1500,
                   border: "1px solid #ddd",
                   borderRadius: "4px",
                   "& .MuiDataGrid-columnHeaders": {
@@ -302,6 +319,8 @@ const TrainingListing = () => {
           </MDBox>
         )}
       </Card>
+
+      {/* Regular Assessment Modal */}
       <Dialog
         open={startAssessmentModal}
         onClose={handleAssesmentModalClose}
@@ -313,20 +332,41 @@ const TrainingListing = () => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-              Are you Sure you want to start the assessment?
+            Are you sure you want to start the assessment?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          {/* <Button onClick={handleAssesmentModalClose}>Disagree</Button> */}
-          <Button onClick={handleAssesmentModalClose} autoFocus>
+          <Button onClick={handleAssesmentModalClose}>
             Cancel
           </Button>  
-          <Button onClick={startAssessmentClick} autoFocus>
+          <Button onClick={startAssessmentClick} autoFocus color="primary" variant="contained">
             Start Assessment
           </Button>
-          {/* <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleClose} autoFocus>
-            Agree
+        </DialogActions>
+      </Dialog>
+
+      {/* Failed Assessment Modal */}
+      <Dialog
+        open={failedAssessmentModal}
+        onClose={handleFailedAssessmentModalClose}
+        aria-labelledby="failed-assessment-dialog-title"
+        aria-describedby="failed-assessment-dialog-description"
+      >
+        <DialogTitle id="failed-assessment-dialog-title" sx={{ display: 'flex', alignItems: 'center', color: 'error.main' }}>
+          <WarningIcon color="error" sx={{ mr: 1 }} />
+          {"Assessment Failed"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="failed-assessment-dialog-description">
+            You have failed this assessment after 3 attempts. Please complete the required classroom activities before attempting again.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleFailedAssessmentModalClose}>
+            Close
+          </Button>  
+          {/* <Button onClick={goToClassroomActivities} color="primary" variant="contained" autoFocus>
+            Go to Classroom Activities
           </Button> */}
         </DialogActions>
       </Dialog>
