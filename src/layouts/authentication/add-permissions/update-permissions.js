@@ -19,7 +19,7 @@ const UpdatePermissionsTable = ({ groupId }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { role } = location.state || {};
-  console.log("Received Role:", role);
+  // console.log("Received Role:", role);
 
   const { data: permissions = [], isLoading: isPermissionsLoading, error,refetch: refetchPermissions } = useFetchPermissionsQuery();
   const { data: groupPermissions, isLoading: isGroupLoading,refetch: refetchGroupPermissions } = useFetchPermissionsByGroupIdQuery(role?.id);
@@ -278,7 +278,6 @@ const UpdatePermissionsTable = ({ groupId }) => {
           </div>
         </MDBox>
       </Card>
-      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
     </MDBox>
   );
 };

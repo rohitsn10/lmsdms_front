@@ -54,7 +54,7 @@ function Login() {
   
     try {
       const response = await groupList({ username: userId, password });
-      console.log("GroupList API Response:", response);
+      // console.log("GroupList API Response:", response);
   
       if (response && response.data && response.data.status) {
         const userFirstName = response.data.data.user_first_name;
@@ -312,35 +312,23 @@ function Login() {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button
-            sx={{
-              backgroundColor: "#ccc", 
-              color: "#fff", 
-              fontSize: "15px", 
-              borderRadius: "8px", 
-              margin: "1px 2.2vw",
-              "&:hover": {
-                backgroundColor: "black",
-              },
-            }}
+          <MDButton
+           sx={{
+            mr:2
+           }}
+            variant="gradient"
+            color="error"
             onClick={handleCloseDialog}
           >
             Cancel
-          </Button>
-          <Button
-            sx={{
-              backgroundColor: "#4CAF50", 
-              color: "#fff", 
-              fontSize: "15px",
-              borderRadius: "8px", 
-              "&:hover": {
-                backgroundColor: "#3E8E41", 
-              },
-            }}
+          </MDButton>
+          <MDButton
+            variant="gradient"
+            color="success"
             onClick={handleOk}
           >
-            Ok
-          </Button>
+            Log In
+          </MDButton>
         </DialogActions>
       </Dialog>
     </BasicLayout>
