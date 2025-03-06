@@ -8,26 +8,32 @@ import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import PropTypes from "prop-types"; 
 import { useFetchParentDocumentsQuery } from "api/auth/documentApi";
-
+import moment from "moment";
 const ChildDocumentsDialog = ({ open, onClose, documentId }) => {
   const { data, error, isLoading, refetch } = useFetchParentDocumentsQuery(documentId, {
     skip: !open, 
   });
-//   console.log("what i get in",documentId)
+
   useEffect(() => {
     if (open) {
       refetch();
     }
   }, [open, refetch]);
+
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-    { field: "document_name", headerName: "Document Name", flex: 1, headerAlign: "center" },
+    { field: "document_title", headerName: "Document Name", flex: 1, headerAlign: "center" },
+    { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
+    { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" },
+    { field: "revision_date", headerName: "Revision Date", flex: 1, headerAlign: "center" },
   ];
 
   const filteredData = data
     ? data.map((item, index) => ({
         ...item,
         serial_number: index + 1, 
+        effective_date: item.effective_date ? moment(item.effective_date).format("DD/MM/YY") : "N/A",
+        revision_date: item.revision_date ? moment(item.revision_date).format("DD/MM/YY") : "N/A",
       }))
     : [];
 
@@ -86,6 +92,7 @@ const ChildDocumentsDialog = ({ open, onClose, documentId }) => {
     </Dialog>
   );
 };
+
 ChildDocumentsDialog.propTypes = {
   open: PropTypes.bool.isRequired, 
   onClose: PropTypes.func.isRequired, 
