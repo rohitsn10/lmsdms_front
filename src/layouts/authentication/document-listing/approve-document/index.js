@@ -82,20 +82,21 @@ const ApprovedDocument = () => {
       return; // Exit if params or row is missing
     }
 
-    const { id, document_current_status, training_required, approval_status } = params.row;
+    const { id, document_current_status, training_required, approval_status,select_template } = params.row;
 
     if (
       id === undefined ||
       document_current_status === undefined ||
       training_required === undefined ||
-      approval_status === undefined
+      approval_status === undefined ||
+      select_template === undefined
     ) {
       console.error("Missing data in params.row:", params.row);
       return;
     }
 
     navigate(
-      `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}`
+      `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}&templateID=${select_template}`
     );
   };
 
@@ -162,6 +163,17 @@ const ApprovedDocument = () => {
     if (type === "end") setEndDate(date);
   };
 
+  const handleViewFile = (url, new_url, params) => {
+    // navigate("/PreView", { state: { templateDoc: url,new_url:new_url, templateData: params } }); // Pass the URL as state
+    navigate("/docviewer", {
+      state: {
+        docId: params.id, templateId: params.select_template
+      }
+    })
+    // console.log(params)
+    // console.log(params.id,params.select_template  )
+  };
+
 
   const filteredData = documents.filter(
     (doc) =>
@@ -170,6 +182,7 @@ const ApprovedDocument = () => {
       doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   const rows = filteredData.map((doc, index) => ({
     ...doc,
@@ -230,9 +243,32 @@ const ApprovedDocument = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <MDBox display="flex" justifyContent="center" gap={1}>
+          <IconButton
+            color="primary"
+            onClick={() => {
+              handleViewFile(
+                params.row.selected_template_url,
+                params.row.front_file_url,
+                params.row
+              );
+              // console.log()
+              console.log("Params", params.row)
+            }}
+          >
+            <VisibilityIcon />
+          </IconButton>
           <IconButton color="inherit" onClick={() => handleClick(params)}>
             <EditCalendarIcon />
           </IconButton>
+
+          <IconButton 
+            color="success"
+            onClick={() => handleDialogOpen(params.row)}
+            disabled={params.row.document_current_status !== 9}
+          >
+            <CheckCircleIcon />
+          </IconButton>
+
         </MDBox>
 
 
