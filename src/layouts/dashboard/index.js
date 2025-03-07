@@ -14,6 +14,7 @@ import DraftsIcon from "@mui/icons-material/Drafts";
 import TaskIcon from "@mui/icons-material/Task";
 import CancelPresentationTwoToneIcon from "@mui/icons-material/CancelPresentationTwoTone";
 import RateReviewTwoToneIcon from "@mui/icons-material/RateReviewTwoTone";
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import { Link } from "react-router-dom";
 import {
   useGetDocumentDataOfStatusIdElevenQuery,
@@ -23,6 +24,8 @@ import {
   useGetDocumentDataOfStatusIdFourQuery,
   useGetDocumentDataOfStatusIdnintyQuery,
 } from "api/auth/dashboardApi";
+import { useGetPrintRequestsQuery } from "api/auth/printApi";
+
 function Dashboard() {
   const { data, error, isLoading } = useGetDashboardCountsQuery(); // Fetch the dashboard counts
   const {
@@ -34,7 +37,13 @@ function Dashboard() {
     startDate: "",
     endDate: "",
   });
-
+  const {
+    data: printdata,
+    isLoading: loadingprint,
+    error: printError,
+  } = useGetPrintRequestsQuery({
+  });
+  console.log("-----------------------------------print dtaa ",printdata)
   const {
     data: approveData,
     isLoading: loadingApprove,
@@ -176,21 +185,6 @@ function Dashboard() {
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <Link to="/draft-document">
-                <ComplexStatisticsCard
-                  color="dark"
-                  icon={<DraftsIcon />}
-                  title="Under Draft"
-                  count={savedraftData?.dataCountsavedraft || 0}
-                  percentage={{
-                    color: "success",
-                  }}
-                />
-              </Link>
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
               <Link to="/reject-document">
                 <ComplexStatisticsCard
                   color="error"
@@ -242,6 +236,21 @@ function Dashboard() {
                   icon={<TaskIcon />}
                   title="Under Approve"
                   count={underapproveData?.dataCountapproved || 0}
+                  percentage={{
+                    color: "success",
+                  }}
+                />
+              </Link>
+            </MDBox>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <Link to="/approval-listing">
+                <ComplexStatisticsCard
+                  color="dark"
+                  icon={<PendingActionsIcon />}
+                  title="Print Approval"
+                  count={printdata?.total || 0}
                   percentage={{
                     color: "success",
                   }}

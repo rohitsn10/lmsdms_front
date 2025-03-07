@@ -26,8 +26,8 @@ import MDButton from "components/MDButton";
 
 const PrintApprovalListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [openDialog, setOpenDialog] = useState(false); // Approval Dialog state
-  const [selectedRequest, setSelectedRequest] = useState(null); // Selected print request data
+  const [openDialog, setOpenDialog] = useState(false); 
+  const [selectedRequest, setSelectedRequest] = useState(null); 
   const [openPrintDialog, setOpenPrintDialog] = useState(false); // Print Document Dialog state
   const [selectedDocumentId, setSelectedDocumentId] = useState(null); // Store document id
   const [Selectedstatus, setSelectedstatus] = useState(""); // State for Parent Document selection
@@ -58,7 +58,7 @@ const PrintApprovalListing = () => {
   // Conditionally set the Selectedstatus based on the groupId
   useEffect(() => {
     if (groupId === 5 || groupId === 6) {
-      setSelectedstatus("12"); // Set default status as "12" for groupId 5 or 6
+      setSelectedstatus("13"); // Set default status as "12" for groupId 5 or 6
     } else {
       setSelectedstatus("all"); // Set default as "all" for other groups
     }
@@ -69,17 +69,21 @@ const PrintApprovalListing = () => {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
+ console.log(printRequests)
+  const filteredData = (printRequests?.data || []) // Use printRequests.data if API includes "data" field
+  .filter((item) => {
+    const matchesSearch = item.document_title?.toLowerCase().includes(searchTerm.toLowerCase());
 
-  const filteredData = (printRequests || [])
-    .filter(
-      (item) =>
-        item.document_title && item.document_title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .reverse()
-    .map((item, index) => ({
-      ...item,
-      serial_number: index + 1,
-    }));
+    // If "all" is selected, include all statuses; otherwise, filter by Selectedstatus
+    const matchesStatus = Selectedstatus === "all" || item.status_id == Selectedstatus;
+
+    return matchesSearch && matchesStatus;
+  })
+  .reverse()
+  .map((item, index) => ({
+    ...item,
+    serial_number: index + 1,
+  }));
 
   const handleOpenDialog = (data) => {
     setSelectedRequest(data); // Store the selected request

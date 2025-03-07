@@ -32,7 +32,10 @@ export const printApi = createApi({
           status_id, // Send the selected status as a query parameter
         },
       }),
-      transformResponse: (response) => response.data, // Extract only the data part from the response
+       transformResponse: (response) => ({
+    total: response.total, // Include total count
+    data: response.data, // Extract data array
+  }), // Extract only the data part from the response
     }),
     // New print_approvals API integration
     printApprovals: builder.mutation({
