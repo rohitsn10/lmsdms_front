@@ -86,6 +86,7 @@ const ReviseApprovalList = () => {
     reviseStatus: doc.status,
     revisereason: doc.revise_description,
     document_current_status_name: doc.document_current_status_name,
+    revise_request_id: doc.revise_request_id,
   }));
 
   // Filter data based on the search term
