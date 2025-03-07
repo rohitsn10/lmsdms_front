@@ -48,7 +48,7 @@ const TaskDescriptionDialog = ({ open, onClose, userId, onSave }) => {
   };
 
   if (isDataLoading) return <div>Loading...</div>;
-  if (isDataError) return <div>Error fetching job description: {dataError?.message}</div>;
+  if (isDataError) return <div> {dataError?.message}</div>;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth sx={{ borderRadius: 2 }}>

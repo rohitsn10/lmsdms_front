@@ -25,6 +25,7 @@ import {
   useGetDocumentDataOfStatusIdnintyQuery,
 } from "api/auth/dashboardApi";
 import { useGetPrintRequestsQuery } from "api/auth/printApi";
+import { useAuth } from "hooks/use-auth";
 
 function Dashboard() {
   const { data, error, isLoading } = useGetDashboardCountsQuery(); // Fetch the dashboard counts
@@ -90,7 +91,10 @@ function Dashboard() {
     startDate: "",
     endDate: "",
   });
+  const {user}= useAuth();
+  const isDocAdmin = user?.user_permissions?.group.id;
 
+  // console.log("User CCtct",isDocAdmin)
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading dashboard data</div>;
 
@@ -243,7 +247,8 @@ function Dashboard() {
               </Link>
             </MDBox>
           </Grid>
-          <Grid item xs={12} md={6} lg={3}>
+          {isDocAdmin == 5 &&
+            <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <Link to="/approval-listing">
                 <ComplexStatisticsCard
@@ -255,16 +260,19 @@ function Dashboard() {
                     color: "success",
                   }}
                 />
-              </Link>
+              </Link> 
             </MDBox>
           </Grid>
+          }
+
+          {isDocAdmin == 5 &&
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <Link to="/approval-listing">
+              <Link to="/revise-listing">
                 <ComplexStatisticsCard
-                  color="dark"
+                  color="warning"
                   icon={<PendingActionsIcon />}
-                  title="Print Approval"
+                  title="Doc Revision Request"
                   count={printdata?.total || 0}
                   percentage={{
                     color: "success",
@@ -273,6 +281,8 @@ function Dashboard() {
               </Link>
             </MDBox>
           </Grid>
+          }
+
         </Grid>
       </MDBox>
     </DashboardLayout>
