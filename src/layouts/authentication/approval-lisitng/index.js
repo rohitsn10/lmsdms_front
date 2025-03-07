@@ -158,6 +158,13 @@ const PrintApprovalListing = () => {
       },
     },
     {
+      field: "version",
+      headerName: "Version",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => params.row.version ?? "-",
+    },
+    {
       field: "no_of_request_by_admin",
       headerName: "Approved",
       flex: 0.75,
@@ -170,6 +177,13 @@ const PrintApprovalListing = () => {
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => params.row.status ?? "-",
+    },
+    {
+      field: "no_of_retrival",
+      headerName: "Retrival",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => params.row.no_of_retrival ?? "-",
     },
     {
       field: "Approve",

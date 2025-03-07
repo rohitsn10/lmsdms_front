@@ -105,8 +105,8 @@ const ReviseApprovalList = () => {
     { field: "document_current_status_name", headerName: "Status", flex: 1, headerAlign: "center" },
 
     // Column for Revise Button
-    ...(hasPermission(userPermissions, "documentrevisionrequestaction", "isChange")
-      ? [
+    // ...(hasPermission(userPermissions, "documentrevisionrequestaction", "isChange")
+    //   ? [
           {
             field: "revise",
             headerName: "Revise",
@@ -114,15 +114,17 @@ const ReviseApprovalList = () => {
             headerAlign: "center",
             renderCell: (params) =>
               // params.row.reviseRequestId === null ? (
-                <IconButton color="warning" onClick={() => handleReviseDialogOpen(params.row)}>
+                <IconButton color="warning" onClick={() => handleReviseDialogOpen(params.row)}
+                disabled={!params.row.is_revise} 
+                >
                   <BackHandSharpIcon />
                 </IconButton>
               // ) : (
               //   "-"
               // ),
           },
-        ]
-      : []), // Hide column if no permission
+      //   ]
+      // : []), // Hide column if no permission
 
     // Column for Approve Button
     ...(hasPermission(userPermissions, "documentrevisionaction", "isAdd")
