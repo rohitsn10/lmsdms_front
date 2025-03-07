@@ -42,8 +42,8 @@ function Dashboard() {
     isLoading: loadingprint,
     error: printError,
   } = useGetPrintRequestsQuery({
+    status_id:13
   });
-  console.log("-----------------------------------print dtaa ",printdata)
   const {
     data: approveData,
     isLoading: loadingApprove,
@@ -236,6 +236,21 @@ function Dashboard() {
                   icon={<TaskIcon />}
                   title="Under Approve"
                   count={underapproveData?.dataCountapproved || 0}
+                  percentage={{
+                    color: "success",
+                  }}
+                />
+              </Link>
+            </MDBox>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <Link to="/approval-listing">
+                <ComplexStatisticsCard
+                  color="dark"
+                  icon={<PendingActionsIcon />}
+                  title="Print Approval"
+                  count={printdata?.total || 0}
                   percentage={{
                     color: "success",
                   }}

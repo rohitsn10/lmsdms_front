@@ -39,6 +39,7 @@ const PrintApprovalListing = () => {
     isLoading,
     refetch,
   } = useGetPrintRequestsQuery(Selectedstatus);
+  
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
@@ -58,7 +59,7 @@ const PrintApprovalListing = () => {
   // Conditionally set the Selectedstatus based on the groupId
   useEffect(() => {
     if (groupId === 5 || groupId === 6) {
-      setSelectedstatus("13"); // Set default status as "12" for groupId 5 or 6
+      setSelectedstatus("all"); // Set default status as "12" for groupId 5 or 6
     } else {
       setSelectedstatus("all"); // Set default as "all" for other groups
     }
@@ -69,7 +70,7 @@ const PrintApprovalListing = () => {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
- console.log(printRequests)
+ 
   const filteredData = (printRequests?.data || []) // Use printRequests.data if API includes "data" field
   .filter((item) => {
     const matchesSearch = item.document_title?.toLowerCase().includes(searchTerm.toLowerCase());
