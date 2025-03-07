@@ -16,7 +16,7 @@ import MDButton from "components/MDButton";
 import { useSelectedUserGetQuery } from "api/auth/documentApi"; // Update with the correct path
 
 const ViewSelectionDialog = ({ open, onClose, documentId }) => {
-  const { data, isLoading } = useSelectedUserGetQuery({ documentId });
+  const { data, isLoading } = useSelectedUserGetQuery({ documentId },{skip: !documentId});
   
   if (isLoading) {
     return <div>Loading...</div>;

@@ -11,7 +11,7 @@ import "react-toastify/dist/ReactToastify.css"; // Import toast styles
 const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
     const [reason, setReason] = useState("");
     const [approveRevise, { isLoading }] = useApproveReviseMutation();
-
+   console.log("roww",row)
     useEffect(() => {
         if (row) {
             setReason(row?.revisereason || ""); 
@@ -23,7 +23,7 @@ const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
             await approveRevise({
                 document_id: row?.id,
                 status_id: 10,
-                request_action_id: row?.id,
+                request_action_id: row?.revise_request_id,
                 action_status: "approved",
             }).unwrap();
             
@@ -124,6 +124,7 @@ ReviseApproveDialog.propTypes = {
         reviseStatus: PropTypes.string,
         requestedUser: PropTypes.string,
         serial_number: PropTypes.number,
+        revise_request_id: PropTypes.number,
     }).isRequired,
 };
 

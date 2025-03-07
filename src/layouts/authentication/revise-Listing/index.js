@@ -86,6 +86,8 @@ const ReviseApprovalList = () => {
     reviseStatus: doc.status,
     revisereason: doc.revise_description,
     document_current_status_name: doc.document_current_status_name,
+    revise_request_id: doc.revise_request_id,
+    is_revise: doc.is_revise,
   }));
 
   // Filter data based on the search term
@@ -104,8 +106,8 @@ const ReviseApprovalList = () => {
     { field: "document_current_status_name", headerName: "Status", flex: 1, headerAlign: "center" },
 
     // Column for Revise Button
-    ...(hasPermission(userPermissions, "documentrevisionrequestaction", "isChange")
-      ? [
+    // ...(hasPermission(userPermissions, "documentrevisionrequestaction", "isChange")
+    //   ? [
           {
             field: "revise",
             headerName: "Revise",
@@ -113,15 +115,17 @@ const ReviseApprovalList = () => {
             headerAlign: "center",
             renderCell: (params) =>
               // params.row.reviseRequestId === null ? (
-                <IconButton color="warning" onClick={() => handleReviseDialogOpen(params.row)}>
+                <IconButton color="warning" onClick={() => handleReviseDialogOpen(params.row)}
+                disabled={params.row.is_revise} 
+                >
                   <BackHandSharpIcon />
                 </IconButton>
               // ) : (
               //   "-"
               // ),
           },
-        ]
-      : []), // Hide column if no permission
+      //   ]
+      // : []), // Hide column if no permission
 
     // Column for Approve Button
     ...(hasPermission(userPermissions, "documentrevisionaction", "isAdd")
@@ -129,7 +133,7 @@ const ReviseApprovalList = () => {
           {
             field: "approve",
             headerName: "Approve",
-            flex: 0.75,
+            flex: 0.75, 
             headerAlign: "center",
             renderCell: (params) =>
               // params.row.reviseRequestId !== null ? (
