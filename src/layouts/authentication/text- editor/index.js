@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import "quill/dist/quill.snow.css";
-import { Document, Packer, Paragraph } from "docx";
-import { saveAs } from "file-saver";
 import { useParams } from "react-router-dom";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 import { Box, IconButton, Paper, TextareaAutosize, TextField } from "@mui/material";
@@ -60,17 +58,9 @@ const DocumentView = () => {
   const [docEditorLoaded, setDocEditorLoaded] = useState(false);
   const [editorConfig, setEditorConfig] = useState(null);
   const { data: templateData, isError, error: apiError } = useGetTemplateQuery(id);
-  // console.log("Template Hook", templateData);
-  // const [docContent, setDocContent] = useState("");
-  // const [isLoaded, setIsLoaded] = useState(false);
   const quillRef = useRef(null);
-  // console.log("Template Data",templateData)
-  const [openDrawer, setOpenDrawer] = useState(false);
   const [opencommentDialog, setOpencommentDialog] = useState(false);
-  const [currentComment, setCurrentComment] = useState("");
   const [selectedRange, setSelectedRange] = useState(null);
-  const [comments, setComments] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
   const [createDocument] = useCreateDocumentMutation();
   const [createComment] = useCreateCommentMutation();
   const { data, error, isLoading } = useGetTemplateQuery(id);
@@ -84,7 +74,6 @@ const DocumentView = () => {
   const [documentDocAdmin] = useDocumentDocadminStatusMutation();
   const searchParams = new URLSearchParams(location.search);
   const document_current_status = searchParams.get("status");
-  const trainingRequired = searchParams.get("training_required");
   const approval_status = searchParams.get("approval_status");
   const version = searchParams.get("version");
   const templateIDMain = searchParams.get("templateID");
@@ -99,20 +88,16 @@ const DocumentView = () => {
   const [statusSendBack, setStatusSendBack] = useState(""); // State for Status Send Back dropdown
 
   const { data: documentsData, isLoading: isDocumentsLoading } = useFetchDocumentsQuery();
-  const [randomNumber] = useState(Math.floor(Math.random() * 100000));
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [action, setAction] = useState("");
   const [openRemarkDialog, setOpenRemarkDialog] = useState(false);
   const [remark, setRemark] = useState(""); // Store entered remark
-  // const [action, setAction] = useState(""); // To store the action like "submit", "approve", etc.
   const [openuserDialog, setOpenuserDialog] = useState(false);
   const [openviewuserDialog, setopenviewuserDialog] = useState(false);
   const [approver, setApprover] = useState("");
   const [reviewer, setReviewer] = useState([]);
   const [docAdmin, setDocAdmin] = useState("");
-  // const [docComments, setDocComments] = useState([]);
   const [cacheDocument, setCacheDocument] = useState("");
-  // const [docCurrentComment, setDocCurrentComment] = useState("");
   const docCommentsRef = useRef([]);
 
   // console.log("User====>",user.id);
@@ -137,10 +122,6 @@ const DocumentView = () => {
       setLoading(false);
       return;
     }
-
-    // console.log("Template Data:", templateData);
-    // console.log("Template URL:", templateData?.template_url);
-
     if (templateData) {
       const fetchEditorConfig = async () => {
         try {
@@ -242,9 +223,6 @@ const DocumentView = () => {
               onDocumentStateChange: (event) => {},
               onAppReady: async () => {
                 window.docEditor = docEditorRef.current;
-                // console.log("ONLYOFFICE Editor is Ready");
-                // console.log("Editor Config:", docEditorRef.current.config); // Log the entire config
-
                 try {
                  
                 } catch (error) {
@@ -272,7 +250,6 @@ const DocumentView = () => {
                       // userEmail: user?.email,
                       // username: user?.first_name,
                     };
-                    // console.log("Submitting draft:", draftData);
                     try {
                       // Send the comment data to the API
                       const result = await addPathUrlDataForComments(draftData).unwrap();
@@ -316,36 +293,6 @@ const DocumentView = () => {
     }
   }, [docEditorLoaded, editorConfig]);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.key === "s") {
-        e.preventDefault();
-        setOpenDialog(true);
-      }
-      if (e.ctrlKey && e.key === "p") {
-        e.preventDefault();
-        handlePrint2(); // Trigger the print function when Ctrl + P is pressed
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.key === "s") {
-        e.preventDefault();
-        setOpenDialog(true);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const handleOpenCommentsDrawer = () => {
-    setOpenDrawer(true);
-  };
 
   const handleRemarkConfirm = async (remark) => {
     // Close RemarkDialog and open E-Signature dialog
@@ -436,11 +383,6 @@ const DocumentView = () => {
     setOpenRemarkDialog(true);
   };
 
-  // const handleDoc = () => {
-  //   setAction("docAdminApprove");
-  //   setOpenSignatureDialog(true);
-  // };
-
   const handleAddComment = () => {
     const quill = quillRef.current;
     const range = quill.getSelection();
@@ -452,153 +394,12 @@ const DocumentView = () => {
     }
   };
 
-  const handleSaveComment = async () => {
-    if (currentComment.trim() === "") return;
-
-    const quill = quillRef.current;
-    const selectedText = quill.getText(selectedRange.index, selectedRange.length).trim();
-    if (!selectedText) return;
-
-    // Highlight the selected text
-    quill.formatText(selectedRange.index, selectedRange.length, { background: "yellow" });
-
-    // Make sure documentId is available
-    if (!id) {
-      console.error("Document ID is missing!");
-      return;
-    }
-
-    const newComment = {
-      document: id, // Make sure document ID is passed correctly
-      selected_word: selectedText, // Store the selected text
-      comment_description: currentComment, // Store the added comment
-    };
-
-    try {
-      const response = await createComment(newComment);
-
-      if (response.status) {
-        setComments([
-          ...comments,
-          {
-            id: Date.now(),
-            selectedWord: selectedText,
-            comment: currentComment,
-            document: id,
-          },
-        ]);
-        setCurrentComment(""); // Clear the comment input
-        setOpencommentDialog(false); // Close the dialog
-      } else {
-        console.error("Failed to save comment:", response.message);
-      }
-    } catch (error) {
-      console.error("Error saving comment:", error);
-    }
-  };
 
   const handlePrint = () => {
    
     navigate(`/print-document/${id}`);
   };
 
-  // const handleNewPrint = () => {
-  //   console.log("New Print Function Triggered for ID:", id);
-  // };
-  const handlePrint2 = (copies = 2) => {
-    const quill = quillRef.current; // Get the Quill instance
-    const editorContent = quill.root.innerHTML; // Get the HTML content from the editor
-
-    // Function to generate a unique number (you can customize this logic)
-    const generateUniqueNumber = (index) => `Print No: ${Date.now()}-${index + 1}`;
-
-    // Create a temporary hidden iframe to load the content and trigger print
-    const iframe = document.createElement("iframe");
-    iframe.style.position = "absolute";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
-    iframe.style.border = "none";
-    document.body.appendChild(iframe);
-
-    const iframeDocument = iframe.contentWindow.document;
-
-    iframeDocument.open();
-    iframeDocument.write(`
-      <html>
-        <head>
-          <style>
-            /* Add basic print styles */
-            body {
-              font-family: Arial, sans-serif;
-              padding: 20px;
-              margin: 0;
-              font-size: 12px;
-            }
-            .copy-container {
-              page-break-after: always; /* Ensures each copy starts on a new page */
-            }
-            .copy-container:last-child {
-              page-break-after: auto; /* Prevents a page break after the last copy */
-            }
-            #editor-container {
-              width: 100%;
-              max-width: 210mm;
-              margin: 0 auto;
-              padding: 10px;
-              background-color: #fff;
-              border: 1px solid #ccc;
-            }
-            .print-header {
-              text-align: center;
-              margin-bottom: 20px;
-              font-size: 14px;
-              font-weight: bold;
-            }
-          </style>
-        </head>
-        <body>
-          ${Array.from({ length: copies })
-            .map(
-              (_, index) => `
-              <div class="copy-container">
-                <div class="print-header">${generateUniqueNumber(index)}</div>
-                <div id="editor-container">${editorContent}</div>
-              </div>
-            `
-            )
-            .join("")}
-        </body>
-      </html>
-    `);
-    iframeDocument.close();
-
-    iframe.onload = () => {
-      // Wait for iframe to load, then focus and trigger the print dialog
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print(); // Trigger print dialog
-      document.body.removeChild(iframe); // Clean up iframe after printing
-    };
-  };
-
-  const handleSaveAsDocx = async () => {
-    const quill = quillRef.current;
-    const htmlContent = quill.root.innerHTML;
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, "text/html");
-    const plainText = doc.body.innerText.split("\n");
-
-    const docxDocument = new Document({
-      sections: [
-        {
-          children: plainText.map((line) => new Paragraph(line)),
-        },
-      ],
-    });
-    Packer.toBlob(docxDocument).then((blob) => {
-      saveAs(blob, "document.docx");
-    });
-  };
   const handleOpenDialog = () => {
     setDialogOpen(true);
   };
@@ -639,8 +440,6 @@ const DocumentView = () => {
     try {
       // console.log("Hit Featureeeeeeeeee ---------->");
       if (docEditorRef.current) {
-     
-
         docEditorRef.current.downloadAs("docx", async (blobUrl) => {
           // console.log("Blob URL:", blobUrl);
         });
@@ -657,42 +456,6 @@ const DocumentView = () => {
     setDialogeffectiveOpen(true); // Open the dialog
   };
 
-  const handleConfirmSave = async () => {
-    const content = quillRef.current.root.innerHTML;
-    const documentData = { document_id: id, document_data: content };
-
-    // Save the document data (existing functionality)
-    await createDocument(documentData);
-
-    // Close the dialog after saving
-    setOpenDialog(false);
-
-    // Save the document as a .docx file if needed
-    handleSaveAsDocx();
-  };
-  const handleEditComment = (id, newComment) => {
-    setComments((prevComments) =>
-      prevComments.map((comment) =>
-        comment.id === id ? { ...comment, comment: newComment } : comment
-      )
-    );
-    // console.log("Edit comment clicked");
-  };
-
-  const handleSaveEdit = (id, newComment) => {
-    // Check if the new comment is not empty
-    if (newComment.trim() === "") return;
-
-    // Update the comment in the state
-    setComments((prevComments) =>
-      prevComments.map((comment) =>
-        comment.id === id ? { ...comment, comment: newComment } : comment
-      )
-    );
-
-    // Close the modal or drawer after saving
-    setOpenDrawer(false); // Close the drawer or modal after saving the comment
-  };
 
   if (loading || isLoading) {
     return (

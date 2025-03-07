@@ -1,14 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
   DialogActions,
   DialogContent,
-  MenuItem,
   FormControl,
-  Select,
-  OutlinedInput,
-  InputLabel,
   TextField,
 } from "@mui/material";
 import MDButton from "components/MDButton";
@@ -33,6 +29,27 @@ const SendBackDialog = ({
 }) => {
   // Fetch approved status users using RTK Query
   const { data: users, isLoading, error } = useGetApprovedStatusUsersQuery(documentId);
+  console.log(users);
+
+  // Automatically set assignedTo to the first user's id when data is loaded
+  useEffect(() => {
+    if (!isLoading && !error && Array.isArray(users) && users.length > 0) {
+      // Only update if assignedTo isn't already set or doesn't match the current user's id
+      if (assignedTo !== users[0].id) {
+        setAssignedTo(users[0].id);
+      }
+    }
+  }, [users, isLoading, error, assignedTo, setAssignedTo]);
+
+  // Determine the display value for the disabled text field:
+  let assignedUserName = "";
+  if (isLoading) {
+    assignedUserName = "Loading user...";
+  } else if (error) {
+    assignedUserName = "Error loading user";
+  } else if (Array.isArray(users) && users.length > 0) {
+    assignedUserName = users[0].first_name;
+  }
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -44,44 +61,14 @@ const SendBackDialog = ({
 
       <form onSubmit={(e) => e.preventDefault()}>
         <DialogContent>
-          {/* Clear Button */}
-          <MDBox display="flex" justifyContent="flex-end">
-            <MDButton
-              variant="outlined"
-              color="error"
-              size="small"
-              onClick={() => handleClear(setAssignedTo, setRemarks)}
-              sx={{ marginRight: "20px" }}
-            >
-              Clear
-            </MDButton>
-          </MDBox>
-
-          {/* Assigned To Dropdown */}
+          {/* Display the assigned user's name in a disabled text field */}
           <FormControl fullWidth margin="dense">
-            <InputLabel id="assigned-to-label">Assigned To</InputLabel>
-            <Select
-              labelId="assigned-to-label"
-              id="assigned-to"
-              value={assignedTo}
-              onChange={(e) => setAssignedTo(e.target.value)}
-              input={<OutlinedInput label="Assigned To" />}
-              sx={{
-                minWidth: 200,
-                height: "3rem",
-                ".MuiSelect-select": { padding: "0.45rem" },
-              }}
-            >
-              {isLoading && <MenuItem disabled>Loading users...</MenuItem>}
-              {error && <MenuItem disabled>Error loading users</MenuItem>}
-              {!isLoading &&
-                Array.isArray(users) &&
-                users.map((user) => (
-                  <MenuItem key={user.id} value={user.id}>
-                    {user.first_name}
-                  </MenuItem>
-                ))}
-            </Select>
+            <TextField
+              label="Assigned To"
+              variant="outlined"
+              disabled
+              value={assignedUserName}
+            />
           </FormControl>
 
           {/* Remarks Field */}
@@ -116,7 +103,7 @@ SendBackDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,
-  assignedTo: PropTypes.string,
+  assignedTo: PropTypes.any,
   setAssignedTo: PropTypes.func.isRequired,
   remarks: PropTypes.string,
   setRemarks: PropTypes.func.isRequired,
