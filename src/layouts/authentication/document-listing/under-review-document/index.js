@@ -108,6 +108,14 @@ const UnderReviewDocument = () => {
     return "";
   };
 
+  const handleViewFile = (url,new_url, params) => {
+    // navigate("/PreView", { state: { templateDoc: url,new_url:new_url, templateData: params } }); // Pass the URL as state
+    navigate("/docviewer",{state:{docId:params.id,templateId:params.select_template
+    }})
+    // console.log(params)
+    // console.log(params.id,params.select_template  )
+  };  
+
   const handleDateRangeChange = (event) => {
     const selectedRange = event.target.value;
     setSelectedDateRange(selectedRange);
@@ -222,7 +230,15 @@ const UnderReviewDocument = () => {
       field: "current_status_name",
       headerName: "Status",
       flex: 0.6,
-      headerAlign: "center",
+      renderCell: (params) => {
+        // Check for the specific condition: is_done is true and current_status_name is "Under Reviewer"
+        // console.log("Print params:::",params);
+        if ((params.row.is_done === false || params.row.is_done === null)  && params.row.document_current_status == 8) {
+          return <span>Under Reviewer</span>
+        }
+        // Otherwise, display the original current_status_name
+        return <span>{params.row.current_status_name}</span>;
+      }
     },
     {
       field: "actions",
@@ -233,6 +249,20 @@ const UnderReviewDocument = () => {
         <MDBox display="flex" justifyContent="center" gap={1}>
           <IconButton color="inherit" onClick={() => handleClick(params)}>
             <EditCalendarIcon />
+          </IconButton>
+          <IconButton
+            color="primary"
+            onClick={() => {
+              handleViewFile(
+                params.row.selected_template_url,
+                params.row.front_file_url,
+                params.row
+              );
+              // console.log()
+              console.log("Params",params.row)
+            }}
+          >
+            <VisibilityIcon />
           </IconButton>
         </MDBox>
 
@@ -338,7 +368,9 @@ const UnderReviewDocument = () => {
           )}
         </MDBox>
 
-        <MDBox display="flex" justifyContent="center" sx={{ height: 500, mt: 2 }}>
+        <MDBox display="flex" 
+          justifyContent="center"
+         sx={{ height: 500, mt: 2}}>
           <DataGrid
             rows={rows}
             columns={columns}
@@ -347,13 +379,22 @@ const UnderReviewDocument = () => {
             disableSelectionOnClick
             autoHeight
             sx={{
-              "& .MuiDataGrid-columnHeader": {
-                textAlign: "center",
-              },
-              "& .MuiDataGrid-cell": {
-                textAlign: "center",
-              },
-            }}
+              overflowY:"auto",
+                // minWidth: 1500,
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: "#f5f5f5",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  justifyContent: "center",
+                },
+                "& .MuiDataGrid-cell": {
+                  textAlign: "center",
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  textAlign: "center",
+                  // width: "100%",
+                },
+              }}
           />
         </MDBox>
       </Card>
