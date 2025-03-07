@@ -87,6 +87,7 @@ const ReviseApprovalList = () => {
     revisereason: doc.revise_description,
     document_current_status_name: doc.document_current_status_name,
     revise_request_id: doc.revise_request_id,
+    is_revise: doc.is_revise,
   }));
 
   // Filter data based on the search term
@@ -115,7 +116,7 @@ const ReviseApprovalList = () => {
             renderCell: (params) =>
               // params.row.reviseRequestId === null ? (
                 <IconButton color="warning" onClick={() => handleReviseDialogOpen(params.row)}
-                disabled={!params.row.is_revise} 
+                disabled={params.row.is_revise} 
                 >
                   <BackHandSharpIcon />
                 </IconButton>
@@ -132,7 +133,7 @@ const ReviseApprovalList = () => {
           {
             field: "approve",
             headerName: "Approve",
-            flex: 0.75,
+            flex: 0.75, 
             headerAlign: "center",
             renderCell: (params) =>
               // params.row.reviseRequestId !== null ? (

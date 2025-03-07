@@ -12,6 +12,7 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { hasPermission } from "utils/hasPermission";
+import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/material";
 import PropTypes from "prop-types";
 import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 import { useAuth } from "hooks/use-auth";
@@ -32,6 +33,8 @@ import EffectiveDialog from "./effectiveDialog";
 import { useDocumentEffectiveMutation } from "api/auth/documentApi";
 import HowToRegTwoToneIcon from "@mui/icons-material/HowToRegTwoTone";
 import ViewSelectionDialog from "./view-user";
+import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
+import { useFetchDocumentExcelReportQuery } from "api/auth/documentApi";
 const DocumentListing = () => {
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
@@ -49,15 +52,15 @@ const DocumentListing = () => {
   const [openChildDialog, setOpenChildDialog] = useState(false);
   const [ObsoletedialogOpen, setObsoleteDialogOpen] = useState(false);
   const [selectedChildDocuments, setSelectedChildDocuments] = useState([]);
+  const [isReportRequested, setIsReportRequested] = useState(false);
   const [updateObsoleteStatus] = useUpdateObsoleteStatusMutation();
   const [openDialog, setOpenDialog] = useState(false);
   const [openviewDialog, setOpenviewDialog] = useState(false);
-  console.log("data in document list",data)
+  const [department, setDepartment] = useState("");
   const [documentEffective, { isLoading: isEffecting, isError: isEffectError }] =
     useDocumentEffectiveMutation();
   const version = searchParams.get("version");
-  // console.log("Versionnon", version);
-  // console.log("Versionnon",version)
+  const { data: departmentsData, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
   useEffect(() => {
     if (data && data.userGroupIds) {
       setUserGroupIds(data.userGroupIds);
@@ -68,7 +71,10 @@ const DocumentListing = () => {
   useEffect(() => {
     refetch();
   }, [location.key]);
-
+  const { data:Exceldata, error } = useFetchDocumentExcelReportQuery({
+    department_id: department,
+   
+  }, { skip: !isReportRequested });
   // Extract revision_month from data
   const revisionMonth = data?.revision_month;
 
@@ -115,7 +121,7 @@ const DocumentListing = () => {
       console.error("Invalid params object:", params);
       return; // Exit if params or row is missing
     }
-
+    
     const {
       id,
       document_current_status,
@@ -191,13 +197,12 @@ const DocumentListing = () => {
     // Close the dialog after the operation
     handleCloseDialog();
   };
-  const handleViewFile = (url,new_url, params) => {
+  const handleViewFile = (url, new_url, params) => {
     // navigate("/PreView", { state: { templateDoc: url,new_url:new_url, templateData: params } }); // Pass the URL as state
-    navigate("/docviewer",{state:{docId:params.id,templateId:params.select_template
-    }})
+    navigate("/docviewer", { state: { docId: params.id, templateId: params.select_template } });
     // console.log(params)
     // console.log(params.id,params.select_template  )
-  };  
+  };
 
   const handleEditClick = (rowData) => {
     navigate("/edit-document", { state: { item: rowData } });
@@ -219,6 +224,33 @@ const DocumentListing = () => {
       toast.error("Failed to mark the document as obsolete. Please try again.");
     }
   };
+
+  const handleDownloadReport = () => {
+    if (!department) {
+      toast.error("Please select a department before generating the report.");
+      return; // Prevent further execution if no department is selected
+    }
+    setIsReportRequested(true); // Trigger the request when the button is clicked
+  };
+
+  useEffect(() => {
+    if (Exceldata) {
+      const fileBlob = new Blob([Exceldata], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(fileBlob);
+      link.download = 'document_report.xlsx'; // Set the desired file name
+      link.click();
+      setIsReportRequested(false); // Reset request flag after download
+    }
+  }, [Exceldata]); // This effect runs when 'Exceldata' is available.
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error fetching the report: {error.message}</div>;
+  }
 
   const filteredData = documents.filter(
     (doc) =>
@@ -355,7 +387,7 @@ const DocumentListing = () => {
                 params.row
               );
               // console.log()
-              console.log("Params",params.row)
+              console.log("Params", params.row);
             }}
           >
             <VisibilityIcon />
@@ -372,18 +404,20 @@ const DocumentListing = () => {
                 </IconButton>
               )
             : hasPermission(userPermissions, "document", "isView") &&
-              params.row.current_status_name !== "Release" && 
-              !(groupId === 3 && params.row.current_status_name == "Under Approver" || params.row.current_status_name == "Effective" ) &&
-               ( // Hide if status is "Approve"
+              params.row.current_status_name !== "Release" &&
+              !(
+                (groupId === 3 && params.row.current_status_name == "Under Approver") ||
+                params.row.current_status_name == "Effective"
+              ) && ( // Hide if status is "Approve"
                 <IconButton color="inherit" onClick={() => handleClick(params)}>
                   <EditCalendarIcon />
                 </IconButton>
               )}
-          {groupId===5 && ( 
+          {groupId === 5 && (
             <IconButton
               color="success"
               onClick={() => handleDialogOpen(params.row)}
-              disabled={params.row.document_current_status !== 9} 
+              disabled={params.row.document_current_status !== 9}
             >
               <CheckCircleIcon />
             </IconButton>
@@ -488,12 +522,48 @@ const DocumentListing = () => {
             value={searchTerm}
             onChange={handleSearch}
           />
+          {groupId === 5 && (
+            <MDBox mb={3}>
+              <FormControl sx={{ width: "250px", mr: 2, mt: 3 }} size="small">
+                <InputLabel id="select-department-label">Department</InputLabel>
+                <Select
+                  labelId="select-department-label"
+                  id="select-department"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  size="small"
+                  input={<OutlinedInput label="Department" />}
+                  sx={{
+                    minWidth: 200,
+                    height: "2.50rem",
+                    
+                  }}
+                >
+                  {isDepartmentsLoading ? (
+                    <MenuItem disabled>Loading departments...</MenuItem>
+                  ) : (
+                    departmentsData?.map((dept) => (
+                      <MenuItem key={dept.id} value={dept.id}>
+                        {dept.department_name}
+                      </MenuItem>
+                    ))
+                  )}
+                </Select>
+              </FormControl>
+            </MDBox>
+          )}
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Document Listing
           </MDTypography>
+
           {groupId === 5 && (
             <MDButton variant="contained" color="primary" onClick={handleObsolete} sx={{ ml: 2 }}>
               Obsolete
+            </MDButton>
+          )}
+          {groupId === 5 && (
+            <MDButton variant="gradient" color="submit" onClick={handleDownloadReport} sx={{ ml: 2 }}>
+              Generate Excel
             </MDButton>
           )}
 

@@ -251,7 +251,7 @@ const UnderReviewDocument = () => {
     <MDBox p={3}>
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
-          {/* Department Dropdown */}
+          {/* Department Dropdown */} 
           <FormControl sx={{ minWidth: 180, mr: 2 }}>
             <InputLabel>Department</InputLabel>
             <Select

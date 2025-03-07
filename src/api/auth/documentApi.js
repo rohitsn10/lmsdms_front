@@ -218,6 +218,14 @@ export const documentApi = createApi({
         method: "GET",
       }),
     }),
+    fetchDocumentExcelReport: builder.query({
+      query: ({ department_id = "", document_current_status = "" }) => ({
+        url: `dms_module/document_excel_report?department_id=${department_id}&document_current_status=${document_current_status}`,
+        method: "GET",
+      }),
+      transformResponse: (response) => response,  
+    }),
+    
   }),
 });
 
@@ -241,5 +249,6 @@ export const {
   useDocumentEffectiveMutation,
   useFetchDocumentVersionListQuery,
   useSelectedUserGetQuery,
-  useFetchSendbackDataQuery
+  useFetchSendbackDataQuery,
+  useFetchDocumentExcelReportQuery,
 } = documentApi;

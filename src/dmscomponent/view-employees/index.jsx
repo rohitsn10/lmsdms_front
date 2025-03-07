@@ -8,12 +8,13 @@ import MDTypography from "components/MDTypography";
 import { useUserListQuery } from "api/auth/userApi";
 import UserAcknowledgementDialog from "./UserAcknowledgementDialog"; // Import the dialog component
 import { useAuth } from "hooks/use-auth";
+import MDInput from "components/MDInput";
 function ViewEmployeeStatus() {
   const { data, error, isLoading } = useUserListQuery();
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
-  // State for handling the dialog
+  const [searchTerm, setSearchTerm] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null); // State for storing the selected user data
 
@@ -111,10 +112,14 @@ function ViewEmployeeStatus() {
       renderCell: renderStatusIcon,
     },
   ];
-
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+  
   // Convert API data to rows
   const rows = data
-    ? data?.data?.map((user, index) => ({
+  ? data?.data
+      .map((user, index) => ({
         id: user.id,
         empNo: `E00${index + 1}`,
         name: user.full_name,
@@ -128,12 +133,25 @@ function ViewEmployeeStatus() {
         is_tni_consent: user.is_tni_consent,
         is_qualification: user.is_qualification,
       }))
-    : [];
+      .filter((user) =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        user.empNo.toLowerCase().includes(searchTerm.toLowerCase())
+      ) // Filters by name and employee number
+  : [];
+
 
   return (
     <MDBox p={3}>
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
+          <MDInput
+                     label="Search"
+                     variant="outlined"
+                     size="small"
+                     sx={{ width: "250px", mr: 2 }}
+                     value={searchTerm}
+                     onChange={handleSearch}
+                   />
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Employee Workflow
           </MDTypography>
