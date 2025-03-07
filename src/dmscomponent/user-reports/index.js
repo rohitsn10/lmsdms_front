@@ -46,34 +46,54 @@ const UserReports = () => {
 
   const handleTrainingNeedReport = (id) => {
     setSelectedTrainingUserId(id);
-  
-    if (trainingNeedLoading) {
-      toast.info("Loading report...");
-      return;
-    }
-  
-    if (trainingNeedData?.status) {
-      toast.success(trainingNeedData.message || "Report generated successfully!"); 
+    // console.log("Debug1")
+    // if (trainingNeedLoading) {
+    //   toast.info("Loading report...");
+    //   return;
+    // }
+    // console.log("Debug2")
+    // if (trainingNeedData.status) {
+    //   console.log("Debug 3")
+    //   toast.success(trainingNeedData.message || "Report generated successfully!"); 
+    //   downloadPDF(trainingNeedData.data, "Employee_Training_Need_Report.pdf");
+    // } else {
+    //   console.log("Debug 4")
+    //   toast.error(trainingNeedData?.message || "Failed to generate training need report.");
+    // }
+    // console.log("Debug 5")
+  };
+  useEffect(()=>{
+    if (trainingNeedData && trainingNeedData.status) {
+      toast.success(trainingNeedData.message || "Report generated successfully!");
       downloadPDF(trainingNeedData.data, "Employee_Training_Need_Report.pdf");
-    } else {
+    } else if (trainingNeedData && trainingNeedData?.message) {
       toast.error(trainingNeedData?.message || "Failed to generate training need report.");
     }
-  };
+  },[trainingNeedData])
+
+  useEffect(()=>{
+    if(jobRoleData && jobRoleData.status){
+      toast.success(jobRoleData.message || "Report generated successfully.");
+      downloadPDF(jobRoleData.data, "Employee_Job_Role_Report.pdf")}  
+      else if(jobRoleData && jobRoleData?.message){
+        toast.error(jobRoleData?.message || "Failed to generate report")
+      }
+  },[jobRoleData])
   
   const handleJobRoleReport = (id) => {
     setSelectedJobRoleUserId(id);
   
-    if (jobRoleLoading) {
-      toast.info("Loading report...");
-      return;
-    }
+    // if (jobRoleLoading) {
+    //   toast.info("Loading report...");
+    //   return;
+    // }
   
-    if (jobRoleData?.status) {
-      toast.success(jobRoleData.message || "Report generated successfully!"); 
-      downloadPDF(jobRoleData.data, "Employee_Job_Role_Report.pdf");
-    } else {
-      toast.error(jobRoleData?.message || "Failed to generate job role report.");
-    }
+    // if (jobRoleData?.status) {
+    //   toast.success(jobRoleData.message || "Report generated successfully!"); 
+    //   downloadPDF(jobRoleData.data, "Employee_Job_Role_Report.pdf");
+    // } else {
+    //   toast.error(jobRoleData?.message || "Failed to generate job role report.");
+    // }
   };
   const downloadPDF = (fileUrl, fileName) => {
     if (!fileUrl) {
