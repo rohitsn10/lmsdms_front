@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogActions,
@@ -8,7 +8,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Button,
   CircularProgress,
   OutlinedInput,
 } from "@mui/material"; 
@@ -20,16 +19,29 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useUserListQuery } from "api/auth/userApi";
 
-const AssignDepartmentDialog = ({ open, onClose, fullName, selectedUserid ,is_department_assigned,departmentId}) => {
-  const [department, setDepartment] = useState("");
-    const { refetch } = useUserListQuery();
+const AssignDepartmentDialog = ({
+  open,
+  onClose,
+  fullName,
+  selectedUserid,
+  is_department_assigned,
+  departmentId,
+}) => {
+  const [department, setDepartment] = useState(departmentId);
+  const { refetch } = useUserListQuery();
   const { data: departmentsData, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
   const [assignDepartment, { isLoading }] = useAssignDepartmentMutation();
+
+  // Reset department state when the dialog is closed or opened again
+  useEffect(() => {
+    if (open) {
+      setDepartment(departmentId); // Set the department state to the provided departmentId when the dialog is opened
+    }
+  }, [open, departmentId]);
+
   const handleDepartmentChange = (event) => {
     setDepartment(event.target.value);
   };
-   console.log("is_department_assigned--------------",departmentId)
-  
 
   const handleAssign = async () => {
     try {
@@ -44,7 +56,11 @@ const AssignDepartmentDialog = ({ open, onClose, fullName, selectedUserid ,is_de
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Assigned department to {fullName}</DialogTitle>
+      <DialogTitle>
+        {is_department_assigned
+          ? `Update Assigned department to ${fullName}`
+          : `Assign Department to ${fullName}`}
+      </DialogTitle>
       <DialogContent>
         <FormControl fullWidth margin="dense">
           <InputLabel id="select-department-label">Assign Department</InputLabel>
@@ -52,7 +68,7 @@ const AssignDepartmentDialog = ({ open, onClose, fullName, selectedUserid ,is_de
             labelId="select-department-label"
             id="select-department"
             value={department}
-            onChange={(e) => setDepartment(e.target.value)}
+            onChange={handleDepartmentChange}
             input={<OutlinedInput label="Assign Department" />}
             sx={{
               minWidth: 200,

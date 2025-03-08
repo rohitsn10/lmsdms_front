@@ -9,13 +9,15 @@ import { TextField } from "@mui/material";
 import { useGetJobDescriptionListQuery, useHodRemarksMutation } from "apilms/jobRoleApi"; 
 import { toast } from "react-toastify"; 
 
-const TaskDescriptionDialog = ({ open, onClose, userId, onSave }) => {
+const TaskDescriptionDialog = ({ open, onClose, userId }) => {
   const [taskDescription, setTaskDescription] = useState(""); // Editable task description
   const [remark, setRemark] = useState(""); // State for remark
   const [hodRemarks] = useHodRemarksMutation(); // Mutation hook for HOD remarks
   console.log(userId)
   // Fetch job description list for the given userId
-  const {   data, isLoading: isDataLoading, isError: isDataError, error: dataError } = useGetJobDescriptionListQuery(userId);
+  const {   data, isLoading: isDataLoading, isError: isDataError, error: dataError } = useGetJobDescriptionListQuery(userId ,{ 
+    skip: !userId 
+  });
 
   // Set task description and user id when data is fetched
   const [currentUserId, setCurrentUserId] = useState(null); // State for storing the current user id
@@ -28,7 +30,7 @@ const TaskDescriptionDialog = ({ open, onClose, userId, onSave }) => {
   }, [data]);
 
   const handleSave = async (status) => {
-    // Ensure we have the current user id
+    console.log("Job Description",currentUserId)
     if (currentUserId) {
       try {
         // Call HOD remarks mutation with the current user_id, status, and remark
@@ -121,7 +123,7 @@ const TaskDescriptionDialog = ({ open, onClose, userId, onSave }) => {
 TaskDescriptionDialog.propTypes = {
   open: PropTypes.bool.isRequired,           // expects a boolean, is required
   onClose: PropTypes.func.isRequired,        // expects a function, is required
-  onSave: PropTypes.func.isRequired,         // expects a function, is required
+         // expects a function, is required
   userId: PropTypes.string.isRequired,       // expects a string, is required
 };
 
