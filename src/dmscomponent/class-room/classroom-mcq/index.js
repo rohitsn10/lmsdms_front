@@ -28,7 +28,7 @@ function ClassMultiChoiceQuestionsSection() {
   const id = location?.state?.rowData?.classroom_id;
   const { user } = useAuth();
   const { data: questionsData, isLoading, isError } = useClassroomQuizGetQuery(id, { skip: !id });
-
+  console.log("Questions Data::::",questionsData)
   const [attemptQuiz] = useAttemptQuizMutation();
   const [questions, setQuestions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
