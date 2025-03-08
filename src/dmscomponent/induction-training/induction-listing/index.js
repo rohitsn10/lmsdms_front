@@ -13,6 +13,7 @@ import moment from "moment";
 import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 import { useAuth } from "hooks/use-auth";
 import { hasPermission } from "utils/hasPermission";
+import SlideshowIcon from '@mui/icons-material/Slideshow';
 const InductionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
@@ -35,11 +36,14 @@ const InductionListing = () => {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
-
+  
   const handleEditInduction = (induction) => {
     navigate("/edit-induction", { state: { induction } });
   };
-
+  const handleView = (row) => {
+    navigate("/ppt-view", { state: { row } });
+    console.log(row)
+  };
   const filteredData = inductions
     .filter((induction) =>
       induction.induction_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -54,18 +58,17 @@ const InductionListing = () => {
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "induction_name", headerName: "Induction Name", flex: 1, headerAlign: "center" },
     { field: "date", headerName: "Date", flex: 1, headerAlign: "center" },
-    // {
-    //   field: "action",
-    //   headerName: "Action",
-    //   flex: 0.5,
-    //   headerAlign: "center",
-    //   renderCell: (params) =>
-    //     hasPermission(userPermissions, "induction", "isChange") ? (
-    //       <IconButton color="primary" onClick={() => handleEditInduction(params.row)}>
-    //         <EditIcon />
-    //       </IconButton>
-    //     ) : null,
-    // },
+    {
+      field: "View",
+      headerName: "Pre-View",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <IconButton color="warning" onClick={() => handleView(params.row)}>
+          <SlideshowIcon />
+        </IconButton>
+      ),
+    },
   ];
   if (hasPermission(userPermissions, "induction", "isChange")) {
     columns.push({
@@ -80,15 +83,12 @@ const InductionListing = () => {
       ),
     });
   }
-  // Handle loading and error states
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
   if (isError) {
     return <div>Error loading induction set.</div>;
   }
-
   return (
     <MDBox p={3}>
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
@@ -104,7 +104,6 @@ const InductionListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Induction Set Listing
           </MDTypography>
-
           {hasPermission(userPermissions, "induction", "isAdd") && (
             <MDButton
               variant="contained"
