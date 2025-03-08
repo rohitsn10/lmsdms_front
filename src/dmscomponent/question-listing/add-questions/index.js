@@ -41,7 +41,8 @@ function AddQuestion() {
   const [openQuestionDialog, setOpenQuestionDialog] = useState(false);
   const [openAnswerDialog, setOpenAnswerDialog] = useState(false);
   const [currentAnswerIndex, setCurrentAnswerIndex] = useState(null);
-  const [mediaFile, setMediaFile] = useState(null);
+  const [hasImage, setHasImage] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const location = useLocation();
   const id = location?.state?.id || null;
   const navigate = useNavigate();
@@ -124,13 +125,15 @@ function AddQuestion() {
       return;
     }
 
-    if (questionType === "Fill in the blank" && !answers[0]?.text.trim()) {
-      toast.error("Answer cannot be empty for Fill in the blank.");
+    // Validate image upload if the checkbox is checked
+    if (hasImage && !selectedFile) {
+      toast.error("Please upload an image for the question.");
       return;
     }
 
     setOpenSignatureDialog(true);
   };
+  
   const handleQuestionTypeChange = (event) => {
     const newType = event.target.value;
     setQuestionType(newType);
@@ -154,45 +157,39 @@ function AddQuestion() {
     }
 
     const formData = new FormData();
+    // formData.append("training_id", id);
     formData.append("document_id", id);
     formData.append("question_text", questionText);
     formData.append("question_type", questionType);
     formData.append("marks", questionMarks);
-    formData.append("status", status);
-    formData.append("createdAt", createdAt);
-    formData.append("createdBy", createdBy);
-
+    
     let options = null;
     let correct_answer = null;
 
     if (questionType === "MCQ") {
+      // options = JSON.stringify(answers.map((answer) => answer.text));
       options = answers.map((answer) => answer.text).join(",");
       correct_answer = answers
         .filter((answer) => answer.isCorrect)
         .map((answer) => answer.text)
         .join(",");
     } else if (questionType === "True/False") {
+      // options = JSON.stringify(["True", "False"]);
       options = "True,False";
       correct_answer = answers[0]?.text;
-    } else if (questionType === "Fill in the blank") {
-      options = "";
-      correct_answer = answers[0]?.text;
     }
+    
     formData.append("options", options ? options : "");
     formData.append("correct_answer", correct_answer ? correct_answer : "");
-    if (mediaFile) {
-      const fileType = mediaFile.type;
-      if (fileType.startsWith("image")) {
-        formData.append("image_file_url", mediaFile);
-      } else if (fileType.startsWith("audio")) {
-        formData.append("audio_file_url", mediaFile);
-      } else if (fileType.startsWith("video")) {
-        formData.append("video_file_url", mediaFile);
-      } else {
-        toast.error("Unsupported file type. Please upload an image, audio, or video.");
-        return;
-      }
+    
+    // Handle image upload
+    if (hasImage && selectedFile) {
+      formData.append("selected_file_type", "image");
+      formData.append("selected_file", selectedFile);
+    } else {
+      formData.append("selected_file_type", "");
     }
+    
     try {
       const response = await createTrainingQuestion(formData).unwrap();
       toast.success("Question created successfully!");
@@ -205,31 +202,50 @@ function AddQuestion() {
       setOpenSignatureDialog(false);
     }
   };
+  
   const handleOpenQuestionDialog = () => {
     setOpenQuestionDialog(true);
   };
+  
   const handleCloseQuestionDialog = () => {
     setOpenQuestionDialog(false);
   };
+  
   const handleOpenAnswerDialog = (index) => {
     setCurrentAnswerIndex(index);
     setOpenAnswerDialog(true);
   };
+  
   const handleCloseAnswerDialog = () => {
     setOpenAnswerDialog(false);
   };
+  
   const handleSaveQuestion = (content) => {
     setQuestionText(content);
   };
+  
   const handleSaveAnswer = (content) => {
     const updatedAnswers = [...answers];
     updatedAnswers[currentAnswerIndex].text = content;
     setAnswers(updatedAnswers);
   };
-  const handleMediaChange = (e) => {
-    const file = e.target.files[0];
-    setMediaFile(file);
+  
+  const handleHasImageChange = (event) => {
+    setHasImage(event.target.checked);
+    if (!event.target.checked) {
+      setSelectedFile(null);
+    }
   };
+  
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && !file.type.startsWith("image/")) {
+      toast.error("Please upload an image file.");
+      return;
+    }
+    setSelectedFile(file);
+  };
+
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto", mt: 5, mb: 5 }}>
@@ -275,25 +291,32 @@ function AddQuestion() {
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
                 >
-                  <MenuItem value="Fill in the blank">Fill in the blank</MenuItem>
                   <MenuItem value="MCQ">MCQ</MenuItem>
                   <MenuItem value="True/False">True/False</MenuItem>
                 </Select>
               </FormControl>
             </MDBox>
             <MDBox mb={3}>
+              <FormControlLabel
+                control={<Checkbox checked={hasImage} onChange={handleHasImageChange} />}
+                label="Question has image"
+              />
+              {hasImage && (
+                <MDBox mt={2}>
+                  <MDTypography variant="body2">Upload question image</MDTypography>
+                  <input type="file" accept="image/*" onChange={handleImageChange} />
+                  {selectedFile && (
+                    <MDTypography variant="body2" color="success">
+                      Selected: {selectedFile.name}
+                    </MDTypography>
+                  )}
+                </MDBox>
+              )}
+            </MDBox>
+            <MDBox mb={3}>
               <MDTypography variant="h6" fontWeight="medium">
                 Add Answers
               </MDTypography>
-              {questionType === "Fill in the blank" && (
-                <MDInput
-                  type="text"
-                  placeholder="Answer"
-                  value={answers[0]?.text}
-                  onChange={(e) => handleAnswerChange(0, e.target.value)}
-                  fullWidth
-                />
-              )}
               {questionType === "MCQ" && (
                 <List>
                   {answers.map((answer, index) => (
@@ -313,7 +336,7 @@ function AddQuestion() {
                             onChange={() => handleCorrectAnswerChange(index)}
                           />
                         }
-                       
+                        label=""
                       />
                       <IconButton
                         edge="end"
@@ -344,7 +367,7 @@ function AddQuestion() {
                   />
                 </RadioGroup>
               )}
-              {questionType !== "True/False" && questionType !== "Fill in the blank" && (
+              {questionType !== "True/False" && (
                 <MDButton variant="outlined" color="success" onClick={handleAddAnswer}>
                   Add Answer
                 </MDButton>
@@ -390,11 +413,6 @@ function AddQuestion() {
                   <FormControlLabel value="Inactive" control={<Radio />} label="Inactive" />
                 </RadioGroup>
               </FormControl>
-            </MDBox>
-            <MDBox mb={3}>
-              <MDTypography variant="h6">Upload Media (Image/Video/Audio)</MDTypography>
-              <input type="file" accept="image/*,video/*,audio/*" onChange={handleMediaChange} />
-              {mediaFile && <MDTypography variant="body2">{mediaFile.name}</MDTypography>}
             </MDBox>
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit">
