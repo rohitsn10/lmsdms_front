@@ -37,6 +37,8 @@ const UsersListing = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isJDDialogOpen, setIsJDDialogOpen] = useState(false);
   const [selectedUserIdForJD, setSelectedUserIdForJD] = useState(null);
+  const [isdepartmentAssigned,setisdepartmentAssigned]= useState("");
+  const [department, setdepartment] = useState(false);
   const [selectedTaskDescription, setSelectedTaskDescription] = useState("");
   const [isTaskDescriptionDialogOpen, setIsTaskDescriptionDialogOpen] = useState(false);
   const { data: userPermissions = [], isError: permissionError } =
@@ -61,9 +63,9 @@ const UsersListing = () => {
         is_jr_approve: item.is_jr_approve || false,
         is_induction_complete:item.is_induction_complete,
         job_role: Array.isArray(item.job_role) ? item.job_role.join(", ") : item.job_role || "N/A",
+        depratment: item.depratment || null,
       }))
     : [];
-
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -74,6 +76,8 @@ const UsersListing = () => {
   const handleAssignDepartmentClick = (user) => {
     setSelectedUser(user); // Set selected user for the dialog
     setIsDialogOpen(true); // Open the dialog
+    setisdepartmentAssigned(user.is_department_assigned);
+    setdepartment(user.setdepartment);
   };
 
   const handleAssignJDClick = (user) => {
@@ -165,7 +169,7 @@ const UsersListing = () => {
               <IconButton
                 color="success"
                 onClick={() => handleAssignDepartmentClick(params.row)}
-                disabled={params.row.is_department_assigned} // Disable if department is assigned
+                // disabled={params.row.is_department_assigned} // Disable if department is assigned
               >
                 <AssignmentIndIcon />
               </IconButton>
@@ -184,7 +188,7 @@ const UsersListing = () => {
               <IconButton
                 color="warning"
                 onClick={() => handleAssignJDClick(params.row)}
-                disabled={params.row.is_jr_assign || !params.row.is_department_assigned} // Enable only if department is assigned
+                // disabled={params.row.is_jr_assign || !params.row.is_department_assigned} // Enable only if department is assigned
               >
                 <AssignmentIcon />
               </IconButton>
@@ -203,7 +207,7 @@ const UsersListing = () => {
               <IconButton
                 color="inherit"
                 onClick={() => handleTaskDescriptionClick(params.row)}
-                disabled={!params.row.is_description} // Enable only if JD is assigned
+                // disabled={!params.row.is_description} // Enable only if JD is assigned
               >
                 <AddTaskIcon />
               </IconButton>
@@ -223,7 +227,7 @@ const UsersListing = () => {
               <IconButton
                 color="info"
                 onClick={() => handleDownloadICClick(params.row)}
-                disabled={!params.row.is_induction_complete}
+                // disabled={!params.row.is_induction_complete}
               >
                 <DownloadIcon />
               </IconButton>
@@ -313,7 +317,9 @@ const UsersListing = () => {
           open={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
           fullName={selectedUser.full_name}
-          selectedUserid={selectedUser.id}
+          selectedUserid={selectedUser.id}  
+          is_department_assigned={isdepartmentAssigned}
+          departmentId={department}
         />
       )}
       <JobDescriptionDialog

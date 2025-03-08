@@ -11,7 +11,7 @@ import {
   Button,
   CircularProgress,
   OutlinedInput,
-} from "@mui/material";
+} from "@mui/material"; 
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 import PropTypes from "prop-types"; // Import PropTypes
 import MDButton from "components/MDButton";
@@ -20,7 +20,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useUserListQuery } from "api/auth/userApi";
 
-const AssignDepartmentDialog = ({ open, onClose, fullName, selectedUserid }) => {
+const AssignDepartmentDialog = ({ open, onClose, fullName, selectedUserid ,is_department_assigned,departmentId}) => {
   const [department, setDepartment] = useState("");
     const { refetch } = useUserListQuery();
   const { data: departmentsData, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
@@ -28,7 +28,7 @@ const AssignDepartmentDialog = ({ open, onClose, fullName, selectedUserid }) => 
   const handleDepartmentChange = (event) => {
     setDepartment(event.target.value);
   };
-   
+   console.log("is_department_assigned--------------",departmentId)
   
 
   const handleAssign = async () => {
@@ -93,6 +93,8 @@ AssignDepartmentDialog.propTypes = {
   onClose: PropTypes.func.isRequired,
   fullName: PropTypes.string.isRequired,
   selectedUserid: PropTypes.number.isRequired,
+  is_department_assigned: PropTypes.bool.isRequired,
+  departmentId: PropTypes.number.isRequired,
 };
 
 export default AssignDepartmentDialog;

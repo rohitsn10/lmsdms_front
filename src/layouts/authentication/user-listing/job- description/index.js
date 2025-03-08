@@ -50,7 +50,7 @@ const JobDescriptionDialog = ({ open, onClose, userId }) => {
           onChange={handleChange}
           required
           multiline
-          rows={4} // Makes the input field larger and multiline for better UX
+          rows={4}
           sx={{
             '& .MuiOutlinedInput-root': {
               borderRadius: 1.5,

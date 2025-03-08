@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
+import DialogActions from "@mui/material/DialogActions"; 
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import MDButton from "components/MDButton";
-import { TextField } from "@mui/material"; // Import the TextField component
-import { useGetJobDescriptionListQuery, useHodRemarksMutation } from "apilms/jobRoleApi"; // Import the new hook
-import { toast } from "react-toastify"; // Import toast for notifications
+import { TextField } from "@mui/material"; 
+import { useGetJobDescriptionListQuery, useHodRemarksMutation } from "apilms/jobRoleApi"; 
+import { toast } from "react-toastify"; 
 
 const TaskDescriptionDialog = ({ open, onClose, userId, onSave }) => {
   const [taskDescription, setTaskDescription] = useState(""); // Editable task description
   const [remark, setRemark] = useState(""); // State for remark
-  const [hodRemarks, { isLoading, isError, error }] = useHodRemarksMutation(); // Mutation hook for HOD remarks
-
+  const [hodRemarks] = useHodRemarksMutation(); // Mutation hook for HOD remarks
+  console.log(userId)
   // Fetch job description list for the given userId
-  const { data, isLoading: isDataLoading, isError: isDataError, error: dataError } = useGetJobDescriptionListQuery(userId);
+  const {   data, isLoading: isDataLoading, isError: isDataError, error: dataError } = useGetJobDescriptionListQuery(userId);
 
   // Set task description and user id when data is fetched
   const [currentUserId, setCurrentUserId] = useState(null); // State for storing the current user id
@@ -32,7 +32,7 @@ const TaskDescriptionDialog = ({ open, onClose, userId, onSave }) => {
     if (currentUserId) {
       try {
         // Call HOD remarks mutation with the current user_id, status, and remark
-        await hodRemarks({ user_id: currentUserId, status, remark,description:taskDescription }).unwrap(); // Trigger HOD remarks mutation
+        await hodRemarks({ user_id: userId, currentUserId, status, remark,description:taskDescription }).unwrap(); // Trigger HOD remarks mutation
         
         // Show success toast notification
         toast.success(`Job description ${status === "approve" ? "approved" : "sent back"} successfully!`);
