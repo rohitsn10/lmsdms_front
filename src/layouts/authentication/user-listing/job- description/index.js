@@ -1,32 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import MDButton from "components/MDButton";
-import { useCreateJobDescriptionMutation } from "apilms/jobRoleApi"; // Import the mutation hook
-import { toast } from "react-toastify"; // Import toast
+import {
+  useCreateJobDescriptionMutation,
+  useGetJobDescriptionListQuery,
+  useSaveDescriptionMutation,
+} from "apilms/jobRoleApi";
+import { toast } from "react-toastify";
 
-const JobDescriptionDialog = ({ open, onClose, userId }) => {
+const JobDescriptionDialog = ({ open, onClose, userId, remark }) => {
   const [jobDescription, setJobDescription] = useState("");
 
-  // Hook to create a job description
-  const [createJobDescription, { isLoading, isError }] = useCreateJobDescriptionMutation();
+  // Fetch job descriptions for the given user
+  const {
+    data,
+    isLoading: isDataLoading,
+    isError: isDataError,
+    refetch, // To refresh data when opening dialog
+  } = useGetJobDescriptionListQuery(userId, { skip: !userId });
+
+  const [createJobDescription, { isLoading }] = useCreateJobDescriptionMutation();
+  const [saveDescription, { isLoading: isSaveLoading }] = useSaveDescriptionMutation();
+
+  // Fetch job description when data is available or dialog opens
+  useEffect(() => {
+    if (open) {
+      refetch(); // Fetch the latest data every time the dialog opens
+
+      if (data?.data?.length > 0) {
+        // Prioritize "send_back" status if available, otherwise take "draft"
+        const jobDesc = data.data.find((item) => item.status === "send_back") ||
+                        data.data.find((item) => item.status === "draft");
+
+        setJobDescription(jobDesc ? jobDesc.employee_job_description : "");
+      } else {
+        setJobDescription(""); // Clear if no data
+      }
+    }
+  }, [open, data]);
 
   const handleChange = (event) => setJobDescription(event.target.value);
 
-  const handleSave = async () => {
+  const handleSubmit = async () => {
     if (jobDescription.trim()) {
       try {
-        // Call the mutation to create the job description
-        await createJobDescription({ user_id: userId, employee_job_description: jobDescription }).unwrap();
-        
-        // Show success toast notification
+        await createJobDescription({
+          user_id: userId,
+          employee_job_description: jobDescription,
+        }).unwrap();
         toast.success("Job description assigned successfully!");
-
-        onClose(); // Close dialog after successful save
+        onClose(); // Close dialog
       } catch (error) {
-        // console.error("Error creating job description:", error);
-
-        // Show error toast notification
         toast.error("Failed to save job description. Please try again.");
       }
     } else {
@@ -34,12 +59,46 @@ const JobDescriptionDialog = ({ open, onClose, userId }) => {
     }
   };
 
+  const handleSave = async () => {
+    if (!jobDescription.trim()) {
+      toast.warning("Please enter a job description.");
+      return;
+    }
+
+    try {
+      await saveDescription({ user_id: userId, employee_job_description: jobDescription }).unwrap();
+      toast.success("Job description saved successfully!");
+      onClose();
+    } catch (error) {
+      console.error("Error saving job description:", error);
+      toast.error("Failed to save job description. Please try again.");
+    }
+  };
+
+  const handleCancel = () => {
+    setJobDescription(""); // Clear input
+    onClose(); // Close dialog
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth sx={{ borderRadius: 2 }}>
-      <DialogTitle sx={{ textAlign: "center", fontWeight: "bold", fontSize: "1.25rem", color: "#333" }}>
-        Assign Job Description
+    <Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth>
+      <DialogTitle
+        sx={{ textAlign: "center", fontWeight: "bold", fontSize: "1.25rem", color: "#333" }}
+      >
+        {remark ? "Assign Job Description to Send Back by HOD" : "Assign Job Description"}
       </DialogTitle>
       <DialogContent>
+        {remark && (
+          <TextField
+            margin="dense"
+            label="Remark"
+            type="text"
+            fullWidth
+            value={remark}
+            InputProps={{ readOnly: true }}
+            sx={{ marginBottom: 2, backgroundColor: "#f4f6f8" }}
+          />
+        )}
         <TextField
           autoFocus
           margin="dense"
@@ -50,44 +109,25 @@ const JobDescriptionDialog = ({ open, onClose, userId }) => {
           onChange={handleChange}
           required
           multiline
-          rows={4} // Makes the input field larger and multiline for better UX
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 1.5,
-              '& fieldset': {
-                borderColor: '#ccc', // Adjusting the border color
-              },
-            },
-            '& .MuiInputLabel-root': {
-              fontWeight: 'bold', // More prominent label
-            },
-            '& .MuiInputBase-input': {
-              fontSize: '1rem', // Slightly larger text for readability
-            },
-          }}
+          rows={5}
         />
       </DialogContent>
-      <DialogActions sx={{ p: 3 }}>
-        <MDButton onClick={onClose} color="secondary" sx={{ textTransform: 'none' }}>
+      <DialogActions>
+        <MDButton onClick={handleSave} variant="gradient" color="submit" disabled={isSaveLoading}>
+          {isSaveLoading ? "Saving..." : "Save"}
+        </MDButton>
+        <MDButton onClick={handleCancel} color="error">
           Cancel
         </MDButton>
-        <MDButton
-          onClick={handleSave}
-          color="primary"
-          sx={{
-            textTransform: 'none',
-            backgroundColor: "#1976d2",
-            '&:hover': {
-              backgroundColor: "#1565c0", // Darker blue on hover
-            },
-            padding: '8px 20px', // Padding for buttons
-          }}
-          disabled={isLoading} // Disable the button when the mutation is loading
-        >
-          {isLoading ? 'Saving...' : 'Save'}
+        <MDButton onClick={handleSubmit} variant="gradient" color="submit" disabled={isLoading}>
+          {isLoading ? "Submitting..." : "Submit"}
         </MDButton>
       </DialogActions>
-      {isError && <div style={{ color: "red", padding: "10px", textAlign: "center" }}>Failed to save job description.</div>}
+      {isDataError && (
+        <div style={{ color: "red", padding: "10px", textAlign: "center" }}>
+          Failed to load job descriptions.
+        </div>
+      )}
     </Dialog>
   );
 };
@@ -96,6 +136,7 @@ JobDescriptionDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   userId: PropTypes.number.isRequired,
+  remark: PropTypes.string,
 };
 
 export default JobDescriptionDialog;

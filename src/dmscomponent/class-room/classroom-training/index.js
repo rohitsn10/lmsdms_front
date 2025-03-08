@@ -53,7 +53,7 @@ function ClassroomTraining() {
     if (!classroomTitle.trim()) newErrors.classroomTitle = "Classroom Title is required.";
     if (!trainingType) newErrors.trainingType = "Training Type is required.";
     if (!description.trim()) newErrors.description = "Description is required.";
-    if (!File) newErrors.File = "File upload is required.";
+    // if (!File) newErrors.File = "File upload is required.";
     if (!trainer) newErrors.trainer = "Trainer is required.";
 
     setErrors(newErrors);
@@ -410,7 +410,7 @@ function ClassroomTraining() {
                   type="file"
                   label={
                     <>
-                      <span style={{ color: "red" }}>*</span> Upload File
+                      Upload File
                     </>
                   }
                   fullWidth
