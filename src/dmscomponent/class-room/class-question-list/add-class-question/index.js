@@ -40,7 +40,8 @@ function ClassAddQuestion() {
   const [openQuestionDialog, setOpenQuestionDialog] = useState(false);
   const [openAnswerDialog, setOpenAnswerDialog] = useState(false);
   const [currentAnswerIndex, setCurrentAnswerIndex] = useState(null);
-
+  const [hasImage, setHasImage] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const location = useLocation();
 
   const classroom_id = (location?.state?.classroom_id || "").toString();
@@ -72,6 +73,22 @@ function ClassAddQuestion() {
     setAnswers(updatedAnswers);
   };
 
+  const handleHasImageChange = (event) => {
+    setHasImage(event.target.checked);
+    if (!event.target.checked) {
+      setSelectedFile(null);
+    }
+  };
+  
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && !file.type.startsWith("image/")) {
+      toast.error("Please upload an image file.");
+      return;
+    }
+    setSelectedFile(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -93,6 +110,11 @@ function ClassAddQuestion() {
 
     if (!questionMarks) {
       toast.error("Question marks are required.");
+      return;
+    }
+
+    if (hasImage && !selectedFile) {
+      toast.error("Please upload an image for the question.");
       return;
     }
 
@@ -123,24 +145,26 @@ function ClassAddQuestion() {
       options = "";
       correct_answer = answers[0]?.text;
     }
-    const dataForm= {
-        classroom_id:classroom_id,
-        question_type:questionType,
-        question_text:questionText,
-        options:options,
-        correct_answer:correct_answer,
-        marks:questionMarks
-      }
-    // const formData = new FormData();
-    // formData.append("classroom_id", classroom_id);
-    // formData.append("question_type", questionType);
-    // formData.append("question_text", questionText);
-    // formData.append("options", options || "");
-    // formData.append("correct_answer", correct_answer || "");
-    // formData.append("marks", questionMarks);
 
     try {
-      const response = await classroomQuestionsPost(dataForm).unwrap();
+      // Use FormData instead of plain object to handle file upload
+      const formData = new FormData();
+      formData.append("classroom_id", classroom_id);
+      formData.append("question_type", questionType);
+      formData.append("question_text", questionText);
+      formData.append("options", options || "");
+      formData.append("correct_answer", correct_answer || "");
+      formData.append("marks", questionMarks);
+      
+      // Handle image upload
+      if (hasImage && selectedFile) {
+        formData.append("selected_file_type", "image");
+        formData.append("selected_file", selectedFile);
+      } else {
+        formData.append("selected_file_type", "");
+      }
+
+      const response = await classroomQuestionsPost(formData).unwrap();
       toast.success("Class Question created successfully!");
       setTimeout(() => {
         navigate("/class-room");
@@ -227,6 +251,23 @@ function ClassAddQuestion() {
                   <MenuItem value="True/False">True/False</MenuItem>
                 </Select>
               </FormControl>
+            </MDBox>
+            <MDBox mb={3}>
+              <FormControlLabel
+                control={<Checkbox checked={hasImage} onChange={handleHasImageChange} />}
+                label="Question has image"
+              />
+              {hasImage && (
+                <MDBox mt={2}>
+                  <MDTypography variant="body2">Upload question image</MDTypography>
+                  <input type="file" accept="image/*" onChange={handleImageChange} />
+                  {selectedFile && (
+                    <MDTypography variant="body2" color="success">
+                      Selected: {selectedFile.name}
+                    </MDTypography>
+                  )}
+                </MDBox>
+              )}
             </MDBox>
             <MDBox mb={3}>
               <MDTypography variant="h6" fontWeight="medium">

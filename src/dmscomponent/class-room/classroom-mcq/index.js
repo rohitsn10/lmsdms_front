@@ -2,20 +2,21 @@ import React, { useEffect, useState } from "react";
 import CounterIndicator from "./counterIndicator";
 import MDButton from "components/MDButton";
 import QuestionSection from "./questionSection";
-import { 
-  Pagination, 
-  Stack, 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Button, 
+import {
+  Pagination,
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
   CircularProgress,
   Box,
-  Container 
+  Container,
+  IconButton
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-// import { useGetTrainingQuizzesQuery } from "apilms/quizapi";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAttemptQuizMutation } from "apilms/quizapi";
 import { useAuth } from "hooks/use-auth";
 import { useClassroomQuizGetQuery } from "apilms/classtestApi";
@@ -26,10 +27,9 @@ function ClassMultiChoiceQuestionsSection() {
   
   const id = location?.state?.rowData?.classroom_id;
   const { user } = useAuth();
-  const { data: questionsData, isLoading, isError } = useClassroomQuizGetQuery(id, {
-    skip: !id,
-  });
-  const [attemptQuiz]  = useAttemptQuizMutation()
+  const { data: questionsData, isLoading, isError } = useClassroomQuizGetQuery(id, { skip: !id });
+
+  const [attemptQuiz] = useAttemptQuizMutation();
   const [questions, setQuestions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [answers, setAnswers] = useState({});
@@ -39,7 +39,35 @@ function ClassMultiChoiceQuestionsSection() {
   const [openModal, setOpenModal] = useState(false);
   const [resultMessage, setResultMessage] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  
+
+  // Prevent Back Navigation (Browser Back Button & Keyboard Shortcuts)
+  useEffect(() => {
+    const preventNavigation = () => {
+      window.history.pushState(null, null, window.location.href);
+    };
+
+    preventNavigation();
+    window.addEventListener("popstate", preventNavigation);
+
+    return () => {
+      window.removeEventListener("popstate", preventNavigation);
+    };
+  }, []);
+
+  useEffect(() => {
+    const blockKeys = (e) => {
+      if ((e.altKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) || e.key === "Backspace") {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener("keydown", blockKeys);
+
+    return () => {
+      window.removeEventListener("keydown", blockKeys);
+    };
+  }, []);
+
   useEffect(() => {
     if (questionsData?.data?.[0]) {
       const quizData = questionsData.data[0];
@@ -103,33 +131,19 @@ function ClassMultiChoiceQuestionsSection() {
     };
   };
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     if (hasSubmitted) return;
 
     const results = calculateResults();
     const passCriteria = parseFloat(questionsData.data[0].pass_criteria);
     const passKey = results.marksObtained >= passCriteria;
-    // console.log("Pass Criteria:",passCriteria)
     const message = `You scored ${results.marksObtained} out of ${results.totalMarks} marks.\nTime taken: ${formatTime(results.timeTaken)}`;
-
-    const quizPayload = {
-      classroom_id: id,
-      user_id: user?.id, // Should come from auth context
-      questions: results.userResponseList,
-      obtain_marks: results.marksObtained,
-      total_marks: results.totalMarks,
-      total_taken_time: results.timeTaken,
-      is_pass:passKey,
-      is_assessment_completed:true
-    };
 
     setResultMessage(message);
     setOpenModal(true);
     setHasSubmitted(true);
 
     try {
-      // await attemptQuiz(quizPayload).unwrap();
-      // console.log(quizPayload)
       console.log("Quiz submitted successfully");
     } catch (error) {
       console.error("Error submitting quiz:", error);
@@ -143,12 +157,7 @@ function ClassMultiChoiceQuestionsSection() {
 
   if (isLoading) {
     return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
-        minHeight="100vh"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
         <CircularProgress />
       </Box>
     );
@@ -161,12 +170,12 @@ function ClassMultiChoiceQuestionsSection() {
         justifyContent="center" 
         alignItems="center" 
         sx={{
-          backgroundColor:"white !important",
-          width:"300px",
-          margin:"auto",
-          padding:'30px',
-          marginTop:'200px',
-          borderRadius:'10px'
+          backgroundColor: "white !important",
+          width: "300px",
+          margin: "auto",
+          padding: "30px",
+          marginTop: "200px",
+          borderRadius: "10px"
         }}
       >
         <p>No questions available or an error occurred.</p>
@@ -189,6 +198,11 @@ function ClassMultiChoiceQuestionsSection() {
           gap: 2
         }}
       >
+        {/* Back Button */}
+        {/* <IconButton onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}>
+          <ArrowBackIcon />
+        </IconButton> */}
+
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <CounterIndicator
             counter={counter}
@@ -207,6 +221,7 @@ function ClassMultiChoiceQuestionsSection() {
           </MDButton>
         </Box>
 
+        {/* Question Section */}
         {questions[currentPage - 1] && (
           <QuestionSection
             question={questions[currentPage - 1]}
@@ -218,20 +233,17 @@ function ClassMultiChoiceQuestionsSection() {
           />
         )}
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 2.5 }}>
-          <Stack spacing={2}>
-            <Pagination
-              onChange={handlePageChange}
-              count={pageCount}
-              page={currentPage}
-              variant="outlined"
-              size="large"
-              color="primary"
-              shape="rounded"
-            />
-          </Stack>
-        </Box>
+        {/* Pagination */}
+        <Stack spacing={2} alignItems="center" mt={2}>
+          <Pagination
+            count={pageCount}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+          />
+        </Stack>
 
+        {/* Result Modal */}
         <Dialog open={openModal} onClose={handleModalClose}>
           <DialogTitle>Quiz Results</DialogTitle>
           <DialogContent>

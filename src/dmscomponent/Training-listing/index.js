@@ -17,6 +17,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import QuizIcon from "@mui/icons-material/Quiz";
 import WarningIcon from "@mui/icons-material/Warning";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const TrainingListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -245,17 +246,35 @@ const TrainingListing = () => {
         const document = data?.document_data?.documents.find(doc => doc.id === params.row.id);
         const userQuizSession = document?.quiz_sessions?.find(session => session.user === user.id);
         const hasFailedStatus = userQuizSession?.status === "Failed";
+        const hasPassedStatus = userQuizSession?.status === "passed";
         
         return (
+          // <MDBox display="flex" justifyContent="center">
+          
+          //   <IconButton 
+          //     disabled={!isUserInView} 
+          //     color={hasFailedStatus ? "warning" : "error"} 
+          //     onClick={() => handleAssessmentClick(params.row.id)}
+          //   >
+          //     {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
+          //   </IconButton>
+          // </MDBox>
           <MDBox display="flex" justifyContent="center">
-            <IconButton 
-              disabled={!isUserInView} 
-              color={hasFailedStatus ? "warning" : "error"} 
+          {hasPassedStatus ? (
+            <IconButton disabled>
+              {/* <ChecklistIcon style={{ color: "green" }} /> Green checkmark */}
+              <CheckCircleIcon style={{ color: "green" }} />
+            </IconButton>
+          ) : (
+            <IconButton
+              disabled={!params.row?.user_view?.some(view => view.user === user.id)}
+              color={hasFailedStatus ? "warning" : "error"}
               onClick={() => handleAssessmentClick(params.row.id)}
             >
               {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
             </IconButton>
-          </MDBox>
+          )}
+        </MDBox>
         );
       },
       sortable: false,
