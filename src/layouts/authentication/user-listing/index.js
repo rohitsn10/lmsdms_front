@@ -59,7 +59,8 @@ const UsersListing = () => {
         is_department_assigned: item.is_department_assigned || false,
         is_description: item.is_description || false,
         is_jr_approve: item.is_jr_approve || false,
-        is_induction_complete:item.is_induction_complete
+        is_induction_complete:item.is_induction_complete,
+        job_role: Array.isArray(item.job_role) ? item.job_role.join(", ") : item.job_role || "N/A",
       }))
     : [];
 
@@ -150,8 +151,9 @@ const UsersListing = () => {
     { field: "full_name", headerName: "Full Name", flex: 1, headerAlign: "center" },
     { field: "email", headerName: "Email", flex: 1, headerAlign: "center" },
     { field: "username", headerName: "Username", flex: 0.75, headerAlign: "center" },
-    { field: "UserRole", headerName: "Role", flex: 1, headerAlign: "center" },
+    { field: "UserRole", headerName: "UserRole", flex: 1, headerAlign: "center" },
     { field: "created_at", headerName: "Date", flex: 0.75, headerAlign: "center" },
+    { field: "job_role", headerName: "Job Role", flex: 1, headerAlign: "center" },
     ...(groupId === 7
       ? [
           {
@@ -213,7 +215,7 @@ const UsersListing = () => {
       ? [
           {
             field: "download_ic",
-            headerName: "IC Download",
+            headerName: "Induction Certificate",
             flex: 0.5,
             headerAlign: "center",
             renderCell: (params) => 
@@ -249,7 +251,7 @@ const UsersListing = () => {
             headerAlign: "center",
             renderCell: (params) => (
               <IconButton
-                color="info"
+                color="success"
                 onClick={() => handleDownloadTrainingCertificate(params.row)}
               >
                 <DownloadIcon />

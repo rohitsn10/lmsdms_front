@@ -206,11 +206,13 @@ function ClassroomEditTraining() {
                     }}
                   >
                     {/* Add trainers dynamically */}
-                    {alltrainers?.map((trainerItem) => (
-                      <MenuItem key={trainerItem.id} value={trainerItem.id}>
-                        {trainerItem.trainer_name} {/* Display trainer name */}
-                      </MenuItem>
-                    ))}
+                    {alltrainers
+                      ?.filter((trainerItem) => trainerItem.is_active) // Only active trainers
+                      .map((trainerItem) => (
+                        <MenuItem key={trainerItem.id} value={trainerItem.id}>
+                          {trainerItem.trainer_name} {/* Display trainer name */}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
 

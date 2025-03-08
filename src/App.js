@@ -132,6 +132,7 @@ import EditQuiz from "dmscomponent/edit-quiz/index.js";
 import DocumentPreviewComponent from "layouts/authentication/document-listing/doc-view-onlyoffice/index.js";
 import TrainingDocumentView from "dmscomponent/Training-listing/onlyofficeDocView/index.js";
 // import DocumentPreviewComponent from "dmscomponent/Training-listing/onlyofficeDocView/index.js";
+import PPTPDFPreview from "dmscomponent/induction-training/PPT-PDF-Preview/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -422,6 +423,7 @@ export default function App() {
       <Route path="/class-edit-quiz" element={<EditClassQuiz/>}/>
       <Route path="/docviewer" element={<DocumentPreviewComponent/>}/>
       <Route path="/training-document-view" element={<TrainingDocumentView/>}/>
+      <Route path="/ppt-view" element={<PPTPDFPreview/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
     <ToastContainer />
