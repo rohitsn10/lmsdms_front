@@ -17,6 +17,7 @@ import { styled } from "@mui/material/styles";
 import apiService from "services/apiService";
 import { useNavigate } from "react-router-dom";
 import MDButton from "components/MDButton";
+
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -30,8 +31,8 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
-    const navigate = useNavigate();
-    console.log("SectionID:",sectionId)
+  const navigate = useNavigate();
+
   const [material, setMaterial] = useState({
     material_title: '',
     material_type: '',
@@ -48,12 +49,26 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
     setMaterial((prevMaterial) => ({
       ...prevMaterial,
       [name]: value,
+      file: null // Reset file when material type changes
     }));
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+      const allowedExtensions = {
+        pdf: ['pdf'],
+        video: ['mp4', 'avi', 'mov'],
+        document: ['doc', 'docx', 'txt']
+      };
+
+      if (material.material_type && !allowedExtensions[material.material_type].includes(fileExtension)) {
+        setOpenSnackbar(true);
+        setErrorMessage(`Invalid file type. Please upload a ${material.material_type.toUpperCase()} file.`);
+        return;
+      }
+
       setMaterial((prevMaterial) => ({
         ...prevMaterial,
         file: file,
@@ -61,11 +76,11 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
     }
   };
 
-  const handleFormSubmit = async(e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     let hasError = false;
     let errorMessage = "";
-    console.log("Noewoe")
+
     if (!material.material_title) {
       hasError = true;
       errorMessage = "Material Title is required";
@@ -88,51 +103,36 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
       setErrorMessage(errorMessage);
       return;
     }
-    // console.log(material.material_title,material.material_type,material.minimum_reading_time,material.section_id,material.file)
+
     const formData = new FormData();
     formData.append('material_title', material.material_title);
     formData.append('material_type', material.material_type);
     formData.append('minimum_reading_time', material.minimum_reading_time);
     formData.append('section_ids', material.section_id);
     formData.append('material_file', material.file);
-    // console.log(formData);
 
     try {
-        // Make the POST request using your Axios inst
-        // ance
-        const response = await apiService.post('/lms_module/create_training_material', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data', // Set proper content type
-          },
-        });
-    
-        // console.log('Response:', response.data);
-        // Reset form and close modal
-        setMaterial({
-          material_title: '',
-          material_type: '',
-          minimum_reading_time: '',
-          file: null,
-          section_id: sectionId,
-        });
-        navigate(0);
+      const response = await apiService.post('/lms_module/create_training_material', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-        handleClose();
-        // navigate(0);
-      } catch (error) {
-        console.error('Error creating training material:', error);
-        setOpenSnackbar(true);
-        setErrorMessage('Failed to create training material. Please try again.');
-      }
-    // handleSubmit(formData);
-    setMaterial({
-      material_title: '',
-      material_type: '',
-      minimum_reading_time: '',
-      file: null,
-      section_id: sectionId
-    });
-    handleClose();
+      setMaterial({
+        material_title: '',
+        material_type: '',
+        minimum_reading_time: '',
+        file: null,
+        section_id: sectionId,
+      });
+
+      navigate(0);
+      handleClose();
+    } catch (error) {
+      console.error('Error creating training material:', error);
+      setOpenSnackbar(true);
+      setErrorMessage('Failed to create training material. Please try again.');
+    }
   };
 
   const handleCloseSnackbar = () => {
@@ -183,23 +183,17 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
               onChange={handleChange}
               fullWidth
               margin="normal"
-              InputProps={{
-                sx: {
-                  height: 50,
-                  fontSize: "1rem",
-                  padding:'20px'
-                },
-              }}
-              SelectProps={{
-                sx: {
-                  padding: "10px",
-                },
-              }}
               required
+              InputProps={{
+    sx: {
+      padding: "7px", // Adds padding inside the input field
+      height: 40, // Adjust height for better spacing
+    },
+  }}
             >
               <MenuItem value="pdf">PDF</MenuItem>
               <MenuItem value="video">Video</MenuItem>
-              <MenuItem value="document">Document</MenuItem>
+              {/* <MenuItem value="document">Document</MenuItem> */}
             </TextField>
 
             <TextField
@@ -212,10 +206,6 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
               margin="normal"
               required
               InputProps={{ inputProps: { min: 1 } }}
-              sx={{
-                height:50
-              }}
-              
             />
 
             <MDButton
@@ -233,7 +223,9 @@ const AddMaterialModal = ({ open, handleClose, sectionId, handleSubmit }) => {
               <VisuallyHiddenInput 
                 type="file" 
                 onChange={handleFileChange}
-                accept=".pdf,.doc,.docx,.txt,.mp4,.avi,.mov"
+                accept={material.material_type === "pdf" ? ".pdf" : 
+                        material.material_type === "video" ? ".mp4,.avi,.mov" : 
+                        ".doc,.docx,.txt"} 
               />
             </MDButton>
 

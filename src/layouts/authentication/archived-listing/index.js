@@ -83,15 +83,13 @@ const ArchivedListing = () => {
                             value={searchTerm}
                             onChange={handleSearch}
                         /> */}
-                        <FormLabel>Select Document:</FormLabel>
+                        {/* <FormLabel>Select Document:</FormLabel>
                         <FormControl sx={{ width: "400px",padding:'10px'}}>
-                            {/* <InputLabel id="document-select-label">Select Document</InputLabel> */}
                             <Select
                                 labelId="document-select-label"
                                 value={selectedDocumentId}
                                 onChange={handleDocumentSelect}
                                 size="small"
-                                // label="Select Document"
                                 sx={{
                                     padding:'10px'
                                 }}
@@ -105,7 +103,7 @@ const ArchivedListing = () => {
                                     </MenuItem>
                                 ))}
                             </Select>
-                        </FormControl>
+                        </FormControl> */}
                     </MDBox>
 
                     <MDBox display="flex" justifyContent="center">

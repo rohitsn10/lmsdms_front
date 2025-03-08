@@ -38,208 +38,76 @@ function MultiChoiceQuestionsSection() {
   const [openModal, setOpenModal] = useState(false);
   const [resultMessage, setResultMessage] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  // New state for confirmation modal
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   
-  // Prevent browser back navigation
-  // useEffect(() => {
-  //   if (hasSubmitted) return; // Don't block navigation after submission
+  // This is the most important part - disabling the back button
+  useEffect(() => {
+    // Force replace current history entry
+    window.history.replaceState(null, "", window.location.pathname);
     
-  //   // Define the function to handle back/forward navigation
-  //   const blockNavigation = (e) => {
-  //     // Push the current state again to prevent navigation
-  //     window.history.pushState(null, null, window.location.href);
-  //     // Show confirmation dialog
-  //     // setOpenConfirmModal(true);
-  //     // Cancel the event
-  //     e.preventDefault();
-  //     // Chrome requires returnValue to be set for beforeunload
-  //     if (e.type === 'beforeunload') {
-  //       e.returnValue = '';
-  //     }
-  //     return '';
-  //   };
-
-  //   // Push state initially to ensure there's a history entry to go back to
-  //   window.history.pushState(null, null, window.location.href);
+    // Push additional state to create new history entry
+    window.history.pushState(null, "", window.location.pathname);
+    window.history.pushState(null, "", window.location.pathname);
     
-  //   // Listen for attempts to navigate away
-  //   window.addEventListener('popstate', blockNavigation);
-  //   window.addEventListener('beforeunload', blockNavigation);
-    
-  //   // Clean up event listeners on component unmount
-  //   return () => {
-  //     window.removeEventListener('popstate', blockNavigation);
-  //     window.removeEventListener('beforeunload', blockNavigation);
-  //   };
-  // }, [hasSubmitted]);
-  // useEffect(() => {
-  //   if (hasSubmitted) return; // Don't block navigation after submission
-  
-  //   let isModalOpen = false; // Track modal state
-  
-  //   const blockNavigation = (e) => {
-  //     if (isModalOpen) return; // Prevent multiple pop-ups
-  
-  //     // Push the current state again to prevent navigation
-  //     window.history.pushState(null, null, window.location.href);
+    // Function to handle popstate (when back/forward buttons are clicked)
+    const blockNavigation = (e) => {
+      // This will stop the navigation from happening
+      window.history.pushState(null, "", window.location.pathname);
       
-  //     // Show confirmation dialog only once
-  //     isModalOpen = true;
-  //     setOpenConfirmModal(true);
-  
-  //     // Prevent default behavior
-  //     e.preventDefault();
-  //     if (e.type === 'beforeunload') e.returnValue = '';
-  
-  //     return '';
-  //   };
-  
-  //   // Push initial state to block navigation
-  //   window.history.pushState(null, null, window.location.href);
-  
-  //   window.addEventListener('popstate', blockNavigation);
-  //   window.addEventListener('beforeunload', blockNavigation);
-  
-  //   return () => {
-  //     window.removeEventListener('popstate', blockNavigation);
-  //     window.removeEventListener('beforeunload', blockNavigation);
-  //   };
-  // }, [hasSubmitted]);
-  // useEffect(() => {
-  //   if (hasSubmitted) return; // Allow navigation after submission
-  
-  //   let isModalOpen = false; // Track modal state
-  
-  //   const blockNavigation = (e) => {
-  //     // Prevent multiple pop-ups
-  //     if (!isModalOpen) {
-  //       isModalOpen = true;
-  //       setOpenConfirmModal(true);
-  //     }
-  
-  //     // Push state again to keep the user on the same page
-  //     window.history.pushState(null, null, window.location.href);
-  
-  //     // Prevent default behavior
-  //     e.preventDefault();
-  //     if (e.type === 'beforeunload') e.returnValue = '';
-  
-  //     return '';
-  //   };
-  
-  //   // Continuously push state to disable back navigation
-  //   const disableBack = () => {
-  //     window.history.pushState(null, null, window.location.href);
-  //   };
-  
-  //   // Initial state push
-  //   disableBack();
-  
-  //   // Listen for back navigation attempts
-  //   window.addEventListener('popstate', blockNavigation);
-  //   window.addEventListener('beforeunload', blockNavigation);
-  
-  //   // Continuously push state to lock the user in the quiz
-  //   const interval = setInterval(disableBack, 500);
-  
-  //   return () => {
-  //     clearInterval(interval); // Stop pushing state when the component unmounts
-  //     window.removeEventListener('popstate', blockNavigation);
-  //     window.removeEventListener('beforeunload', blockNavigation);
-  //   };
-  // }, [hasSubmitted]);
-  // useEffect(() => {
-  //   if (hasSubmitted) return; // Allow navigation only after submission
-  
-  //   let isModalOpen = false; // Track modal state
-  
-  //   const blockNavigation = (e) => {
-  //     if (!isModalOpen) {
-  //       isModalOpen = true;
-  //       setOpenConfirmModal(true);
-  //     }
-  
-  //     // Prevent back navigation by pushing the same state repeatedly
-  //     window.history.pushState(null, null, window.location.href);
-  
-  //     e.preventDefault();
-  //     if (e.type === 'beforeunload') e.returnValue = '';
-  //     return '';
-  //   };
-  
-  //   const disableBack = () => {
-  //     window.history.pushState(null, null, window.location.href);
-  //   };
-  
-  //   // Prevent back navigation immediately
-  //   disableBack();
-  
-  //   // Listen for back button attempts
-  //   window.addEventListener('popstate', blockNavigation);
-  //   window.addEventListener('beforeunload', blockNavigation);
-  
-  //   // Force the state push continuously to lock user in
-  //   const interval = setInterval(disableBack, 100);
-  
-  //   return () => {
-  //     clearInterval(interval);
-  //     window.removeEventListener('popstate', blockNavigation);
-  //     window.removeEventListener('beforeunload', blockNavigation);
-  //   };
-  // }, [hasSubmitted]);
-
-  // Make sure navigation is disabled when using keyboard shortcuts too
-  // useEffect(() => {
-  //   if (hasSubmitted) return;
-    
-  //   const handleKeyDown = (e) => {
-  //     // Block Alt+Left (back) and Alt+Right (forward) keyboard shortcuts
-  //     if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
-  //       e.preventDefault();
-  //       // setOpenConfirmModal(true);
-  //     }
-  //   };
-    
-  //   window.addEventListener('keydown', handleKeyDown);
-    
-  //   return () => {
-  //     window.removeEventListener('keydown', handleKeyDown);
-  //   };
-  // }, [hasSubmitted]);
-  useEffect(() => {
-    // Prevent back navigation by pushing the same state repeatedly
-    const preventNavigation = () => {
-      window.history.pushState(null, null, window.location.href);
+      // Push one more state to ensure we have enough history entries
+      window.history.pushState(null, "", window.location.pathname);
     };
-
-    preventNavigation();
-    window.addEventListener("popstate", preventNavigation);
-
-    return () => {
-      window.removeEventListener("popstate", preventNavigation);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Block keyboard shortcuts (Alt + Left/Right, Backspace)
-    const blockKeys = (e) => {
-      if ((e.altKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) || e.key === "Backspace") {
+    
+    // Block Ctrl+W, Alt+F4, and other ways to close the window/tab
+    const blockBeforeUnload = (e) => {
+      if (!hasSubmitted) {
         e.preventDefault();
+        e.returnValue = "";
+        return "";
       }
     };
-
-    window.addEventListener("keydown", blockKeys);
-
-    return () => {
-      window.removeEventListener("keydown", blockKeys);
+    
+    // Block keyboard shortcuts
+    const blockKeys = (e) => {
+      // Block Alt+Left, Alt+Right (browser navigation keys)
+      if (e.altKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+      
+      // Block Backspace outside of input fields (which triggers back navigation)
+      if (e.key === "Backspace" && 
+          e.target.tagName !== "INPUT" && 
+          e.target.tagName !== "TEXTAREA" && 
+          !e.target.isContentEditable) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
     };
-  }, []);
+    
+    // Register all event listeners
+    window.addEventListener("popstate", blockNavigation);
+    window.addEventListener("beforeunload", blockBeforeUnload);
+    window.addEventListener("keydown", blockKeys, true);
+    
+    // Periodically push state to ensure back button is always disabled
+    const intervalId = setInterval(() => {
+      window.history.pushState(null, "", window.location.pathname);
+    }, 300);
+    
+    return () => {
+      // Clean up all event listeners when component unmounts
+      window.removeEventListener("popstate", blockNavigation);
+      window.removeEventListener("beforeunload", blockBeforeUnload);
+      window.removeEventListener("keydown", blockKeys, true);
+      clearInterval(intervalId);
+    };
+  }, [hasSubmitted]);
+
   const handleConfirmExit = () => {
     setOpenConfirmModal(false);
-    // Remove the event listeners before navigating to prevent blocking the navigation
-    window.removeEventListener('popstate', () => {});
-    window.removeEventListener('beforeunload', () => {});
     navigate("/trainingListing", { replace: true });
   };
 
@@ -470,14 +338,24 @@ function MultiChoiceQuestionsSection() {
             <Button onClick={handleCancelExit} color="primary">
               Continue Quiz
             </Button>
-            {/* <Button onClick={handleConfirmExit} color="error">
+            <Button onClick={handleConfirmExit} color="error">
               Exit Quiz
-            </Button> */}
+            </Button>
           </DialogActions>
         </Dialog>
       </Box>
     </Container>
   );
+}
+
+// Add this to ensure back button is disabled immediately
+// when the file is loaded, before the component mounts
+if (typeof window !== 'undefined') {
+  window.history.pushState(null, "", window.location.pathname);
+  window.history.pushState(null, "", window.location.pathname);
+  window.addEventListener("popstate", function() {
+    window.history.pushState(null, "", window.location.pathname);
+  });
 }
 
 export default MultiChoiceQuestionsSection;

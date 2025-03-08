@@ -198,7 +198,7 @@ export const documentApi = createApi({
     }),   
     fetchDocumentVersionList: builder.query({
       query: (documentId) => ({
-        url: `dms_module/document_version_list/${documentId}`,
+        url: `dms_module/document_version_list`,
         method: "GET",
       }),
       transformResponse: (response) => response.data,
