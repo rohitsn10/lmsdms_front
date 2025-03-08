@@ -135,7 +135,7 @@ const QuestionListing = () => {
             variant="outlined"
             size="small"
             sx={{ width: "250px", mr: 2 }}
-            value={searchTerm}
+            value={searchTerm} 
             onChange={handleSearch}
           />
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>

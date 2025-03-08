@@ -32,7 +32,6 @@ function ClassroomTraining() {
   const { data: alldocument } = useFetchTrainingsQuery();
   const { data: alltrainers } = useFetchTrainersQuery();
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
-
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [sopdocument, setsopdocument] = useState("None");
   const [trainer, setTrainer] = useState("");
@@ -95,7 +94,7 @@ function ClassroomTraining() {
     formData.append("upload_doc", File);
     formData.append("online_offline_status", onlineOfflineStatus);
     formData.append("select_users", JSON.stringify(selectedUsers));
-  
+
     const token = sessionStorage.getItem("token");
     const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/create_classroom`;
 
@@ -130,7 +129,7 @@ function ClassroomTraining() {
   };
 
   return (
-    <BasicLayout image={bgImage} showNavbarFooter={false}> 
+    <BasicLayout image={bgImage} showNavbarFooter={false}>
       <Card sx={{ width: 600, mx: "auto" }}>
         <MDBox
           borderRadius="lg"
@@ -180,7 +179,7 @@ function ClassroomTraining() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControl fullWidth margin="dense" >
+                <FormControl fullWidth margin="dense">
                   <InputLabel id="training-type-label">
                     <span style={{ color: "red" }}>*</span>Type
                   </InputLabel>
@@ -201,15 +200,13 @@ function ClassroomTraining() {
                   </Select>
                 </FormControl>
                 {errors.trainingType && (
-                  <MDTypography variant="caption" >
-                    {errors.trainingType}
-                  </MDTypography>
+                  <MDTypography variant="caption">{errors.trainingType}</MDTypography>
                 )}
               </Grid>
               <Grid item xs={12}>
-                <FormControl fullWidth margin="dense" >
+                <FormControl fullWidth margin="dense">
                   <InputLabel id="trainer-type-label">
-                    <span style={{color:"red"}}>*</span>Select Trainer
+                    <span style={{ color: "red" }}>*</span>Select Trainer
                   </InputLabel>
                   <Select
                     labelId="select-trainer-label"
@@ -224,17 +221,19 @@ function ClassroomTraining() {
                     }}
                   >
                     {/* Add trainers dynamically */}
-                    {alltrainers?.map((trainerItem) => (
-                      <MenuItem key={trainerItem.id} value={trainerItem.id}>
-                        {trainerItem.trainer_name} {/* Display trainer name */}
-                      </MenuItem>
-                    ))}
+                    {alltrainers
+                      ?.filter((trainerItem) => trainerItem.is_active) // Only active trainers
+                      .map((trainerItem) => (
+                        <MenuItem key={trainerItem.id} value={trainerItem.id}>
+                          {trainerItem.trainer_name} {/* Display trainer name */}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
 
                 {/* Display error message for the "trainer" field */}
                 {errors.trainer && (
-                  <MDTypography variant="caption" >
+                  <MDTypography variant="caption">
                     {errors.trainer} {/* Display the error message for the trainer */}
                   </MDTypography>
                 )}

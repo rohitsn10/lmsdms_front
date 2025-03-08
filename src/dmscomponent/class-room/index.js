@@ -53,15 +53,24 @@ const ClassroomListing = () => {
   };
   const handleDownloadAttendanceSheet = (documentId) => {
     setDownloadDocumentId(documentId);
-    toast.info("Downloading attendance sheet...", { autoClose: 1000 }); // Show loading toast
+    toast.info("Downloading attendance sheet..."); // Show loading toast
   };
-
+  
   useEffect(() => {
     if (attendanceSheetData && downloadDocumentId) {
-      // Create a Blob URL for the file
-      const url = window.URL.createObjectURL(new Blob([attendanceSheetData]));
+      // Check if the API response indicates a failure
+      if (attendanceSheetData.status === false) {
+        // Show error message from API response
+        toast.error(`Failed to download attendance sheet: ${attendanceSheetData.message}`, {
+        
+        });
+        setDownloadDocumentId(null); // Reset the document ID
+        return; // Prevent further execution
+      }
+  
+      const url = attendanceSheetData.data; // URL directly from attendanceSheetData
       const link = document.createElement("a");
-      link.href = url;
+      link.href = url; // Use the URL from the response
       link.setAttribute("download", `attendance_sheet_${downloadDocumentId}.pdf`); // Set the file name
       document.body.appendChild(link);
       link.click();
@@ -69,19 +78,20 @@ const ClassroomListing = () => {
   
       // Reset states after download
       setDownloadDocumentId(null); // Reset the document ID
-      toast.success("Attendance sheet downloaded successfully!", { autoClose: 3000 }); // Show success toast
+      toast.success("Attendance sheet downloaded successfully!",); // Show success toast
     }
   }, [attendanceSheetData, downloadDocumentId]);
-
+  
   // Handle error in attendance sheet download
   useEffect(() => {
     if (isAttendanceSheetError) {
       toast.error(`Failed to download attendance sheet: ${attendanceSheetError?.message}`, {
-        autoClose: 5000,
+  
       });
       setDownloadDocumentId(null); // Reset the document ID
     }
   }, [isAttendanceSheetError, attendanceSheetError]);
+  
   if (isLoading) {
     return (
       <MDBox

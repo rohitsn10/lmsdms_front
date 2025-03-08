@@ -16,12 +16,12 @@ import MDButton from "components/MDButton";
 import { useSelectedUserGetQuery } from "api/auth/documentApi"; // Update with the correct path
 
 const ViewSelectionDialog = ({ open, onClose, documentId }) => {
-  const { data, isLoading } = useSelectedUserGetQuery({ documentId },{skip: !documentId});
-  
+  const { data, isLoading } = useSelectedUserGetQuery({ documentId }, { skip: !documentId });
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
-  
+
   const { approver, reviewer, doc_admin: docAdmin } = data?.data || {};
 
   return (
@@ -33,10 +33,8 @@ const ViewSelectionDialog = ({ open, onClose, documentId }) => {
       </MDBox>
 
       <DialogContent>
-       
-
         {/* Reviewer Display */}
-        <MDBox mb={3}> 
+        <MDBox mb={3}>
           <FormControl fullWidth margin="dense" variant="outlined" disabled>
             <InputLabel id="view-reviewer-label">Reviewer</InputLabel>
             <Select
@@ -65,8 +63,8 @@ const ViewSelectionDialog = ({ open, onClose, documentId }) => {
             </Select>
           </FormControl>
         </MDBox>
- {/* Approver Display */}
- <MDBox mb={3}>
+        {/* Approver Display */}
+        <MDBox mb={3}>
           <FormControl fullWidth margin="dense" variant="outlined" disabled>
             <InputLabel id="view-approver-label">Approver</InputLabel>
             <Select

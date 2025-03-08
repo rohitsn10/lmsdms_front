@@ -7,7 +7,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi"; // API call for fetching departments
@@ -22,17 +22,30 @@ const AddInductionTraining = () => {
   const { data: departments, isLoading: deptLoading } = useFetchDepartmentsQuery();
   const navigate = useNavigate();
   const [createInduction]=useCreateGetInductionMutation();
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === "application/pdf") {
+      setDocument(file);
+      setErrors((prevErrors) => ({ ...prevErrors, document: "" }));
+    } else {
+      setDocument(null);
+      setErrors((prevErrors) => ({ ...prevErrors, document: "Only PDF files are allowed." }));
+      toast.error("Only PDF files are allowed.");
+    }
+  };
+
   const validateInputs = () => {
     const newErrors = {};
     if (!inductionTitle.trim()) newErrors.inductionTitle = "Induction Title is required.";
     if (!department) newErrors.department = "Department is required.";
-    if (!document) newErrors.document = "Document is required.";
+    if (!document) {
+      newErrors.document = "Document is required.";
+    } else if (document.type !== "application/pdf") {
+      newErrors.document = "Only PDF files are allowed.";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const handleFileChange = (e) => {
-    setDocument(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
@@ -54,7 +67,6 @@ const AddInductionTraining = () => {
       return;
     }
 
-
     try {
       const inductiondata = new FormData();
       inductiondata.append("induction_name", inductionTitle.trim());
@@ -75,7 +87,6 @@ const AddInductionTraining = () => {
       console.error("Error adding induction training:", error);
       toast.error("An error occurred while adding the Induction Training.");
     }
-
   };
 
   return (
@@ -152,6 +163,7 @@ const AddInductionTraining = () => {
                 onChange={handleFileChange}
                 error={!!errors.document}
                 helperText={errors.document}
+                inputProps={{ accept: "application/pdf" }}
               />
             </MDBox>
 
@@ -165,7 +177,6 @@ const AddInductionTraining = () => {
       </Card>
 
       <ESignatureDialog open={openSignatureDialog} onClose={() => setOpenSignatureDialog(false)} onConfirm={handleSignatureComplete} />
-      <ToastContainer position="top-right" autoClose={3000} />
     </BasicLayout>
   );
 };
