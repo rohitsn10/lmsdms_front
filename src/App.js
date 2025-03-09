@@ -133,6 +133,7 @@ import DocumentPreviewComponent from "layouts/authentication/document-listing/do
 import TrainingDocumentView from "dmscomponent/Training-listing/onlyofficeDocView/index.js";
 // import DocumentPreviewComponent from "dmscomponent/Training-listing/onlyofficeDocView/index.js";
 import PPTPDFPreview from "dmscomponent/induction-training/PPT-PDF-Preview/index.js";
+import TrainingDocumentObsoleteView from "layouts/authentication/archived-listing/onlyoffice-archived.jsx";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -293,7 +294,7 @@ export default function App() {
   <div>
     {/* Always render Sidenav */}
     {window.location.pathname !== "/login" && !/^\/document-view\/\d+$/.test(pathname) && window.location.pathname !== "/forgotpassword" && window.location.pathname !== "/mcq-module" &&
-    window.location.pathname !== "/exam-mcq-module" && window.location.pathname !== '/docviewer' && window.location.pathname  !== '/training-document-view'
+    window.location.pathname !== "/exam-mcq-module" && window.location.pathname !== '/docviewer' && window.location.pathname  !== '/training-document-view' && window.location.pathname  !== '/archived-docviewer'
      &&(
       <Sidenav
         color={sidenavColor}
@@ -360,6 +361,7 @@ export default function App() {
       <Route path="/under-approve-document" element={<UnderApproveDocument/>}/>
       <Route path="/PDFPreview" element={<PDFPreview/>}/>
       <Route path="/archived-listing" element={<ArchivedListing/>}/>
+      <Route path="/archived-docviewer" element={<TrainingDocumentObsoleteView/>}/>
       <Route path="/Obsolete-data" element={<ObsoleteDataListing/>}/>
       <Route path="/due-sop-document" element={<DueSOPDocument/>}/>
       {/* Lms components */}

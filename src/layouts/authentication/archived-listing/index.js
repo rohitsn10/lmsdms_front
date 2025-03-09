@@ -1,116 +1,105 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import InputLabel from "@mui/material/InputLabel";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
-import moment from "moment";
-import { useFetchDocumentsQuery, useFetchDocumentVersionListQuery } from "api/auth/documentApi";
-import { FormLabel } from "@mui/material";
-
+import { useFetchDocumentVersionListQuery } from "api/auth/documentApi";
+import { useNavigate } from "react-router-dom";
 const ArchivedListing = () => {
-    const [searchTerm, setSearchTerm] = useState("");
-    const [selectedDocumentId, setSelectedDocumentId] = useState("");
     const navigate = useNavigate();
-
-    const { data: documents = [], isLoading: documentsLoading } = useFetchDocumentsQuery();
-    // Always call the hook, but pass null when no document is selected
+    const [selectedDocumentId, setSelectedDocumentId] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
     const { data: versions = [], isLoading: versionsLoading } = useFetchDocumentVersionListQuery(
         selectedDocumentId || null
     );
 
     const handleSearch = (event) => {
-        setSearchTerm(event.target.value);
+        setSearchTerm(event.target.value.toLowerCase());
     };
 
-    const handleDocumentSelect = (event) => {
-        setSelectedDocumentId(event.target.value);
-    };
-
-    const filteredDocuments = documents?.documents?.filter(doc =>
-        doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.document_number.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
-
-    const versionColumns = [
-        { field: "version_no", headerName: "Version", flex: 1, headerAlign: "center" },
-        { field: "department_id", headerName: "Department ID", flex: 1, headerAlign: "center" },
-        { field: "user", headerName: "User ID", flex: 1, headerAlign: "center" },
+    const columns = [
+        // { field: "sr", headerName: "Sr", flex: 0.3, headerAlign: "center", valueGetter: (params) => params.rowIndex + 1 },
         {
-            field: "front_file_url",
-            headerName: "Document",
-            flex: 1.5,
+            field: "index",
+            headerName: "Sr.No.",
+            flex: 0.3,
+            headerAlign: "center",
+            renderCell: (params) =>{ 
+                // console.log(params)
+                return(<span>{params.row.id }</span>)
+        },
+            sortable: false,
+            filterable: false,
+        },
+        { field: "document_title", headerName: "Document Title", flex: 1, headerAlign: "center" },
+        { field: "document_type", headerName: "Document Type", flex: 1, headerAlign: "center" },
+        { field: "document_current_status_name", headerName: "Status", flex: 1, headerAlign: "center" },
+        // {
+        //     field: "action",
+        //     headerName: "Action",
+        //     flex: 0.5,
+        //     headerAlign: "center",
+        //     renderCell: () => (
+        //         <IconButton color="primary">
+        //             <VisibilityIcon />
+        //         </IconButton>
+        //     )
+        // }
+        {
+            field: "action",
+            headerName: "Action",
+            flex: 0.5,
             headerAlign: "center",
             renderCell: (params) => (
-                <a
-                    href={params.value}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: '#1976d2', textDecoration: 'underline' }}
+                <IconButton
+                    color="primary"
+                    onClick={() =>
+                        navigate("/archived-docviewer", {
+                            state: { front_file_url: "http://127.0.0.1:8000/media/templates/Cobra_4.docx" }
+                        })
+                    }
                 >
-                    View Document
-                </a>
-            ),
-        },
+                    <VisibilityIcon />
+                </IconButton>
+            )
+        }
     ];
 
-    const formattedVersions = (selectedDocumentId && versions) ? versions.map((version, index) => ({
-        id: index,
-        ...version
-    })) : [];
+    const filteredRows = versions?.filter(version => 
+        version.document_title.toLowerCase().includes(searchTerm)
+    ).map((version, index) => ({ id: index + 1, rowIndex: index, ...version })) || [];
 
     return (
         <MDBox p={3}>
-            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
+            {/* <Card sx={{ maxWidth: "90%", mx: "auto", mt: 3,ml:3 }}> */}
+            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 5 }}>
                 <MDBox p={3}>
-                    <MDTypography variant="h4" fontWeight="medium" sx={{ textAlign: "center", mb: 3 }}>
-                        Archived Listing
-                    </MDTypography>
-                    
-                    <MDBox display="flex" alignItems="center" gap={2} mb={3}>
-                        {/* <MDInput
-                            label="Search Documents"
+                <MDBox 
+                        display="flex" 
+                        justifyContent="space-between" 
+                        alignItems="center" 
+                        mb={2}
+                    >
+                        <MDInput
+                            label="Search by Document Title"
                             variant="outlined"
                             size="small"
-                            sx={{ width: "250px" }}
                             value={searchTerm}
                             onChange={handleSearch}
-                        /> */}
-                        {/* <FormLabel>Select Document:</FormLabel>
-                        <FormControl sx={{ width: "400px",padding:'10px'}}>
-                            <Select
-                                labelId="document-select-label"
-                                value={selectedDocumentId}
-                                onChange={handleDocumentSelect}
-                                size="small"
-                                sx={{
-                                    padding:'10px'
-                                }}
-                            >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                {filteredDocuments.map((doc) => (
-                                    <MenuItem key={doc.id} value={doc.id}>
-                                        {doc.document_title} ({doc.document_number})
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl> */}
+                            sx={{ width: "300px" }}
+                        />
+                        <MDTypography variant="h4" fontWeight="medium" sx={{ textAlign: "center", flexGrow: 1 }}>
+                            Archived Listing
+                        </MDTypography>
                     </MDBox>
-
                     <MDBox display="flex" justifyContent="center">
                         <div style={{ height: 400, width: "100%" }}>
                             <DataGrid
-                                rows={formattedVersions}
-                                columns={versionColumns}
+                                rows={filteredRows}
+                                columns={columns}
                                 pageSize={5}
                                 rowsPerPageOptions={[5, 10, 20]}
                                 disableSelectionOnClick
@@ -125,17 +114,6 @@ const ArchivedListing = () => {
                                     "& .MuiDataGrid-cell": {
                                         textAlign: "center",
                                     },
-                                }}
-                                components={{
-                                    NoRowsOverlay: () => (
-                                        <MDBox display="flex" justifyContent="center" alignItems="center" height="100%">
-                                            <MDTypography>
-                                                {selectedDocumentId 
-                                                    ? "No versions found for this document" 
-                                                    : "Please select a document to view its versions"}
-                                            </MDTypography>
-                                        </MDBox>
-                                    ),
                                 }}
                             />
                         </div>
