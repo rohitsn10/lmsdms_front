@@ -30,15 +30,11 @@ const TrainingDocumentObsoleteView = () => {
   const fetchEditorConfig = async () => {
     const apiUrl = process.env.REACT_APP_APIKEY;
     try {
-      const response = await fetch(`${apiUrl}dms_module/get_editor_config_for_obsolete_doc`, {
+      // http://127.0.0.1:8000/dms_module/get_editor_config_for_obsolete_doc?front_file_url=http://127.0.0.1:8000/media/templates/Cobra_4.docx
+      const response = await fetch(`${apiUrl}dms_module/get_editor_config_for_obsolete_doc?front_file_url=${front_file_url}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          // document_id,
-          // template_id: templateId,
-          front_file_url: "http://127.0.0.1:8000/media/templates/Cobra_4.docx",
-        }),
       });
       if (!response.ok) throw new Error("Failed to fetch ONLYOFFICE configuration");
       const config = await response.json();

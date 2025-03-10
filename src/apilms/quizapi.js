@@ -77,7 +77,7 @@ export const quizapi = createApi({
       }),
       transformResponse: (response) => response, // Handle raw response
     }),
-    
+
     // PUT method for updating or deleting a quiz
     updateDeleteQuiz: builder.mutation({
       query: ({
@@ -107,13 +107,13 @@ export const quizapi = createApi({
       transformResponse: (response) => response, // Handle raw response
     }),
     attemptQuiz: builder.mutation({
-  query: (quizPayload) => ({
-    url: 'lms_module/attempted_quiz',
-    method: 'POST',
-    body: quizPayload,
-  }),
-  transformResponse: (response) => response, // Handle raw response
-}),
+      query: (quizPayload) => ({
+        url: 'lms_module/attempted_quiz',
+        method: 'POST',
+        body: quizPayload,
+      }),
+      transformResponse: (response) => response, // Handle raw response
+    }),
   }),
 });
 
@@ -123,5 +123,5 @@ export const {
   useUpdateTrainingQuizMutation,
   useUpdateDeleteQuizMutation,
   useAttemptQuizMutation
-  
+
 } = quizapi;

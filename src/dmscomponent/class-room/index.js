@@ -49,7 +49,10 @@ const ClassroomListing = () => {
   };
 
   const handleAssessmentClick = (rowData) => {
-    navigate("/exam-mcq-module", { state: { rowData } });
+    // console.log(rowData)
+    navigate(`/exam-mcq-module/${rowData?.classroom_id}`)
+    // navigate("/exam-mcq-module", { state: { rowData } });
+    // /:classroomQuizId
   };
   const handleDownloadAttendanceSheet = (documentId) => {
     setDownloadDocumentId(documentId);
