@@ -15,21 +15,25 @@ import {
   Container,
   IconButton
 } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAttemptQuizMutation } from "apilms/quizapi";
 import { useAuth } from "hooks/use-auth";
 import { useClassroomQuizGetQuery } from "apilms/classtestApi";
+import { useClassroomStartAttemptQuizMutation } from "apilms/classtestApi";
+import { useClassroomAttemptQuizMutation } from "apilms/classtestApi";
 
 function ClassMultiChoiceQuestionsSection() {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  const id = location?.state?.rowData?.classroom_id;
+  const [startAttemptQuiz] = useClassroomStartAttemptQuizMutation();
+  const { classroomQuizId } = useParams();
+  const id = classroomQuizId;
   const { user } = useAuth();
   const { data: questionsData, isLoading, isError } = useClassroomQuizGetQuery(id, { skip: !id });
-  console.log("Questions Data::::",questionsData)
-  const [attemptQuiz] = useAttemptQuizMutation();
+  // useClassroomStartAttemptQuizMutation
+  // console.log("Questions Data::::",questionsData)
+  // const [attemptQuiz] = useAttemptQuizMutation();
   const [questions, setQuestions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [answers, setAnswers] = useState({});
@@ -39,7 +43,18 @@ function ClassMultiChoiceQuestionsSection() {
   const [openModal, setOpenModal] = useState(false);
   const [resultMessage, setResultMessage] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
-
+  
+    const [attemptQuiz] = useClassroomAttemptQuizMutation();
+    useEffect(() => {
+      if (questionsData?.data?.[0]?.id) {
+        const quizId = questionsData.data[0].id;
+        
+        // Call the mutation when quiz starts
+        startAttemptQuiz({ classroom_id: id, quiz_id: quizId })
+          .then(() => console.log("Quiz attempt started successfully"))
+          .catch((error) => console.error("Error starting quiz attempt:", error));
+      }
+    }, [questionsData]);
   // Prevent Back Navigation (Browser Back Button & Keyboard Shortcuts)
   useEffect(() => {
     const preventNavigation = () => {
@@ -106,6 +121,8 @@ function ClassMultiChoiceQuestionsSection() {
     let totalMarks = 0;
     let marksObtained = 0;
     const userResponseList = [];
+    const incorrectList = [];
+    const correctList = [];
 
     questions.forEach((question) => {
       totalMarks += question.marks;
@@ -118,8 +135,24 @@ function ClassMultiChoiceQuestionsSection() {
         user_answer: userAnswer || "No Answer",
       });
 
+      // if (userAnswer === correctAnswer) {
+      //   marksObtained += question.marks;
+      // }
       if (userAnswer === correctAnswer) {
         marksObtained += question.marks;
+        correctList.push({
+          question_id: question.id,
+          question_text: question.question_text,
+          user_answer: userAnswer || "No Answer",
+          correct_answer: correctAnswer || "none"
+        })
+      } else {
+        incorrectList.push({
+          question_id: question.id,
+          question_text: question.question_text,
+          user_answer: userAnswer || "No Answer",
+          correct_answer: correctAnswer || "none"
+        })
       }
     });
 
@@ -127,7 +160,9 @@ function ClassMultiChoiceQuestionsSection() {
       totalMarks,
       marksObtained,
       userResponseList,
-      timeTaken: questionsData.data[0].quiz_time * 60 - counter
+      timeTaken: questionsData.data[0].quiz_time * 60 - counter,
+      incorrectList,
+      correctList
     };
   };
 
@@ -138,12 +173,27 @@ function ClassMultiChoiceQuestionsSection() {
     const passCriteria = parseFloat(questionsData.data[0].pass_criteria);
     const passKey = results.marksObtained >= passCriteria;
     const message = `You scored ${results.marksObtained} out of ${results.totalMarks} marks.\nTime taken: ${formatTime(results.timeTaken)}`;
+    // const quiz_id=questionsData?.id;
+    const quiz_id = questionsData?.data?.[0]?.id; 
 
     setResultMessage(message);
     setOpenModal(true);
     setHasSubmitted(true);
 
+    const quizPayload = {
+      classroom_id: id,
+      quiz_id: quiz_id,
+      user_id: user?.id,
+      questions: results.userResponseList,
+      obtain_marks: results.marksObtained,
+      total_marks: results.totalMarks,
+      total_taken_time: results.timeTaken,
+      is_pass: passKey,
+      incorrect_questions: results.incorrectList,
+      correct_questions: results.correctList
+    };
     try {
+      await attemptQuiz(quizPayload).unwrap();
       console.log("Quiz submitted successfully");
     } catch (error) {
       console.error("Error submitting quiz:", error);

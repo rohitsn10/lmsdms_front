@@ -44,7 +44,7 @@ function MultiChoiceQuestionsSection() {
   useEffect(() => {
     // Force replace current history entry
     window.history.replaceState(null, "", window.location.pathname);
-    
+
     // Push additional state to create new history entry
     window.history.pushState(null, "", window.location.pathname);
     window.history.pushState(null, "", window.location.pathname);

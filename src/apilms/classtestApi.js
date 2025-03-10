@@ -53,7 +53,23 @@ export const classtestApi = createApi({
         body: quizData,
         }),
         transformResponse: (response) => response,
+      }),
+    classroomAttemptQuiz: builder.mutation({
+        query: (quizPayload) => ({
+          url: 'lms_module/classroom_attempted_quiz',
+          method: 'POST',
+          body: quizPayload,
         }),
+        transformResponse: (response) => response,
+      }),
+    classroomStartAttemptQuiz: builder.mutation({
+        query: (quizPayload) => ({
+          url: 'lms_module/once_classroom_attempted',
+          method: 'PUT',
+          body: quizPayload,
+        }),
+        transformResponse: (response) => response,
+     }),
   }),
 });
 
@@ -63,4 +79,6 @@ export const {
   useClassroomQuizPostMutation,
   useClassroomQuizGetQuery,
   useClassroomQuizEditMutation,
+  useClassroomAttemptQuizMutation,
+  useClassroomStartAttemptQuizMutation 
 } = classtestApi;
