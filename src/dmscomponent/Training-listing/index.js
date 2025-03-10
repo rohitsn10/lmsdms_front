@@ -290,7 +290,7 @@ const TrainingListing = () => {
             label="Search Training"
             variant="outlined"
             size="small"
-            sx={{ width: "250px", mr: 2 }}
+            sx={{ width: "100%", maxWidth: "300px", minWidth: "150px", mr: 2 }}
             value={searchTerm}
             onChange={handleSearch}
           />
@@ -309,11 +309,11 @@ const TrainingListing = () => {
           </MDTypography>
         ) : (
           <MDBox display="flex" justifyContent="center" p={2}>
-            <div style={{ height: 500, width: "100%", overflow: "auto" }}>
+            <div style={{ height: 600, width: "100%", overflow: "auto" }}>
               <DataGrid
                 rows={filteredData}
                 columns={columns}
-                pageSize={5}
+                pageSize={7}
                 rowsPerPageOptions={[5, 10, 20]}
                 disableSelectionOnClick
                 sx={{

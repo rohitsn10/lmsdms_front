@@ -145,16 +145,11 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
   };
   useEffect(() => {
-    if (isLoading) {
-      console.log("Loading roles...");
-    }
-
-    if (isError) {
-      console.error("Error loading roles!");
-    }
+    
+    
 
     if (rolesData && rolesData.data) {
-      console.log("Roles data:", rolesData);
+     
       const fetchedRoles = rolesData.data.map((role) => ({
         id: role.id,
         name: role.name,
