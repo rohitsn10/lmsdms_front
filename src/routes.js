@@ -191,15 +191,15 @@ const routes = [
     component: <PrinterListing />,
     routeCat:"lms"
   },
-  {
-    type: "collapse",
-    name: "Print Retrieval",
-    key: "retrieval-listing",
-    icon: <GetAppOutlinedIcon />,
-    route: "/retrieval-listing",
-    component: <PrintRetrievalListing />,
-    routeCat:"dms"
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Print Retrieval",
+  //   key: "retrieval-listing",
+  //   icon: <GetAppOutlinedIcon />,
+  //   route: "/retrieval-listing",
+  //   component: <PrintRetrievalListing />,
+  //   routeCat:"dms"
+  // },
   {
     type: "collapse",
     name: "Doc  Revision Request",
@@ -528,14 +528,14 @@ export const DmsRoutes = [
     route: "printer-listing",
     component: <PrinterListing />,
   },
-  {
-    type: "collapse",
-    name: "Print Retrieval",
-    key: "retrieval-listing",
-    icon: <GetAppOutlinedIcon />,
-    route: "/retrieval-listing",
-    component: <PrintRetrievalListing />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Print Retrieval",
+  //   key: "retrieval-listing",
+  //   icon: <GetAppOutlinedIcon />,
+  //   route: "/retrieval-listing",
+  //   component: <PrintRetrievalListing />,
+  // },
   {
     type: "collapse",
     name: "Doc  Revision Request",

@@ -59,8 +59,7 @@ const RejectedDocument = () => {
     }
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
 
-
-  const documents = data?.rejectdata || [];// Extract documents from the new API response
+  const documents = data?.rejectdata || []; // Extract documents from the new API response
   console.log("-+---+-+--+------++-+--+", documents);
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
@@ -162,7 +161,6 @@ const RejectedDocument = () => {
     if (type === "end") setEndDate(date);
   };
 
-
   const filteredData = documents.filter(
     (doc) =>
       doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -234,7 +232,6 @@ const RejectedDocument = () => {
             <EditCalendarIcon />
           </IconButton>
         </MDBox>
-
       ),
       sortable: false,
       filterable: false,
@@ -280,7 +277,11 @@ const RejectedDocument = () => {
             onChange={handleSearch}
           />
 
-          <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center", mr: 28 }}>
+          <MDTypography
+            variant="h4"
+            fontWeight="medium"
+            sx={{ flexGrow: 1, textAlign: "center", mr: 28 }}
+          >
             Rejected Document Listing
           </MDTypography>
 
@@ -338,22 +339,24 @@ const RejectedDocument = () => {
         </MDBox>
 
         <MDBox display="flex" justifyContent="center" sx={{ height: 500, mt: 2 }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            pageSize={5}
-            rowsPerPageOptions={[5]}
-            disableSelectionOnClick
-            autoHeight
-            sx={{
-              "& .MuiDataGrid-columnHeader": {
-                textAlign: "center",
-              },
-              "& .MuiDataGrid-cell": {
-                textAlign: "center",
-              },
-            }}
-          />
+          <div style={{ height: 500, width: "100%" }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pageSize={5}
+              rowsPerPageOptions={[5]}
+              disableSelectionOnClick
+              autoHeight
+              sx={{
+                "& .MuiDataGrid-columnHeader": {
+                  textAlign: "center",
+                },
+                "& .MuiDataGrid-cell": {
+                  textAlign: "center",
+                },
+              }}
+            />
+          </div>
         </MDBox>
       </Card>
 

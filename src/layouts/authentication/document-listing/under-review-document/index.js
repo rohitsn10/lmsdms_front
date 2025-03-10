@@ -58,9 +58,8 @@ const UnderReviewDocument = () => {
     }
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
 
+  const documents = data?.reviewdata || []; // Extract documents from the new API response
 
-  const documents = data?.reviewdata || [];// Extract documents from the new API response
- 
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
     setDialogOpen(true);
@@ -76,13 +75,20 @@ const UnderReviewDocument = () => {
   };
 
   const handleClick = (params) => {
-    console.log("Ree",params.row)
+    console.log("Ree", params.row);
     if (!params || !params.row) {
       console.error("Invalid params object:", params);
       return; // Exit if params or row is missing
     }
-    console.log("Params ROOWWWW",params.row)
-    const { id, document_current_status, training_required, approval_status,select_template,version } = params.row;
+    console.log("Params ROOWWWW", params.row);
+    const {
+      id,
+      document_current_status,
+      training_required,
+      approval_status,
+      select_template,
+      version,
+    } = params.row;
 
     if (
       id === undefined ||
@@ -90,7 +96,7 @@ const UnderReviewDocument = () => {
       training_required === undefined ||
       approval_status === undefined ||
       select_template === undefined ||
-      version ==undefined
+      version == undefined
     ) {
       console.error("Missing data in params.row:", params.row);
       return;
@@ -99,7 +105,9 @@ const UnderReviewDocument = () => {
     // navigate(
     //   `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}`
     // );
-         navigate(`/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}`)
+    navigate(
+      `/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}`
+    );
   };
   const formatDate = (date) => {
     if (date) {
@@ -108,13 +116,12 @@ const UnderReviewDocument = () => {
     return "";
   };
 
-  const handleViewFile = (url,new_url, params) => {
+  const handleViewFile = (url, new_url, params) => {
     // navigate("/PreView", { state: { templateDoc: url,new_url:new_url, templateData: params } }); // Pass the URL as state
-    navigate("/docviewer",{state:{docId:params.id,templateId:params.select_template
-    }})
+    navigate("/docviewer", { state: { docId: params.id, templateId: params.select_template } });
     // console.log(params)
     // console.log(params.id,params.select_template  )
-  };  
+  };
 
   const handleDateRangeChange = (event) => {
     const selectedRange = event.target.value;
@@ -234,12 +241,15 @@ const UnderReviewDocument = () => {
       renderCell: (params) => {
         // Check for the specific condition: is_done is true and current_status_name is "Under Reviewer"
         // console.log("Print params:::",params);
-        if ((params.row.is_done === false || params.row.is_done === null)  && params.row.document_current_status == 8) {
-          return <span>Under Reviewer</span>
+        if (
+          (params.row.is_done === false || params.row.is_done === null) &&
+          params.row.document_current_status == 8
+        ) {
+          return <span>Under Reviewer</span>;
         }
         // Otherwise, display the original current_status_name
-        return <span>{params.row.current_status_name}</span>; 
-      }
+        return <span>{params.row.current_status_name}</span>;
+      },
     },
     {
       field: "actions",
@@ -260,13 +270,12 @@ const UnderReviewDocument = () => {
                 params.row
               );
               // console.log()
-              console.log("Params",params.row)
+              console.log("Params", params.row);
             }}
           >
             <VisibilityIcon />
           </IconButton>
         </MDBox>
-
       ),
       sortable: false,
       filterable: false,
@@ -282,7 +291,7 @@ const UnderReviewDocument = () => {
     <MDBox p={3}>
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
-          {/* Department Dropdown */} 
+          {/* Department Dropdown */}
           <FormControl sx={{ minWidth: 180, mr: 2 }}>
             <InputLabel>Department</InputLabel>
             <Select
@@ -312,7 +321,11 @@ const UnderReviewDocument = () => {
             onChange={handleSearch}
           />
 
-          <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center", mr: 28 }}>
+          <MDTypography
+            variant="h4"
+            fontWeight="medium"
+            sx={{ flexGrow: 1, textAlign: "center", mr: 28 }}
+          >
             Under Review Listing
           </MDTypography>
 
@@ -369,34 +382,34 @@ const UnderReviewDocument = () => {
           )}
         </MDBox>
 
-        <MDBox display="flex" 
-          justifyContent="center"
-         sx={{ height: 500, mt: 2}}>
+        <MDBox display="flex" justifyContent="center" sx={{ height: 500, mt: 2 }}>
+        <div style={{ height: 500, width: "100%" }}>
           <DataGrid
             rows={rows}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}
             disableSelectionOnClick
-            autoHeight
+          
             sx={{
-              overflowY:"auto",
-                // minWidth: 1500,
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: "#f5f5f5",
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  justifyContent: "center",
-                },
-                "& .MuiDataGrid-cell": {
-                  textAlign: "center",
-                },
-                "& .MuiDataGrid-columnHeaderTitle": {
-                  textAlign: "center",
-                  // width: "100%",
-                },
-              }}
+              overflowY: "auto",
+              // minWidth: 1500,
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f5f5f5",
+                fontWeight: "bold",
+                textAlign: "center",
+                justifyContent: "center",
+              },
+              "& .MuiDataGrid-cell": {
+                textAlign: "center",
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                textAlign: "center",
+                // width: "100%",
+              },
+            }}
           />
+          </div>
         </MDBox>
       </Card>
 
