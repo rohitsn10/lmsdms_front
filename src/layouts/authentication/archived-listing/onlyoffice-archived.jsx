@@ -10,48 +10,73 @@ const TrainingDocumentObsoleteView = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { docId: document_id, templateId,front_file_url } = location.state || {};
-  console.log("HEre comes::::",front_file_url)
+  const { docId: document_id, templateId, front_file_url } = location.state || {};
+  console.log("File URL:", front_file_url);
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editorConfig, setEditorConfig] = useState(null);
+  const [docEditorLoaded, setDocEditorLoaded] = useState(false);
   const docEditorRef = useRef(null);
   const [completeViewDocument] = useCompleteViewDocumentMutation();
-
-  useEffect(() => {
-    if (front_file_url) {
-      fetchEditorConfig();
-    } else {
-      setError("File Url is missing");
-      setLoading(false);
-    }
-  }, [front_file_url]);
 
   const fetchEditorConfig = async () => {
     const apiUrl = process.env.REACT_APP_APIKEY;
     try {
-      // http://127.0.0.1:8000/dms_module/get_editor_config_for_obsolete_doc?front_file_url=http://127.0.0.1:8000/media/templates/Cobra_4.docx
-      const response = await fetch(`${apiUrl}dms_module/get_editor_config_for_obsolete_doc?front_file_url=${front_file_url}`, {
+      console.log("Fetching editor config for URL:", front_file_url);
+      const cleanFrontFileUrl = front_file_url.startsWith('/') ? front_file_url.substring(1) : front_file_url;
+      const fullUrl = `${apiUrl}dms_module/get_editor_config_for_obsolete_doc?front_file_url=${apiUrl}${cleanFrontFileUrl}`;
+      
+      console.log("Making request to:", fullUrl);
+      const response = await fetch(fullUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to fetch ONLYOFFICE configuration");
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Response not OK:", response.status, errorText);
+        throw new Error(`Failed to fetch ONLYOFFICE configuration: ${response.status}`);
+      }
+      
       const config = await response.json();
+      console.log("Editor config received:", config);
       setEditorConfig(config);
+      setDocEditorLoaded(true);
     } catch (fetchError) {
-      setError("Failed to fetch ONLYOFFICE configuration");
+      console.error("Fetch error:", fetchError);
+      setError(`Failed to fetch ONLYOFFICE configuration: ${fetchError.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (editorConfig) {
+    if (front_file_url) {
+      fetchEditorConfig();
+    } else {
+      console.error("Missing front_file_url");
+      setError("File URL is missing");
+      setLoading(false);
+    }
+
+    return () => {
+      setEditorConfig(null);
+      setDocEditorLoaded(false);
+      console.log("Cleanup: Resetting editor config");
+    };
+  }, [front_file_url]);
+
+  useEffect(() => {
+    if (docEditorLoaded && editorConfig) {
+      console.log("Initializing ONLYOFFICE editor");
       const script = document.createElement("script");
       script.src = process.env.REACT_APP_ONLYOFFICE_SCRIPT;
+      
       script.onload = () => {
         try {
+          console.log("ONLYOFFICE script loaded, creating editor");
           docEditorRef.current = new window.DocsAPI.DocEditor("onlyoffice-editor-container", {
             width: "100%",
             height: "100%",
@@ -60,27 +85,102 @@ const TrainingDocumentObsoleteView = () => {
             editorConfig: {
               mode: "view",
               callbackUrl: editorConfig.callbackUrl,
-              user: { id: user?.id, name: user?.first_name },
+              user: { 
+                id: user?.id || "1", 
+                name: user?.first_name || "User" 
+              },
+              customization: {
+                printButton: true,
+                // other customization settings
+            },
+              // customization: {
+              //   autosave: false,
+              //   forcesave: false,
+              //   review: {
+              //     trackChanges: true,
+              //     showReviewChanges: true,
+              //   },
+              //   features: {
+              //     trackChanges: true
+              //   },
+              //   saveButton: false,
+              //   showReviewChanges: true,
+              //   trackChanges: true,
+              //   chat: false,
+              //   comments: true,
+              //   zoom: 100,
+              //   compactHeader: false,
+              //   leftMenu: true,
+              //   rightMenu: false,
+              //   toolbar: true,
+              //   statusBar: false,
+              //   autosaveMessage: false,
+              //   forcesaveMessage: false,
+              //   downloadButton: false,
+              //   printButton: true,
+              // },
+            },
+            events: {
+              onAppReady: () => {
+                window.docEditor = docEditorRef.current;
+                console.log("ONLYOFFICE Editor is Ready in View Mode");
+              },
+              onError: (event) => {
+                console.error("Editor error:", event);
+                return true;
+              },
+              onDocumentReady: () => {
+                console.log("Document is loaded and ready");
+              }
             },
             token: editorConfig.token,
           });
-        } catch (error) {
-          setError("Failed to initialize ONLYOFFICE editor");
+          console.log("ONLYOFFICE editor initialized in view mode");
+        } catch (initError) {
+          console.error("Editor initialization error:", initError);
+          setError(`Failed to initialize ONLYOFFICE editor: ${initError.message}`);
         }
       };
-      script.onerror = () => setError("Failed to load ONLYOFFICE script");
+      
+      script.onerror = (e) => {
+        console.error("Script load error:", e);
+        setError("Failed to load ONLYOFFICE script");
+      };
+      
       document.body.appendChild(script);
+      
       return () => {
+        if (docEditorRef.current) {
+          try {
+            docEditorRef.current.destroyEditor();
+            console.log("Cleanup: ONLYOFFICE editor destroyed");
+          } catch (err) {
+            console.error("Error destroying editor:", err);
+          }
+          docEditorRef.current = null;
+        }
         document.body.removeChild(script);
-        docEditorRef.current = null;
+        console.log("Cleanup: ONLYOFFICE script removed");
       };
     }
-  }, [editorConfig, user]);
+  }, [docEditorLoaded, editorConfig, user]);
 
-  if (loading || error) {
+  if (loading) {
     return (
       <Box sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        {loading ? <CircularProgress /> : <Typography color="error">{error}</Typography>}
+        <CircularProgress />
+        <Typography sx={{ marginLeft: 2 }}>Loading editor...</Typography>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 2 }}>
+        <Typography variant="h6" color="error">{`Error: ${error}`}</Typography>
+        <MDButton variant="contained" color="primary" onClick={() => navigate("/archived-listing")}>
+          Go Back
+        </MDButton>
       </Box>
     );
   }
@@ -100,10 +200,24 @@ const TrainingDocumentObsoleteView = () => {
       <AppBar position="static">
         <Toolbar sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <Typography variant="h6">Obsolete Document View</Typography>
-          <MDButton variant="contained" color="primary" onClick={() => navigate("/trainingListing")}>Go Back</MDButton>
+          <MDButton 
+            variant="contained" 
+            color="primary" 
+            onClick={() => navigate("/archived-listing")}
+          >
+            Go Back
+          </MDButton>
         </Toolbar>
       </AppBar>
-      <Box id="onlyoffice-editor-container" sx={{ flex: 1, backgroundColor: "#fff" }} />
+      <Box 
+        id="onlyoffice-editor-container" 
+        sx={{ 
+          flex: 1, 
+          backgroundColor: "#fff",
+          boxShadow: 2,
+          margin: "20px", 
+        }} 
+      />
     </MDBox>
   );
 };

@@ -53,18 +53,20 @@ const ArchivedListing = () => {
             headerName: "Action",
             flex: 0.5,
             headerAlign: "center",
-            renderCell: (params) => (
+            renderCell: (params) => 
+                (
                 <IconButton
                     color="primary"
                     onClick={() =>
                         navigate("/archived-docviewer", {
-                            state: { front_file_url: "http://127.0.0.1:8000/media/templates/Cobra_4.docx" }
+                            state: { front_file_url: params.row.front_file_url }
                         })
                     }
                 >
                     <VisibilityIcon />
                 </IconButton>
             )
+            // {console.log(params.row.front_file_url)}
         }
     ];
 
