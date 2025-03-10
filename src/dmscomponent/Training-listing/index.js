@@ -93,7 +93,8 @@ const TrainingListing = () => {
 
   const startAssessmentClick = () => {
     if (selectedRowData) {
-      navigate("/mcq-module", { state: { rowData: selectedRowData } });
+      // console.log("SelectedRow Data",selectedRowData)
+      navigate(`/mcq-module/${selectedRowData}`);
       handleAssesmentModalClose();
     }
   };

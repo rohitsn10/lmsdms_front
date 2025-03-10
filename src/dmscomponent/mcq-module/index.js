@@ -14,7 +14,7 @@ import {
   Box,
   Container 
 } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useGetTrainingQuizzesQuery } from "apilms/quizapi";
 import { useAttemptQuizMutation } from "apilms/quizapi";
 import { useAuth } from "hooks/use-auth";
@@ -22,7 +22,9 @@ import { useAuth } from "hooks/use-auth";
 function MultiChoiceQuestionsSection() {
   const navigate = useNavigate();
   const location = useLocation();
-  const id = location?.state?.rowData;
+    const { trainingQuizId } = useParams();
+  // const id = location?.state?.rowData;
+  const id = trainingQuizId;
   const { user } = useAuth();
   const { data: questionsData, isLoading, isError } = useGetTrainingQuizzesQuery(id, {
     skip: !id,
