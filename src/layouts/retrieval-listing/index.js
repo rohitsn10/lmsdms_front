@@ -107,7 +107,7 @@ const PrintRetrievalListing = () => {
         ? [
             {
               field: "article_rounded",
-              headerName: "Article",
+              headerName: "Retrieval No.",
               flex: 0.5,
               headerAlign: "center",
               renderCell: (params) => (

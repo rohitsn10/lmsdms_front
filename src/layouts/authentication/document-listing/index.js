@@ -57,6 +57,7 @@ const DocumentListing = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openviewDialog, setOpenviewDialog] = useState(false);
   const [department, setDepartment] = useState("");
+  const [downloadUrl, setDownloadUrl] = useState(null); 
   const [documentEffective, { isLoading: isEffecting, isError: isEffectError }] =
     useDocumentEffectiveMutation();
   const version = searchParams.get("version");
@@ -71,11 +72,12 @@ const DocumentListing = () => {
   useEffect(() => {
     refetch();
   }, [location.key]);
-  const { data:Exceldata, error } = useFetchDocumentExcelReportQuery({
+  const { data: response, error} = useFetchDocumentExcelReportQuery({
     department_id: department,
-   
-  }, { skip: !isReportRequested });
-  // Extract revision_month from data
+  }, {
+    skip: !isReportRequested,
+  });
+
   const revisionMonth = data?.revision_month;
 
   const documents = data?.documents || [];
@@ -228,21 +230,40 @@ const DocumentListing = () => {
   const handleDownloadReport = () => {
     if (!department) {
       toast.error("Please select a department before generating the report.");
-      return; // Prevent further execution if no department is selected
+      return;
     }
     setIsReportRequested(true); // Trigger the request when the button is clicked
   };
 
   useEffect(() => {
-    if (Exceldata) {
-      const fileBlob = new Blob([Exceldata], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(fileBlob);
-      link.download = 'document_report.xlsx'; // Set the desired file name
-      link.click();
-      setIsReportRequested(false); // Reset request flag after download
+    if (response && response.status && response.data) {
+      // Set the download URL from the API response
+      setDownloadUrl(response.data);
     }
-  }, [Exceldata]); // This effect runs when 'Exceldata' is available.
+  }, [response]);
+
+  useEffect(() => {
+    if (downloadUrl) {
+      // Fetch the file from the URL and trigger the download
+      fetch(downloadUrl)
+        .then((res) => res.blob()) // Convert the response to a Blob
+        .then((blob) => {
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'document_report.xlsx'; // Set the desired file name
+          document.body.appendChild(link); // Append the link to the body (required for Firefox)
+          link.click();
+          document.body.removeChild(link); // Clean up and remove the link
+          setIsReportRequested(false); // Reset request flag after download
+          setDownloadUrl(null); // Reset the download URL
+        })
+        .catch((error) => {
+          console.error('Error downloading the file:', error);
+          toast.error('Failed to download the report.');
+          setIsReportRequested(false); // Reset request flag on error
+        });
+    }
+  }, [downloadUrl]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -251,7 +272,6 @@ const DocumentListing = () => {
   if (error) {
     return <div>Error fetching the report: {error.message}</div>;
   }
-
   const filteredData = documents.filter(
     (doc) =>
       (doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
