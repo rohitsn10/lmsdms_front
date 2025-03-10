@@ -230,6 +230,7 @@ const UnderReviewDocument = () => {
       field: "current_status_name",
       headerName: "Status",
       flex: 0.6,
+      headerAlign: "center",
       renderCell: (params) => {
         // Check for the specific condition: is_done is true and current_status_name is "Under Reviewer"
         // console.log("Print params:::",params);
@@ -237,7 +238,7 @@ const UnderReviewDocument = () => {
           return <span>Under Reviewer</span>
         }
         // Otherwise, display the original current_status_name
-        return <span>{params.row.current_status_name}</span>;
+        return <span>{params.row.current_status_name}</span>; 
       }
     },
     {

@@ -60,8 +60,7 @@ const ApprovedDocument = () => {
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
 
 
-  const documents = data?.approvedata || []; // Extract documents from the new API response
-  console.log("-+---+-+--+------++-+--+", documents);
+  const documents = data?.approvedata || []; 
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
     setDialogOpen(true);
@@ -234,7 +233,7 @@ const ApprovedDocument = () => {
       field: "current_status_name",
       headerName: "Status",
       flex: 0.6,
-      headerAlign: "center",
+      headerAlign: "center", 
     },
     {
       field: "actions",
@@ -260,7 +259,7 @@ const ApprovedDocument = () => {
           <IconButton color="inherit" onClick={() => handleClick(params)}>
             <EditCalendarIcon />
           </IconButton>
-
+          {groupId === 5 && (
           <IconButton 
             color="success"
             onClick={() => handleDialogOpen(params.row)}
@@ -268,7 +267,7 @@ const ApprovedDocument = () => {
           >
             <CheckCircleIcon />
           </IconButton>
-
+          )}
         </MDBox>
 
 

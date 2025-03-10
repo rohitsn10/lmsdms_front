@@ -156,15 +156,15 @@ const routes = [
     component: <InventoryListing />,
     routeCat:"lms"
   },
-  {
-    type: "collapse",
-    name: "Archived",
-    key: "archived-listing",
-    icon: <ArchiveIcon />,
-    route: "/archived-listing",
-    component: <ArchivedListing />,
-    routeCat:"lms"
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Archived",
+  //   key: "archived-listing",
+  //   icon: <ArchiveIcon />,
+  //   route: "/archived-listing",
+  //   component: <ArchivedListing />,
+  //   routeCat:"lms"
+  // },
   // {
   //   type: "collapse",
   //   name: "Roles & Permissions",
@@ -496,14 +496,14 @@ export const DmsRoutes = [
   //   route: "/inventory-list",
   //   component: <InventoryListing />,
   // },
-  {
-    type: "collapse",
-    name: "Archived",
-    key: "archived-listing",
-    icon: <ArchiveIcon />,
-    route: "/archived-listing",
-    component: <ArchivedListing />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Archived",
+  //   key: "archived-listing",
+  //   icon: <ArchiveIcon />,
+  //   route: "/archived-listing",
+  //   component: <ArchivedListing />,
+  // },
   // {
   //   type: "collapse",
   //   name: "Roles & Permissions",

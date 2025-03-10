@@ -15,6 +15,7 @@ import TaskIcon from "@mui/icons-material/Task";
 import CancelPresentationTwoToneIcon from "@mui/icons-material/CancelPresentationTwoTone";
 import RateReviewTwoToneIcon from "@mui/icons-material/RateReviewTwoTone";
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import ArchiveIcon from "@mui/icons-material/Archive";
 import { Link } from "react-router-dom";
 import {
   useGetDocumentDataOfStatusIdElevenQuery,
@@ -282,7 +283,23 @@ function Dashboard() {
             </MDBox>
           </Grid>
           }
-
+    {isDocAdmin == 5 &&
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <Link to="/archived-listing">
+                <ComplexStatisticsCard
+                  color="error"
+                  icon={<ArchiveIcon />}
+                  title="Archived"
+                  // count={printdata?.total || 0}
+                  percentage={{
+                    color: "success",
+                  }}
+                />
+              </Link>
+            </MDBox>
+          </Grid>
+          }
         </Grid>
       </MDBox>
     </DashboardLayout>
