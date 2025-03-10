@@ -5,11 +5,13 @@ import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { usePrintConvertPdfMutation } from "api/auth/printApi";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumber, document_status }) => {
+const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumber, document_status, print_count }) => {
   const [pdfLink, setPdfLink] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [printCount, setPrintCount] = useState(0);
+  const [printCount, setPrintCount] = useState(print_count);
   const [printConvertPdf] = usePrintConvertPdfMutation();
 
   useEffect(() => {
@@ -26,42 +28,42 @@ const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumbe
         approval_numbers: printNumber,
         document_status: document_status,
       }).unwrap();
-  
+
       if (response && response.pdf_link) {
         setPdfLink(response.pdf_link);
       } else {
         console.error("Error fetching PDF: No file link received");
-        alert("Failed to retrieve PDF link");
+        toast.error("Failed to retrieve PDF link");
       }
     } catch (err) {
       console.error("Error fetching PDF:", err);
-      alert("Error fetching PDF document");
+      toast.error("Error fetching PDF document");
     }
     setIsLoading(false);
   };
-  
+
   const handlePrint = () => {
     if (!pdfLink || printCount >= noOfRequestByAdmin) {
-      alert("Print limit reached or PDF not available!");
+      toast.warning("Print limit reached or PDF not available!");
       return;
     }
-  
+
     try {
-      // Attempt multiple print strategies
-      const printWindow = window.open(pdfLink, '_blank');
+      const printWindow = window.open(pdfLink, "_blank");
       
       if (printWindow) {
-        printWindow.addEventListener('load', () => {
+        printWindow.addEventListener("load", () => {
           try {
             printWindow.print();
             setPrintCount((prev) => prev + 1);
+            toast.success("Print successful");
           } catch (printError) {
             console.error("Print error in window:", printError);
             fallbackPrintMethod();
           }
         });
       } else {
-        alert("Popup blocked! Please allow popups to print the document.");
+        toast.warning("Popup blocked! Please allow popups to print the document.");
         fallbackPrintMethod();
       }
     } catch (error) {
@@ -71,29 +73,26 @@ const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumbe
   };
 
   const fallbackPrintMethod = () => {
-    // Alternative print method using iframe
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.top = '-9999px';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.top = "-9999px";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
     iframe.src = pdfLink;
     
     iframe.onload = () => {
       try {
         iframe.contentWindow.print();
         setPrintCount((prev) => prev + 1);
+        toast.success("Print successful");
       } catch (error) {
         console.error("Fallback print method error:", error);
-        alert("Unable to print document. Please check browser settings.");
+        toast.error("Unable to print document. Please check browser settings.");
       }
-      
-      // Clean up iframe after a delay
       setTimeout(() => {
         document.body.removeChild(iframe);
       }, 1000);
     };
-    
     document.body.appendChild(iframe);
   };
 
@@ -109,6 +108,8 @@ const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumbe
           <MDBox sx={{ display: "flex", justifyContent: "center", padding: 2 }}>
             <CircularProgress />
           </MDBox>
+        ) : printCount >= noOfRequestByAdmin ? (
+          <MDTypography color="error">You reached the max limit which Doc Admin allows. For more prints, request again.</MDTypography>
         ) : pdfLink ? (
           <MDTypography>Document is ready to print.</MDTypography>
         ) : (
@@ -141,6 +142,7 @@ PrintDocumentDialog.propTypes = {
   noOfRequestByAdmin: PropTypes.number.isRequired,
   printNumber: PropTypes.array.isRequired,
   document_status: PropTypes.string.isRequired,
+  print_count: PropTypes.number.isRequired,
 };
 
 export default PrintDocumentDialog;
