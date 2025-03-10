@@ -166,12 +166,12 @@ export default function App() {
           // console.log("DTC Check")
           setRouteItems([...DtcRoutes])
         }else{
-          console.log("LMS Check")
+          // console.log("LMS Check")
           setRouteItems([...LmsRoutes])
         }
         // navigate('/lms-dashboard')
       }else{
-          console.log("DMS Check")
+          // console.log("DMS Check")
           setRouteItems([...DmsRoutes])
         // console.log("Check")
         // navigate('/dms-dashboard')

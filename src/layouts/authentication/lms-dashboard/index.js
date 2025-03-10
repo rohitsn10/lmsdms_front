@@ -43,40 +43,44 @@ const ProgressChart = ({ completed, assigned }) => {
   return (
     <Card>
       <CardContent>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h4" gutterBottom>
           SOP Completion Progress
         </Typography>
         <Box sx={{ position: "relative", pt: 2 }}>
           <Box sx={{ position: "relative", display: "inline-flex", justifyContent: "center" }}>
-            <Box sx={{
-              position: "relative",
-              display: "inline-flex",
-              borderRadius: "50%",
-              background: `conic-gradient(#2e7d32 ${percentage}%, #e0e0e0 ${percentage}% 100%)`,
-              width: 300,
-              height: 300,
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                top: "10%",
-                left: "10%",
-                right: "10%",
-                bottom: "10%",
+            <Box
+              sx={{
+                position: "relative",
+                display: "inline-flex",
                 borderRadius: "50%",
-                background: "white",
-              }
-            }} />
-            <Box sx={{
-              top: 0,
-              left: 0,
-              bottom: 0,
-              right: 0,
-              position: "absolute",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
+                background: `conic-gradient(#2e7d32 ${percentage}%, #e0e0e0 ${percentage}% 100%)`,
+                width: 300,
+                height: 300,
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: "10%",
+                  left: "10%",
+                  right: "10%",
+                  bottom: "10%",
+                  borderRadius: "50%",
+                  background: "white",
+                },
+              }}
+            />
+            <Box
+              sx={{
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                position: "absolute",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <Typography variant="h2" component="div" color="text.primary">
                 {percentage}%
               </Typography>
@@ -94,7 +98,7 @@ const ProgressChart = ({ completed, assigned }) => {
 function LMSDashboard() {
   const { user } = useAuth();
   const { data, isLoading } = useGetDashboardDocumentQuery(user.id);
-  console.log("data assing",data)
+ 
   if (isLoading) return <Typography>Loading...</Typography>;
 
   const assignedSOPs = data?.totalAssignDocument || 0;

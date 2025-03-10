@@ -67,6 +67,7 @@ const UsersListing = () => {
         job_role: Array.isArray(item.job_role) ? item.job_role.join(", ") : item.job_role || "N/A",
         departmentId: item.depratment || "N/A",
         remark: item.remarks,
+        depratment: item.department_name || "Not Assigned",
       }))
     : [];
 
@@ -155,13 +156,14 @@ const UsersListing = () => {
   };
 
   const columns = [
-    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
-    { field: "full_name", headerName: "Full Name", flex: 1, headerAlign: "center" },
+    { field: "serial_number", headerName: "Sr. No.", flex: 0.4, headerAlign: "center" },
+    { field: "full_name", headerName: "Full Name", flex: 0.8, headerAlign: "center" },
     { field: "email", headerName: "Email", flex: 1, headerAlign: "center" },
     { field: "username", headerName: "Username", flex: 0.75, headerAlign: "center" },
     { field: "UserRole", headerName: "UserRole", flex: 1, headerAlign: "center" },
     { field: "created_at", headerName: "Date", flex: 0.75, headerAlign: "center" },
     { field: "job_role", headerName: "Job Role", flex: 1, headerAlign: "center" },
+    { field: "depratment", headerName: "Department", flex: 1, headerAlign: "center" },
     ...(groupId === 7
       ? [
           {
@@ -277,7 +279,7 @@ const UsersListing = () => {
             label="Search"
             variant="outlined"
             size="small"
-            sx={{ width: "250px", mr: 2 }}
+            sx={{ width: "100%", maxWidth: "300px", minWidth: "150px", mr: 2 }}
             value={searchTerm}
             onChange={handleSearch}
           />
@@ -291,7 +293,7 @@ const UsersListing = () => {
           )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
-          <div style={{ height: 500, width: "100%" }}>
+          <div style={{ height: 600, width: "100%",overflow: "auto"  }}>
             <DataGrid
               rows={filteredData}
               columns={columns}
@@ -299,6 +301,7 @@ const UsersListing = () => {
               rowsPerPageOptions={[5, 10, 20]}
               disableSelectionOnClick
               sx={{
+                minWidth: 1500,
                 border: "1px solid #ddd",
                 borderRadius: "4px",
                 "& .MuiDataGrid-columnHeaders": {

@@ -135,7 +135,7 @@ const ClassroomListing = () => {
           variant="outlined"
           color="primary"
           onClick={() => handleSession(params.row)}
-          disabled={params.row.is_assesment === "Without Assessment"} // Disable if 'is_assesment' is 'With Assessment'
+          // disabled={params.row.is_assesment === "Without Assessment"} // Disable if 'is_assesment' is 'With Assessment'
         >
           Start Session
         </MDButton>
@@ -153,7 +153,7 @@ const ClassroomListing = () => {
                 variant="outlined"
                 color="info"
                 onClick={() => navigate("/class-question", { state: { classroom: params.row } })}
-                disabled={params.row.is_assesment === "Without Assessment"} // Disable if 'is_assesment' is 'With Assessment'
+                disabled={params.row.online_offline_status === "Online"} // Disable if 'is_assesment' is 'With Assessment'
               >
                 Questions
               </MDButton>
@@ -173,7 +173,7 @@ const ClassroomListing = () => {
                 variant="outlined"
                 color="secondary"
                 onClick={() => navigate("/class-quiz", { state: { classroom: params.row } })}
-                disabled={params.row.is_assesment === "Without Assessment"} // Disable if 'is_assesment' is 'With Assessment'
+                disabled={params.row.online_offline_status === "Online"} // Disable if 'is_assesment' is 'With Assessment'
               >
                 Quiz
               </MDButton>
