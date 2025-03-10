@@ -374,6 +374,7 @@ const ApprovedDocument = () => {
         </MDBox>
 
         <MDBox display="flex" justifyContent="center" sx={{ height: 500, mt: 2 }}>
+        <div style={{ height: 500, width: "100%" }}>
           <DataGrid
             rows={rows}
             columns={columns}
@@ -390,6 +391,7 @@ const ApprovedDocument = () => {
               },
             }}
           />
+          </div>
         </MDBox>
       </Card>
 
