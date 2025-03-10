@@ -294,7 +294,7 @@ export default function App() {
   <div>
     {/* Always render Sidenav */}
     {window.location.pathname !== "/login" && !/^\/document-view\/\d+$/.test(pathname) && window.location.pathname !== "/forgotpassword" && window.location.pathname !== "/mcq-module" &&
-     window.location.pathname !== '/docviewer' && window.location.pathname  !== '/training-document-view' && window.location.pathname  !== '/archived-docviewer' &&   !/^\/exam-mcq-module\/\d+$/.test(pathname) 
+     window.location.pathname !== '/docviewer' && window.location.pathname  !== '/training-document-view' && window.location.pathname  !== '/archived-docviewer' &&   !/^\/exam-mcq-module\/\d+$/.test(pathname) &&   !/^\/mcq-module\/\d+$/.test(pathname) 
      &&(
       <Sidenav
         color={sidenavColor}
@@ -403,7 +403,7 @@ export default function App() {
       <Route path="/training-mapping" element={<TrainingMapping />} />
       <Route path="/jobrole-mapping" element={<JobRoleMapping/>}/>
       <Route path="/exam-module" element={<ExamModule/>}/>
-      <Route path="/mcq-module" element={<MultiChoiceQuesionsSection/>}/>
+      <Route path="/mcq-module/:trainingQuizId" element={<MultiChoiceQuesionsSection/>}/>
       <Route path="/exam-mcq-module/:classroomQuizId" element={<ClassMultiChoiceQuestionsSection/>}/>
       <Route path="/training-material/:trainingNumber" element={<MaterialListing/>}/>
       <Route path="/class-room" element={<ClassroomListing/>}/>
