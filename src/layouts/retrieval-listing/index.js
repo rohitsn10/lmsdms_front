@@ -77,6 +77,13 @@ const PrintRetrievalListing = () => {
     { field: "document_title", headerName: "Document Title", flex: 1, headerAlign: "center" },
     { field: "no_of_print", headerName: "Copies Requested", flex: 0.7, headerAlign: "center" },
     {
+      field: "no_of_retrival",
+      headerName: "Retrival",
+      flex: 1,
+      headerAlign: "center",
+      renderCell: (params) => params.row.no_of_retrival ?? "-",
+    },
+    {
       field: "no_of_request_by_admin",
       headerName: "Copies Approved",
       flex: 0.7,

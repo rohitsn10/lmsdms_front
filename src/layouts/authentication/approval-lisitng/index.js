@@ -179,13 +179,13 @@ const PrintApprovalListing = () => {
       headerAlign: "center",
       renderCell: (params) => params.row.status ?? "-",
     },
-    {
-      field: "no_of_retrival",
-      headerName: "Retrival",
-      flex: 1,
-      headerAlign: "center",
-      renderCell: (params) => params.row.no_of_retrival ?? "-",
-    },
+    // {
+    //   field: "no_of_retrival",
+    //   headerName: "Retrival",
+    //   flex: 1,
+    //   headerAlign: "center",
+    //   renderCell: (params) => params.row.no_of_retrival ?? "-",
+    // },
     {
       field: "Approve",
       headerName: "Approve Date",
