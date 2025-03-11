@@ -121,7 +121,15 @@ export const quizapi = createApi({
         body: quizPayload,
       }),
       transformResponse: (response) => response,
-    })
+    }),
+    toggleUserTraining: builder.mutation({
+      query: (payload) => ({
+        url: 'lms_module/on_off_user_for_training',
+        method: 'PUT',
+        body: payload, // Directly sending the object
+      }),
+      transformResponse: (response) => response,
+    }),
   }),
 });
 
@@ -131,6 +139,6 @@ export const {
   useUpdateTrainingQuizMutation,
   useUpdateDeleteQuizMutation,
   useAttemptQuizMutation,
-  useStartAttemptQuizMutation
-
+  useStartAttemptQuizMutation,
+  useToggleUserTrainingMutation
 } = quizapi;

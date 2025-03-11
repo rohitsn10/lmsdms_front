@@ -18,6 +18,8 @@ import ChecklistIcon from "@mui/icons-material/Checklist";
 import QuizIcon from "@mui/icons-material/Quiz";
 import WarningIcon from "@mui/icons-material/Warning";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import WhiteListDialog from "./whitelist-users";
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 const TrainingListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,10 +30,28 @@ const TrainingListing = () => {
   const groupId = group.id;
   // Fetch training data using the API query hook
   const { data, error, isLoading, refetch } = useFetchTrainingsQuery();
-  
+  const [blacklistModalOpen, setBlacklistModalOpen] = useState(false);
+
   const [startAssessmentModal, setStartAssessmentModal] = useState(false);
   const [failedAssessmentModal, setFailedAssessmentModal] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
+
+  const [whiteListModalOpen, setWhiteListModalOpen] = useState(false);
+  const [selectedDocId, setSelectedDocId] = useState(null);
+
+  const handleWhiteListModalOpen = (docId) => {
+    setSelectedDocId(docId);
+    setWhiteListModalOpen(true);
+  };
+
+  const handleWhiteListModalClose = () => {
+    setWhiteListModalOpen(false);
+    setSelectedDocId(null)
+  };
+
+  const handleBlacklistModalClose = () => {
+    setBlacklistModalOpen(false);
+  };
 
   const handleAssesmentModalClose = () => {
     setStartAssessmentModal(false);
@@ -235,6 +255,61 @@ const TrainingListing = () => {
           },
         ]
       : []),
+      ...(groupId === 7
+        ? [
+            {
+              field: "Whitlist Users",
+              headerName: "Whitelist User",
+              flex: 0.8,
+              headerAlign: "center",
+              renderCell: (params) => (
+                <MDBox display="flex" justifyContent="center">
+                  <IconButton color="secondary" onClick={()=>{handleWhiteListModalOpen(params.row.docId)}}>
+                    <AdminPanelSettingsIcon />
+                  </IconButton>
+                </MDBox>
+              ),
+              sortable: false,
+              filterable: false,
+            },
+          ]
+        : []),
+    // {
+    //   field: "Assessment",
+    //   headerName: "Assessment",
+    //   flex: 0.8,
+    //   headerAlign: "center",
+    //   renderCell: (params) => {
+    //     const isUserInView = params.row?.user_view?.some(view => view.user === user.id);
+        
+    //     // Check if this document has a failed quiz session for the current user
+    //     const document = data?.document_data?.documents.find(doc => doc.id === params.row.id);
+    //     const userQuizSession = document?.quiz_sessions?.find(session => session.user === user.id);
+    //     const hasFailedStatus = userQuizSession?.status === "Failed";
+    //     const hasPassedStatus = userQuizSession?.status === "passed";
+    //     const hasBlackListed = document?.training_assesment_attempted == true;
+    //     // console.log(document.document_title,hasBlackListed)
+    //     return (
+    //     <MDBox display="flex" justifyContent="center">
+    //     {hasPassedStatus ? (
+    //       <IconButton disabled>
+    //         <CheckCircleIcon style={{ color: "green" }} />
+    //       </IconButton>
+    //     ) : (
+    //       <IconButton
+    //         disabled={!isUserInView} // Only enable if user is in view
+    //         color={hasFailedStatus ? "warning" : "error"}
+    //         onClick={() => handleAssessmentClick(params.row.id)}
+    //       >
+    //         {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
+    //       </IconButton>
+    //     )}
+    //   </MDBox>
+    //     );
+    //   },
+    //   sortable: false,
+    //   filterable: false,
+    // },
     {
       field: "Assessment",
       headerName: "Assessment",
@@ -248,54 +323,42 @@ const TrainingListing = () => {
         const userQuizSession = document?.quiz_sessions?.find(session => session.user === user.id);
         const hasFailedStatus = userQuizSession?.status === "Failed";
         const hasPassedStatus = userQuizSession?.status === "passed";
+        const hasBlackListed = document?.training_assesment_attempted === true;
+        
+        // Handler for blacklisted user clicks
+        const handleBlacklistedClick = () => {
+          // Show dialog for blacklisted users
+          setBlacklistModalOpen(true);
+        };
         
         return (
-          // <MDBox display="flex" justifyContent="center">
-          
-          //   <IconButton 
-          //     disabled={!isUserInView} 
-          //     color={hasFailedStatus ? "warning" : "error"} 
-          //     onClick={() => handleAssessmentClick(params.row.id)}
-          //   >
-          //     {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
-          //   </IconButton>
-          // </MDBox>
-        //   <MDBox display="flex" justifyContent="center">
-        //   {hasPassedStatus ? (
-        //     <IconButton disabled>
-        //       {/* <ChecklistIcon style={{ color: "green" }} /> Green checkmark */}
-        //       <CheckCircleIcon style={{ color: "green" }} />
-        //     </IconButton>
-        //   ) : (
-        //     <IconButton
-        //       disabled={!params.row?.user_view?.some(view => view.user === user.id)}
-        //       color={hasFailedStatus ? "warning" : "error"}
-        //       onClick={() => handleAssessmentClick(params.row.id)}
-        //     >
-        //       {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
-        //     </IconButton>
-        //   )}
-        // </MDBox>
-        <MDBox display="flex" justifyContent="center">
-        {hasPassedStatus ? (
-          <IconButton disabled>
-            <CheckCircleIcon style={{ color: "green" }} />
-          </IconButton>
-        ) : (
-          <IconButton
-            disabled={!isUserInView} // Only enable if user is in view
-            color={hasFailedStatus ? "warning" : "error"}
-            onClick={() => handleAssessmentClick(params.row.id)}
-          >
-            {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
-          </IconButton>
-        )}
-      </MDBox>
+          <MDBox display="flex" justifyContent="center">
+            {hasPassedStatus ? (
+              <IconButton disabled>
+                <CheckCircleIcon style={{ color: "green" }} />
+              </IconButton>
+            ) : hasBlackListed ? (
+              <IconButton
+                color="default"
+                onClick={handleBlacklistedClick}
+              >
+                <WarningIcon style={{ color: "gray" }} />
+              </IconButton>
+            ) : (
+              <IconButton
+                disabled={!isUserInView} // Only enable if user is in view
+                color={hasFailedStatus ? "warning" : "error"}
+                onClick={() => handleAssessmentClick(params.row.id)}
+              >
+                {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
+              </IconButton>
+            )}
+          </MDBox>
         );
       },
       sortable: false,
       filterable: false,
-    },
+    }
   ];
 
   return (
@@ -357,28 +420,36 @@ const TrainingListing = () => {
 
       {/* Regular Assessment Modal */}
       <Dialog
-        open={startAssessmentModal}
-        onClose={handleAssesmentModalClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Start Assessment?"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to start the assessment?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleAssesmentModalClose}>
-            Cancel
-          </Button>  
-          <Button onClick={startAssessmentClick} autoFocus color="primary" variant="contained">
-            Start Assessment
-          </Button>
-        </DialogActions>
-      </Dialog>
+  open={startAssessmentModal}
+  onClose={handleAssesmentModalClose}
+  aria-labelledby="alert-dialog-title"
+  aria-describedby="alert-dialog-description"
+>
+  <DialogTitle id="alert-dialog-title">
+    {"Start Assessment?"}
+  </DialogTitle>
+  <DialogContent>
+    <DialogContentText sx={{
+      padding:"15px"
+    }} id="alert-dialog-description">
+      Are you sure you want to start the assessment?  
+      <br /><br />
+      <strong>Important:</strong> Once you start the exam:
+      <ul>
+        <li>You must complete and submit it before leaving.</li>
+        <li>If you close or exit the exam without submitting, you will be <strong>blacklisted</strong> and will not be able to attempt the exam again.</li>
+      </ul>
+    </DialogContentText>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleAssesmentModalClose}>
+      Cancel
+    </Button>  
+    <MDButton onClick={startAssessmentClick} autoFocus color="primary" variant="contained">
+      Start Assessment
+    </MDButton>
+  </DialogActions>
+    </Dialog>
 
       {/* Failed Assessment Modal */}
       <Dialog
@@ -405,6 +476,30 @@ const TrainingListing = () => {
           </Button> */}
         </DialogActions>
       </Dialog>
+      {/* Blacklisted Assessment Modal */}
+      <Dialog
+  open={blacklistModalOpen}
+  onClose={handleBlacklistModalClose}
+  aria-labelledby="blacklisted-dialog-title"
+  aria-describedby="blacklisted-dialog-description"
+>
+  <DialogTitle id="blacklisted-dialog-title" sx={{ display: 'flex', alignItems: 'center', color: 'error.main' }}>
+    <WarningIcon color="error" sx={{ mr: 1 }} />
+    {"Assessment Access Restricted"}
+  </DialogTitle>
+  <DialogContent>
+    <DialogContentText id="blacklisted-dialog-description">
+      You are blacklisted due to not submitting a previous assessment attempt. Please request DTC to whitelist your account to regain access.
+    </DialogContentText>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleBlacklistModalClose}>
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
+{/* Whitelist modal */}
+      <WhiteListDialog open={whiteListModalOpen} onClose={handleWhiteListModalClose} documentId={selectedDocId}/>
     </MDBox>
   );
 };

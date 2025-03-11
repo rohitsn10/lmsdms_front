@@ -75,7 +75,7 @@ const UnderApproveDocument = () => {
       return; // Exit if params or row is missing
     }
 
-    const { id, document_current_status, training_required, approval_status } = params.row;
+    const { id, document_current_status, training_required, approval_status,select_template } = params.row;
 
     if (
       id === undefined ||
@@ -88,7 +88,7 @@ const UnderApproveDocument = () => {
     }
 
     navigate(
-      `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}`
+      `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}&template_id=${select_template}`
     );
   };
   const formatDate = (date) => {

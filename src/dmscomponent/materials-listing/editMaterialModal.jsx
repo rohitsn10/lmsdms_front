@@ -260,7 +260,7 @@ const EditMaterialModal = ({ open, handleClose, materialData, handleSubmit }) =>
             {/* File Upload */}
             <input
               type="file"
-              accept=".pdf,.mp4,.docx"
+              accept=".pdf,.mp4"
               onChange={handleFileChange}
               style={{ display: "block", marginTop: "16px", marginBottom: "16px" }}
               required

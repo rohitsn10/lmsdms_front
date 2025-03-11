@@ -52,6 +52,14 @@ export const trainingApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    fetchTrainingWiseUsers: builder.query({
+      query: (documentId) => ({
+        url: `lms_module/training_wise_users?document_id=${documentId}`,
+        // training_wise_users?document_id=1
+        method: 'GET',
+      }),
+      transformResponse: (response) => response,
+    }),
   }),
 });
 
@@ -59,5 +67,6 @@ export const {
   useCreateTrainingMutation,
   useFetchTrainingsQuery,
   useUpdateTrainingMutation,
-  useCompleteViewDocumentMutation
+  useCompleteViewDocumentMutation,
+  useFetchTrainingWiseUsersQuery
 } = trainingApi;
