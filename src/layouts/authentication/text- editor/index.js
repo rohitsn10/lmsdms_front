@@ -35,18 +35,18 @@ import { useFetchSendbackDataQuery } from "api/auth/documentApi";
 
 const DocumentView = () => {
   const { id } = useParams();
-  const {data:reviewerData ,refetch:reviewerRefetch} = useFetchSendbackDataQuery(id);
+  const { data: reviewerData, refetch: reviewerRefetch } = useFetchSendbackDataQuery(id);
   const { user, setValue } = useContext(AuthContext);
-  const currentUserID = user.id; 
+  const currentUserID = user.id;
   const sendBackRequests = reviewerData?.send_back_requests || [];
 
   const isUserSendBack = sendBackRequests.some(
     (request) => request.user_id == currentUserID && request.is_send_back
   );
   const shouldShowSendBackButton = !isUserSendBack;
-  useEffect(()=>{
-    reviewerRefetch()
-  },[reviewerRefetch])
+  useEffect(() => {
+    reviewerRefetch();
+  }, [reviewerRefetch]);
   // console.log("Reviewer Data",reviewerData);
   const [loading, setLoading] = useState(true);
   const docEditorRef = useRef(null);
@@ -77,7 +77,7 @@ const DocumentView = () => {
   const approval_status = searchParams.get("approval_status");
   const version = searchParams.get("version");
   const templateIDMain = searchParams.get("templateID");
-  
+
   const [isSaved, setIsSaved] = useState(false);
   const handleDownloadSave = () => {
     setIsSaved(true);
@@ -101,7 +101,6 @@ const DocumentView = () => {
   const docCommentsRef = useRef([]);
 
   // console.log("User====>",user.id);
-
 
   const userGroupIds = documentsData?.userGroupIds || [];
   const isButtonVisible = (requiredGroupIds) => {
@@ -224,7 +223,6 @@ const DocumentView = () => {
               onAppReady: async () => {
                 window.docEditor = docEditorRef.current;
                 try {
-                 
                 } catch (error) {
                   console.error("Error inserting header:", error);
                 }
@@ -293,7 +291,6 @@ const DocumentView = () => {
     }
   }, [docEditorLoaded, editorConfig]);
 
-
   const handleRemarkConfirm = async (remark) => {
     // Close RemarkDialog and open E-Signature dialog
     setOpenRemarkDialog(false);
@@ -327,7 +324,7 @@ const DocumentView = () => {
             approver,
             doc_admin: docAdmin,
           }).unwrap();
-         
+
           toast.success("Document Submitted!");
           break;
         case "review":
@@ -363,13 +360,11 @@ const DocumentView = () => {
 
   const handleSubmit = () => {
     setAction("submit");
-  
+
     if (document_current_status == 8) {
-      setopenviewuserDialog(true);
-     
+      setOpenRemarkDialog(true);
     } else {
       setOpenuserDialog(true);
-     
     }
   };
 
@@ -394,9 +389,7 @@ const DocumentView = () => {
     }
   };
 
-
   const handlePrint = () => {
-   
     navigate(`/print-document/${id}`);
   };
 
@@ -418,8 +411,7 @@ const DocumentView = () => {
         status_sendback: "8", // The current status (replace with actual status if needed)
         remark: remark, // Include the remark field
       }).unwrap();
-  
-     
+
       if (response.status) {
         toast.success("Document Sent Back Successfully!");
         setTimeout(() => {
@@ -433,7 +425,7 @@ const DocumentView = () => {
       toast.error("Failed to Send Back. Please try again.");
     }
   };
-  
+
   const container = document.getElementById("onlyoffice-editor-container");
 
   const handleDownloadFeature = async () => {
@@ -455,7 +447,6 @@ const DocumentView = () => {
     // console.log("Doc Admin Approve clicked - Confirmed");
     setDialogeffectiveOpen(true); // Open the dialog
   };
-
 
   if (loading || isLoading) {
     return (
@@ -558,7 +549,9 @@ const DocumentView = () => {
               </>
             )}
           {/* Condition 2: Show Review button when status is "3" */}
-          {(document_current_status === "3" || document_current_status === "2" || document_current_status === "8") &&
+          {(document_current_status === "3" ||
+            document_current_status === "2" ||
+            document_current_status === "8") &&
             isButtonVisible([3]) && (
               <>
                 <MDButton
@@ -571,14 +564,15 @@ const DocumentView = () => {
                 </MDButton>
 
                 {shouldShowSendBackButton && (
-                <MDButton
-                  variant="gradient"
-                  color="error" // Change color to indicate sending back
-                  onClick={handleOpenDialog}
-                  disabled={isLoading || !isSaved}
-                >
-                  Send Back
-                </MDButton>)}
+                  <MDButton
+                    variant="gradient"
+                    color="error" // Change color to indicate sending back
+                    onClick={handleOpenDialog}
+                    disabled={isLoading || !isSaved}
+                  >
+                    Send Back
+                  </MDButton>
+                )}
               </>
             )}
           {/* Condition 3: Show Approve button when status is "4" */}
@@ -667,15 +661,18 @@ const DocumentView = () => {
       >
         {/* import time line code  */}
         <Grid container spacing={3} justifyContent="center" alignItems="center">
-          <Grid item xs={12} md={6} lg={4}
+          <Grid
+            item
+            xs={12}
+            md={6}
+            lg={4}
             sx={{
-    maxHeight: "500px", // Adjust the height as needed
-    overflowY: "auto",
-    border: "1px solid #ddd", // Optional: Just to visually separate it
-    padding: "10px",
-    backgroundColor: "#fff",
-  }}
-
+              maxHeight: "500px", // Adjust the height as needed
+              overflowY: "auto",
+              border: "1px solid #ddd", // Optional: Just to visually separate it
+              padding: "10px",
+              backgroundColor: "#fff",
+            }}
           >
             <OrdersOverview docId={id} />
           </Grid>
@@ -710,10 +707,10 @@ const DocumentView = () => {
         onConfirm={handleConfirmSelection}
       />
       <ViewUserDialog
-      open={openviewuserDialog}
-      onClose={handleviewuserCloseDialog}
-      onConfirm={handleConfirmViewSelection}
-      documentId={id}
+        open={openviewuserDialog}
+        onClose={handleviewuserCloseDialog}
+        onConfirm={handleConfirmViewSelection}
+        documentId={id}
       />
       {/* <ConditionalDialog
         open={dialogeffectiveOpen}

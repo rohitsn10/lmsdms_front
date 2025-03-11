@@ -37,14 +37,21 @@ export const lmsReportsAPI = createApi({
         url: `lms_module/training_attendance_sheet/${document_id}`,
         method: 'GET',
       }),
-      transformResponse: (response) => response, // Handle raw response
+      transformResponse: (response) => response, 
     }),
     getemployeeRecordlog:builder.query({
       query:()=>({
         url:`dms_module/employee_record_log`,
       }),
       transformResponse:(response)=>response,
-    })
+    }),
+    getTrainingAttendanceClassSheet: builder.query({
+      query: (document_id) => ({
+        url: `lms_module/classroom_training_attendance_sheet/${document_id}`,
+        method: 'GET',
+      }),
+      transformResponse: (response) => response, 
+    }),
   }),
 });
 
@@ -53,4 +60,5 @@ export const {
  useGetEmployeeTrainingNeedIdentificationQuery,
  useGetTrainingAttendanceSheetQuery,
  useGetemployeeRecordlogQuery,
+ useGetTrainingAttendanceClassSheetQuery,
 } = lmsReportsAPI;
