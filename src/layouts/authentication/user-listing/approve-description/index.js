@@ -30,15 +30,22 @@ const TaskDescriptionDialog = ({ open, onClose, userId }) => {
   }, [data]);
 
   const handleSave = async (status) => {
-    console.log("Job Description",currentUserId)
+    
     if (currentUserId) {
       try {
-        // Call HOD remarks mutation with the current user_id, status, and remark
-        await hodRemarks({ user_id: userId, currentUserId, status, remark,description:taskDescription }).unwrap(); // Trigger HOD remarks mutation
-        
+        const payload = {
+          user_id: userId,
+          currentUserId,
+          status,
+          description: taskDescription,
+          remark: status === "approved" ? "" : remark, // Always include remark, empty string when approved
+        };
+  
+        await hodRemarks(payload).unwrap(); // Trigger HOD remarks mutation
+  
         // Show success toast notification
-        toast.success(`Job description ${status === "approve" ? "approved" : "sent back"} successfully!`);
-        
+        toast.success(`Job description ${status === "approved" ? "approved" : "sent back"} successfully!`);
+  
         onClose(); // Close the dialog after saving
       } catch (error) {
         // Show error toast notification
@@ -48,6 +55,8 @@ const TaskDescriptionDialog = ({ open, onClose, userId }) => {
       console.error("User ID is missing.");
     }
   };
+  
+  
 
   if (isDataLoading) return <div>Loading...</div>;
   if (isDataError) return <div> {dataError?.message}</div>;
