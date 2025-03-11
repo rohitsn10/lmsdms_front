@@ -94,7 +94,7 @@ const QuizListing = () => {
             // onClick={() => navigate("/add-quiz", { state: { DataQuiz } })}
             onClick={() => navigate(`/add-quiz/${id}`)}
             sx={{ ml: 2 }}
-          >
+          > 
             Add Quiz
           </MDButton>
         </MDBox>

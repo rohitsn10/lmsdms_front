@@ -58,9 +58,14 @@ const ArchivedListing = () => {
                 <IconButton
                     color="primary"
                     onClick={() =>
-                        navigate("/archived-docviewer", {
-                            state: { front_file_url: params.row.front_file_url }
-                        })
+                      {  
+                        console.log("Paramss",params)
+                        //     navigate("/archived-docviewer", {
+                            // state: { front_file_url: params.row.front_file_url }
+                        // }
+                        // )
+                        navigate("/docviewer", { state: { docId: params.row.document_id, templateId: params.row.select_template } });
+                    }
                     }
                 >
                     <VisibilityIcon />

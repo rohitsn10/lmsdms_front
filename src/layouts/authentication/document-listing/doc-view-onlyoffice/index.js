@@ -188,7 +188,7 @@ const DocumentPreviewComponent = () => {
           <MDButton
             variant="contained"
             color="primary"
-            onClick={() => navigate("/document-listing")}
+            onClick={() => navigate(-1)}
             sx={{ ml: 2 }}
           >
             Go Back
