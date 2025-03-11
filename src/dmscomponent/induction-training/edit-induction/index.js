@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Card, MenuItem, Select, InputLabel, FormControl, OutlinedInput } from "@mui/material";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -17,7 +17,6 @@ const EditInduction = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const inductionId=state?.induction?.id
-
   const [inductionTitle, setInductionTitle] = useState(state?.induction?.induction_name || "");
   const [department, setDepartment] = useState(state?.induction?.department || "");
   const [document, setDocument] = useState(null);
@@ -35,9 +34,17 @@ const EditInduction = () => {
   };
 
   const handleFileChange = (e) => {
-    setDocument(e.target.files[0]);
-  };
-
+    const file = e.target.files[0];
+  
+    if (file) {
+      if (file.type !== "application/pdf") {
+        toast.error("Only PDF files are allowed!", { position: "top-right" });
+        setDocument(null);
+        return;
+      }
+      setDocument(file);
+    }
+  };  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
@@ -136,7 +143,6 @@ const EditInduction = () => {
                 </Select>
               </FormControl>
             </MDBox>
-
             <MDBox mb={3}>
               <MDInput
                 type="file"
@@ -146,7 +152,6 @@ const EditInduction = () => {
                 helperText={errors.document}
               />
             </MDBox>
-
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit" disabled={isLoading}>
                 {isLoading ? "Updating..." : "Save Changes"}
@@ -157,7 +162,6 @@ const EditInduction = () => {
       </Card>
 
       <ESignatureDialog open={openSignatureDialog} onClose={() => setOpenSignatureDialog(false)} onConfirm={handleSignatureComplete} />
-      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
     </BasicLayout>
   );
 };
