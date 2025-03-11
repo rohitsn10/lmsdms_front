@@ -45,7 +45,12 @@ const ClassroomListing = () => {
 
   // Handle session button click
   const handleSession = (classroom) => {
-    navigate("/session-list", { state: { classroom } });
+    // console.log(classroom)
+    if(classroom.classroom_id){
+      navigate(`/session-list/${classroom.classroom_id}`);
+    }else{
+      console.log("ClassroomId not exist.")
+    }
   };
 
   const handleAssessmentClick = (rowData) => {

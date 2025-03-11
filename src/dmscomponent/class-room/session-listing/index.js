@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useGetSessionsQuery, useMarkSessionCompletedMutation } from "apilms/classRoomApi";
 import { useUserListQuery } from "api/auth/userApi";
 import Card from "@mui/material/Card";
@@ -31,9 +31,12 @@ const SessionListing = () => {
 
   const [selectedSessionId, setSelectedSessionId] = useState(null);
   const navigate = useNavigate();
-  const location = useLocation();
-  const classroom = location.state?.classroom;
-  const classroomId = classroom.classroom_id;
+  // const location = useLocation();
+  // const classroom = location.state?.classroom;
+  // const classroomId = classroom.classroom_id;
+  const {classroomId} = useParams();
+  // const classroomId = classroomId;
+
   const [markSessionCompleted] = useMarkSessionCompletedMutation();
   const { data, isLoading, error, refetch } = useGetSessionsQuery(classroomId);
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
