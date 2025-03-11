@@ -81,7 +81,7 @@ const JobDescriptionDialog = ({ open, onClose, userId, remark }) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth>
+    <Dialog  open={open} onClose={handleCancel} maxWidth="md" fullWidth>
       <DialogTitle
         sx={{ textAlign: "center", fontWeight: "bold", fontSize: "1.25rem", color: "#333" }}
       >
@@ -109,7 +109,7 @@ const JobDescriptionDialog = ({ open, onClose, userId, remark }) => {
           onChange={handleChange}
           required
           multiline
-          rows={5}
+          rows={8}
         />
       </DialogContent>
       <DialogActions>

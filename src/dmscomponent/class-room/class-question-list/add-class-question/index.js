@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import {
   Card,
   MenuItem,
@@ -388,7 +388,7 @@ function ClassAddQuestion() {
         content={answers[currentAnswerIndex]?.text || ""}
         onSave={handleSaveAnswer}
       />
-      <ToastContainer position="top-right" autoClose={3000} />
+    
     </BasicLayout>
   );
 }

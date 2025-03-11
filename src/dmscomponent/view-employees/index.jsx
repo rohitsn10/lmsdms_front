@@ -18,7 +18,6 @@ function ViewEmployeeStatus() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null); // State for storing the selected user data
 
-  // Function to render tick (green) and cross (red) icons
   const renderStatusIcon = (params) => {
     return (
       <div
@@ -41,7 +40,8 @@ function ViewEmployeeStatus() {
               cursor: groupId === 8 ? "pointer" : "not-allowed", // Change cursor style based on groupId
             }}
             onClick={() => {
-              if (groupId === 8 && params?.field == "is_induction_complete") {
+      
+              if (groupId === 8 && params?.field == "is_induction_complete" && params.row.is_department_assigned == true) {
                 handleOpenDialog(params.row); // Open the dialog when groupId is 8
               }
             }}

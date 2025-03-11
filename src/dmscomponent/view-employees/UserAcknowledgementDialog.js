@@ -10,6 +10,7 @@ import {
 import PropTypes from "prop-types"; // Import PropTypes for prop validation
 import { useCreateacnowledgementMutation } from "apilms/workflowapi"; // Import the mutation hook
 import { toast, ToastContainer } from "react-toastify"; // Import toastify for toast notifications
+import MDButton from "components/MDButton";
 
 // Dialog component to handle HR Acknowledgement
 const UserAcknowledgementDialog = ({ open, onClose, selectedUserData }) => {
@@ -38,29 +39,29 @@ const UserAcknowledgementDialog = ({ open, onClose, selectedUserData }) => {
 
   return (
     <>
-      <ToastContainer />
+    
 
-      <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md"> 
         <DialogTitle>{`Acknowledgement - ${selectedUserData?.name}`}</DialogTitle>
         <DialogContent>
           <TextField
             label="Remark"
             fullWidth
             multiline
-            rows={4}
+            rows={9}
             variant="outlined"
             value={remark}
             onChange={(e) => setRemark(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{ mb: 5 }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} color="secondary">
+          <MDButton onClick={onClose} color="error">
             Cancel
-          </Button>
-          <Button onClick={handleSubmit} color="primary" disabled={isLoading}>
+          </MDButton>
+          <MDButton onClick={handleSubmit} variant="gradient" color="submit" disabled={isLoading}>
             {isLoading ? "Submitting..." : "Submit"}
-          </Button>
+          </MDButton>
         </DialogActions>
         {error && <div style={{ color: "red", padding: "10px" }}>Error: {error.message}</div>}
       </Dialog>

@@ -108,7 +108,7 @@ const TrainerListing = () => {
     { field: "created_at", headerName: "Created At", flex: 1.5, headerAlign: "center" },
     {
       field: "active",
-      headerName: "Active/Inactive",
+      headerName: "Inactive/Active",
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => (

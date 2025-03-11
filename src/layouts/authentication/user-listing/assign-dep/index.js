@@ -55,7 +55,7 @@ const AssignDepartmentDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose}fullWidth maxWidth="md">
       <DialogTitle>
         {is_department_assigned
           ? `Update Assigned department to ${fullName}`

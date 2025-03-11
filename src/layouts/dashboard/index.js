@@ -28,6 +28,7 @@ import {
 } from "api/auth/dashboardApi";
 import { useGetPrintRequestsQuery } from "api/auth/printApi";
 import { useAuth } from "hooks/use-auth";
+import { useReviseRequestGetQuery } from "api/auth/reviseApi";
 
 function Dashboard() {
   const { data, error, isLoading } = useGetDashboardCountsQuery(); // Fetch the dashboard counts
@@ -47,6 +48,12 @@ function Dashboard() {
   } = useGetPrintRequestsQuery({
     status_id:13
   });
+  const {
+    data: retrievaldata,
+    isLoading: loadingretrieval,
+    error: retrievalError,
+  } = useReviseRequestGetQuery();
+  console.log("retrval data",retrievaldata)
   const {
     data: approveData,
     isLoading: loadingApprove,
@@ -275,7 +282,7 @@ function Dashboard() {
                   color="warning"
                   icon={<PendingActionsIcon />}
                   title="Doc Revision Request"
-                  count={printdata?.total || 0}
+                  count={retrievaldata?.pending_revise_count || 0}
                   percentage={{
                     color: "success",
                   }}

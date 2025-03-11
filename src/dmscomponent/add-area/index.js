@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Card from "@mui/material/Card";
 import MenuItem from "@mui/material/MenuItem";
@@ -174,7 +174,7 @@ function AddArea() {
         onClose={() => setOpenSignatureDialog(false)}
         onConfirm={handleSignatureComplete}
       />
-      <ToastContainer position="top-right" autoClose={3000} />
+     
     </BasicLayout>
   );
 }

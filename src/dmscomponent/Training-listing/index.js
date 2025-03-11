@@ -356,12 +356,12 @@ const TrainingListing = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleAssesmentModalClose}>
+          <MDButton onClick={handleAssesmentModalClose}>
             Cancel
-          </Button>  
-          <Button onClick={startAssessmentClick} autoFocus color="primary" variant="contained">
+          </MDButton>  
+          <MDButton onClick={startAssessmentClick} autoFocus color="primary" variant="contained">
             Start Assessment
-          </Button>
+          </MDButton>
         </DialogActions>
       </Dialog>
 

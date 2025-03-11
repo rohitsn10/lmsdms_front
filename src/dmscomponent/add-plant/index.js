@@ -176,7 +176,7 @@ const AddPlant = () => {
         onConfirm={handleSignatureComplete}
       />
 
-      <ToastContainer position="top-right" autoClose={3000} />
+     
     </BasicLayout>
   );
 };

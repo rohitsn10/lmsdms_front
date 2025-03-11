@@ -4,6 +4,7 @@ import { Dialog, DialogTitle, DialogContent, IconButton, TextField, Button, Snac
 import CloseIcon from "@mui/icons-material/Close";
 import apiService from "services/apiService";
 import { useNavigate } from "react-router-dom";
+import MDButton from "components/MDButton";
 
 const EditMaterialModal = ({ open, handleClose, materialData, handleSubmit }) => {
   const [material, setMaterial] = useState({
@@ -266,10 +267,11 @@ const EditMaterialModal = ({ open, handleClose, materialData, handleSubmit }) =>
               required
             />
 
-            <Button
+            <MDButton
               type="submit"
               fullWidth
-              variant="contained"
+              variant="gradient"
+              color="submit"
               sx={{
                 marginTop: 2,
                 backgroundColor: "#31AC47",
@@ -279,7 +281,7 @@ const EditMaterialModal = ({ open, handleClose, materialData, handleSubmit }) =>
               }}
             >
               Save Changes
-            </Button>
+            </MDButton>
           </form>
         </DialogContent>
       </Dialog>
