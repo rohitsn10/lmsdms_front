@@ -39,6 +39,7 @@ const DocumentListing = () => {
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
+  console.log("GRORORO",groupId)
   const [searchTerm, setSearchTerm] = useState("");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -359,7 +360,7 @@ const DocumentListing = () => {
       renderCell: (params) => {
         // Check for the specific condition: is_done is true and current_status_name is "Under Reviewer"
         // console.log("Print params:::",params);
-        if ((params.row.is_done === false || params.row.is_done === null)  && params.row.document_current_status == 8) {
+        if (( groupId ==3 &&( params.row.is_done === false || params.row.is_done === null)  && params.row.document_current_status == 8)) {
           return <span>Under Reviewer</span>
         }
         // Otherwise, display the original current_status_name

@@ -181,10 +181,11 @@ const UnderReviewDocument = () => {
 
   const filteredData = documents.filter(
     (doc) =>
+      !doc.is_reviewed && (
       doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())
+      doc.created_at.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const rows = filteredData.map((doc, index) => ({
