@@ -12,7 +12,7 @@ import { useGetClassroomsQuery } from "apilms/classRoomApi"; // Import your API 
 import moment from "moment"; // For date formatting
 import { CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
-import { useGetTrainingAttendanceSheetQuery } from "apilms/reportsApi";
+import { useGetTrainingAttendanceSheetQuery,useGetTrainingAttendanceClassSheetQuery } from "apilms/reportsApi";
 import { useAuth } from "hooks/use-auth";
 
 const ClassroomListing = () => { 
@@ -21,8 +21,7 @@ const ClassroomListing = () => {
   const navigate = useNavigate();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
-
-  // Fetch classrooms using the query hook
+  const [downloadClassroomId, setDownloadClassroomId] = useState(null);
   const { data, isLoading, isError, error } = useGetClassroomsQuery();
   const [downloadDocumentId, setDownloadDocumentId] = useState(null);
   const {
@@ -31,9 +30,12 @@ const ClassroomListing = () => {
     isError: isAttendanceSheetError,
     error: attendanceSheetError,
   } = useGetTrainingAttendanceSheetQuery(downloadDocumentId, {
-    skip: !downloadDocumentId, // Skip the query if downloadDocumentId is not set
+    skip: !downloadDocumentId, 
   });
-  // Handle search input change
+  const { data: attendanceClassSheetData, isFetching: isFetchingAttendanceClassSheet } = useGetTrainingAttendanceClassSheetQuery(downloadClassroomId, {
+    skip: !downloadClassroomId,
+  });
+  // Handle search input change 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -59,36 +61,42 @@ const ClassroomListing = () => {
     // navigate("/exam-mcq-module", { state: { rowData } });
     // /:classroomQuizId
   };
-  const handleDownloadAttendanceSheet = (documentId) => {
-    setDownloadDocumentId(documentId);
-    toast.info("Downloading attendance sheet..."); // Show loading toast
+  const handleDownloadAttendanceSheet = (documentId, classroomId) => {
+    if (documentId) {
+      setDownloadDocumentId(documentId);
+    } else if (classroomId) {
+      setDownloadClassroomId(classroomId);
+    } else {
+      toast.error("No valid document or classroom ID available for download.");
+    }
   };
   
   useEffect(() => {
-    if (attendanceSheetData && downloadDocumentId) {
-      // Check if the API response indicates a failure
-      if (attendanceSheetData.status === false) {
-        // Show error message from API response
-        toast.error(`Failed to download attendance sheet: ${attendanceSheetData.message}`, {
-        
-        });
-        setDownloadDocumentId(null); // Reset the document ID
-        return; // Prevent further execution
+    const handleDownload = (data, id) => {
+      if (data && id) {
+        if (data.status === false) {
+          toast.error(`Failed to download attendance sheet: ${data.message}`);
+          setDownloadDocumentId(null);
+          setDownloadClassroomId(null);
+          return;
+        }
+        const url = data.data;
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `attendance_sheet_${id}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setDownloadDocumentId(null);
+        setDownloadClassroomId(null);
+        toast.success("Attendance sheet downloaded successfully!");
       }
-  
-      const url = attendanceSheetData.data; // URL directly from attendanceSheetData
-      const link = document.createElement("a");
-      link.href = url; // Use the URL from the response
-      link.setAttribute("download", `attendance_sheet_${downloadDocumentId}.pdf`); // Set the file name
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-  
-      // Reset states after download
-      setDownloadDocumentId(null); // Reset the document ID
-      toast.success("Attendance sheet downloaded successfully!",); // Show success toast
-    }
-  }, [attendanceSheetData, downloadDocumentId]);
+    };
+
+    handleDownload(attendanceSheetData, downloadDocumentId);
+    handleDownload(attendanceClassSheetData, downloadClassroomId);
+  }, [attendanceSheetData, downloadDocumentId, attendanceClassSheetData, downloadClassroomId]);
+
   
   // Handle error in attendance sheet download
   useEffect(() => {
@@ -216,8 +224,8 @@ const ClassroomListing = () => {
           <MDButton
             variant="outlined"
             color="success"
-            onClick={() => handleDownloadAttendanceSheet(params.row.document)}
-            disabled={!params.row.is_all_completed} 
+            onClick={() => handleDownloadAttendanceSheet(params.row.document, params.row.classroom_id)}
+            // disabled={!params.row.is_all_completed} 
           >
             Attendance Sheet
           </MDButton>
