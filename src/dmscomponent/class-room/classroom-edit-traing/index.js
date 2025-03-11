@@ -21,7 +21,7 @@ import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import MDInput from "components/MDInput";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useFetchTrainingsQuery } from "apilms/trainingApi";
 import { useFetchTrainersQuery } from "api/auth/trainerApi";
@@ -99,7 +99,7 @@ function ClassroomEditTraining() {
     formData.append("select_users", JSON.stringify(selectedUsers));
 
     const token = sessionStorage.getItem("token");
-    const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/update_classroom_training/${classroom.classroom_id}`;
+    const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/update_classroom/${classroom.classroom_id}`;
 
     try {
       const response = await axios.put(apiUrl, formData, {
@@ -395,7 +395,7 @@ function ClassroomEditTraining() {
                   type="file"
                   label={
                     <>
-                      <span style={{ color: "red" }}>*</span> Upload File
+                       Upload File
                     </>
                   }
                   fullWidth
@@ -421,7 +421,7 @@ function ClassroomEditTraining() {
           </MDBox>
         </MDBox>
       </Card>
-      <ToastContainer />
+     
       <ESignatureDialog
         open={openSignatureDialog}
         onClose={() => setOpenSignatureDialog(false)}

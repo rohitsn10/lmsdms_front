@@ -57,7 +57,7 @@ const AreaListing = () => {
   const columns = [
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "area_name", headerName: "Area Name", flex: 1, headerAlign: "center" },
-    { field: "department", headerName: "Department", flex: 1, headerAlign: "center" },
+    { field: "department_name", headerName: "Department", flex: 1, headerAlign: "center" },
     { field: "area_description", headerName: "Area Description", flex: 1.5, headerAlign: "center" },
     { field: "date", headerName: "Date", flex: 1, headerAlign: "center" },
     // {

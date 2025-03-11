@@ -17,6 +17,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import MDButton from "components/MDButton";
 import {
   KeyboardArrowDown,
   KeyboardArrowUp,
@@ -163,13 +164,13 @@ const CollapsibleCard = ({ data, open, setOpen }) => {
                       </Typography>
                     </Box>
                     <Box>
-                      <Button
+                      <MDButton
                         startIcon={<Edit />}
                         sx={{ marginLeft: 1, color: "#1976d2" }}
                         onClick={() => handleOpenEditModal(row)}
                       >
                         Edit Section
-                      </Button>
+                      </MDButton>
                       <Button
                         startIcon={<Delete />}
                         onClick={() => openDeleteConfirmation(row.id)}

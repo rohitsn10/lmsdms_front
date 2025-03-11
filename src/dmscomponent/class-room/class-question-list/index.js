@@ -159,7 +159,7 @@ const ClassQuestion = () => {
           onClose={() => setOpenSignatureDialog(false)}
           onConfirm={handleSignatureComplete} // Pass the handler for signature completion
         /> */}
-      <ToastContainer position="top-right" autoClose={3000} />
+     
     </MDBox>
   );
 };

@@ -6,6 +6,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { useDocumentreleaseEffectiveStatusMutation } from "api/auth/texteditorApi"; // import the API hook
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
+import { toast } from "react-toastify";
 
 const ConditionalDialog = ({
   open,
@@ -25,8 +26,7 @@ const ConditionalDialog = ({
       : "Are you sure you want to effective the document?";
 
   const handleConfirm = async () => {
-    const status = trainingStatus === true ? 6 : 7; // Use "6" if true, otherwise "7"
-    // Get the current date and format it as DD-MM-YYYY
+    const status = trainingStatus === true ? 6 : 7; 
     const currentDate = new Date();
     const effectiveDate = `${currentDate.getDate().toString().padStart(2, "0")}-${(
       currentDate.getMonth() + 1
@@ -34,42 +34,35 @@ const ConditionalDialog = ({
       .toString()
       .padStart(2, "0")}-${currentDate.getFullYear()}`;
 
-    let revisionDate = ""; // Default to blank
+    let revisionDate = ""; 
     if (revisionMonth && revisionMonth !== "0") {
       const [day, month, year] = effectiveDate.split("-").map(Number);
       const effectiveDateObj = new Date(year, month - 1, day);
-
-      // Set the revision date to one year later and update the month
       const revisionYear = effectiveDateObj.getFullYear() + 1;
       const revisionDateObj = new Date(revisionYear, parseInt(revisionMonth, 10) - 1, day);
-
-      // Handle invalid dates (e.g., February 30)
       if (revisionDateObj.getMonth() !== parseInt(revisionMonth, 10) - 1) {
-        revisionDateObj.setDate(0); // Move to the last valid day of the month
+        revisionDateObj.setDate(0); 
       }
-
       revisionDate = `${revisionDateObj.getDate().toString().padStart(2, "0")}-${(
         revisionDateObj.getMonth() + 1
       )
         .toString()
         .padStart(2, "0")}-${revisionDateObj.getFullYear()}`;
     }
-
     try {
-      // Call the mutation API with the documentId, status, and effectiveDate
       await documentReleaseEffectiveStatus({
         document_id: documentId,
         status_id: status,
-        ...(status === 7 && { effective_date: effectiveDate }), // Include effective_date only if status_id is 7
-        ...(status === 7 && effectiveDate && { revision_date: revisionDate }), // Include revision_date only if effective_date is present
+        ...(status === 7 && { effective_date: effectiveDate }),
+        ...(status === 7 && effectiveDate && { revision_date: revisionDate }),
       });
       refetch();
- // Trigger the onConfirm callback if needed
+      toast.success("Document release successful!", ); 
     } catch (error) {
       console.error("Error submitting the document release:", error);
+      toast.error("Failed to release document. Please try again.");
     }
-
-    onClose(); // Close the dialog after submission
+    onClose(); 
   };
 
   return (

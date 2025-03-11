@@ -158,7 +158,7 @@ const EditPlant = () => {
         onConfirm={handleSignatureComplete}
       />
 
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
     </BasicLayout>
   );
 };

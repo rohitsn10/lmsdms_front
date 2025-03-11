@@ -68,10 +68,12 @@ const UsersListing = () => {
         departmentId: item.depratment || "N/A",
         remark: item.remarks,
         depratment: item.department_name || "Not Assigned",
+        is_qualification:item.is_qualification || false,
+        is_induction_certificate:item.is_induction_certificate || false,
       }))
     : [];
 
-
+   
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -168,8 +170,8 @@ const UsersListing = () => {
       ? [
           {
             field: "action",
-            headerName: "Assign",
-            flex: 0.5,
+            headerName: "Assign Department",
+            flex: 0.7,
             headerAlign: "center",
             renderCell: (params) => (
               <IconButton
@@ -190,15 +192,21 @@ const UsersListing = () => {
             headerName: "JD Assign",
             flex: 0.5,
             headerAlign: "center",
-            renderCell: (params) => (
-              <IconButton
-                color="warning"
-                onClick={() => handleAssignJDClick(params.row)}
-                // disabled={params.row.is_jr_assign || !params.row.is_department_assigned} // Enable only if department is assigned
-              >
-                {!params.row.remark ? <AssignmentIcon /> : <AssignmentLateIcon />}
-              </IconButton>
-            ),
+            renderCell: (params) => {
+              const isRemarkPresent = !!params.row.remark; // Check if 'remark' exists
+              const iconColor = isRemarkPresent ? "error" : "warning"; // Change color dynamically
+              const IconComponent = isRemarkPresent ? AssignmentLateIcon : AssignmentIcon; // Choose icon dynamically
+
+              return (
+                <IconButton
+                  color={iconColor}
+                  onClick={() => handleAssignJDClick(params.row)}
+                  disabled={!params.row.is_induction_certificate}
+                >
+                  <IconComponent />
+                </IconButton>
+              );
+            },
           },
         ]
       : []),
@@ -213,7 +221,7 @@ const UsersListing = () => {
               <IconButton
                 color="inherit"
                 onClick={() => handleTaskDescriptionClick(params.row)}
-                // disabled={!params.row.is_description} // Enable only if JD is assigned
+                disabled={params.row.is_jr_approve} // Enable only if JD is assigned
               >
                 <AddTaskIcon />
               </IconButton>
@@ -224,7 +232,7 @@ const UsersListing = () => {
     ...(groupId === 7
       ? [
           {
-            field: "download_ic", 
+            field: "download_ic",
             headerName: "Induction Certificate",
             flex: 0.5,
             headerAlign: "center",
@@ -232,7 +240,7 @@ const UsersListing = () => {
               <IconButton
                 color="info"
                 onClick={() => handleDownloadICClick(params.row)}
-                disabled={!params.row.is_department_assigned}
+                disabled={!params.row.is_induction_complete}
               >
                 <DownloadIcon />
               </IconButton>
@@ -262,6 +270,7 @@ const UsersListing = () => {
               <IconButton
                 color="success"
                 onClick={() => handleDownloadTrainingCertificate(params.row)}
+                disabled={!params.row.is_qualification}
               >
                 <DownloadIcon />
               </IconButton>
@@ -293,7 +302,7 @@ const UsersListing = () => {
           )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
-          <div style={{ height: 600, width: "100%",overflow: "auto"  }}>
+          <div style={{ height: 600, width: "100%", overflow: "auto" }}>
             <DataGrid
               rows={filteredData}
               columns={columns}
@@ -301,7 +310,7 @@ const UsersListing = () => {
               rowsPerPageOptions={[5, 10, 20]}
               disableSelectionOnClick
               sx={{
-                minWidth: 1500,
+                minWidth: 1800,
                 border: "1px solid #ddd",
                 borderRadius: "4px",
                 "& .MuiDataGrid-columnHeaders": {

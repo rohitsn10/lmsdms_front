@@ -157,7 +157,7 @@ const EditInduction = () => {
       </Card>
 
       <ESignatureDialog open={openSignatureDialog} onClose={() => setOpenSignatureDialog(false)} onConfirm={handleSignatureComplete} />
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
     </BasicLayout>
   );
 };

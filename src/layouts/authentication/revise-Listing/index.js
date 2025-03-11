@@ -11,7 +11,7 @@ import BackHandSharpIcon from "@mui/icons-material/BackHandSharp";
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
 import ReviseDialog from "./Revise";
 import ReviseApproveDialog from "./Approve";
-import { useReviseRequestGetQuery } from "api/auth/reviseApi"; // Adjust import as per your API slice location
+import { useReviseRequestGetQuery } from "api/auth/reviseApi"; // Adjust import as per your API slice location 
 import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 import { hasPermission } from "utils/hasPermission";
 import { useAuth } from "hooks/use-auth";
@@ -75,20 +75,24 @@ const ReviseApprovalList = () => {
     handleApproveDialogClose();
   };
 
-  // Format data for DataGrid
-  const formattedData = apiDocuments.map((doc, index) => ({
-    id: doc.document_id,
-    serial_number: index + 1,
-    documentTitle: doc.document_title,
-    documentType: doc.document_type,
-    requestedUser: `${doc.user}`,
-    requestedDate: new Date(doc.revision_created_at).toLocaleDateString(),
-    reviseStatus: doc.status,
-    revisereason: doc.revise_description,
-    document_current_status_name: doc.document_current_status_name,
-    revise_request_id: doc.revise_request_id,
-    is_revise: doc.is_revise,
-  }));
+ // Format data for DataGrid (filter out approved documents)
+const formattedData = apiDocuments
+.filter((doc) => doc.status !== "approved") // Exclude approved documents
+.map((doc, index) => ({
+  id: doc.document_id,
+  serial_number: index + 1,
+  documentTitle: doc.document_title,
+  documentType: doc.document_type,
+  requestedUser: `${doc.user}`,
+  requestedDate: new Date(doc.revision_created_at).toLocaleDateString(),
+  reviseStatus: doc.status,
+  revisereason: doc.revise_description,
+  document_current_status_name: doc.document_current_status_name,
+  revise_request_id: doc.revise_request_id,
+  is_revise: doc.is_revise,
+}));
+ 
+console.log(formattedData);
 
   // Filter data based on the search term
   const displayedData = formattedData.filter(
@@ -132,12 +136,14 @@ const ReviseApprovalList = () => {
       ? [
           {
             field: "approve",
-            headerName: "Approve",
+            headerName: "Approve", 
             flex: 0.75, 
             headerAlign: "center",
             renderCell: (params) =>
               // params.row.reviseRequestId !== null ? (
-                <IconButton color="primary" onClick={() => handleApproveDialogOpen(params.row)}>
+                <IconButton color="primary" onClick={() => handleApproveDialogOpen(params.row)}
+                disabled={!params.row.is_revise} 
+                >
                   <ImportContactsTwoToneIcon />
                 </IconButton>
               // ) : (

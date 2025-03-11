@@ -13,11 +13,22 @@ import MDButton from "components/MDButton";
 import moment from "moment";
 import AttendanceDialog from "./attendance";
 import ViewAttendanceDialog from "./view-attendance";
+import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
+import { useAuth } from "hooks/use-auth";
+import { hasPermission } from "utils/hasPermission";
 const SessionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [attendanceData, setAttendanceData] = useState([]);
   const [openAttendanceDialog, setOpenAttendanceDialog] = useState(false);
-  console.log("----------------------------", openAttendanceDialog);
+  const { user, role } = useAuth();
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
+
+  const { data: userPermissions = [], isError: permissionError } =
+    useFetchPermissionsByGroupIdQuery(groupId?.toString(), {
+      skip: !groupId,
+    });
+
   const [selectedSessionId, setSelectedSessionId] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,7 +89,7 @@ const SessionListing = () => {
           id: session.session_id,
           serial_number: index + 1,
           start_date: moment(session.start_date).format("DD MMM YYYY"),
-          start_time:moment(session.start_time, "HH:mm:ss").format("HH:mm A")
+          start_time: moment(session.start_time, "HH:mm:ss").format("HH:mm A"),
         }))
     : [];
 
@@ -136,21 +147,25 @@ const SessionListing = () => {
         </MDButton>
       ),
     },
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 0.5,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <IconButton
-          color="primary"
-          onClick={() => handleEditSession(params.row)}
-          disabled={!params.row.is_completed}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
-    },
+    ...(hasPermission(userPermissions, "session", "isAdd")
+      ? [
+          {
+            field: "action",
+            headerName: "Action",
+            flex: 0.5,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <IconButton
+                color="primary"
+                onClick={() => handleEditSession(params.row)}
+                disabled={!params.row.is_completed}
+              >
+                <EditIcon />
+              </IconButton>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -168,14 +183,16 @@ const SessionListing = () => {
           <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
             Session Listing
           </MDTypography>
-          <MDButton
-            variant="contained"
-            color="primary"
-            onClick={() => navigate("/add-session", { state: { classroomId } })}
-            sx={{ ml: 2 }}
-          >
-            Add Session
-          </MDButton>
+          {hasPermission(userPermissions, "session", "isAdd") && (
+            <MDButton
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/add-session", { state: { classroomId } })}
+              sx={{ ml: 2 }}
+            >
+              Add Session
+            </MDButton>
+          )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
           <div style={{ height: 500, width: "100%" }}>

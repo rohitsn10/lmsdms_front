@@ -13,6 +13,7 @@ import useSectionMaterials from "../../hooks/materialHook"; // Import the hook
 import AddMaterialModal from "./createMaterialModal";
 import apiService from "services/apiService";
 import { useNavigate } from "react-router-dom";
+import MDButton from "components/MDButton";
 
 const CollapsibleSection = ({
   open,
@@ -124,7 +125,7 @@ const CollapsibleSection = ({
                 {new Date(material.material_created_at).toLocaleString()}
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "row", gap: "10px" }}>
-                <Button
+                <MDButton
                   variant="contained"
                   startIcon={<Visibility />}
                   color="primary"
@@ -136,7 +137,7 @@ const CollapsibleSection = ({
                   }}
                 >
                   View File
-                </Button>
+                </MDButton>
                 <Button
                   startIcon={<Edit />}
                   onClick={() => handleOpenEditMaterialModal(material)}

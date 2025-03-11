@@ -371,7 +371,7 @@ function EditTraining() {
         onClose={() => setOpenSignatureDialog(false)} // Close the dialog
         onConfirm={handleSignatureComplete} // Handle signature completion
       />
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
     </BasicLayout>
   );
 }
