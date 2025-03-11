@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 import { useGetTrainingAttendanceSheetQuery } from "apilms/reportsApi";
 import { useAuth } from "hooks/use-auth";
 
-const ClassroomListing = () => {
+const ClassroomListing = () => { 
   const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -217,7 +217,7 @@ const ClassroomListing = () => {
             variant="outlined"
             color="success"
             onClick={() => handleDownloadAttendanceSheet(params.row.document)}
-            // disabled={params.row.is_assesment === "Without Assessment"} // Disable if 'is_assesment' is 'Without Assessment'
+            disabled={!params.row.is_all_completed} 
           >
             Attendance Sheet
           </MDButton>
