@@ -41,23 +41,6 @@ const TrainingDocumentObsoleteView = () => {
       }
       
       const config = await response.json();
-      // const config = {
-      //   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudCI6eyJmaWxlVHlwZSI6ImRvY3giLCJrZXkiOiI3ZjFlNDRmYTU3ZDg4ZTRmNmNlMDc0OTVhYmRhNDFiMzljYTE3MjMzYWM3NWIyMjcwYWNlOTg2MWJhNWEzYjY1IiwidGl0bGUiOiJEb2N1bWVudCIsInVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9tZWRpYS85MTk5NmFmNS05OTg1LTQ5MzAtYTg1Yi04NGFiZDRlOWYzNDUuZG9jeCJ9LCJlZGl0b3JDb25maWciOnsiY2FsbGJhY2tVcmwiOiJodHRwOi8vaG9zdC5kb2NrZXIuaW50ZXJuYWw6ODA4MC9kbXNfbW9kdWxlL29ubHlvZmZpY2VfY2FsbGJhY2siLCJtb2RlIjoiZWRpdCIsInVzZXIiOnsiaWQiOiIxIiwibmFtZSI6IlJvaGl0IFNoYXJtYSJ9fX0.rcGFq2iV-qEUrBfrgJNZ3-rOOVeNpKLGpClnGIr-QVU",
-      //   "document": {
-      //     "fileType": "docx",
-      //     "key": "7f1e44fa57d88e4f6ce07495abda41b39ca17233ac75b2270ace9861ba5a3b65",
-      //     "title": "Document",
-      //     "url": "http://127.0.0.1:8000/media/91996af5-9985-4930-a85b-84abd4e9f345.docx"
-      //   },
-      //   "editorConfig": {
-      //     "callbackUrl": "http://host.docker.internal:8080/dms_module/onlyoffice_callback",
-      //     "mode": "edit",
-      //     "user": {
-      //       "id": "1",
-      //       "name": "Rohit Sharma"
-      //     }
-      //   }
-      // }
       console.log("Editor config received:", config);
       setEditorConfig(config);
       setDocEditorLoaded(true);
@@ -105,37 +88,7 @@ const TrainingDocumentObsoleteView = () => {
               user: { 
                 id: user?.id || "1", 
                 name: user?.first_name || "User" 
-              },
-              customization: {
-                printButton: true,
-                // other customization settings
-            },
-              // customization: {
-              //   autosave: false,
-              //   forcesave: false,
-              //   review: {
-              //     trackChanges: true,
-              //     showReviewChanges: true,
-              //   },
-              //   features: {
-              //     trackChanges: true
-              //   },
-              //   saveButton: false,
-              //   showReviewChanges: true,
-              //   trackChanges: true,
-              //   chat: false,
-              //   comments: true,
-              //   zoom: 100,
-              //   compactHeader: false,
-              //   leftMenu: true,
-              //   rightMenu: false,
-              //   toolbar: true,
-              //   statusBar: false,
-              //   autosaveMessage: false,
-              //   forcesaveMessage: false,
-              //   downloadButton: false,
-              //   printButton: true,
-              // },
+              }
             },
             events: {
               onAppReady: () => {

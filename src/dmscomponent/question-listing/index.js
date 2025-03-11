@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
@@ -18,17 +18,18 @@ import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 import { toast, ToastContainer } from "react-toastify";
 const QuestionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const {id} =useParams();
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [pendingQuestionId, setPendingQuestionId] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const id = location?.state?.rowData || null;
+  // const id = location?.state?.rowData || null;
   const { data, isLoading, isError, refetch } = useFetchTrainingWiseQuestionsQuery(id);
   const [deleteTrainingQuestion] = useDeleteTrainingQuestionMutation(id);
-  console.log(data);
+  // console.log(data);
   useEffect(() => {
     refetch();
-  }, [location.key]);
+  }, [id]);
 
   const handleAddQuestion = () => {
     navigate("/add-question", { state: { id } });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
@@ -14,12 +14,14 @@ const QuizListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const { DataQuiz } = location.state || {};
-  const { data: response, isLoading, isError, refetch } = useGetTrainingQuizzesQuery(DataQuiz.id);
+  // const { DataQuiz } = location.state || {};
+  const {id} = useParams();
+  // console.log("DatatattaQuziz",DataQuiz)
+  const { data: response, isLoading, isError, refetch } = useGetTrainingQuizzesQuery(id);
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [id]);
 
   const quizzes = response?.data || [];
 
@@ -89,7 +91,8 @@ const QuizListing = () => {
           <MDButton
             variant="contained"
             color="primary"
-            onClick={() => navigate("/add-quiz", { state: { DataQuiz } })}
+            // onClick={() => navigate("/add-quiz", { state: { DataQuiz } })}
+            onClick={() => navigate(`/add-quiz/${id}`)}
             sx={{ ml: 2 }}
           >
             Add Quiz

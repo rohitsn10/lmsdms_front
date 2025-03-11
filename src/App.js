@@ -374,9 +374,9 @@ export default function App() {
       <Route path="/add-training" element={<AddTraining />} />
       <Route path="/add-material" element={<AddMaterial />} />
       <Route path="/add-question" element={<AddQuestion />} />
-      <Route path="/add-quiz" element={<CreateQuiz />} />
+      <Route path="/add-quiz/:id" element={<CreateQuiz />} />
       <Route path="/edit-quiz" element={<EditQuiz />} />
-      <Route path="/quiz-list" element={<QuizListing />} />
+      <Route path="/quiz-list/:id" element={<QuizListing />} />
       <Route path="/classroom-training" element={<ClassroomTraining />} />
       <Route path="/training-matrix" element={<TrainingMatrix />} />
       <Route path="/exam-result" element={<ExamResultsReport />} />
@@ -396,7 +396,7 @@ export default function App() {
       <Route path="/edit-training" element={<EditTraining />} />
       <Route path="/LMS-Document" element={<LMSDocument />} />
       <Route path="/lms-document-viewer" element={<LMSDocument />} />
-      <Route path="/questions" element={<QuestionListing />} />
+      <Route path="/questions/:id" element={<QuestionListing />} />
       <Route path="/edit-question" element={<EditQuestion />} />
       <Route path="/jobRole-listing" element={<JobroleListing />} />
       <Route path="/edit-jobrole" element={<EditJobRole />} />

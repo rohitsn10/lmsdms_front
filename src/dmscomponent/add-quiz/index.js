@@ -26,7 +26,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useCreateTrainingQuizMutation } from "apilms/quizapi";
 import { useFetchTrainingWiseQuestionsQuery } from "apilms/questionApi";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { FormControl, InputLabel } from "@mui/material";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -35,7 +35,7 @@ function CreateQuiz() {
   const location = useLocation();
   const { DataQuiz } = location.state || {};
   const navigate = useNavigate();
-  
+  const {id} = useParams()
   // Form state
   const [quizName, setQuizName] = useState("");
   const [quizTime, setQuizTime] = useState("");
@@ -51,7 +51,7 @@ function CreateQuiz() {
   const passCriteria = totalMarks ? (parseFloat(totalMarks) * 0.8).toFixed(0) : "";
 
   // Fetch questions data
-  const { data, isLoading, isError } = useFetchTrainingWiseQuestionsQuery(DataQuiz?.id);
+  const { data, isLoading, isError } = useFetchTrainingWiseQuestionsQuery(id);
   const [createQuiz, { isLoading: isQuizLoading }] = useCreateTrainingQuizMutation();
 
   // Set available questions from API response
@@ -320,7 +320,7 @@ function CreateQuiz() {
     
     // Prepare quiz data
     const quizData = {
-      document_id: DataQuiz?.id,
+      document_id:id,
       name: quizName,
       pass_criteria: parseFloat(totalMarks) * 0.8, // 80% of total marks
       quiz_time: quizTime,

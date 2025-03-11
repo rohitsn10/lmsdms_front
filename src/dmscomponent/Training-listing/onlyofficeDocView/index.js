@@ -16,7 +16,7 @@ const TrainingDocumentView = () => {
   const [error, setError] = useState(null);
   const [editorConfig, setEditorConfig] = useState(null);
   const docEditorRef = useRef(null);
-  const [timeLeft, setTimeLeft] = useState(8);
+  const [timeLeft, setTimeLeft] = useState(600);
   const timerRef = useRef(null);
   const [completeViewDocument] = useCompleteViewDocumentMutation();
     // console.log(document_id,templateId);

@@ -80,11 +80,15 @@ const TrainingListing = () => {
   };
 
   const handleQuestionClick = (rowData) => {
-    navigate("/questions", { state: { rowData } });
+    // console.log(rowData)
+    // navigate("/questions", { state: { rowData } });
+    navigate(`/questions/${rowData}`);
   };
 
   const handleQuizClick = (DataQuiz) => {
-    navigate("/quiz-list", { state: { DataQuiz } });
+    // console.log(DataQuiz);
+    navigate(`/quiz-list/${DataQuiz.id}`);
+    // navigate("/quiz-list", { state: { DataQuiz } });
   };
 
   const handleAssessmentClick = (rowId) => {
