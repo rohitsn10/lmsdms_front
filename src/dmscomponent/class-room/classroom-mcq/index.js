@@ -86,15 +86,33 @@ function ClassMultiChoiceQuestionsSection() {
   useEffect(() => {
     if (questionsData?.data?.[0]) {
       const quizData = questionsData.data[0];
-      setQuestions(quizData.questions || []);
-      setPageCount(quizData.questions?.length || 0);
-      setCounter(quizData.quiz_time * 60);
 
-      const initialCorrectAnswers = (quizData.questions || []).reduce((acc, item) => {
+      const shuffleArray = (array) => {
+        let shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      };
+      const shuffledQuestions = shuffleArray(quizData.questions || []);
+
+      // setQuestions(quizData.questions || []);
+      // setPageCount(quizData.questions?.length || 0);
+      setQuestions(shuffledQuestions);
+      setPageCount(shuffledQuestions.length);
+      setCounter(quizData.quiz_time * 60);
+      
+      const initialCorrectAnswers = shuffledQuestions.reduce((acc, item) => {
         acc[item.id] = (item.correct_answer || "").toLowerCase();
         return acc;
       }, {});
       setCorrectAnswers(initialCorrectAnswers);
+      // const initialCorrectAnswers = (quizData.questions || []).reduce((acc, item) => {
+      //   acc[item.id] = (item.correct_answer || "").toLowerCase();
+      //   return acc;
+      // }, {});
+      // setCorrectAnswers(initialCorrectAnswers);
     }
   }, [questionsData]);
 

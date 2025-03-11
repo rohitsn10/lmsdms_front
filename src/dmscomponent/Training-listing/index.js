@@ -260,22 +260,37 @@ const TrainingListing = () => {
           //     {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
           //   </IconButton>
           // </MDBox>
-          <MDBox display="flex" justifyContent="center">
-          {hasPassedStatus ? (
-            <IconButton disabled>
-              {/* <ChecklistIcon style={{ color: "green" }} /> Green checkmark */}
-              <CheckCircleIcon style={{ color: "green" }} />
-            </IconButton>
-          ) : (
-            <IconButton
-              disabled={!params.row?.user_view?.some(view => view.user === user.id)}
-              color={hasFailedStatus ? "warning" : "error"}
-              onClick={() => handleAssessmentClick(params.row.id)}
-            >
-              {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
-            </IconButton>
-          )}
-        </MDBox>
+        //   <MDBox display="flex" justifyContent="center">
+        //   {hasPassedStatus ? (
+        //     <IconButton disabled>
+        //       {/* <ChecklistIcon style={{ color: "green" }} /> Green checkmark */}
+        //       <CheckCircleIcon style={{ color: "green" }} />
+        //     </IconButton>
+        //   ) : (
+        //     <IconButton
+        //       disabled={!params.row?.user_view?.some(view => view.user === user.id)}
+        //       color={hasFailedStatus ? "warning" : "error"}
+        //       onClick={() => handleAssessmentClick(params.row.id)}
+        //     >
+        //       {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
+        //     </IconButton>
+        //   )}
+        // </MDBox>
+        <MDBox display="flex" justifyContent="center">
+        {hasPassedStatus ? (
+          <IconButton disabled>
+            <CheckCircleIcon style={{ color: "green" }} />
+          </IconButton>
+        ) : (
+          <IconButton
+            disabled={!isUserInView} // Only enable if user is in view
+            color={hasFailedStatus ? "warning" : "error"}
+            onClick={() => handleAssessmentClick(params.row.id)}
+          >
+            {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
+          </IconButton>
+        )}
+      </MDBox>
         );
       },
       sortable: false,

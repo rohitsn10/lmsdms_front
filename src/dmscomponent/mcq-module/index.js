@@ -18,6 +18,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useGetTrainingQuizzesQuery } from "apilms/quizapi";
 import { useAttemptQuizMutation } from "apilms/quizapi";
 import { useAuth } from "hooks/use-auth";
+import { useStartAttemptQuizMutation } from "apilms/quizapi";
 
 function MultiChoiceQuestionsSection() {
   const navigate = useNavigate();
@@ -29,6 +30,8 @@ function MultiChoiceQuestionsSection() {
   const { data: questionsData, isLoading, isError } = useGetTrainingQuizzesQuery(id, {
     skip: !id,
   });
+  console.log("QUESSS>>>>>",questionsData)
+  const [startAttemptQuiz]=useStartAttemptQuizMutation();
   const quiz_id = questionsData?.data[0]?.id || 0;
   const [attemptQuiz] = useAttemptQuizMutation();
   const [questions, setQuestions] = useState([]);
@@ -108,6 +111,16 @@ function MultiChoiceQuestionsSection() {
     };
   }, [hasSubmitted]);
 
+    useEffect(() => {
+        if (questionsData?.data?.[0]?.id) {
+          const quizId = questionsData.data[0].id;
+          
+          // Call the mutation when quiz starts
+          startAttemptQuiz({ document_id: id, quiz_id: quizId })
+            .then(() => console.log("Quiz attempt started successfully"))
+            .catch((error) => console.error("Error starting quiz attempt:", error));
+        }
+      }, [questionsData]);
   const handleConfirmExit = () => {
     setOpenConfirmModal(false);
     navigate("/trainingListing", { replace: true });
@@ -120,15 +133,39 @@ function MultiChoiceQuestionsSection() {
   useEffect(() => {
     if (questionsData?.data?.[0]) {
       const quizData = questionsData.data[0];
-      setQuestions(quizData.questions || []);
-      setPageCount(quizData.questions?.length || 0);
+
+
+      const shuffleArray = (array) => {
+        let shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      };
+      const shuffledQuestions = shuffleArray(quizData.questions || []);
+    
+      setQuestions(shuffledQuestions);
+      setPageCount(shuffledQuestions.length);
       setCounter(quizData.quiz_time * 60);
-      
-      const initialCorrectAnswers = (quizData.questions || []).reduce((acc, item) => {
+  
+      const initialCorrectAnswers = shuffledQuestions.reduce((acc, item) => {
         acc[item.id] = (item.correct_answer || "").toLowerCase();
         return acc;
       }, {});
       setCorrectAnswers(initialCorrectAnswers);
+      // const shuffledQuestions = shuffleArray(quizData.questions || []);
+
+      // setQuestions(quizData.questions || []);
+      // setPageCount(quizData.questions?.length || 0);
+      // setCounter(quizData.quiz_time * 60);
+      
+      // const initialCorrectAnswers = (quizData.questions || []).reduce((acc, item) => {
+      //   acc[item.id] = (item.correct_answer || "").toLowerCase();
+      //   return acc;
+      // }, {});
+
+      // setCorrectAnswers(initialCorrectAnswers);
     }
   }, [questionsData]);
 
@@ -202,7 +239,8 @@ function MultiChoiceQuestionsSection() {
     const results = calculateResults();
     const passCriteria = parseFloat(questionsData.data[0].pass_criteria);
     const passKey = results.marksObtained >= passCriteria;
-    const message = `You scored ${results.marksObtained} out of ${results.totalMarks} marks.\nTime taken: ${formatTime(results.timeTaken)}`;
+    const statusMessage = passKey ? "Congratulations! You have passed." : "Unfortunately, you have failed. Try again next time.";
+    const message = `${statusMessage} You scored ${results.marksObtained} out of ${results.totalMarks} marks.\nTime taken: ${formatTime(results.timeTaken)}`;
 
     const quizPayload = {
       document_id: id,

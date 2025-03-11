@@ -114,6 +114,14 @@ export const quizapi = createApi({
       }),
       transformResponse: (response) => response, // Handle raw response
     }),
+    startAttemptQuiz: builder.mutation({
+      query: (quizPayload) => ({
+        url: 'lms_module/once_training_attempted',
+        method: 'PUT',
+        body: quizPayload,
+      }),
+      transformResponse: (response) => response,
+    })
   }),
 });
 
@@ -122,6 +130,7 @@ export const {
   useGetTrainingQuizzesQuery,    // Hook for the create_training_quiz GET API
   useUpdateTrainingQuizMutation,
   useUpdateDeleteQuizMutation,
-  useAttemptQuizMutation
+  useAttemptQuizMutation,
+  useStartAttemptQuizMutation
 
 } = quizapi;
