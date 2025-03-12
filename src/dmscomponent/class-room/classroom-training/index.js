@@ -27,12 +27,14 @@ import { useFetchTrainingsQuery } from "apilms/trainingApi";
 import { useFetchTrainersQuery } from "api/auth/trainerApi";
 import { useUserListQuery } from "api/auth/userApi";
 import { useFailedUserQuery } from "api/auth/userApi";
+
 function ClassroomTraining() {
   const [trainingType, setTrainingType] = useState("");
   const { data: alldocument } = useFetchTrainingsQuery();
   const { data: alltrainers } = useFetchTrainersQuery();
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
   const [selectedUsers, setSelectedUsers] = useState([]);
+  console.log("Selected User::::", selectedUsers);
   const [sopdocument, setsopdocument] = useState("None");
   const [trainer, setTrainer] = useState("");
   const [classroomTitle, setClassroomTitle] = useState("");
@@ -44,9 +46,28 @@ function ClassroomTraining() {
   const [isLoading, setIsLoading] = useState(false);
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const navigate = useNavigate();
-  const handleUserChange = (e) => setSelectedUsers(e.target.value);
+  
   const { data: failedUsersData, isLoading: isFailedUsersLoading } =
     useFailedUserQuery(sopdocument);
+  
+  // Modified handleUserChange to handle both regular users and failed users
+  const handleUserChange = (e) => {
+    const selectedValues = e.target.value;
+    
+    // If document is selected (not "None"), handle failed users differently
+    if (sopdocument !== "None") {
+      // For failed users, map selected IDs to the corresponding user IDs from the failedUsersData
+      const mappedSelectedUsers = selectedValues.map(id => {
+        const failedUser = failedUsersData?.data.find(u => u.id === id);
+        // Return the user field instead of the id
+        return failedUser ? failedUser.user : id;
+      });
+      setSelectedUsers(mappedSelectedUsers);
+    } else {
+      // For regular users, use the IDs directly
+      setSelectedUsers(selectedValues);
+    }
+  };
 
   const validateInputs = () => {
     const newErrors = {};
@@ -72,6 +93,7 @@ function ClassroomTraining() {
     setDescription("");
     setStatus("Assigned");
     setFile(null);
+    setSelectedUsers([]);
     setErrors({});
     toast.info("Form cleared successfully.");
   };
@@ -94,7 +116,7 @@ function ClassroomTraining() {
     formData.append("upload_doc", File);
     formData.append("online_offline_status", onlineOfflineStatus);
     formData.append("select_users", JSON.stringify(selectedUsers));
-
+    
     const token = sessionStorage.getItem("token");
     const apiUrl = `${process.env.REACT_APP_APIKEY}lms_module/create_classroom`;
 
@@ -127,6 +149,11 @@ function ClassroomTraining() {
     setFile(e.target.files[0]);
     setErrors((prev) => ({ ...prev, File: "" }));
   };
+
+  // Clear selected users when switching between document types
+  React.useEffect(() => {
+    setSelectedUsers([]);
+  }, [sopdocument]);
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
@@ -200,7 +227,7 @@ function ClassroomTraining() {
                   </Select>
                 </FormControl>
                 {errors.trainingType && (
-                  <MDTypography variant="caption">{errors.trainingType}</MDTypography>
+                  <MDTypography variant="caption" color="error">{errors.trainingType}</MDTypography>
                 )}
               </Grid>
               <Grid item xs={12}>
@@ -233,7 +260,7 @@ function ClassroomTraining() {
 
                 {/* Display error message for the "trainer" field */}
                 {errors.trainer && (
-                  <MDTypography variant="caption">
+                  <MDTypography variant="caption" color="error">
                     {errors.trainer} {/* Display the error message for the trainer */}
                   </MDTypography>
                 )}
@@ -322,15 +349,20 @@ function ClassroomTraining() {
                       labelId="select-failed-users-label"
                       id="select-failed-users"
                       multiple
-                      value={selectedUsers}
+                      value={selectedUsers.map(userId => {
+                        // For display purposes, find the failed user record that contains this user ID
+                        const failedUser = failedUsersData?.data.find(u => u.user === userId);
+                        // If found, return the id (not the user field) for the Select component
+                        return failedUser ? failedUser.id : userId;
+                      })}
                       onChange={handleUserChange}
                       input={<OutlinedInput label="Failed Users" />}
                       renderValue={(selected) =>
                         selected
-                          .map((userId) => {
-                            const user = failedUsersData?.data.find((u) => u.id === userId);
+                          .map((id) => {
+                            const user = failedUsersData?.data.find((u) => u.id === id);
                             // Return the full name of the user (first name + last name)
-                            return user ? `${user.user_first_name} ${user.user_last_name}` : userId;
+                            return user ? `${user.user_first_name} ${user.user_last_name}` : id;
                           })
                           .join(", ")
                       }
@@ -437,9 +469,6 @@ function ClassroomTraining() {
           </MDBox>
         </MDBox>
       </Card>
-
-      {/* Toast Container */}
-      {/* <ToastContainer /> */}
 
       {/* E-Signature Dialog */}
       <ESignatureDialog
