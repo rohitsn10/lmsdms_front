@@ -53,7 +53,6 @@ function Dashboard() {
     isLoading: loadingretrieval,
     error: retrievalError,
   } = useReviseRequestGetQuery();
-  console.log("retrval data",retrievaldata)
   const {
     data: approveData,
     isLoading: loadingApprove,

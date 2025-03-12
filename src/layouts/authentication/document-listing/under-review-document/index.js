@@ -88,6 +88,7 @@ const UnderReviewDocument = () => {
       approval_status,
       select_template,
       version,
+      is_reviewed,
     } = params.row;
 
     if (
@@ -96,7 +97,8 @@ const UnderReviewDocument = () => {
       training_required === undefined ||
       approval_status === undefined ||
       select_template === undefined ||
-      version == undefined
+      version == undefined ||
+      is_reviewed === undefined 
     ) {
       console.error("Missing data in params.row:", params.row);
       return;
@@ -106,7 +108,7 @@ const UnderReviewDocument = () => {
     //   `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}`
     // );
     navigate(
-      `/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}`
+      `/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}&is_reviewed=${is_reviewed}`
     );
   };
   const formatDate = (date) => {
@@ -313,7 +315,7 @@ const UnderReviewDocument = () => {
             </Select>
           </FormControl>
 
-          <MDInput
+          <MDInput 
             label="Search"
             variant="outlined"
             size="small"

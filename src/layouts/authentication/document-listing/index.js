@@ -132,6 +132,7 @@ const DocumentListing = () => {
       training_required,
       approval_status,
       version,
+      is_reviewed,
     } = params.row;
     // console.log("Version", version);
     // Ensure required fields are defined
@@ -139,14 +140,15 @@ const DocumentListing = () => {
       id === undefined ||
       document_current_status === undefined ||
       training_required === undefined ||
-      approval_status === undefined
+      approval_status === undefined ||
+      is_reviewed === undefined 
     ) {
       console.error("Missing data in params.row:", params.row);
       return;
     }
     // console.log("Console.log check for ID:",params?.row?.version)
     navigate(
-      `/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}`
+      `/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}&is_reviewed=${is_reviewed}`
     );
     // console.log("Navigated with:", {
     //   id,
@@ -345,7 +347,7 @@ const DocumentListing = () => {
       headerName: "Version",
       flex: 0.4,
       headerAlign: "center",
-    },
+    }, 
     {
       field: "created_at",
       headerName: "Created Date",

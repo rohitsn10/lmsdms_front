@@ -47,7 +47,7 @@ const DocumentView = () => {
   useEffect(() => {
     reviewerRefetch();
   }, [reviewerRefetch]);
-  // console.log("Reviewer Data",reviewerData);
+  console.log("Reviewer Data", reviewerData);
   const [loading, setLoading] = useState(true);
   const docEditorRef = useRef(null);
   const [addPathUrlDataForComments, { isLoading: isAddingComment }] =
@@ -77,7 +77,8 @@ const DocumentView = () => {
   const approval_status = searchParams.get("approval_status");
   const version = searchParams.get("version");
   const templateIDMain = searchParams.get("templateID");
-
+  const is_reviewed = searchParams.get("is_reviewed");
+  console.log("------------------------------------------", typeof is_reviewed);
   const [isSaved, setIsSaved] = useState(false);
   const handleDownloadSave = () => {
     setIsSaved(true);
@@ -548,25 +549,27 @@ const DocumentView = () => {
                 </MDButton>
               </>
             )}
-          {/* Condition 2: Show Review button when status is "3" */}
+          {/* Condition 2: Show Review button when status is "For Under Review" */}
           {(document_current_status === "3" ||
             document_current_status === "2" ||
             document_current_status === "8") &&
+            is_reviewed !== "true" &&
             isButtonVisible([3]) && (
               <>
-                <MDButton
-                  variant="gradient"
-                  color="submit"
-                  onClick={handleReview}
-                  disabled={isLoading || !isSaved}
-                >
-                  Review
-                </MDButton>
-
                 {shouldShowSendBackButton && (
                   <MDButton
                     variant="gradient"
-                    color="error" // Change color to indicate sending back
+                    color="submit"
+                    onClick={handleReview}
+                    disabled={isLoading || !isSaved}
+                  >
+                    Review
+                  </MDButton>
+                )}
+                {shouldShowSendBackButton && (
+                  <MDButton
+                    variant="gradient"
+                    color="error"
                     onClick={handleOpenDialog}
                     disabled={isLoading || !isSaved}
                   >
@@ -575,7 +578,8 @@ const DocumentView = () => {
                 )}
               </>
             )}
-          {/* Condition 3: Show Approve button when status is "4" */}
+
+          {/* Condition 3: Show Approve button when status is "Approver" */}
           {(document_current_status === "4" || document_current_status === "2") &&
             isButtonVisible([4]) && (
               <>
@@ -603,14 +607,14 @@ const DocumentView = () => {
               {/* <MDButton variant="gradient" color="submit" onClick={handleDoc} disabled={isLoading}>
               Doc Admin Approve
             </MDButton> */}
-              <MDButton
+              {/* <MDButton
                 variant="gradient"
                 color="error"
                 onClick={handleOpenDialog}
                 disabled={isLoading || !isSaved}
               >
                 Send Back
-              </MDButton>
+              </MDButton> */}
             </>
           )}
           {/* Display success or error messages */}
