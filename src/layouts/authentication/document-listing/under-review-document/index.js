@@ -58,6 +58,9 @@ const UnderReviewDocument = () => {
     }
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
 
+  useEffect(() => {
+    refetch();
+  }, []);
   const documents = data?.reviewdata || []; // Extract documents from the new API response
 
   const handleDialogOpen = (row) => {
@@ -98,7 +101,7 @@ const UnderReviewDocument = () => {
       approval_status === undefined ||
       select_template === undefined ||
       version == undefined ||
-      is_reviewed === undefined 
+      is_reviewed === undefined
     ) {
       console.error("Missing data in params.row:", params.row);
       return;
@@ -183,11 +186,11 @@ const UnderReviewDocument = () => {
 
   const filteredData = documents.filter(
     (doc) =>
-      !doc.is_reviewed && (
-      doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.created_at.toLowerCase().includes(searchTerm.toLowerCase()))
+      !doc.is_reviewed && !doc.is_done &&
+      (doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.created_at.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const rows = filteredData.map((doc, index) => ({
@@ -315,7 +318,7 @@ const UnderReviewDocument = () => {
             </Select>
           </FormControl>
 
-          <MDInput 
+          <MDInput
             label="Search"
             variant="outlined"
             size="small"
@@ -386,32 +389,31 @@ const UnderReviewDocument = () => {
         </MDBox>
 
         <MDBox display="flex" justifyContent="center" sx={{ height: 500, mt: 2 }}>
-        <div style={{ height: 500, width: "100%" }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            pageSize={5}
-            rowsPerPageOptions={[5]}
-            disableSelectionOnClick
-          
-            sx={{
-              overflowY: "auto",
-              // minWidth: 1500,
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "#f5f5f5",
-                fontWeight: "bold",
-                textAlign: "center",
-                justifyContent: "center",
-              },
-              "& .MuiDataGrid-cell": {
-                textAlign: "center",
-              },
-              "& .MuiDataGrid-columnHeaderTitle": {
-                textAlign: "center",
-                // width: "100%",
-              },
-            }}
-          />
+          <div style={{ height: 500, width: "100%" }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pageSize={5}
+              rowsPerPageOptions={[5]}
+              disableSelectionOnClick
+              sx={{
+                overflowY: "auto",
+                // minWidth: 1500,
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: "#f5f5f5",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  justifyContent: "center",
+                },
+                "& .MuiDataGrid-cell": {
+                  textAlign: "center",
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  textAlign: "center",
+                  // width: "100%",
+                },
+              }}
+            />
           </div>
         </MDBox>
       </Card>

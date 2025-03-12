@@ -54,6 +54,9 @@ const UnderApproveDocument = () => {
       refetch();
     }
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
+    useEffect(() => {
+      refetch();
+    }, []);
   const documents = data?.approvedata || []; // Extract documents from the new API response
   const handleDialogOpen = (row) => {
     setSelectedRow(row);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -31,7 +31,7 @@ const UsersListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { data, error, isLoading } = useUserListQuery();
+  const { data,refetch, error, isLoading } = useUserListQuery();
   const [selectedUser, setSelectedUser] = useState(null);
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
@@ -49,7 +49,9 @@ const UsersListing = () => {
   const [remark, setRemark] = useState("");
   const [downloadInductionCertificate] = useCreateInductionCertificateMutation();
   const [isSOPDialogOpen, setSOPDialogOpen] = useState(false);
-
+    useEffect(() => {
+      refetch();
+    }, []);
   const [downloadTrainingCertificate] = useGetTrainingCompletionCertificateMutation();
   const formattedData = Array.isArray(data?.data)
     ? data.data.map((item, index) => ({

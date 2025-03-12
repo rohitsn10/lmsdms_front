@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Card } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -10,13 +10,13 @@ import UserAcknowledgementDialog from "./UserAcknowledgementDialog"; // Import t
 import { useAuth } from "hooks/use-auth";
 import MDInput from "components/MDInput";
 function ViewEmployeeStatus() {
-  const { data, error, isLoading } = useUserListQuery();
+  const { data, refetch,error, isLoading } = useUserListQuery();
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
   const [searchTerm, setSearchTerm] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null); // State for storing the selected user data
+  const [selectedUser, setSelectedUser] = useState(null); 
 
   const renderStatusIcon = (params) => {
     return (
@@ -40,7 +40,6 @@ function ViewEmployeeStatus() {
               cursor: groupId === 8 ? "pointer" : "not-allowed", // Change cursor style based on groupId
             }}
             onClick={() => {
-      
               if (groupId === 8 && params?.field == "is_induction_complete" && params.row.is_department_assigned == true) {
                 handleOpenDialog(params.row); // Open the dialog when groupId is 8
               }
@@ -50,7 +49,9 @@ function ViewEmployeeStatus() {
       </div>
     );
   };
-
+  useEffect(() => {
+    refetch();
+  }, []);
   // Function to open the dialog and set the selected user
   const handleOpenDialog = (userData) => {
     setSelectedUser(userData); // Set the selected user data

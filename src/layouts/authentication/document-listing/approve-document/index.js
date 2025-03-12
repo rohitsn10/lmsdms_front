@@ -58,7 +58,9 @@ const ApprovedDocument = () => {
       refetch();
     }
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
-
+  useEffect(() => {
+    refetch();
+  }, []);
 
   const documents = data?.approvedata || []; 
   const handleDialogOpen = (row) => {

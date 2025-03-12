@@ -58,9 +58,11 @@ const RejectedDocument = () => {
       refetch();
     }
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
-
+  useEffect(() => {
+    refetch();
+  }, []);
   const documents = data?.rejectdata || []; // Extract documents from the new API response
-  console.log("-+---+-+--+------++-+--+", documents);
+
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
     setDialogOpen(true);
