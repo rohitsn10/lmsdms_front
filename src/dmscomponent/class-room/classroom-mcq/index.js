@@ -189,6 +189,7 @@ function ClassMultiChoiceQuestionsSection() {
 
     const results = calculateResults();
     const passCriteria = parseFloat(questionsData.data[0].pass_criteria);
+    console.log("PassCriteria",passCriteria);
     const passKey = results.marksObtained >= passCriteria;
     const statusMessage = passKey ? "Congratulations! You have passed." : "Unfortunately, you have failed. Try again next time.";
     const message = `${statusMessage} You scored ${results.marksObtained} out of ${results.totalMarks} marks.\nTime taken: ${formatTime(results.timeTaken)}`;
