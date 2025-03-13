@@ -246,7 +246,7 @@ function ClassAddQuestion() {
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
                 >
-                  <MenuItem value="Fill in the blank">Fill in the blank</MenuItem>
+                  {/* <MenuItem value="Fill in the blank">Fill in the blank</MenuItem> */}
                   <MenuItem value="MCQ">MCQ</MenuItem>
                   <MenuItem value="True/False">True/False</MenuItem>
                 </Select>
@@ -347,7 +347,7 @@ function ClassAddQuestion() {
                 onChange={(e) => setQuestionMarks(e.target.value)}
               />
             </MDBox>
-            <MDBox mb={3}>
+            {/* <MDBox mb={3}>
               <FormControl component="fieldset" fullWidth>
                 <MDTypography variant="h6" fontWeight="medium">
                   Status
@@ -357,7 +357,7 @@ function ClassAddQuestion() {
                   <FormControlLabel value="Inactive" control={<Radio />} label="Inactive" />
                 </RadioGroup>
               </FormControl>
-            </MDBox>
+            </MDBox> */}
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit">
                 Submit

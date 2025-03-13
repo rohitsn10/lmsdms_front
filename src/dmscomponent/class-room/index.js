@@ -14,6 +14,7 @@ import { CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
 import { useGetTrainingAttendanceSheetQuery,useGetTrainingAttendanceClassSheetQuery } from "apilms/reportsApi";
 import { useAuth } from "hooks/use-auth";
+import SlideshowIcon from '@mui/icons-material/Slideshow';
 
 const ClassroomListing = () => { 
   const [searchTerm, setSearchTerm] = useState("");
@@ -157,6 +158,19 @@ const ClassroomListing = () => {
         </MDButton>
       ),
     },
+    {
+          field: "View",
+          headerName: "Pre-View",
+          flex: 0.5,
+          headerAlign: "center",
+          renderCell: (params) => (
+            <IconButton color="warning" 
+            // onClick={() => handleView(params.row)}
+            >
+              <SlideshowIcon />
+            </IconButton>
+          ),
+        },
     ...(groupId === 7
       ? [
           {
@@ -233,17 +247,17 @@ const ClassroomListing = () => {
       },
     ]
     : []),
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 0.5,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <IconButton color="primary" onClick={() => handleEditClassroom(params.row)}>
-          <EditIcon />
-        </IconButton>
-      ),
-    },
+    // {
+    //   field: "action",
+    //   headerName: "Action",
+    //   flex: 0.5,
+    //   headerAlign: "center",
+    //   renderCell: (params) => (
+    //     <IconButton color="primary" onClick={() => handleEditClassroom(params.row)}>
+    //       <EditIcon />
+    //     </IconButton>
+    //   ),
+    // },
   ];
 
   const getRowId = (row) => {

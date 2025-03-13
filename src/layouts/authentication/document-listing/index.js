@@ -439,7 +439,7 @@ const DocumentListing = () => {
               params.row.current_status_name !== "Release" &&
               !(
                 (groupId === 3 && params.row.current_status_name == "Under Approver") ||
-                params.row.current_status_name == "Effective"
+                params.row.document_current_status === 7 || params.row.document_current_status === 9
               ) && ( // Hide if status is "Approve"
                 <IconButton color="inherit" onClick={() => handleClick(params)}>
                   <EditCalendarIcon />

@@ -16,6 +16,7 @@ import ViewAttendanceDialog from "./view-attendance";
 import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 import { useAuth } from "hooks/use-auth";
 import { hasPermission } from "utils/hasPermission";
+
 const SessionListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [attendanceData, setAttendanceData] = useState([]);
@@ -34,7 +35,7 @@ const SessionListing = () => {
   // const location = useLocation();
   // const classroom = location.state?.classroom;
   // const classroomId = classroom.classroom_id;
-  const {classroomId} = useParams();
+  const { classroomId } = useParams();
   // const classroomId = classroomId;
 
   const [markSessionCompleted] = useMarkSessionCompletedMutation();
@@ -117,15 +118,70 @@ const SessionListing = () => {
         <MDButton
           variant="outlined"
           color={params.row.is_completed ? "success" : "error"}
+          disabled={!groupId === 7}
           onClick={() => {
-            if (!params.row.is_completed) handleMarkCompleted(params.row.id);
+            if (groupId == 7) {
+              console.log("----------")
+              if (!params.row.is_completed) handleMarkCompleted(params.row.id);
+             
+            } else {
+              console.log("+++++++++++")
+              return null;
+            }
           }}
         >
           {params.row.is_completed ? "Completed" : "Pending"}
         </MDButton>
       ),
     },
-    {
+    // {
+    //   field: "attendance",
+    //   headerName: "Attendance",
+    //   flex: 1,
+    //   headerAlign: "center",
+    //   renderCell: (params) => (
+    //     <MDButton
+    //       variant="outlined"
+    //       color="primary"
+    //       onClick={() => {
+    //         const isViewAttendance = params.row.attend;
+    //         // console.log("is view open get or not ",isViewAttendance)
+    //         handleAttendanceClick(params.row.id, isViewAttendance);
+    //       }}
+    //       // onClick={() => {
+    //       //   const isViewAttendance = params.row.attend; // Check if attendance is available to view
+    //       //   console.log("View Attendance",isViewAttendance);
+    //       //   handleAttendanceClick(params.row.id, isViewAttendance); // Pass isViewAttendance flag
+    //       // }}
+    //       disabled={!params.row.is_completed}
+    //     >
+    //       {params.row.attend ? "View Attendance" : "Mark Attendance"}
+    //     </MDButton>
+    //   ),
+    // },
+    // ...(hasPermission(userPermissions, "session", "isAdd")
+    //   ? [
+    //       {
+    //         field: "action",
+    //         headerName: "Action",
+    //         flex: 0.5,
+    //         headerAlign: "center",
+    //         renderCell: (params) => (
+    //           <IconButton
+    //             color="primary"
+    //             onClick={() => handleEditSession(params.row)}
+    //             disabled={!params.row.is_completed}
+    //           >
+    //             <EditIcon />
+    //           </IconButton>
+    //         ),
+    //       },
+    //     ]
+    //   : []),
+  ];
+
+  if (hasPermission(userPermissions, "attendance", "isChange")) {
+    columns.push({
       field: "attendance",
       headerName: "Attendance",
       flex: 1,
@@ -149,28 +205,8 @@ const SessionListing = () => {
           {params.row.attend ? "View Attendance" : "Mark Attendance"}
         </MDButton>
       ),
-    },
-    ...(hasPermission(userPermissions, "session", "isAdd")
-      ? [
-          {
-            field: "action",
-            headerName: "Action",
-            flex: 0.5,
-            headerAlign: "center",
-            renderCell: (params) => (
-              <IconButton
-                color="primary"
-                onClick={() => handleEditSession(params.row)}
-                disabled={!params.row.is_completed}
-              >
-                <EditIcon />
-              </IconButton>
-            ),
-          },
-        ]
-      : []),
-  ];
-
+    });
+  }
   return (
     <MDBox p={3}>
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
