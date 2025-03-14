@@ -56,6 +56,10 @@ const ClassroomListing = () => {
     }
   };
 
+  const handleFileView = (rowData)=>{
+    navigate('/classroom-file-view',{ state: { rowData } })
+  }
+
   const handleAssessmentClick = (rowData) => {
     // console.log(rowData)
     navigate(`/exam-mcq-module/${rowData?.classroom_id}`)
@@ -125,8 +129,7 @@ const ClassroomListing = () => {
   }
 
   // Filter classroom data based on search term
-  const filteredData = data?.data
-    .filter(
+  const filteredData = data?.data?.filter(
       (classroom) =>
         classroom.classroom_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         classroom.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -165,7 +168,7 @@ const ClassroomListing = () => {
           headerAlign: "center",
           renderCell: (params) => (
             <IconButton color="warning" 
-            // onClick={() => handleView(params.row)}
+            onClick={() => handleFileView(params.row)}
             >
               <SlideshowIcon />
             </IconButton>

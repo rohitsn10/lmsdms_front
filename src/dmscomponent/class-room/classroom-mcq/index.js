@@ -50,7 +50,7 @@ function ClassMultiChoiceQuestionsSection() {
         const quizId = questionsData.data[0].id;
         
         // Call the mutation when quiz starts
-        startAttemptQuiz({ classroom_id: id, quiz_id: quizId })
+        startAttemptQuiz({ classroom_id: Number(id), quiz_id: quizId })
           .then(() => console.log("Quiz attempt started successfully"))
           .catch((error) => console.error("Error starting quiz attempt:", error));
       }

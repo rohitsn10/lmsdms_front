@@ -134,6 +134,7 @@ import TrainingDocumentView from "dmscomponent/Training-listing/onlyofficeDocVie
 // import DocumentPreviewComponent from "dmscomponent/Training-listing/onlyofficeDocView/index.js";
 import PPTPDFPreview from "dmscomponent/induction-training/PPT-PDF-Preview/index.js";
 import TrainingDocumentObsoleteView from "layouts/authentication/archived-listing/onlyoffice-archived.jsx";
+import ClassFileView from "dmscomponent/class-room/class-file-preview/index.js";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -425,7 +426,8 @@ export default function App() {
       <Route path="/class-edit-quiz" element={<EditClassQuiz/>}/>
       <Route path="/docviewer" element={<DocumentPreviewComponent/>}/>
       <Route path="/training-document-view" element={<TrainingDocumentView/>}/>
-      <Route path="/ppt-view" element={<PPTPDFPreview/>}/>
+      <Route path="/pdf-view" element={<PPTPDFPreview/>}/>
+      <Route path="/classroom-file-view" element={<ClassFileView/>}/>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
     <ToastContainer />

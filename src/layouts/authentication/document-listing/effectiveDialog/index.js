@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';  // Import PropTypes
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
 import MDButton from 'components/MDButton';
 function EffectiveDialog({ openDialog, selectedRow, handleCloseDialog, handleConfirmEffective }) {
+  // console.log("Selected row",selectedRow);
   return (
     <Dialog open={openDialog} onClose={handleCloseDialog}>
-      <DialogTitle>Confirm Effective Action</DialogTitle>
+      <DialogTitle>Confirm Effective Action1</DialogTitle>
       <DialogContent>
         {selectedRow && (
           <p>

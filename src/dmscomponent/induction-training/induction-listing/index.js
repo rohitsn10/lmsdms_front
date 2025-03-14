@@ -41,7 +41,7 @@ const InductionListing = () => {
     navigate("/edit-induction", { state: { induction } });
   };
   const handleView = (row) => {
-    navigate("/ppt-view", { state: { row } });
+    navigate("/pdf-view", { state: { row } });
     console.log(row)
   };
   const filteredData = inductions

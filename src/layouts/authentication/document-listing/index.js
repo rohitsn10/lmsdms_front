@@ -645,6 +645,7 @@ const DocumentListing = () => {
         trainingStatus={selectedRow?.training_required || "false"}
         documentId={selectedRow?.id || ""}
         revisionMonth={selectedRow?.revision_month}
+        isParent={selectedRow?.is_parent}
       />
       <ChildDocumentsDialog
         open={openChildDialog}

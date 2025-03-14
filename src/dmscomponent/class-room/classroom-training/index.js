@@ -34,7 +34,7 @@ function ClassroomTraining() {
   const { data: alltrainers } = useFetchTrainersQuery();
   const { data: userData, isLoading: isUserLoading, error: userError } = useUserListQuery();
   const [selectedUsers, setSelectedUsers] = useState([]);
-  console.log("Selected User::::", selectedUsers);
+  // console.log("Selected User::::", selectedUsers);
   const [sopdocument, setsopdocument] = useState("None");
   const [trainer, setTrainer] = useState("");
   const [classroomTitle, setClassroomTitle] = useState("");
@@ -144,11 +144,42 @@ function ClassroomTraining() {
       setIsLoading(false);
     }
   };
-
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    if (!e.target.files || e.target.files.length === 0) {
+      setErrors((prev) => ({ ...prev, File: "No file selected." }));
+      setFile(null);
+      return;
+    }
+  
+    const file = e.target.files[0];
+    const allowedType = "application/pdf";
+  
+    if (file.type !== allowedType) {
+      setErrors((prev) => ({ ...prev, File: "Only PDF files are allowed." }));
+      setFile(null);
+      return;
+    }
+  
+    setFile(file);
     setErrors((prev) => ({ ...prev, File: "" }));
   };
+  
+  // const handleFileChange = (e) => {
+  //   const file = e.target.file[0];
+  //   if(file){
+  //     const allowedType = 'application/pdf';
+  //     if (file.type !== allowedType) {
+  //       setErrors((prev) => ({ ...prev, File: "Only PDF files are allowed." }));
+  //       setFile(null);
+  //       return;
+  //     }
+  //   setFile(file);
+  //   setErrors((prev) => ({ ...prev, File: "" }));
+  //   }
+
+  //   // setFile(e.target.files[0]);
+  //   // setErrors((prev) => ({ ...prev, File: "" }));
+  // };
 
   // Clear selected users when switching between document types
   React.useEffect(() => {
@@ -448,7 +479,7 @@ function ClassroomTraining() {
                   fullWidth
                   onChange={handleFileChange}
                   InputLabelProps={{ shrink: true }}
-                  inputProps={{ accept: ".pdf,.ppt,.doc,.docx" }}
+                  inputProps={{ accept: ".pdf" }}
                   error={!!errors.File}
                   helperText={errors.File}
                 />
