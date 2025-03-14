@@ -15,7 +15,10 @@ const DocumentPreviewComponent = () => {
   const [error, setError] = useState(null);
   const [docEditorLoaded, setDocEditorLoaded] = useState(false);
   const [editorConfig, setEditorConfig] = useState(null);
-
+  const handlePrint = () => {
+    console.log("Id passed:", docId);
+    navigate(`/print-document/${docId}`);
+  };
   useEffect(() => {
     const fetchEditorConfig = async () => {
       try {
@@ -185,6 +188,15 @@ const DocumentPreviewComponent = () => {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Document View
           </Typography>
+          <div>
+          <MDButton
+            variant="contained"
+            color="secondary"
+            onClick={handlePrint}
+            sx={{ ml: 2 }}
+          >
+            Print
+          </MDButton>
           <MDButton
             variant="contained"
             color="primary"
@@ -193,6 +205,8 @@ const DocumentPreviewComponent = () => {
           >
             Go Back
           </MDButton>
+          </div>
+
         </Toolbar>
       </AppBar>
       <Box

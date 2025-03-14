@@ -25,7 +25,7 @@ function PrintDocument() {
   const { id } = useParams(); // Fetch sop_document_id from URL
   const navigate = useNavigate();
 
-  console.log("Id : ", id);
+  // console.log("Id : ", id);
 
   // Initialize the mutation hook
   const [printDocument, { isLoading, isSuccess, error }] = usePrintDocumentMutation();

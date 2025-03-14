@@ -1,4 +1,4 @@
-import React, { useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -12,9 +12,15 @@ import { useGetClassroomsQuery } from "apilms/classRoomApi"; // Import your API 
 import moment from "moment"; // For date formatting
 import { CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
-import { useGetTrainingAttendanceSheetQuery,useGetTrainingAttendanceClassSheetQuery } from "apilms/reportsApi";
+import { useGetTrainingAttendanceSheetQuery, useGetTrainingAttendanceClassSheetQuery } from "apilms/reportsApi";
 import { useAuth } from "hooks/use-auth";
 import SlideshowIcon from '@mui/icons-material/Slideshow';
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import Button from "@mui/material/Button";
 
 const ClassroomListing = () => { 
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,6 +31,9 @@ const ClassroomListing = () => {
   const [downloadClassroomId, setDownloadClassroomId] = useState(null);
   const { data, isLoading, isError, error } = useGetClassroomsQuery();
   const [downloadDocumentId, setDownloadDocumentId] = useState(null);
+  const [startAssessmentModal, setStartAssessmentModal] = useState(false);
+  const [selectedClassroom, setSelectedClassroom] = useState(null);
+  
   const {
     data: attendanceSheetData,
     isFetching: isFetchingAttendanceSheet,
@@ -36,6 +45,7 @@ const ClassroomListing = () => {
   const { data: attendanceClassSheetData, isFetching: isFetchingAttendanceClassSheet } = useGetTrainingAttendanceClassSheetQuery(downloadClassroomId, {
     skip: !downloadClassroomId,
   });
+  
   // Handle search input change 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -48,7 +58,6 @@ const ClassroomListing = () => {
 
   // Handle session button click
   const handleSession = (classroom) => {
-    // console.log(classroom)
     if(classroom.classroom_id){
       navigate(`/session-list/${classroom.classroom_id}`);
     }else{
@@ -56,16 +65,32 @@ const ClassroomListing = () => {
     }
   };
 
-  const handleFileView = (rowData)=>{
+  const handleFileView = (rowData) => {
     navigate('/classroom-file-view',{ state: { rowData } })
   }
 
+  // Open the assessment warning modal
   const handleAssessmentClick = (rowData) => {
-    // console.log(rowData)
-    navigate(`/exam-mcq-module/${rowData?.classroom_id}`)
-    // navigate("/exam-mcq-module", { state: { rowData } });
-    // /:classroomQuizId
+    setSelectedClassroom(rowData);
+    setStartAssessmentModal(true);
   };
+
+  // Close the assessment warning modal
+  const handleAssesmentModalClose = () => {
+    setStartAssessmentModal(false);
+    setSelectedClassroom(null);
+  };
+
+  // Start the assessment after confirmation
+  const startAssessmentClick = () => {
+    if (selectedClassroom?.classroom_id) {
+      navigate(`/exam-mcq-module/${selectedClassroom.classroom_id}`);
+    } else {
+      toast.error("Classroom ID is missing");
+    }
+    setStartAssessmentModal(false);
+  };
+
   const handleDownloadAttendanceSheet = (documentId, classroomId) => {
     if (documentId) {
       setDownloadDocumentId(documentId);
@@ -155,25 +180,24 @@ const ClassroomListing = () => {
           variant="outlined"
           color="primary"
           onClick={() => handleSession(params.row)}
-          // disabled={params.row.is_assesment === "Without Assessment"} // Disable if 'is_assesment' is 'With Assessment'
         >
           Start Session
         </MDButton>
       ),
     },
     {
-          field: "View",
-          headerName: "Pre-View",
-          flex: 0.5,
-          headerAlign: "center",
-          renderCell: (params) => (
-            <IconButton color="warning" 
-            onClick={() => handleFileView(params.row)}
-            >
-              <SlideshowIcon />
-            </IconButton>
-          ),
-        },
+      field: "View",
+      headerName: "Pre-View",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <IconButton color="warning" 
+        onClick={() => handleFileView(params.row)}
+        >
+          <SlideshowIcon />
+        </IconButton>
+      ),
+    },
     ...(groupId === 7
       ? [
           {
@@ -224,7 +248,7 @@ const ClassroomListing = () => {
             variant="outlined"
             color="warning"
             onClick={() => handleAssessmentClick(params.row)}
-            disabled={params.row.is_assessment_completed} // Disable if 'is_assessment_completed' is true or 'is_assesment' is 'Without Assessment'
+            disabled={params.row.classroom_attempted} // Disable if 'is_assessment_completed' is true or 'is_assesment' is 'Without Assessment'
           >
             Assessment
           </MDButton>
@@ -242,7 +266,6 @@ const ClassroomListing = () => {
             variant="outlined"
             color="success"
             onClick={() => handleDownloadAttendanceSheet(params.row.document, params.row.classroom_id)}
-            // disabled={!params.row.is_all_completed} 
           >
             Attendance Sheet
           </MDButton>
@@ -250,17 +273,6 @@ const ClassroomListing = () => {
       },
     ]
     : []),
-    // {
-    //   field: "action",
-    //   headerName: "Action",
-    //   flex: 0.5,
-    //   headerAlign: "center",
-    //   renderCell: (params) => (
-    //     <IconButton color="primary" onClick={() => handleEditClassroom(params.row)}>
-    //       <EditIcon />
-    //     </IconButton>
-    //   ),
-    // },
   ];
 
   const getRowId = (row) => {
@@ -273,6 +285,39 @@ const ClassroomListing = () => {
 
   return (
     <MDBox p={3}>
+      {/* Assessment Warning Modal */}
+      <Dialog
+        open={startAssessmentModal}
+        onClose={handleAssesmentModalClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Start Assessment?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{
+            padding:"15px"
+          }} id="alert-dialog-description">
+            Are you sure you want to start the assessment?  
+            <br /><br />
+            <strong>Important:</strong> Once you start the assessment:
+            <ul>
+              <li>You can only attempt the classroom assessment once.</li>
+              <li>You must complete and submit it before leaving.</li>
+            </ul>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAssesmentModalClose}>
+            Cancel
+          </Button>  
+          <MDButton onClick={startAssessmentClick} autoFocus color="primary" variant="contained">
+            Start Assessment
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           <MDInput

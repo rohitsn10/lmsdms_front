@@ -11,7 +11,8 @@ const ClassFileView = () => {
 
   // Extract and construct the full PDF URL
   const pdfUrl = newRowData?.files?.length > 0 
-    ? `${BASE_URL.replace(/\/$/, "")}${newRowData.files[0].upload_doc}` // Ensure no double slashes
+    // ? `${BASE_URL.replace(/\/$/, "")}${newRowData.files[0].upload_doc}` // Ensure no double slashes
+    ? `${newRowData.files[0].upload_doc}` // Ensure no double slashes
     : null;
 
   const [blobUrl, setBlobUrl] = useState(null);
