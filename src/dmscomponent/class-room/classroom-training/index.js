@@ -244,7 +244,7 @@ function ClassroomTraining() {
                   <Select
                     labelId="training-type-label"
                     id="training-type"
-                    value={trainingType}
+                    value={trainingType} 
                     onChange={(e) => setTrainingType(e.target.value)}
                     input={<OutlinedInput label=" Type " />}
                     sx={{
