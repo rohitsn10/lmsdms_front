@@ -16,7 +16,7 @@ const TrainingDocumentView = () => {
   const [error, setError] = useState(null);
   const [editorConfig, setEditorConfig] = useState(null);
   const docEditorRef = useRef(null);
-  const [timeLeft, setTimeLeft] = useState(6);
+  const [timeLeft, setTimeLeft] = useState(600);
   const timerRef = useRef(null);
   const [completeViewDocument] = useCompleteViewDocumentMutation();
     // console.log(document_id,templateId);
@@ -128,22 +128,9 @@ if (loading || error) {
         position: "relative",
       }}
     >
-      {/* <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>Document View</Typography>
-          <Typography variant="h5">Time Left: {formatTime(timeLeft)}</Typography>
-          <Button variant="contained" color="primary" onClick={() => navigate("/document-listing")}>
-            Go Back
-          </Button>
-          
-        </Toolbar>
-      </AppBar> */}
       <AppBar position="static">
   <Toolbar sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
     <Typography variant="h6">Document View</Typography>
-    {/* <Typography variant="h5" sx={{ marginLeft: "auto", marginRight: "20px" }}>
-      Time Left: {formatTime(timeLeft)}
-    </Typography> */}
     <Typography 
   variant="h5" 
   sx={{ 
@@ -165,8 +152,6 @@ if (loading || error) {
     </MDButton>
   </Toolbar>
 </AppBar>
-      {/* <Box sx={{ padding: 2, display: "flex", justifyContent: "space-between" }}>
-      </Box> */}
       <Box id="onlyoffice-editor-container" sx={{ flex: 1, backgroundColor: "#fff" }} />
     </MDBox>
   );

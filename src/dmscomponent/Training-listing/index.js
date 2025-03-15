@@ -129,10 +129,29 @@ const TrainingListing = () => {
     handleFailedAssessmentModalClose();
   };
 
+  // const handleview = (item) => {
+  //   const documentUrl = item;
+  //   console.log(documentUrl)
+  //   if (documentUrl) {
+  //     navigate("/training-document-view", { state: { docId: item.docId, templateId: item.templateId } });
+  //   }
+  // };
+
   const handleview = (item) => {
     const documentUrl = item;
+    console.log(documentUrl);
     if (documentUrl) {
-      navigate("/training-document-view", { state: { docId: item.docId, templateId: item.templateId } });
+      if (documentUrl.is_parent) {
+        // Navigate to parent document view if document has children
+        navigate("/parent-training-document-view", { 
+          state: { docId: item.docId, templateId: item.templateId } 
+        });
+      } else {
+        // Navigate to regular document view if document has no children
+        navigate("/training-document-view", { 
+          state: { docId: item.docId, templateId: item.templateId } 
+        });
+      }
     }
   };
 
@@ -156,7 +175,8 @@ const TrainingListing = () => {
         user_view: item.user_view,
         docId: item.id,
         templateId: item.select_template,
-        quiz_sessions: item.quiz_sessions
+        quiz_sessions: item.quiz_sessions,
+        is_parent:item.is_parent
       };
     });
 

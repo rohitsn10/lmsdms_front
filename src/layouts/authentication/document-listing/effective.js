@@ -160,7 +160,7 @@ const ConditionalDialog = ({
               {isParent && !allChildrenApproved && childDocuments && Array.isArray(childDocuments) && childDocuments.length > 0 && (
                 <MDBox sx={{ mt: 2 }}>
                   <MDTypography variant="body2" color="error">
-                    All child documents must be Approved before making this document effective.
+                    All child documents must be Released before making this document effective.
                   </MDTypography>
                 </MDBox>
               )}
