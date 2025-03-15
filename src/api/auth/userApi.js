@@ -58,6 +58,13 @@ export const userApi = createApi({
         userIdWiseResult: builder.query({
             query: ({ userId, documentId }) => `lms_module/user_id_wise_result/${userId}/${documentId}`,
         }),
+        userIdWiseNoOfClassAttempts: builder.mutation({
+            query: (userId) => ({
+                url: 'lms_module/classroom_user_id_wise_no_of_attempts',
+                method: 'POST',
+                body: { user_id: userId },
+            }),
+        }),
     }),
 });
 
@@ -70,4 +77,5 @@ export const {
      useFailedUserQuery,
      useUserIdWiseNoOfAttemptsMutation,
      useUserIdWiseResultQuery,
+     useUserIdWiseNoOfClassAttemptsMutation,
      } = userApi;

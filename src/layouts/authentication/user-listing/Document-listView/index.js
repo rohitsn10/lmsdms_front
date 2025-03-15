@@ -6,12 +6,15 @@ import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import MDButton from "components/MDButton";
 import { DataGrid } from '@mui/x-data-grid';
-import { useUserIdWiseNoOfAttemptsMutation } from 'api/auth/userApi';
+import { useUserIdWiseNoOfAttemptsMutation, useUserIdWiseNoOfClassAttemptsMutation } from 'api/auth/userApi';
 import AnswerDialog from './AnswerDialog'; // Import AnswerDialog
 import { useAuth } from 'hooks/use-auth';
+
 const SOPDialog = ({ open, onClose, selectedUserid }) => {
-  const [fetchAttempts, { data, isLoading, isError }] = useUserIdWiseNoOfAttemptsMutation();
+  const [fetchAttempts, { data: attemptsData, isLoading: isAttemptsLoading, isError: isAttemptsError }] = useUserIdWiseNoOfAttemptsMutation();
+  const [fetchClassAttempts, { data: classAttemptsData, isLoading: isClassAttemptsLoading, isError: isClassAttemptsError }] = useUserIdWiseNoOfClassAttemptsMutation();
   const [sopData, setSopData] = useState([]);
+  const [classAttempts, setClassAttempts] = useState([]);
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
@@ -22,18 +25,19 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
   useEffect(() => {
     if (open && selectedUserid) {
       fetchAttempts(selectedUserid);
+      fetchClassAttempts(selectedUserid);
     }
-  }, [open, selectedUserid, fetchAttempts]);
+  }, [open, selectedUserid, fetchAttempts, fetchClassAttempts]);
 
   const convertTime = (totalTimeInSeconds) => {
     if (!totalTimeInSeconds) return 'N/A';
-  
+
     const hours = Math.floor(totalTimeInSeconds / 3600); // Calculate hours
     const minutes = Math.floor((totalTimeInSeconds % 3600) / 60); // Calculate minutes
     const seconds = totalTimeInSeconds % 60; // Calculate seconds
-  
+
     let timeString = '';
-  
+
     if (hours > 0) {
       timeString += `${hours}h `;
     }
@@ -41,13 +45,13 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
       timeString += `${minutes}m `;
     }
     timeString += `${seconds}s`; // Always show seconds
-  
+
     return timeString.trim();
   };
-  
+
   useEffect(() => {
-    if (data?.status && data?.data) {
-      const formattedData = data.data.map((item) => ({
+    if (attemptsData?.status && attemptsData?.data) {
+      const formattedData = attemptsData.data.map((item) => ({
         id: item.id,
         user: item.user,
         document: item.document,
@@ -61,9 +65,25 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
       }));
       setSopData(formattedData);
     }
-  }, [data]);
-  
-    
+  }, [attemptsData]);
+
+  useEffect(() => {
+    if (classAttemptsData?.status && classAttemptsData?.data) {
+      const formattedClassAttempts = classAttemptsData.data.map((item) => ({
+        id: item.id,
+        user: item.user,
+        classroom: item.classroom,
+        serial_number: item.id,
+        classroomName: item.classroom_name,
+        obtainedMarks: item.obtain_marks || '0',
+        totalMarks: item.total_marks || '0',
+        timeTaken: convertTime(item.total_taken_time),
+        status: item.is_pass ? 'Pass' : 'Fail',
+        attemptDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'
+      }));
+      setClassAttempts(formattedClassAttempts);
+    }
+  }, [classAttemptsData]);
 
   const handleOpenAnswerDialog = (userId, documentId) => {
     setSelectedUser(userId);
@@ -110,6 +130,23 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
   : []),
   ];
 
+  const classAttemptsColumns = [
+    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
+    { field: "classroomName", headerName: "Classroom Name", flex: 1.5, headerAlign: "center" },
+    { 
+      field: "obtainedMarks", 
+      headerName: "Marks Obtained", 
+      flex: 1, 
+      headerAlign: "center",
+      renderCell: (params) => (
+        <span>{params.row.obtainedMarks}/{params.row.totalMarks}</span>
+      )
+    },
+    { field: "timeTaken", headerName: "Time Taken", flex: 1, headerAlign: "center" },
+    { field: "status", headerName: "Status", flex: 0.8, headerAlign: "center" },
+    { field: "attemptDate", headerName: "Attempt Date", flex: 1, headerAlign: "center" },
+  ];
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>
@@ -135,19 +172,19 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
             SOP Attempt History
           </MDTypography>
           
-          {isLoading && (
+          {isAttemptsLoading && (
             <MDTypography variant="h6" color="textSecondary">
               Loading SOP data...
             </MDTypography>
           )}
           
-          {isError && (
+          {isAttemptsError && (
             <MDTypography variant="h6" color="error">
               Failed to fetch data. Please try again.
             </MDTypography>
           )}
 
-          {data && !isLoading && !isError && (
+          {attemptsData && !isAttemptsLoading && !isAttemptsError && (
             <div style={{ height: 400, width: '100%' }}>
               <DataGrid
                 rows={sopData}
@@ -168,6 +205,34 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
                 }}
               />
             </div>
+          )}
+
+          {classAttemptsData && classAttempts.length > 0 && (
+            <>
+              <MDTypography variant="h5" fontWeight="medium" sx={{ mt: 5, mb: 3, textAlign: "center" }}>
+                Classroom Attempt History
+              </MDTypography>
+              <div style={{ height: 400, width: '100%' }}>
+                <DataGrid
+                  rows={classAttempts}
+                  columns={classAttemptsColumns}
+                  pageSize={5}
+                  rowsPerPageOptions={[5, 10, 20]}
+                  disableSelectionOnClick
+                  sx={{
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                    "& .MuiDataGrid-columnHeaders": {
+                      backgroundColor: "#f5f5f5",
+                      fontWeight: "bold"
+                    },
+                    "& .MuiDataGrid-cell": {
+                      textAlign: "center"
+                    }
+                  }}
+                />
+              </div>
+            </>
           )}
         </MDBox>
       </DialogContent>
