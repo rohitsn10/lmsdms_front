@@ -95,7 +95,7 @@ const TrainingListing = () => {
     // Get the document data for the selected row
     const document = data?.document_data?.documents.find(doc => doc.id === rowId);
     setSelectedRowData(rowId);
-    
+    // console.log("rowwwwowow",rowId)
     // Check if the user has a failed quiz session for this document
     if (document && document.quiz_sessions) {
       const userQuizSession = document.quiz_sessions.find(
@@ -176,7 +176,8 @@ const TrainingListing = () => {
         docId: item.id,
         templateId: item.select_template,
         quiz_sessions: item.quiz_sessions,
-        is_parent:item.is_parent
+        is_parent:item.is_parent,
+        quiz_count:item.quiz_count
       };
     });
 
@@ -370,7 +371,7 @@ const TrainingListing = () => {
               </IconButton>
             ) : (
               <IconButton
-                disabled={!isUserInView} // Only enable if user is in view
+                disabled={!isUserInView || params.row.quiz_count ==0} // Only enable if user is in view
                 color={hasFailedStatus ? "warning" : "error"}
                 onClick={() => handleAssessmentClick(params.row.id)}
               >

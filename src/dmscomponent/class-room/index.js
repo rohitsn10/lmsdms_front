@@ -29,7 +29,7 @@ const ClassroomListing = () => {
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
   const [downloadClassroomId, setDownloadClassroomId] = useState(null);
-  const { data, isLoading, isError, error } = useGetClassroomsQuery();
+  const { data, isLoading, isError, error,refetch  } = useGetClassroomsQuery();
   const [downloadDocumentId, setDownloadDocumentId] = useState(null);
   const [startAssessmentModal, setStartAssessmentModal] = useState(false);
   const [selectedClassroom, setSelectedClassroom] = useState(null);
@@ -46,6 +46,9 @@ const ClassroomListing = () => {
     skip: !downloadClassroomId,
   });
   
+  useEffect(() => {
+    refetch(); // Refresh data on mount
+  }, [refetch]);
   // Handle search input change 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -249,7 +252,9 @@ const ClassroomListing = () => {
             variant="outlined"
             color="warning"
             onClick={() => handleAssessmentClick(params.row)}
-            disabled={params.row.classroom_attempted || !params.row.is_all_completed} 
+            disabled={params.row.classroom_attempted || !params.row.is_all_completed || params.row.quiz_count==0} 
+            // disabled={params.row.quiz_count==0} 
+
           >
             Assessment
           </MDButton>
