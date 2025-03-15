@@ -29,12 +29,19 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
     }
   }, [open, selectedUserid, fetchAttempts, fetchClassAttempts]);
 
+  useEffect(() => {
+    if (!open) {
+      setSopData([]);
+      setClassAttempts([]);
+    }
+  }, [open]);
+
   const convertTime = (totalTimeInSeconds) => {
     if (!totalTimeInSeconds) return 'N/A';
 
-    const hours = Math.floor(totalTimeInSeconds / 3600); // Calculate hours
-    const minutes = Math.floor((totalTimeInSeconds % 3600) / 60); // Calculate minutes
-    const seconds = totalTimeInSeconds % 60; // Calculate seconds
+    const hours = Math.floor(totalTimeInSeconds / 3600); 
+    const minutes = Math.floor((totalTimeInSeconds % 3600) / 60); 
+    const seconds = totalTimeInSeconds % 60;
 
     let timeString = '';
 
@@ -44,7 +51,7 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
     if (minutes > 0 || hours > 0) {
       timeString += `${minutes}m `;
     }
-    timeString += `${seconds}s`; // Always show seconds
+    timeString += `${seconds}s`; 
 
     return timeString.trim();
   };
@@ -59,7 +66,7 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
         documentName: item.document_name,
         obtainedMarks: item.obtain_marks || '0',
         totalMarks: item.total_marks || '0',
-        timeTaken: convertTime(item.total_taken_time), // Use the convertTime function
+        timeTaken: convertTime(item.total_taken_time), 
         status: item.is_pass ? 'Pass' : 'Fail',
         attemptDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'
       }));
