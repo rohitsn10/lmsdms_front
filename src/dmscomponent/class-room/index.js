@@ -193,6 +193,7 @@ const ClassroomListing = () => {
       renderCell: (params) => (
         <IconButton color="warning" 
         onClick={() => handleFileView(params.row)}
+        disabled={params.row.files.length === 0}
         >
           <SlideshowIcon />
         </IconButton>
@@ -248,7 +249,7 @@ const ClassroomListing = () => {
             variant="outlined"
             color="warning"
             onClick={() => handleAssessmentClick(params.row)}
-            disabled={params.row.classroom_attempted} // Disable if 'is_assessment_completed' is true or 'is_assesment' is 'Without Assessment'
+            disabled={params.row.classroom_attempted || !params.row.is_all_completed} 
           >
             Assessment
           </MDButton>

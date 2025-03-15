@@ -90,6 +90,7 @@ const formattedData = apiDocuments
   document_current_status_name: doc.document_current_status_name,
   revise_request_id: doc.revise_request_id,
   is_revise: doc.is_revise,
+  version: doc.version,
 }));
  
 console.log(formattedData);
@@ -106,6 +107,7 @@ console.log(formattedData);
     { field: "documentTitle", headerName: "Document Title", flex: 1, headerAlign: "center" },
     { field: "documentType", headerName: "Document Type", flex: 1, headerAlign: "center" },
     { field: "requestedUser", headerName: "Requested User", flex: 1, headerAlign: "center" },
+    { field: "version", headerName: "Version", flex: 1, headerAlign: "center" },
     { field: "requestedDate", headerName: "Requested Date", flex: 1, headerAlign: "center" },
     { field: "document_current_status_name", headerName: "Status", flex: 1, headerAlign: "center" },
 
