@@ -41,10 +41,11 @@ const ConditionalDialog = ({
     
     // return childDocuments.every(doc => doc.status === "Approve");
     return childDocuments.every(doc => 
-      // doc.status === "Approve" || 
-      // doc.status === "Approved" || 
+      doc.status === "Approve" || 
+      doc.status === "Approved" || 
       doc.status === "Effective" || 
-      doc.status === "Release"
+      doc.status === "Release" ||
+      doc.status === "Obsolete"  
     );
   }, [childDocuments]);
 
