@@ -28,7 +28,7 @@ import ChildDocumentsDialog from "./child-document";
 import SubtitlesOffIcon from "@mui/icons-material/SubtitlesOff";
 import ObsoleteDialog from "./obsolete";
 import { useUpdateObsoleteStatusMutation } from "api/auth/documentApi";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import EffectiveDialog from "./effectiveDialog";
 import { useDocumentEffectiveMutation } from "api/auth/documentApi";
 import HowToRegTwoToneIcon from "@mui/icons-material/HowToRegTwoTone";
@@ -39,7 +39,7 @@ const DocumentListing = () => {
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
-  console.log("GRORORO",groupId)
+  // console.log("GRORORO",groupId)
   const [searchTerm, setSearchTerm] = useState("");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -133,6 +133,7 @@ const DocumentListing = () => {
       approval_status,
       version,
       is_reviewed,
+      
     } = params.row;
     // console.log("Version", version);
     // Ensure required fields are defined

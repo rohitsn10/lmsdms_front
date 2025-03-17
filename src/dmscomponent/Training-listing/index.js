@@ -20,6 +20,8 @@ import WarningIcon from "@mui/icons-material/Warning";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import WhiteListDialog from "./whitelist-users";
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import FolderSharedOutlinedIcon from "@mui/icons-material/FolderSharedOutlined";
+import ChildDocumentsDialog from "layouts/authentication/document-listing/child-document";
 
 const TrainingListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,11 +33,11 @@ const TrainingListing = () => {
   // Fetch training data using the API query hook
   const { data, error, isLoading, refetch } = useFetchTrainingsQuery();
   const [blacklistModalOpen, setBlacklistModalOpen] = useState(false);
-
+  const [openChildDialog, setOpenChildDialog] = useState(false);
   const [startAssessmentModal, setStartAssessmentModal] = useState(false);
   const [failedAssessmentModal, setFailedAssessmentModal] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
-
+  const [selectedChildDocuments, setSelectedChildDocuments] = useState([]);
   const [whiteListModalOpen, setWhiteListModalOpen] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState(null);
 
@@ -51,6 +53,12 @@ const TrainingListing = () => {
 
   const handleBlacklistModalClose = () => {
     setBlacklistModalOpen(false);
+  };
+
+  const handleViewChildDocuments = (row) => {
+    setSelectedRowData(row);
+    setSelectedChildDocuments([]);
+    setOpenChildDialog(true);
   };
 
   const handleAssesmentModalClose = () => {
@@ -185,6 +193,29 @@ const TrainingListing = () => {
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "document_name", headerName: "Title", flex: 1.5, headerAlign: "center" },
     { field: "document_type", headerName: "Type", flex: 1, headerAlign: "center" },
+    {
+      field: "sop_icon",
+      headerName: "SOP Action",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => {
+        const isSOP = params.row.document_type === "SOP";
+        // console.log(params.row)
+        return (
+          <MDBox display="flex" justifyContent="center">
+            <IconButton
+              color="success"
+              onClick={() => handleViewChildDocuments(params.row)}
+              disabled={!isSOP} // Disable if document type is not SOP
+            >
+              <FolderSharedOutlinedIcon /> {/* Replace with the desired icon */}
+            </IconButton>
+          </MDBox>
+        );
+      },
+      sortable: false,
+      filterable: false,
+    },
     { field: "document_number", headerName: "Document No", flex: 1.5, headerAlign: "center" },
     { field: "version", headerName: "Version", flex: 0.8, headerAlign: "center" },
     { field: "created_date", headerName: "Created Date", flex: 1, headerAlign: "center" },
@@ -523,6 +554,11 @@ const TrainingListing = () => {
     </Button>
   </DialogActions>
 </Dialog>
+      <ChildDocumentsDialog
+        open={openChildDialog}
+        onClose={() => setOpenChildDialog(false)}
+        documentId={selectedRowData?.id || ""}
+      />
 {/* Whitelist modal */}
       <WhiteListDialog open={whiteListModalOpen} onClose={handleWhiteListModalClose} documentId={selectedDocId}/>
     </MDBox>
