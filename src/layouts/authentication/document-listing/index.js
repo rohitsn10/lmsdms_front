@@ -420,7 +420,7 @@ const DocumentListing = () => {
                 params.row
               );
               // console.log()
-              console.log("Params", params.row);
+              // console.log("Params", params.row);
             }}
           >
             <VisibilityIcon />
@@ -647,6 +647,7 @@ const DocumentListing = () => {
         documentId={selectedRow?.id || ""}
         revisionMonth={selectedRow?.revision_month}
         isParent={selectedRow?.is_parent}
+        parentId={selectedRow?.parent_document}
       />
       <ChildDocumentsDialog
         open={openChildDialog}

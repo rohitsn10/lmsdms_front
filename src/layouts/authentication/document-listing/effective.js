@@ -8,6 +8,7 @@ import { useDocumentreleaseEffectiveStatusMutation } from "api/auth/texteditorAp
 import { useFetchDocumentsQuery } from "api/auth/documentApi";
 import { useFetchParentDocumentsQuery } from "api/auth/documentApi";
 import { toast } from "react-toastify";
+import { useGetIdWiseDocumentListQuery } from "api/auth/texteditorApi";
 
 const ConditionalDialog = ({
   open,
@@ -16,12 +17,34 @@ const ConditionalDialog = ({
   trainingStatus,
   documentId,
   revisionMonth,
-  isParent
+  isParent,
+  parentId
 }) => {
   // Destructure the mutation hook
   const [documentReleaseEffectiveStatus] = useDocumentreleaseEffectiveStatusMutation();
   const { refetch } = useFetchDocumentsQuery();
-  
+  console.log("Parent IDDD", parentId);
+
+  // Fetch parent document data if parentId exists
+  const { 
+    data: parentDocumentData, 
+    isLoading: isLoadingParent, 
+    isError: isParentError 
+  } = useGetIdWiseDocumentListQuery(
+    parentId, 
+    { skip: !parentId || !open }
+  );
+
+  // Determine if the parent document allows release (current_status_name is "Release" or has effective_date)
+  const canReleaseFromParent = React.useMemo(() => {
+    if (!parentId || !parentDocumentData || !Array.isArray(parentDocumentData) || parentDocumentData.length === 0) {
+      return true; // If no parent, allow release
+    }
+    
+    const parentDoc = parentDocumentData[0];
+    return parentDoc.current_status_name === "Release" || parentDoc.effective_date !== null;
+  }, [parentId, parentDocumentData]);
+
   // Fetch child documents if this is a parent document
   const { 
     data: childDocuments, 
@@ -94,7 +117,8 @@ const ConditionalDialog = ({
     onClose(); 
   };
 
-  const canSubmit = !isParent || (isParent && allChildrenApproved);
+  // Combined check for button disabled state
+  const canSubmit = (!isParent || (isParent && allChildrenApproved)) && canReleaseFromParent;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth> 
@@ -111,6 +135,43 @@ const ConditionalDialog = ({
               Please confirm your action.
             </MDTypography>
           </MDBox>
+          
+          {/* Display parent document status if applicable */}
+          {parentId && (
+            <MDBox sx={{ marginTop: 2 }}>
+              <MDTypography variant="h6" color="#344767">
+                Parent Document Status:
+              </MDTypography>
+              
+              {isLoadingParent ? (
+                <MDTypography variant="body2">Loading parent document...</MDTypography>
+              ) : isParentError ? (
+                <MDTypography variant="body2" color="error">
+                  Error loading parent document
+                </MDTypography>
+              ) : parentDocumentData && Array.isArray(parentDocumentData) && parentDocumentData.length > 0 ? (
+                <MDBox sx={{ p: 1, borderBottom: "1px solid #eee" }}>
+                  <MDTypography variant="body2">
+                    {parentDocumentData[0].document_title}
+                  </MDTypography>
+                  <MDTypography 
+                    variant="body2"
+                    color={canReleaseFromParent ? "success" : "error"}
+                    fontWeight="medium"
+                  >
+                    Status: {parentDocumentData[0].current_status_name}
+                  </MDTypography>
+                  {!canReleaseFromParent && (
+                    <MDTypography variant="body2" color="error" mt={1}>
+                      Parent document must be Released or Effective before releasing this document.
+                    </MDTypography>
+                  )}
+                </MDBox>
+              ) : (
+                <MDTypography variant="body2">No parent document found.</MDTypography>
+              )}
+            </MDBox>
+          )}
           
           {/* Display child documents if this is a parent */}
           {isParent && (
@@ -161,7 +222,7 @@ const ConditionalDialog = ({
               {isParent && !allChildrenApproved && childDocuments && Array.isArray(childDocuments) && childDocuments.length > 0 && (
                 <MDBox sx={{ mt: 2 }}>
                   <MDTypography variant="body2" color="error">
-                    All child documents must be Released before making this document effective.
+                    All child documents must be Approved before making this document effective.
                   </MDTypography>
                 </MDBox>
               )}
@@ -197,7 +258,8 @@ ConditionalDialog.propTypes = {
   trainingStatus: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).isRequired,
   documentId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   revisionMonth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  isParent: PropTypes.bool
+  isParent: PropTypes.bool,
+  parentId: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.null])
 };
 
 ConditionalDialog.defaultProps = {

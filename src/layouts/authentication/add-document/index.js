@@ -315,11 +315,20 @@ function AddDocument() {
                   }}
                   disabled={type === 1} // Disable Parent Document dropdown if Type is 1
                 >
-                  {alldocument?.map((doc) => (
-                    <MenuItem key={doc.id} value={doc.id}>
-                      {doc.document_title} {/* Display document title */}
-                    </MenuItem>
-                  ))}
+                 
+                  {alldocument?.map((doc) => 
+                    {
+                      if(
+                        doc.status == "Effective" ||
+                         doc.status == "Obsolete"
+                      ){
+                        return null
+                      }
+                      return(<MenuItem key={doc.id} value={doc.id}>
+                      {doc.document_title}
+                    </MenuItem>)}
+                  )}
+                 
                 </Select>
 
                 {/* Show message when Parent Document is not required */}

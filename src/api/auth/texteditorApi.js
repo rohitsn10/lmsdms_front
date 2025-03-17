@@ -95,6 +95,12 @@ export const texteditorApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    getIdWiseDocumentList: builder.query({
+      query: (documentId) => ({
+        url: `dms_module/id_wise_document_list/${documentId}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -109,4 +115,5 @@ export const {
   useDocumentSendBackStatusMutation,
   useGetApprovedStatusUsersQuery,
   useDocumentreleaseEffectiveStatusMutation,
+  useGetIdWiseDocumentListQuery
 } = texteditorApi;
