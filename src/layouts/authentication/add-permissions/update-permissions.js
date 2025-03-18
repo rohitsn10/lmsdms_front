@@ -19,10 +19,19 @@ const UpdatePermissionsTable = ({ groupId }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { role } = location.state || {};
-  // console.log("Received Role:", role);
 
-  const { data: permissions = [], isLoading: isPermissionsLoading, error,refetch: refetchPermissions } = useFetchPermissionsQuery();
-  const { data: groupPermissions, isLoading: isGroupLoading,refetch: refetchGroupPermissions } = useFetchPermissionsByGroupIdQuery(role?.id);
+
+  const {
+    data: permissions = [],
+    isLoading: isPermissionsLoading,
+    error,
+    refetch: refetchPermissions,
+  } = useFetchPermissionsQuery();
+  const {
+    data: groupPermissions,
+    isLoading: isGroupLoading,
+    refetch: refetchGroupPermissions,
+  } = useFetchPermissionsByGroupIdQuery(role?.id);
   const [updateGroupPermissions] = useUpdateGroupPermissionsMutation();
 
   const [permissionState, setPermissionState] = useState({});
@@ -34,7 +43,7 @@ const UpdatePermissionsTable = ({ groupId }) => {
     refetchPermissions();
     refetchGroupPermissions();
   };
-  
+
   useEffect(() => {
     refetchAllData();
   }, [location.key]);
@@ -57,7 +66,8 @@ const UpdatePermissionsTable = ({ groupId }) => {
 
   // Prepopulate permissions state if groupPermissions is available
   useEffect(() => {
-    if (groupPermissions) {
+    if (groupPermissions && permissions.length > 0) {
+      // Ensure both are available
       const updatedState = {};
       groupPermissions.forEach((perm) => {
         if (perm.name) {
@@ -69,9 +79,10 @@ const UpdatePermissionsTable = ({ groupId }) => {
           };
         }
       });
+
       setPermissionState((prevState) => ({ ...prevState, ...updatedState }));
     }
-  }, [groupPermissions]);
+  }, [groupPermissions, permissions]); // Depend on both values
 
   // Handle checkbox changes
   const handleCheckboxChange = (role, action) => {
