@@ -54,9 +54,9 @@ const UnderApproveDocument = () => {
       refetch();
     }
   }, [selectedDepartment, startDate, endDate, refetch]); // Add these dependencies to refetch when conditions change
-    useEffect(() => {
-      refetch();
-    }, []);
+  useEffect(() => {
+    refetch();
+  }, []);
   const documents = data?.approvedata || []; // Extract documents from the new API response
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
@@ -78,7 +78,8 @@ const UnderApproveDocument = () => {
       return; // Exit if params or row is missing
     }
 
-    const { id, document_current_status, training_required, approval_status,select_template } = params.row;
+    const { id, document_current_status, training_required, approval_status, select_template } =
+      params.row;
 
     if (
       id === undefined ||
@@ -335,23 +336,25 @@ const UnderApproveDocument = () => {
         </MDBox>
 
         <MDBox display="flex" justifyContent="center" sx={{ height: 500, mt: 2 }}>
-        <div style={{ height: 500, width: "100%" }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            pageSize={5}
-            rowsPerPageOptions={[5]}
-            disableSelectionOnClick
-            autoHeight
-            sx={{
-              "& .MuiDataGrid-columnHeader": {
-                textAlign: "center",
-              },
-              "& .MuiDataGrid-cell": {
-                textAlign: "center",
-              },
-            }}
-          />
+          <div style={{ height: 500, width: "100%" }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pageSize={5}
+              rowsPerPageOptions={[5]}
+              disableSelectionOnClick
+              sx={{
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: "#f5f5f5",
+                  fontWeight: "bold",
+                },
+                "& .MuiDataGrid-cell": {
+                  textAlign: "center",
+                },
+              }}
+            />
           </div>
         </MDBox>
       </Card>

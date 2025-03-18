@@ -348,10 +348,12 @@ const RejectedDocument = () => {
               pageSize={5}
               rowsPerPageOptions={[5]}
               disableSelectionOnClick
-              autoHeight
               sx={{
-                "& .MuiDataGrid-columnHeader": {
-                  textAlign: "center",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: "#f5f5f5",
+                  fontWeight: "bold",
                 },
                 "& .MuiDataGrid-cell": {
                   textAlign: "center",
