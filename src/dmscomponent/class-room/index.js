@@ -173,6 +173,7 @@ const ClassroomListing = () => {
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "classroom_name", headerName: "Class Name", flex: 1, headerAlign: "center" },
     { field: "start_date", headerName: "Start Date & Time", flex: 1, headerAlign: "center" },
+    { field: "is_assesment", headerName: "Assesment", flex: 1, headerAlign: "center" },
     {
       field: "session",
       headerName: "Session",
@@ -347,7 +348,7 @@ const ClassroomListing = () => {
           </MDButton>
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
-          <div style={{ height: 500, width: "100%" }}>
+          <div style={{ height: 500, width: "100%",overflow: "auto" }}>
             <DataGrid
               rows={filteredData || []} // Use filteredData if available
               columns={columns}
@@ -356,6 +357,7 @@ const ClassroomListing = () => {
               disableSelectionOnClick
               getRowId={getRowId} // Specify how to get the row's unique id
               sx={{
+                minWidth: 1400,
                 border: "1px solid #ddd",
                 borderRadius: "4px",
                 "& .MuiDataGrid-columnHeaders": {

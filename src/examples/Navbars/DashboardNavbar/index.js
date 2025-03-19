@@ -33,7 +33,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import MDBox from "components/MDBox";
 import MDInput from "components/MDInput";
 import Breadcrumbs from "examples/Breadcrumbs";
@@ -44,7 +44,7 @@ import {
   navbarIconButton,
   navbarMobileMenu,
 } from "examples/Navbars/DashboardNavbar/styles";
-import axios from 'axios';
+import axios from "axios";
 // Material Dashboard 2 React context
 import {
   useMaterialUIController,
@@ -63,7 +63,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
-  const { data, error} = useGetemployeeRecordlogQuery();
+  const { data, error } = useGetemployeeRecordlogQuery();
   const route = useLocation().pathname.split("/").slice(1);
   const { user, role } = useAuth();
   const [roles, setRoles] = useState([]);
@@ -125,13 +125,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
       const fileUrl = data.data;
       try {
         // Download the file using Axios
-        const response = await axios.get(fileUrl, { responseType: 'blob' });
+        const response = await axios.get(fileUrl, { responseType: "blob" });
 
         // Create a link element to trigger the download
-        const link = document.createElement('a');
-        const file = new Blob([response.data], { type: 'application/pdf' });
+        const link = document.createElement("a");
+        const file = new Blob([response.data], { type: "application/pdf" });
         link.href = URL.createObjectURL(file);
-        link.download = fileUrl.split('/').pop(); // Extract filename from URL
+        link.download = fileUrl.split("/").pop(); // Extract filename from URL
         link.click();
 
         // Show success toast
@@ -145,11 +145,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
   };
   useEffect(() => {
-    
-    
-
     if (rolesData && rolesData.data) {
-     
       const fetchedRoles = rolesData.data.map((role) => ({
         id: role.id,
         name: role.name,
@@ -318,7 +314,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 variant="text"
                 size="large"
                 sx={navbarIconButton}
-                onClick={handleClickOpen}
+                // onClick={handleClickOpen}
               >
                 {role}
               </Button>
