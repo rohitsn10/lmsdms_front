@@ -16,8 +16,8 @@ const ConditionalDialog = ({
   onConfirm,
   trainingStatus,
   documentId,
-  revisionMonth,
-  isParent,
+  revisionMonth, 
+  isParent, 
   parentId
 }) => {
   // Destructure the mutation hook

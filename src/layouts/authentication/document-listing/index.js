@@ -285,14 +285,25 @@ const DocumentListing = () => {
       doc.document_current_status !== 12
   );
 
-  const rows = filteredData.map((doc, index) => ({
-    ...doc,
-    index,
-    created_at: doc.created_at ? moment(doc.created_at).format("DD/MM/YY") : "N/A",
-    effective_date: doc.effective_date ? moment(doc.effective_date).format("DD/MM/YY") : "N/A",
-    revision_date: doc.revision_date ? moment(doc.revision_date).format("DD/MM/YY") : "N/A",
-  }));
-
+  const rows = filteredData.map((doc, index) => {
+    const effectiveDate = doc.effective_date ? moment(doc.effective_date) : null;
+    const revisionMonths = doc.revision_month ? parseInt(doc.revision_month, 10) : null;
+    
+    // Calculate revision_date only if effective_date exists and revision_month is valid
+    let revisionDate = "N/A";
+    if (effectiveDate && revisionMonths) {
+      revisionDate = moment(effectiveDate).add(revisionMonths, 'months').format("DD/MM/YY");
+    }
+  
+    return {
+      ...doc,
+      index,
+      created_at: doc.created_at ? moment(doc.created_at).format("DD/MM/YY") : "N/A",
+      effective_date: doc.effective_date ? moment(doc.effective_date).format("DD/MM/YY") : "N/A", // Keep as received from API
+      revision_date: revisionDate, // Dynamically calculated
+    };
+  });
+  
   const columns = [
     {
       field: "index",
@@ -682,7 +693,7 @@ const DocumentListing = () => {
     </MDBox>
   );
 };
-
+ 
 DocumentListing.propTypes = {
   userPermissions: PropTypes.arrayOf(
     PropTypes.shape({

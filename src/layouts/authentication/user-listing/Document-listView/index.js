@@ -58,8 +58,8 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
 
   useEffect(() => {
     if (attemptsData?.status && attemptsData?.data) {
-      const formattedData = attemptsData.data.map((item) => ({
-        id: item.id,
+      const formattedData = attemptsData.data.map((item,index) => ({
+        id: index + 1,
         user: item.user,
         document: item.document,
         serial_number: item.id,
@@ -76,8 +76,8 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
 
   useEffect(() => {
     if (classAttemptsData?.status && classAttemptsData?.data) {
-      const formattedClassAttempts = classAttemptsData.data.map((item) => ({
-        id: item.id,
+      const formattedClassAttempts = classAttemptsData.data.map((item,index) => ({
+        id: index + 1,
         user: item.user,
         classroom: item.classroom,
         serial_number: item.id,
@@ -103,7 +103,7 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
   };
 
   const columns = [
-    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
+    { field: "id", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "documentName", headerName: "Document Name", flex: 1.5, headerAlign: "center" },
     { 
       field: "obtainedMarks", 
@@ -138,7 +138,7 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
   ];
 
   const classAttemptsColumns = [
-    { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
+    { field: "id", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "classroomName", headerName: "Classroom Name", flex: 1.5, headerAlign: "center" },
     { 
       field: "obtainedMarks", 
