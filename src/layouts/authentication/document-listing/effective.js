@@ -23,7 +23,7 @@ const ConditionalDialog = ({
   // Destructure the mutation hook
   const [documentReleaseEffectiveStatus] = useDocumentreleaseEffectiveStatusMutation();
   const { refetch } = useFetchDocumentsQuery();
-  console.log("Parent IDDD", parentId);
+  // console.log("Parent IDDD", parentId);
 
   // Fetch parent document data if parentId exists
   const { 

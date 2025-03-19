@@ -44,7 +44,7 @@ function ClassAddQuestion() {
   const [selectedFile, setSelectedFile] = useState(null);
   const location = useLocation();
 
-  const classroom_id = (location?.state?.classroom_id || "").toString();
+  const classroom_id = (location?.state?.classroomId || "").toString();
   const navigate = useNavigate();
 
   const [classroomQuestionsPost] = useClassroomQuestionsPostMutation();
@@ -166,8 +166,9 @@ function ClassAddQuestion() {
 
       const response = await classroomQuestionsPost(formData).unwrap();
       toast.success("Class Question created successfully!");
+      // console.log(`/class-question/${classroom_id}`)
       setTimeout(() => {
-        navigate("/class-room");
+        navigate(`/class-question/${classroom_id}`);
       }, 1500);
     } catch (error) {
       toast.error("Failed to create class question. Please try again.");

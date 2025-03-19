@@ -417,7 +417,7 @@ export default function App() {
       <Route path="/trainer-listing" element={<TrainerListing/>}/>
       <Route path="/add-trainer" element={<AddTrainer/>}/>
       <Route path="/edit-trainer" element={<EditTrainer/>}/>
-      <Route path="/class-question" element={<ClassQuestion/>}/>
+      <Route path="/class-question/:classroomId" element={<ClassQuestion/>}/>
       <Route path="/class-quiz" element={<QuestionQuiz/>}/>
       <Route path="/class-add-question" element={<ClassAddQuestion/>}/>
       <Route path="/class-add-quiz" element={<CreateClassQuiz/>}/>

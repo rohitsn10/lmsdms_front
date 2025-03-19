@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
@@ -17,19 +17,24 @@ import { useClassroomQuestionsGetQuery } from "apilms/classtestApi";
 const ClassQuestion = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const location = useLocation();
-  const classroom = location?.state?.classroom || null;
-  const classroom_id = classroom?.classroom_id || null;
+  // const classroom = location?.state?.classroom || null;
+  // const classroom_id = classroom?.classroom_id || null;
 
+  const {classroomId} = useParams()
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [pendingQuestionId, setPendingQuestionId] = useState(null);
   const navigate = useNavigate();
 
   // Fetch questions for the classroom using the classroom_id
-  const { data, isLoading, isError } = useClassroomQuestionsGetQuery(classroom_id);
+  const { data, isLoading, isError,refetch } = useClassroomQuestionsGetQuery(classroomId);
   const questions = data?.data || []; // Access the 'data' field, or default to an empty array if it's not available
+  
+  useEffect(() => {
+    refetch(); // Trigger refetch on mount
+  }, [refetch]);
 
   const handleAddQuestion = () => {
-    navigate("/class-add-question", { state: { classroom_id } });
+    navigate("/class-add-question", { state: { classroomId } });
   };
 
   // Handle search input change

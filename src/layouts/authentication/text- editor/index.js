@@ -47,7 +47,7 @@ const DocumentView = () => {
   useEffect(() => {
     reviewerRefetch();
   }, [reviewerRefetch]);
-  console.log("Reviewer Data", reviewerData);
+  // console.log("Reviewer Data", reviewerData);
   const [loading, setLoading] = useState(true);
   const docEditorRef = useRef(null);
   const [addPathUrlDataForComments, { isLoading: isAddingComment }] =
@@ -74,11 +74,12 @@ const DocumentView = () => {
   const [documentDocAdmin] = useDocumentDocadminStatusMutation();
   const searchParams = new URLSearchParams(location.search);
   const document_current_status = searchParams.get("status");
+  // console.log("Document status:::",typeof document_current_status)
   const approval_status = searchParams.get("approval_status");
   const version = searchParams.get("version");
   const templateIDMain = searchParams.get("templateID");
   const is_reviewed = searchParams.get("is_reviewed");
-  console.log("------------------------------------------", typeof is_reviewed);
+  // console.log("------------------------------------------", typeof is_reviewed);
   const [isSaved, setIsSaved] = useState(false);
   const handleDownloadSave = () => {
     setIsSaved(true);
@@ -236,7 +237,11 @@ const DocumentView = () => {
                 try {
                   const cacheUrl = response?.data?.url;
                   setCacheDocument(cacheUrl);
-                  const newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
+                  let newVersion = version;
+                  if (document_current_status !== "6" && document_current_status !== "7") {
+                    newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
+                  }
+              
                   if (cacheUrl) {
                     const draftData = {
                       user: user?.id,

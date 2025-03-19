@@ -194,7 +194,7 @@ function AddQuestion() {
       const response = await createTrainingQuestion(formData).unwrap();
       toast.success("Question created successfully!");
       setTimeout(() => {
-        navigate("/trainingListing");
+        navigate(`/questions/${id}`);
       }, 1500);
     } catch (error) {
       toast.error("Failed to create question. Please try again.");

@@ -214,7 +214,13 @@ const ClassroomListing = () => {
               <MDButton
                 variant="outlined"
                 color="info"
-                onClick={() => navigate("/class-question", { state: { classroom: params.row } })}
+                // onClick={() => navigate("/class-question", { state: { classroom: params.row } })}
+                onClick={() => navigate(`/class-question/${params.row?.classroom_id}`)}
+
+                // onClick={() => {
+                //   console.log(params.row)
+                // }}
+
                 disabled={params.row.is_assesment === "Without Assessment" || params.row.document !== null}// Disable if 'is_assesment' is 'With Assessment'
               >
                 Questions

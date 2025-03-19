@@ -73,7 +73,15 @@ const DocumentPreviewComponent = () => {
             height: "100%",
             type: "desktop",
             document: editorConfig.document,
-
+            // document: {
+            //   // Copy existing document settings
+            //   ...editorConfig.document,
+            //   // Override permissions
+            //   permissions: {
+            //     // ...editorConfig.document.permissions,
+            //     print: false
+            //   }
+            // },
             editorConfig: {
               mode: "view",
               showHeader: false,
@@ -104,6 +112,14 @@ const DocumentPreviewComponent = () => {
                 },
                 saveButton: false,
                 showReviewChanges: true,
+                layout: {
+                  toolbar: {
+                    file: {
+                      print: false,
+                      download: false
+                    }
+                  }
+                },
                 trackChanges: true,
                 chat: false,
                 comments: true,
@@ -127,6 +143,11 @@ const DocumentPreviewComponent = () => {
               onError: (event) => {
                 console.error("Editor error:", event);
                 return true;
+              },
+              onRequestPrint: (event) => {
+                console.log("Print requested but blocked");
+                alert("Printing is disabled for this document.");
+                return false;
               },
             },
             token: editorConfig.token,
@@ -170,7 +191,9 @@ const DocumentPreviewComponent = () => {
       </Box>
     );
   }
-
+  window.print = () => {
+    alert("Printing is disabled on this page.");
+  };
   return (
     <MDBox
       sx={{
