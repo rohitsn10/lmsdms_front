@@ -125,11 +125,11 @@ import apiService from 'services/apiService';
                       borderRadius: '4px',
                       padding: 2,
           }}>
-              <MDTypography variant="h4" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
+              <MDTypography variant="h3" fontWeight="medium" sx={{ flexGrow: 1, textAlign: "center" }}>
                   Manage Sections
               </MDTypography>
-              <Divider sx={{ marginBottom: 2 }} />
-              <Grid container spacing={1} sx={{
+              <Divider sx={{ marginBottom: 1 }} />
+              {/* <Grid container spacing={1} sx={{
                   mr:2,
                   ml:2
               }}>
@@ -150,10 +150,8 @@ import apiService from 'services/apiService';
                       Reading Time:
                       </MDTypography>
                       <Typography variant="h5">--</Typography>
-                  {/*  */}
                   </Grid>
                   <Grid item xs={4}>
-                      {/*  */}
                       <MDTypography variant="h5" color="textSecondary">
                       Training Title:                    
                       </MDTypography>
@@ -161,7 +159,7 @@ import apiService from 'services/apiService';
                       {trainingTitle}
                       </Typography>
                   </Grid>
-              </Grid>
+              </Grid> */}
           </Box>
         <hr
             style={{

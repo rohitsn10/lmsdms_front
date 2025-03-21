@@ -33,7 +33,7 @@ const TrainingDocumentView = () => {
     const apiUrl = process.env.REACT_APP_APIKEY;
     try {
     //   const response = await fetch(`http://127.0.0.1:8000/dms_module/get_editor_config?document_id=${document_id}&template_id=${templateId}`);
-    const response = await fetch(`${apiUrl}dms_module/get_editor_config?document_id=${document_id}&template_id=${templateId}`);
+    const response = await fetch(`${apiUrl}dms_module/get_editor_config?document_id=${document_id}&template_id=${templateId}&is_view=${true}`);
       if (!response.ok) throw new Error("Failed to fetch ONLYOFFICE configuration");
       const config = await response.json();
       setEditorConfig(config);
