@@ -67,7 +67,7 @@ const ParentTrainingDocumentView = () => {
   useEffect(() => {
     if (documents.length > 0 && currentDocIndex < documents.length) {
       const currentDoc = documents[currentDocIndex];
-      const timerDuration = currentDoc.isParent ? 20 : 12; // 600s (10min) or 180s (3min)
+      const timerDuration = currentDoc.isParent ? 600 : 180; // 600s (10min) or 180s (3min)
       setTimeLeft(timerDuration);
       setTimerComplete(false);
       fetchEditorConfig(currentDoc.id, currentDoc.select_template);
@@ -91,7 +91,7 @@ const ParentTrainingDocumentView = () => {
     setTimerActive(false); // Pause timer while loading
     
     try {
-      const response = await fetch(`${apiUrl}dms_module/get_editor_config?document_id=${docId}&template_id=${tempId}`);
+      const response = await fetch(`${apiUrl}dms_module/get_editor_config?document_id=${docId}&template_id=${tempId}&is_view=${true}`);
       if (!response.ok) throw new Error("Failed to fetch ONLYOFFICE configuration");
       const config = await response.json();
       setEditorConfig(config);

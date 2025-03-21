@@ -24,7 +24,7 @@ const DocumentPreviewComponent = () => {
       try {
         const response = await fetch(
           // `http://127.0.0.1:8000/dms_module/get_editor_config?document_id=${docId}&template_id=${templateId}`,
-        `${process.env.REACT_APP_APIKEY}dms_module/get_editor_config?document_id=${docId}&template_id=${templateId}`,
+        `${process.env.REACT_APP_APIKEY}dms_module/get_editor_config?document_id=${docId}&template_id=${templateId}&is_view=${true}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

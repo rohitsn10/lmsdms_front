@@ -129,7 +129,7 @@ const DocumentView = () => {
           const response = await fetch(
             // `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`,
             // `http://127.0.0.1:8000/dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}`,
-            `${process.env.REACT_APP_APIKEY}dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}`,
+            `${process.env.REACT_APP_APIKEY}dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}&is_view=${false}`,
             // http://127.0.0.1:8000/dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}
             {
               // const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
