@@ -162,7 +162,7 @@ function AddQuestion() {
     formData.append("question_text", questionText);
     formData.append("question_type", questionType);
     formData.append("marks", questionMarks);
-    
+    formData.append("status",status)
     let options = null;
     let correct_answer = null;
 

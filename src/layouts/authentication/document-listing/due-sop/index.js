@@ -82,7 +82,7 @@ const DueSOPDocument = () => {
       return; // Exit if params or row is missing
     }
 
-    const { id, document_current_status, training_required, approval_status } = params.row;
+    const { id, document_current_status, training_required, approval_status,version,select_template,is_reviewed } = params.row;
 
     if (
       id === undefined ||
@@ -94,8 +94,11 @@ const DueSOPDocument = () => {
       return;
     }
 
+    // navigate(
+    //   `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}`
+    // );
     navigate(
-      `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}`
+      `/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}&is_reviewed=${is_reviewed}`
     );
   };
 
