@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useGetDocumentDataOfStatusIdNineQuery } from "api/auth/dashboardApi"; // Use the new API
+import { useGetDocumentDataOfStatusIdElevenQuery } from "api/auth/dashboardApi"; // Use the new API
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -36,7 +36,7 @@ const RejectedDocument = () => {
   const location = useLocation();
 
   // Fetching documents using the new API
-  const { data, refetch, isLoading, isError } = useGetDocumentDataOfStatusIdNineQuery({
+  const { data, refetch, isLoading, isError } = useGetDocumentDataOfStatusIdElevenQuery({
     departmentId: selectedDepartment,
     startDate: startDate ? moment(startDate).format("DD-MM-YYYY") : "", // Format start date
     endDate: endDate ? moment(endDate).format("DD-MM-YYYY") : "", // Format end date

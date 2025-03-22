@@ -47,7 +47,6 @@ const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumbe
       toast.warning("Print limit reached or PDF not available!");
       return;
     }
-
     try {
       const printWindow = window.open(pdfLink, "_blank");
       
@@ -79,7 +78,6 @@ const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumbe
     iframe.style.width = "0";
     iframe.style.height = "0";
     iframe.src = pdfLink;
-    
     iframe.onload = () => {
       try {
         iframe.contentWindow.print();

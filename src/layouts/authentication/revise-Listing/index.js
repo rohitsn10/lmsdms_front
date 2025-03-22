@@ -42,7 +42,7 @@ const ReviseApprovalList = () => {
 
   useEffect(() => {
     refetch();
-  }, [location.key]);
+  }, []);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);

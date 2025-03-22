@@ -112,6 +112,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleCloseReportSubMenu = () => {
     setAnchorReportEl(null);
   };
+  
   const handleDownloadReport = async () => {
     if (isLoading) {
       toast.info("Generating the report, please wait...");
@@ -504,16 +505,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   }}
                 >
                   <MenuItem onClick={handleDownloadReport}>Employee record log Report</MenuItem>
+                  <MenuItem onClick={handleDownloadTrainingExcelReport}> Employee Training Excel Report</MenuItem>
                 </Menu>
-                <MenuItem onClick={handleDownloadTrainingExcelReport}>
-                  Employee Training Excel Report
-                </MenuItem>
-
                 <MenuItem component={RouterLink} to="/logout">
                   Logout
                 </MenuItem>
               </Menu>
-            </MDBox>
+            </MDBox>  
           </MDBox>
         )}
       </Toolbar>

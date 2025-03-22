@@ -40,8 +40,8 @@ const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
         try {
             await approveRevise({
                 document_id: row?.id,
-                status_id: 7,
-                request_action_id: row?.id,
+                status_id: 11,
+                request_action_id: row?.revise_request_id,
                 action_status: "rejected",
             }).unwrap();
             
