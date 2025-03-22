@@ -12,7 +12,7 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Button,
+  Button, 
   Box,
   Typography,
   Paper,
@@ -41,17 +41,42 @@ const JobRoleMapping = () => {
   const [assignedTrainings, setAssignedTrainings] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: trainingData, isLoading: trainingLoading } = useFetchTrainingsQuery();
-  const { data: jobRoleData, isLoading: jobRoleLoading } = useGetJobRoleQuery();
+  const { data: trainingData, isLoading: trainingLoading, refetch: refetchTrainings } = useFetchTrainingsQuery();
+  const { data: jobRoleData, isLoading: jobRoleLoading, refetch: refetchJobRoles } = useGetJobRoleQuery();
   const [assignTrainings] = useTrainingAssignJobroleMutationMutation();
   // console.log()
   // Fetch already assigned trainings when job role is selected
   const { 
     data: assignedTrainingData, 
-    isLoading: assignedTrainingIsLoading 
+    isLoading: assignedTrainingIsLoading,
+    refetch: refetchAssignedTrainings 
   } = useTrainingAssignJobroleQuery(selectedJobRole, { 
     skip: !selectedJobRole 
   });
+
+  useEffect(() => {
+    refetchTrainings();
+    refetchJobRoles();
+    if (selectedJobRole) {
+      refetchAssignedTrainings();
+    }
+  }, []);
+
+    // Refetch assigned trainings whenever job role changes
+    useEffect(() => {
+      if (selectedJobRole) {
+        refetchAssignedTrainings();
+      }
+    }, [selectedJobRole]);
+
+      // After successful assignment, refetch trainings and assigned trainings
+  const handleSuccessfulUpdate = () => {
+    refetchTrainings();
+    if (selectedJobRole) {
+      refetchAssignedTrainings();
+    }
+  };
+
 
   // Initialize assigned trainings when job role changes or when fetching completes
   useEffect(() => {
@@ -64,6 +89,7 @@ const JobRoleMapping = () => {
       setAssignedTrainings([]);
     }
   }, [selectedJobRole, assignedTrainingData, assignedTrainingIsLoading]);
+
 
   // Reset selections when training data changes
   useEffect(() => {
@@ -126,6 +152,7 @@ const JobRoleMapping = () => {
       });
       toast.success("Training assigned successfully!");
       // Don't reset assigned trainings as they're now persisted
+      handleSuccessfulUpdate();
     } catch (err) {
       toast.error("Error assigning training");
     } finally {
@@ -286,7 +313,7 @@ const JobRoleMapping = () => {
                       </ListItemIcon>
                       <ListItemText 
                         primary={normalizedTraining.title} 
-                        secondary={normalizedTraining.type}
+                        // secondary={normalizedTraining.type}
                       />
                     </ListItem>
                   );
@@ -354,9 +381,9 @@ const JobRoleMapping = () => {
                         }}
                         secondary={
                           <Box component="span">
-                            <Typography variant="body2" component="span">
+                            {/* <Typography variant="body2" component="span">
                               {normalizedTraining.type}
-                            </Typography>
+                            </Typography> */}
                             {normalizedTraining.status && (
                               <Chip 
                                 size="small" 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -8,30 +8,32 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/material";
-import { useCreateUserMutation } from "api/auth/userApi";
+import { useUpdateUserMutation } from "api/auth/userApi";
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 import { getUserGroups } from "api/auth/auth";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ESignatureDialog from "layouts/authentication/ESignatureDialog";
 
-function AddUser() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [username, setUsername] = useState("");
-  const [userRole, setUserRole] = useState([]);
-  // const [department, setDepartment] = useState("");
+function EditUser() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const userData = location.state?.user || JSON.parse(localStorage.getItem("userData")) || {};
+  const [firstName, setFirstName] = useState(userData.first_name || "");
+  const [lastName, setLastName] = useState(userData.last_name || "");
+  const [email, setEmail] = useState(userData.email || "");
+
+  const [username, setUsername] = useState(userData.username || "");
+  const [userRole, setUserRole] = useState(
+    userData.groups_list ? userData.groups_list.split(",").map(Number) : []
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [userRoles, setUserRoles] = useState([]);
+  const [userRoles, setUserRoles] = useState([userData.groups_list]);
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-
-  const navigate = useNavigate();
-  const [createUser, { isLoading }] = useCreateUserMutation();
-
-  const { data: departmentsData, isLoading: isDepartmentsLoading } = useFetchDepartmentsQuery();
+  console.log(userData);
+  const [updateUser] = useUpdateUserMutation();
+  const { data: departmentsData } = useFetchDepartmentsQuery();
 
   useEffect(() => {
     const fetchUserRoles = async () => {
@@ -50,15 +52,18 @@ function AddUser() {
     if (!firstName.trim()) newErrors.firstName = "First Name is required.";
     if (!lastName.trim()) newErrors.lastName = "Last Name is required.";
     if (!email.trim()) newErrors.email = "Email is required.";
-    // if (!phone.trim()) newErrors.phone = "Phone is required.";
     if (!username.trim()) newErrors.username = "Username is required.";
     if (!userRole.length) newErrors.userRole = "User Role is required.";
-    // if (!department) newErrors.department = "Department is required.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
+  useEffect(() => {
+    if (location.state?.user) {
+      localStorage.setItem("userData", JSON.stringify(location.state.user));
+    }
+  }, [location.state?.user]);
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -67,7 +72,7 @@ function AddUser() {
       setIsSubmitting(false);
       return;
     }
-    setOpenSignatureDialog(true); // Open E-Signature dialog
+    setOpenSignatureDialog(true);
   };
 
   const handleSignatureComplete = async (password) => {
@@ -78,39 +83,27 @@ function AddUser() {
       return;
     }
 
-    const userData = {
+    const updatedUserData = {
+      id: userData.id,
       first_name: firstName,
       last_name: lastName,
       email,
-      // phone,
       username,
-      user_role: userRole,
-      // department_id: department,
+      groups: userRole,
     };
 
     try {
-      const response = await createUser(userData).unwrap();
-      toast.success("User added successfully!");
+      await updateUser(updatedUserData).unwrap();
+      toast.success("User updated successfully!");
       setTimeout(() => {
         navigate("/user-listing");
       }, 1500);
     } catch (error) {
-      toast.error("Failed to create user. Please try again.");
-      console.error("Failed to create user:", error);
+      toast.error("Failed to update user. Please try again.");
+      console.error("Failed to update user:", error);
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleClear = () => {
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setPhone("");
-    setUsername("");
-    setUserRole([]);
-   
-    setErrors({});
   };
 
   return (
@@ -120,7 +113,6 @@ function AddUser() {
           borderRadius="lg"
           sx={{
             background: "linear-gradient(212deg, #d5b282, #f5e0c3)",
-            borderRadius: "lg",
             mx: 2,
             mt: -3,
             p: 2,
@@ -129,20 +121,8 @@ function AddUser() {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-            Add User
+            Edit User
           </MDTypography>
-        </MDBox>
-
-        <MDBox mt={2} mb={1} display="flex" justifyContent="flex-end">
-          <MDButton
-            variant="outlined"
-            color="error"
-            size="small"
-            onClick={handleClear}
-            sx={{ marginRight: "20px" }}
-          >
-            Clear
-          </MDButton>
         </MDBox>
 
         <MDBox pb={3} px={3}>
@@ -180,7 +160,7 @@ function AddUser() {
                 helperText={errors.email}
               />
             </MDBox>
-            
+
             <MDBox mb={3}>
               <MDInput
                 type="text"
@@ -210,10 +190,13 @@ function AddUser() {
                     },
                   }}
                   renderValue={(selected) =>
-                    selected.map((roleId) => {
-                      const role = userRoles.find((r) => r.id === roleId);
-                      return role?.name || roleId;
-                    }).join(', ')
+                    selected
+                      .map((roleId) => {
+                        if (!userRoles || userRoles.length === 0) return `Unknown Role (${roleId})`;
+                        const role = userRoles.find((r) => Number(r.id) === Number(roleId));
+                        return role ? role.name : `Unknown Role (${roleId})`;
+                      })
+                      .join(", ")
                   }
                   error={!!errors.userRole}
                 >
@@ -235,14 +218,13 @@ function AddUser() {
               </FormControl>
             </MDBox>
 
-
             <MDBox mt={2} mb={1}>
               <MDButton
                 variant="gradient"
                 color="submit"
                 fullWidth
                 type="submit"
-                  // disabled={isLoading || isSubmitting}
+                // disabled={isLoading || isSubmitting}
               >
                 Submit
               </MDButton>
@@ -250,9 +232,7 @@ function AddUser() {
           </MDBox>
         </MDBox>
       </Card>
-      {/* <ToastContainer /> */}
 
-      {/* E-Signature Dialog */}
       <ESignatureDialog
         open={openSignatureDialog}
         onClose={() => setOpenSignatureDialog(false)}
@@ -262,4 +242,4 @@ function AddUser() {
   );
 }
 
-export default AddUser;
+export default EditUser;

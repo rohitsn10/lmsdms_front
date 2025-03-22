@@ -36,6 +36,7 @@ const ArchivedListing = () => {
         },
         { field: "document_title", headerName: "Document Title", flex: 1, headerAlign: "center" },
         { field: "document_type", headerName: "Document Type", flex: 1, headerAlign: "center" },
+        { field: "version", headerName: "Version", flex: 1, headerAlign: "center" },
         { field: "document_current_status_name", headerName: "Status", flex: 1, headerAlign: "center" },
         // {
         //     field: "action",

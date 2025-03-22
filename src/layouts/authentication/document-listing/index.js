@@ -541,6 +541,7 @@ const DocumentListing = () => {
                 <IconButton
                   color="primary"
                   onClick={() => handleEffectiveClick(params.row)} // Open dialog when clicked
+                  disabled={params.row.document_current_status === 7}
                 >
                   <CheckCircleIcon /> {/* Example icon for 'Effective' */}
                 </IconButton>

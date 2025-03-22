@@ -15,6 +15,7 @@ import { useReviseRequestGetQuery } from "api/auth/reviseApi"; // Adjust import 
 import { useFetchPermissionsByGroupIdQuery } from "api/auth/permissionApi";
 import { hasPermission } from "utils/hasPermission";
 import { useAuth } from "hooks/use-auth";
+import moment from "moment/moment";
 
 const ReviseApprovalList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -83,8 +84,10 @@ const formattedData = apiDocuments
   serial_number: index + 1,
   documentTitle: doc.document_title,
   documentType: doc.document_type,
-  requestedUser: `${doc.user}`,
-  requestedDate: new Date(doc.revision_created_at).toLocaleDateString(),
+  requestedUser: doc.user ? `${doc.user}` : "N/A",
+  requestedDate: doc.revision_created_at
+  ? moment(doc.revision_created_at).format("DD/MM/YYYY")
+  : "N/A",
   reviseStatus: doc.status,
   revisereason: doc.revise_description,
   document_current_status_name: doc.document_current_status_name,

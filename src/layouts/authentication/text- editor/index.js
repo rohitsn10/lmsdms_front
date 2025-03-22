@@ -79,6 +79,9 @@ const DocumentView = () => {
   const version = searchParams.get("version");
   const templateIDMain = searchParams.get("templateID");
   const is_reviewed = searchParams.get("is_reviewed");
+  // console.log("Test..",typeof version); 
+  console.log("Test2..",typeof templateIDMain); 
+
   // console.log("------------------------------------------", typeof is_reviewed);
   const [isSaved, setIsSaved] = useState(false);
   const handleDownloadSave = () => {

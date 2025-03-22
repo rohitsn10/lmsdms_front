@@ -50,7 +50,7 @@ const SendBackDialog = ({
   } else if (Array.isArray(users) && users.length > 0) {
     assignedUserName = users[0].first_name;
   }
-
+ 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <MDBox sx={{ textAlign: "center" }}>

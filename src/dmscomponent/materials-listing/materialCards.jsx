@@ -1,19 +1,13 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import {
-  CardContent,
-  Collapse,
-  Paper,
-  Typography,
-  Box,
-  Button,
-} from "@mui/material";
+import { CardContent, Collapse, Paper, Typography, Box, Button } from "@mui/material";
 import { Visibility, Edit, Delete, Add } from "@mui/icons-material";
 import useSectionMaterials from "../../hooks/materialHook"; // Import the hook
 import AddMaterialModal from "./createMaterialModal";
 import apiService from "services/apiService";
 import { useNavigate } from "react-router-dom";
 import MDButton from "components/MDButton";
+import moment from "moment/moment";
 
 const CollapsibleSection = ({
   open,
@@ -24,8 +18,7 @@ const CollapsibleSection = ({
   const [openAddMaterialModal, setOpenAddMaterialModal] = useState(false);
   const navigate = useNavigate();
   // Use the custom hook
-  const { materialItems, fetchMaterialSection, loading, error } =
-    useSectionMaterials(sectionID);
+  const { materialItems, fetchMaterialSection, loading, error } = useSectionMaterials(sectionID);
 
   // Remove `sectionID` dependency since it's static
   React.useEffect(() => {
@@ -58,15 +51,17 @@ const CollapsibleSection = ({
   };
   const deleteMaterial = async (trainingMaterialId) => {
     try {
-      const response = await apiService.delete(`/lms_module/update_training_material/${trainingMaterialId}`);
-      navigate(0)
+      const response = await apiService.delete(
+        `/lms_module/update_training_material/${trainingMaterialId}`
+      );
+      navigate(0);
       return response.data;
     } catch (error) {
-      console.error('Error deleting material:', error);
+      console.error("Error deleting material:", error);
       throw error;
     }
-  };  
-  
+  };
+
   // console.log("Material ID",materialItems)
   return (
     <Collapse in={open} timeout="auto" unmountOnExit>
@@ -122,7 +117,9 @@ const CollapsibleSection = ({
               </Typography>
               <Typography variant="body2">
                 <strong>Created At:</strong>{" "}
-                {new Date(material.material_created_at).toLocaleString()}
+                {material.material_created_at
+                  ? moment(material.material_created_at).format("DD/MM/YYYY HH:mm:ss")
+                  : "N/A"}
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "row", gap: "10px" }}>
                 <MDButton
@@ -158,7 +155,9 @@ const CollapsibleSection = ({
                   variant="contained"
                   startIcon={<Delete />}
                   size="small"
-                  onClick={()=>{deleteMaterial(material?.id)}}
+                  onClick={() => {
+                    deleteMaterial(material?.id);
+                  }}
                   sx={{
                     marginTop: 1,
                     color: "white !important",

@@ -13,13 +13,20 @@ import moment from "moment";
 import { useFetchTrainingsQuery } from "apilms/trainingApi"; // Update this path as needed
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import QuizIcon from "@mui/icons-material/Quiz";
 import WarningIcon from "@mui/icons-material/Warning";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import WhiteListDialog from "./whitelist-users";
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import FolderSharedOutlinedIcon from "@mui/icons-material/FolderSharedOutlined";
 import ChildDocumentsDialog from "layouts/authentication/document-listing/child-document";
 
@@ -48,7 +55,7 @@ const TrainingListing = () => {
 
   const handleWhiteListModalClose = () => {
     setWhiteListModalOpen(false);
-    setSelectedDocId(null)
+    setSelectedDocId(null);
   };
 
   const handleBlacklistModalClose = () => {
@@ -101,15 +108,13 @@ const TrainingListing = () => {
 
   const handleAssessmentClick = (rowId) => {
     // Get the document data for the selected row
-    const document = data?.document_data?.documents.find(doc => doc.id === rowId);
+    const document = data?.document_data?.documents.find((doc) => doc.id === rowId);
     setSelectedRowData(rowId);
     // console.log("rowwwwowow",rowId)
     // Check if the user has a failed quiz session for this document
     if (document && document.quiz_sessions) {
-      const userQuizSession = document.quiz_sessions.find(
-        session => session.user === user.id
-      );
-      
+      const userQuizSession = document.quiz_sessions.find((session) => session.user === user.id);
+
       if (userQuizSession && userQuizSession.status === "Failed") {
         // Show the failed assessment modal
         setFailedAssessmentModal(true);
@@ -151,13 +156,13 @@ const TrainingListing = () => {
     if (documentUrl) {
       if (documentUrl.is_parent) {
         // Navigate to parent document view if document has children
-        navigate("/parent-training-document-view", { 
-          state: { docId: item.docId, templateId: item.templateId } 
+        navigate("/parent-training-document-view", {
+          state: { docId: item.docId, templateId: item.templateId },
         });
       } else {
         // Navigate to regular document view if document has no children
-        navigate("/training-document-view", { 
-          state: { docId: item.docId, templateId: item.templateId } 
+        navigate("/training-document-view", {
+          state: { docId: item.docId, templateId: item.templateId },
         });
       }
     }
@@ -178,14 +183,17 @@ const TrainingListing = () => {
         created_date: moment(item.created_at).format("DD-MM-YY"),
         status: item.current_status_name,
         revision_date: item.revision_month,
-        effective_date: moment(item.created_at).format("DD-MM-YY"),
+        effective_date: item.effective_date
+          ? moment(item.effective_date).format("DD-MM-YY")
+          : "N/A",
+
         selected_template_url: item.selected_template_url,
         user_view: item.user_view,
         docId: item.id,
         templateId: item.select_template,
         quiz_sessions: item.quiz_sessions,
-        is_parent:item.is_parent,
-        quiz_count:item.quiz_count
+        is_parent: item.is_parent,
+        quiz_count: item.quiz_count,
       };
     });
 
@@ -311,25 +319,30 @@ const TrainingListing = () => {
           },
         ]
       : []),
-      ...(groupId === 7
-        ? [
-            {
-              field: "Whitlist Users",
-              headerName: "Whitelist User",
-              flex: 0.8,
-              headerAlign: "center",
-              renderCell: (params) => (
-                <MDBox display="flex" justifyContent="center">
-                  <IconButton color="secondary" onClick={()=>{handleWhiteListModalOpen(params.row.docId)}}>
-                    <AdminPanelSettingsIcon />
-                  </IconButton>
-                </MDBox>
-              ),
-              sortable: false,
-              filterable: false,
-            },
-          ]
-        : []),
+    ...(groupId === 7
+      ? [
+          {
+            field: "Whitlist Users",
+            headerName: "Whitelist User",
+            flex: 0.8,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <MDBox display="flex" justifyContent="center">
+                <IconButton
+                  color="secondary"
+                  onClick={() => {
+                    handleWhiteListModalOpen(params.row.docId);
+                  }}
+                >
+                  <AdminPanelSettingsIcon />
+                </IconButton>
+              </MDBox>
+            ),
+            sortable: false,
+            filterable: false,
+          },
+        ]
+      : []),
     // {
     //   field: "Assessment",
     //   headerName: "Assessment",
@@ -337,7 +350,7 @@ const TrainingListing = () => {
     //   headerAlign: "center",
     //   renderCell: (params) => {
     //     const isUserInView = params.row?.user_view?.some(view => view.user === user.id);
-        
+
     //     // Check if this document has a failed quiz session for the current user
     //     const document = data?.document_data?.documents.find(doc => doc.id === params.row.id);
     //     const userQuizSession = document?.quiz_sessions?.find(session => session.user === user.id);
@@ -372,21 +385,23 @@ const TrainingListing = () => {
       flex: 0.8,
       headerAlign: "center",
       renderCell: (params) => {
-        const isUserInView = params.row?.user_view?.some(view => view.user === user.id);
-        
+        const isUserInView = params.row?.user_view?.some((view) => view.user === user.id);
+
         // Check if this document has a failed quiz session for the current user
-        const document = data?.document_data?.documents.find(doc => doc.id === params.row.id);
-        const userQuizSession = document?.quiz_sessions?.find(session => session.user === user.id);
+        const document = data?.document_data?.documents.find((doc) => doc.id === params.row.id);
+        const userQuizSession = document?.quiz_sessions?.find(
+          (session) => session.user === user.id
+        );
         const hasFailedStatus = userQuizSession?.status === "Failed";
         const hasPassedStatus = userQuizSession?.status === "passed";
         const hasBlackListed = document?.training_assesment_attempted === true;
-        
+
         // Handler for blacklisted user clicks
         const handleBlacklistedClick = () => {
           // Show dialog for blacklisted users
           setBlacklistModalOpen(true);
         };
-        
+
         return (
           <MDBox display="flex" justifyContent="center">
             {hasPassedStatus ? (
@@ -394,15 +409,12 @@ const TrainingListing = () => {
                 <CheckCircleIcon style={{ color: "green" }} />
               </IconButton>
             ) : hasBlackListed ? (
-              <IconButton
-                color="default"
-                onClick={handleBlacklistedClick}
-              >
+              <IconButton color="default" onClick={handleBlacklistedClick}>
                 <WarningIcon style={{ color: "gray" }} />
               </IconButton>
             ) : (
               <IconButton
-                disabled={!isUserInView || params.row.quiz_count ==0} // Only enable if user is in view
+                disabled={!isUserInView || params.row.quiz_count == 0} // Only enable if user is in view
                 color={hasFailedStatus ? "warning" : "error"}
                 onClick={() => handleAssessmentClick(params.row.id)}
               >
@@ -414,7 +426,7 @@ const TrainingListing = () => {
       },
       sortable: false,
       filterable: false,
-    }
+    },
   ];
 
   return (
@@ -476,36 +488,39 @@ const TrainingListing = () => {
 
       {/* Regular Assessment Modal */}
       <Dialog
-  open={startAssessmentModal}
-  onClose={handleAssesmentModalClose}
-  aria-labelledby="alert-dialog-title"
-  aria-describedby="alert-dialog-description"
->
-  <DialogTitle id="alert-dialog-title">
-    {"Start Assessment?"}
-  </DialogTitle>
-  <DialogContent>
-    <DialogContentText sx={{
-      padding:"15px"
-    }} id="alert-dialog-description">
-      Are you sure you want to start the assessment?  
-      <br /><br />
-      <strong>Important:</strong> Once you start the exam:
-      <ul>
-        <li>You must complete and submit it before leaving.</li>
-        <li>If you close or exit the exam without submitting, you will be <strong>blacklisted</strong> and will not be able to attempt the exam again.</li>
-      </ul>
-    </DialogContentText>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={handleAssesmentModalClose}>
-      Cancel
-    </Button>  
-    <MDButton onClick={startAssessmentClick} autoFocus color="primary" variant="contained">
-      Start Assessment
-    </MDButton>
-  </DialogActions>
-    </Dialog>
+        open={startAssessmentModal}
+        onClose={handleAssesmentModalClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Start Assessment?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            sx={{
+              padding: "15px",
+            }}
+            id="alert-dialog-description"
+          >
+            Are you sure you want to start the assessment?
+            <br />
+            <br />
+            <strong>Important:</strong> Once you start the exam:
+            <ul>
+              <li>You must complete and submit it before leaving.</li>
+              <li>
+                If you close or exit the exam without submitting, you will be{" "}
+                <strong>blacklisted</strong> and will not be able to attempt the exam again.
+              </li>
+            </ul>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAssesmentModalClose}>Cancel</Button>
+          <MDButton onClick={startAssessmentClick} autoFocus color="primary" variant="contained">
+            Start Assessment
+          </MDButton>
+        </DialogActions>
+      </Dialog>
 
       {/* Failed Assessment Modal */}
       <Dialog
@@ -514,19 +529,21 @@ const TrainingListing = () => {
         aria-labelledby="failed-assessment-dialog-title"
         aria-describedby="failed-assessment-dialog-description"
       >
-        <DialogTitle id="failed-assessment-dialog-title" sx={{ display: 'flex', alignItems: 'center', color: 'error.main' }}>
+        <DialogTitle
+          id="failed-assessment-dialog-title"
+          sx={{ display: "flex", alignItems: "center", color: "error.main" }}
+        >
           <WarningIcon color="error" sx={{ mr: 1 }} />
           {"Assessment Failed"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="failed-assessment-dialog-description">
-            You have failed this assessment after 3 attempts. Please complete the required classroom activities before attempting again.
+            You have failed this assessment after 3 attempts. Please complete the required classroom
+            activities before attempting again.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleFailedAssessmentModalClose}>
-            Close
-          </Button>  
+          <Button onClick={handleFailedAssessmentModalClose}>Close</Button>
           {/* <Button onClick={goToClassroomActivities} color="primary" variant="contained" autoFocus>
             Go to Classroom Activities
           </Button> */}
@@ -534,33 +551,39 @@ const TrainingListing = () => {
       </Dialog>
       {/* Blacklisted Assessment Modal */}
       <Dialog
-  open={blacklistModalOpen}
-  onClose={handleBlacklistModalClose}
-  aria-labelledby="blacklisted-dialog-title"
-  aria-describedby="blacklisted-dialog-description"
->
-  <DialogTitle id="blacklisted-dialog-title" sx={{ display: 'flex', alignItems: 'center', color: 'error.main' }}>
-    <WarningIcon color="error" sx={{ mr: 1 }} />
-    {"Assessment Access Restricted"}
-  </DialogTitle>
-  <DialogContent>
-    <DialogContentText id="blacklisted-dialog-description">
-      You are blacklisted due to not submitting a previous assessment attempt. Please request DTC to whitelist your account to regain access.
-    </DialogContentText>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={handleBlacklistModalClose}>
-      Close
-    </Button>
-  </DialogActions>
-</Dialog>
+        open={blacklistModalOpen}
+        onClose={handleBlacklistModalClose}
+        aria-labelledby="blacklisted-dialog-title"
+        aria-describedby="blacklisted-dialog-description"
+      >
+        <DialogTitle
+          id="blacklisted-dialog-title"
+          sx={{ display: "flex", alignItems: "center", color: "error.main" }}
+        >
+          <WarningIcon color="error" sx={{ mr: 1 }} />
+          {"Assessment Access Restricted"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="blacklisted-dialog-description">
+            You are blacklisted due to not submitting a previous assessment attempt. Please request
+            DTC to whitelist your account to regain access.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleBlacklistModalClose}>Close</Button>
+        </DialogActions>
+      </Dialog>
       <ChildDocumentsDialog
         open={openChildDialog}
         onClose={() => setOpenChildDialog(false)}
         documentId={selectedRowData?.id || ""}
       />
-{/* Whitelist modal */}
-      <WhiteListDialog open={whiteListModalOpen} onClose={handleWhiteListModalClose} documentId={selectedDocId}/>
+      {/* Whitelist modal */}
+      <WhiteListDialog
+        open={whiteListModalOpen}
+        onClose={handleWhiteListModalClose}
+        documentId={selectedDocId}
+      />
     </MDBox>
   );
 };

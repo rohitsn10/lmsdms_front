@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import { DataGrid } from "@mui/x-data-grid";
@@ -18,6 +18,7 @@ import JobDescriptionDialog from "./job- description";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import TaskDescriptionDialog from "./approve-description";
 import DownloadIcon from "@mui/icons-material/Download";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   useCreateInductionCertificateMutation,
   useGetTrainingCompletionCertificateMutation,
@@ -26,12 +27,13 @@ import { toast } from "react-toastify";
 import Visibilityicon from "@mui/icons-material/Visibility";
 import SOPDialog from "./Document-listView";
 import AssignmentLateIcon from "@mui/icons-material/AssignmentLate";
+import { Edit } from "@mui/icons-material";
 // import { useGetTrainingCompletionCertificateQuery } from "apilms/workflowapi";
 const UsersListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { data,refetch, error, isLoading } = useUserListQuery();
+  const { data, refetch, error, isLoading } = useUserListQuery();
   const [selectedUser, setSelectedUser] = useState(null);
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
@@ -49,9 +51,9 @@ const UsersListing = () => {
   const [remark, setRemark] = useState("");
   const [downloadInductionCertificate] = useCreateInductionCertificateMutation();
   const [isSOPDialogOpen, setSOPDialogOpen] = useState(false);
-    useEffect(() => {
-      refetch();
-    }, []);
+  useEffect(() => {
+    refetch();
+  }, []);
   const [downloadTrainingCertificate] = useGetTrainingCompletionCertificateMutation();
   const formattedData = Array.isArray(data?.data)
     ? data.data.map((item, index) => ({
@@ -70,18 +72,23 @@ const UsersListing = () => {
         departmentId: item.depratment || "N/A",
         remark: item.remarks,
         depratment: item.department_name || "Not Assigned",
-        is_qualification:item.is_qualification || false,
-        is_induction_certificate:item.is_induction_certificate || false,
+        is_qualification: item.is_qualification || false,
+        is_induction_certificate: item.is_induction_certificate || false,
+        first_name: item.first_name,
+        last_name: item.last_name,
+        groups_list: item.groups_list?.map((group) => group.id).join(", ") || "N/A",
       }))
     : [];
 
-   
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
   const handleAddUser = () => {
     navigate("/add-user");
+  };
+  const handleEditUser = (user) => {
+    navigate("/update-user", { state: { user } });
   };
   const handleAssignDepartmentClick = (user) => {
     setSelectedUser(user); // Set selected user for the dialog
@@ -168,6 +175,7 @@ const UsersListing = () => {
     { field: "created_at", headerName: "Date", flex: 0.75, headerAlign: "center" },
     { field: "job_role", headerName: "Job Role", flex: 1, headerAlign: "center" },
     { field: "depratment", headerName: "Department", flex: 1, headerAlign: "center" },
+
     ...(groupId === 7
       ? [
           {
@@ -250,6 +258,7 @@ const UsersListing = () => {
           },
         ]
       : []),
+
     {
       field: "view_sop",
       headerName: "View SOP",
@@ -261,6 +270,7 @@ const UsersListing = () => {
         </IconButton>
       ),
     },
+
     ...(groupId === 7
       ? [
           {
@@ -282,6 +292,19 @@ const UsersListing = () => {
       : []),
   ];
 
+  if (hasPermission(userPermissions, "customuser", "isChange")) {
+    columns.push({
+      field: "edit",
+      headerName: "Edit",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <IconButton color="primary" onClick={() => handleEditUser(params.row)}>
+          <EditIcon />
+        </IconButton>
+      ),
+    });
+  }
   return (
     <MDBox p={3}>
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>

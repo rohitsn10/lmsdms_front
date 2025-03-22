@@ -78,22 +78,26 @@ const UnderApproveDocument = () => {
       return; // Exit if params or row is missing
     }
 
-    const { id, document_current_status, training_required, approval_status, select_template } =
+    const { id, document_current_status, training_required, approval_status, select_template,version,is_reviewed } =
       params.row;
-
+  // console.log("Template ID Test",typeof select_template)
     if (
       id === undefined ||
       document_current_status === undefined ||
       training_required === undefined ||
-      approval_status === undefined
+      approval_status === undefined ||
+      select_template === undefined 
     ) {
       console.error("Missing data in params.row:", params.row);
       return;
     }
 
-    navigate(
-      `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}&template_id=${select_template}`
-    );
+    // navigate(
+      // `/document-view/${id}?status=${document_current_status}&training_required=${training_required},&approval_status=${approval_status}&template_id=${select_template}`
+      navigate(
+        `/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}&is_reviewed=${is_reviewed}`
+      );
+    // );
   };
   const formatDate = (date) => {
     if (date) {
