@@ -39,6 +39,15 @@ export const lmsReportsAPI = createApi({
       }),
       transformResponse: (response) => response, 
     }),
+
+    getEmployeeTrainingExcel: builder.query({
+      query: () => ({
+        url: `lms_module/employee_training_excel`, // Adjust the URL based on your backend
+        method: 'GET',
+      }),
+      transformResponse: (response) => response, // Return raw response
+    }),
+
     getemployeeRecordlog:builder.query({
       query:()=>({
         url:`dms_module/employee_record_log`,
@@ -59,6 +68,7 @@ export const {
   useGetEmployeeJobRoleReportQuery,
  useGetEmployeeTrainingNeedIdentificationQuery,
  useGetTrainingAttendanceSheetQuery,
+ useGetEmployeeTrainingExcelQuery,
  useGetemployeeRecordlogQuery,
  useGetTrainingAttendanceClassSheetQuery,
 } = lmsReportsAPI;
