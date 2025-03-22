@@ -9,6 +9,7 @@ import MDButton from "components/MDButton";
 import PropTypes from "prop-types"; 
 import { useFetchParentDocumentsQuery } from "api/auth/documentApi";
 import moment from "moment";
+
 const ChildDocumentsDialog = ({ open, onClose, documentId }) => {
   const { data, error, isLoading, refetch } = useFetchParentDocumentsQuery(documentId, {
     skip: !open, 
@@ -24,17 +25,28 @@ const ChildDocumentsDialog = ({ open, onClose, documentId }) => {
     { field: "serial_number", headerName: "Sr. No.", flex: 0.5, headerAlign: "center" },
     { field: "document_title", headerName: "Document Name", flex: 1, headerAlign: "center" },
     { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
-    { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" },
+    { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" }, 
     { field: "revision_date", headerName: "Revision Date", flex: 1, headerAlign: "center" },
   ];
 
   const filteredData = data
-    ? data.map((item, index) => ({
-        ...item,
-        serial_number: index + 1, 
-        effective_date: item.effective_date ? moment(item.effective_date).format("DD/MM/YY") : "N/A",
-        revision_date: item.revision_date ? moment(item.revision_date).format("DD/MM/YY") : "N/A",
-      }))
+    ? data.map((item, index) => {
+        const effectiveDate = item.effective_date ? moment(item.effective_date) : null;
+        const revisionMonths = item.revision_month ? parseInt(item.revision_month, 10) : null;
+        
+        // Calculate revision_date only if effective_date and revision_month are valid
+        let revisionDate = "N/A";
+        if (effectiveDate && revisionMonths) {
+          revisionDate = effectiveDate.add(revisionMonths, "months").format("DD/MM/YY");
+        }
+
+        return {
+          ...item,
+          serial_number: index + 1,
+          effective_date: item.effective_date ? moment(item.effective_date).format("DD/MM/YY") : "N/A",
+          revision_date: revisionDate, // Dynamically calculated
+        };
+      })
     : [];
 
   return (

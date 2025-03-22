@@ -56,7 +56,7 @@ const ConditionalDialog = ({
     { skip: !isParent || !open || !documentId }
   );
   
-  // Check if all child documents are approved
+  // Check if all child documents are approved 
   const allChildrenApproved = React.useMemo(() => {
     if (!childDocuments || !Array.isArray(childDocuments) || childDocuments.length === 0) {
       return false;

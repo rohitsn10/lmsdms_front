@@ -135,7 +135,7 @@ function EditQuestion() {
         navigate("/trainingListing");
       }, 1500);
     } catch (error) {
-      toast.error("Failed to create question. Please try again.");
+      toast.false("Failed to create question. Please try again.");
     } finally {
       setOpenSignatureDialog(false);
     }
