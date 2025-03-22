@@ -67,7 +67,7 @@ const ParentTrainingDocumentView = () => {
   useEffect(() => {
     if (documents.length > 0 && currentDocIndex < documents.length) {
       const currentDoc = documents[currentDocIndex];
-      const timerDuration = currentDoc.isParent ? 600 : 180; // 600s (10min) or 180s (3min)
+      const timerDuration = currentDoc.isParent ? 8 : 4; // 600s (10min) or 180s (3min)
       setTimeLeft(timerDuration);
       setTimerComplete(false);
       fetchEditorConfig(currentDoc.id, currentDoc.select_template);

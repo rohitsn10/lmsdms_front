@@ -34,7 +34,7 @@ function AddQuestion() {
   const [answers, setAnswers] = useState([{ text: "", isCorrect: false }]);
   const [questionMarks, setQuestionMarks] = useState("");
   const [questionLanguage, setQuestionLanguage] = useState("");
-  const [status, setStatus] = useState("Active");
+  // const [status, setStatus] = useState("Active");
   const [createdAt, setCreatedAt] = useState(new Date().toISOString().slice(0, 10));
   const [createdBy, setCreatedBy] = useState(""); // Replace with actual user info if needed
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
@@ -96,10 +96,10 @@ function AddQuestion() {
       return;
     }
 
-    if (!status) {
-      toast.error("Please select a status.");
-      return;
-    }
+    // if (!status) {
+    //   toast.error("Please select a status.");
+    //   return;
+    // }
 
     if (questionType === "MCQ") {
       if (answers.length < 2) {
@@ -162,7 +162,7 @@ function AddQuestion() {
     formData.append("question_text", questionText);
     formData.append("question_type", questionType);
     formData.append("marks", questionMarks);
-    formData.append("status",status)
+    // formData.append("status",status)
     let options = null;
     let correct_answer = null;
 
@@ -403,7 +403,7 @@ function AddQuestion() {
                 </Select>
               </FormControl>
             </MDBox>
-            <MDBox mb={3}>
+            {/* <MDBox mb={3}>
               <FormControl component="fieldset" fullWidth>
                 <MDTypography variant="h6" fontWeight="medium">
                   Status
@@ -413,7 +413,7 @@ function AddQuestion() {
                   <FormControlLabel value="Inactive" control={<Radio />} label="Inactive" />
                 </RadioGroup>
               </FormControl>
-            </MDBox>
+            </MDBox> */}
             <MDBox mt={2} mb={1}>
               <MDButton variant="gradient" color="submit" fullWidth type="submit">
                 Submit

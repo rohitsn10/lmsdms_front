@@ -101,9 +101,16 @@ function EditQuiz() {
   }, [quiz, initialLoad]);
 
   // Set available questions from API response
+  // useEffect(() => {
+  //   if (data?.status && data?.data) {
+  //     setAvailableQuestions(data.data);
+  //   }
+  // }, [data]);
+
   useEffect(() => {
     if (data?.status && data?.data) {
-      setAvailableQuestions(data.data);
+      const filteredQuestions = data.data.filter(question => question.status);
+      setAvailableQuestions(filteredQuestions);
     }
   }, [data]);
 
