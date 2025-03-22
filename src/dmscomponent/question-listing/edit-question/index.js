@@ -40,12 +40,11 @@ function EditQuestion() {
       isCorrect: option.trim() === correctAnswer.trim(), // Mark correct answer
     }));
   });
-
   const [questionText, setQuestionText] = useState(state?.item?.fullData?.question_text || "");
   const [questionType, setQuestionType] = useState(state?.item?.question_type || "MCQ");
   const [questionMarks, setQuestionMarks] = useState(state?.item?.fullData?.marks || "");
   const [questionLanguage, setQuestionLanguage] = useState(state?.item?.language || "English");
-  const [status, setStatus] = useState(state?.item?.status ? "Active" : "Inactive");
+  const [status, setStatus] = useState(state?.item?.fullData?.status ? "true" : "false");
   const [createdAt, setCreatedAt] = useState(
     state?.question_created_at ? state.question_created_at : new Date().toISOString().slice(0, 10)
   );
@@ -366,8 +365,8 @@ function EditQuestion() {
                   Status
                 </MDTypography>
                 <RadioGroup row value={status} onChange={(e) => setStatus(e.target.value)}>
-                  <FormControlLabel value="Active" control={<Radio />} label="Active" />
-                  <FormControlLabel value="Inactive" control={<Radio />} label="Inactive" />
+                  <FormControlLabel value="true" control={<Radio />} label="Active" />
+                  <FormControlLabel value="false" control={<Radio />} label="Inactive" />
                 </RadioGroup>
               </FormControl>
             </MDBox>
