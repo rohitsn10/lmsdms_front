@@ -15,7 +15,7 @@ import { usePrintDocumentMutation } from "api/auth/printApi";
 import { useGetPrintersQuery } from "api/auth/PrinterApi";
 
 // Example issue types (Replace with actual options)
-const issueTypes = ["issue 1", "issue 2", "issue 3"];
+const issueTypes = ["CONTROLLED COPY", " DISPLAY COPY", "FOR INFORMATION ONLY" , "EXECUTION COPY"];
 
 function PrintDocument() {
   const [numberOfPrints, setNumberOfPrints] = useState(1);

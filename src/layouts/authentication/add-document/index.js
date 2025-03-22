@@ -200,6 +200,7 @@ function AddDocument() {
         training_required: trainingRequired.toLowerCase() === "yes", // Convert to boolean
         // visible_to_users: selectedUsers, // Assuming selectedUsers is an array
         parent_document: parentDocument,
+        // parent_document: [parentDocument], 
         equipment_id: equipmentId,
         product_code: productCode,
       };

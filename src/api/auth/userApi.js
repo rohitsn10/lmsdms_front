@@ -24,7 +24,14 @@ export const userApi = createApi({
             }),
             invalidatesTags: ['UserList'],
         }),
-
+        updateUser: builder.mutation({
+            query: (body) => ({
+                url: `user_profile/user_update/${body.id}`,
+                method: 'PUT',
+                body,
+            }),
+            invalidatesTags: ['UserList'],
+        }),
         userList: builder.query({
             query: () => 'user_profile/user_list',
             providesTags: ['UserList'], 
@@ -70,6 +77,7 @@ export const userApi = createApi({
 
 export const {
      useCreateUserMutation,
+     useUpdateUserMutation,
      useUserListQuery,
      useReviewerUsersQuery,
      useApproverUsersQuery,

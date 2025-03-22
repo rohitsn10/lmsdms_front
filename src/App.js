@@ -22,6 +22,7 @@ import Brandlogo from "assets/images/bp-logo.png";
 import Login from "./layouts/authentication/log-in/index.js";
 import DocumentView from "layouts/authentication/text- editor/index.js";
 import AddUser from "layouts/authentication/add-user";
+import EditUser from "layouts/authentication/user-listing/edit-user/index.js";
 import AddDepartment from "layouts/authentication/add-department";
 import AddDocument from "layouts/authentication/add-document";
 import ResetPassword from "layouts/authentication/forgot-password/index.js";
@@ -318,6 +319,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/document-view/:id" element={<DocumentView />} />
       <Route path="/add-user" element={<AddUser />} />
+      <Route path="/update-user" element={<EditUser />} />
       <Route path="/add-document" element={<AddDocument />} />
       <Route path="/edit-document" element={<EditDocument />} />
       <Route path="/add-department" element={<AddDepartment />} />
