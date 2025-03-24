@@ -17,14 +17,14 @@ function EffectiveDialog({ openDialog, selectedRow, handleCloseDialog, handleCon
     selectedRow?.id, 
     { skip: !selectedRow?.is_parent || !openDialog || !selectedRow?.id }
   );
-  
+  // console.log("++++++++",childDocuments)
   // Check if all child documents are effective
   const allChildrenEffective = useMemo(() => {
     if (!childDocuments || !Array.isArray(childDocuments) || childDocuments.length === 0) {
       return true; // If no children, allow effective
     }
     
-    return childDocuments.every(doc => doc.status === "Effective");
+    return childDocuments.every(doc => doc.document_current_status === 7 || doc.document_current_status === 12);
   }, [childDocuments]);
 
   // Combined check for button disabled state
@@ -90,7 +90,7 @@ function EffectiveDialog({ openDialog, selectedRow, handleCloseDialog, handleCon
                 {selectedRow.is_parent && !allChildrenEffective && childDocuments && Array.isArray(childDocuments) && childDocuments.length > 0 && (
                   <MDBox sx={{ mt: 2 }}>
                     <MDTypography variant="body2" color="error">
-                      All child documents must be Effective before making this document effective.
+                      All child documents must be Effective or Obsolete before making this document effective.
                     </MDTypography>
                   </MDBox>
                 )}

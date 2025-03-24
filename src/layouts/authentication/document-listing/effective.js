@@ -34,7 +34,7 @@ const ConditionalDialog = ({
     parentId, 
     { skip: !parentId || !open }
   );
-
+  // console.log(">>>>>>>>>",parentDocumentData)
   // Determine if the parent document allows release (current_status_name is "Release" or has effective_date)
   const canReleaseFromParent = React.useMemo(() => {
     if (!parentId || !parentDocumentData || !Array.isArray(parentDocumentData) || parentDocumentData.length === 0) {
@@ -42,7 +42,8 @@ const ConditionalDialog = ({
     }
     
     const parentDoc = parentDocumentData[0];
-    return parentDoc.current_status_name === "Release" || parentDoc.effective_date !== null;
+    // console.log(parentDoc)
+    return parentDoc.document_current_status === 6 || parentDoc.effective_date !== null;
   }, [parentId, parentDocumentData]);
 
   // Fetch child documents if this is a parent document
@@ -55,7 +56,7 @@ const ConditionalDialog = ({
     documentId, 
     { skip: !isParent || !open || !documentId }
   );
-  
+  // console.log(">>>>>",childDocuments)
   // Check if all child documents are approved 
   const allChildrenApproved = React.useMemo(() => {
     if (!childDocuments || !Array.isArray(childDocuments) || childDocuments.length === 0) {
@@ -64,11 +65,14 @@ const ConditionalDialog = ({
     
     // return childDocuments.every(doc => doc.status === "Approve");
     return childDocuments.every(doc => 
-      doc.status === "Approve" || 
-      doc.status === "Approved" || 
-      doc.status === "Effective" || 
-      doc.status === "Release" ||
-      doc.status === "Obsolete"  
+      // doc.status === "Approve" || 
+      // doc.status === "Approved" || 
+      // doc.status === "Effective" || 
+      // doc.status === "Release" ||
+      // doc.status === "Obsolete"  
+      doc.document_current_status == 7 || 
+      doc.document_current_status == 6 ||
+      doc.document_current_status == 12  
     );
   }, [childDocuments]);
 

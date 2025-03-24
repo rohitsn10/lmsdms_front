@@ -672,6 +672,7 @@ const DocumentListing = () => {
         onConfirm={handleObsoleteConfirm}
         documentTitle={selectedRow?.document_title || "Unknown Document"} // Pass document_title here
         documentId={selectedRow?.id || ""}
+        selectedRow={selectedRow}
       />
       <EffectiveDialog
         openDialog={openDialog}

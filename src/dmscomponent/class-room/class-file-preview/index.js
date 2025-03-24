@@ -2,21 +2,36 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Box, Typography, CircularProgress } from "@mui/material";
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { useUpdateClassroomPreviewMutation } from "apilms/classRoomApi";
+// import { useUpdateClassroomPreviewMutation } from "path-to-your-api/classRoomApi"; // Adjust import path as needed
+// useUpdateClassroomPreviewMutation
 const ClassFileView = () => {
   const location = useLocation();
   const newRowData = location.state?.rowData || null;
-
-  // Get the backend URL from environment variables
-  const BASE_URL = process.env.REACT_APP_APIKEY 
-
-  // Extract and construct the full PDF URL
+  const classroomId = newRowData?.classroom_id;
+  const BASE_URL = process.env.REACT_APP_APIKEY;
+  
   const pdfUrl = newRowData?.files?.length > 0 
-    // ? `${BASE_URL.replace(/\/$/, "")}${newRowData.files[0].upload_doc}` // Ensure no double slashes
-    ? `${newRowData.files[0].upload_doc}` // Ensure no double slashes
+    ? `${newRowData.files[0].upload_doc}` 
     : null;
 
   const [blobUrl, setBlobUrl] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [updateClassroomPreview] = useUpdateClassroomPreviewMutation();
+
+  useEffect(() => {
+    if (classroomId) {
+      updateClassroomPreview({ classroom_id: classroomId, is_preview: true })
+        .unwrap()
+        .then((response) => {
+          console.log("Classroom preview status updated:", response);
+        })
+        .catch((error) => {
+          console.error("Error updating classroom preview status:", error);
+        });
+    }
+  }, [classroomId, updateClassroomPreview]);
 
   useEffect(() => {
     if (pdfUrl) {
@@ -44,20 +59,20 @@ const ClassFileView = () => {
         <iframe src={blobUrl} width="800px" height="1000px" title="PDF Preview"></iframe>
       ) : (
         <Box sx={{ 
-  display: "flex", 
-  flexDirection: "column", 
-  alignItems: "center", 
-  justifyContent: "center", 
-  height: "250px", // Increased height for better spacing
-  width: "500px", 
-  margin: "50px auto", // Centered horizontally & added top margin
-  color: "#444", // Slightly darker text for better contrast
-  backgroundColor: "#f9f9f9", // Softer background
-  borderRadius: "12px", // Rounded corners for a modern look
-  padding: "20px", // Added padding for spacing
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
-  textAlign: "center" // Ensures text is properly centered
-}}>
+          display: "flex", 
+          flexDirection: "column", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          height: "250px",
+          width: "500px", 
+          margin: "50px auto",
+          color: "#444",
+          backgroundColor: "#f9f9f9",
+          borderRadius: "12px",
+          padding: "20px",
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          textAlign: "center"
+        }}>
           <PictureAsPdfIcon sx={{ fontSize: 80, color: "#d32f2f" }} /> 
           <Typography variant="h6" sx={{ mt: 2, fontWeight: "bold" }}>
             No PDF Available

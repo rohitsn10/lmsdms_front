@@ -95,6 +95,14 @@ export const classRoomApi = createApi({
     }),
     transformResponse: (response) => response.data,
   }),
+  updateClassroomPreview: builder.mutation({
+    query: ({ classroom_id, is_preview }) => ({
+      url: `lms_module/classroom_is_preview/${classroom_id}`,
+      method: 'PUT',
+      body: { is_preview },
+    }),
+    transformResponse: (response) => response,
+  }),
   }),
 });
 export const { 
@@ -108,4 +116,5 @@ export const {
   useCreateAttendanceMutation,
   useGetAttendanceQuery,
   useGetselecteduserQuery,
+  useUpdateClassroomPreviewMutation
 } = classRoomApi;
