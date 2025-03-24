@@ -58,14 +58,18 @@ import { useDispatch } from "react-redux";
 // Import the API hook for switching roles
 import { useRequestUserGroupListQuery, useUserSwitchRoleMutation } from "api/auth/switchRoleApi";
 import { setUserDetails } from "slices/userRoleSlice";
-import { useGetemployeeRecordlogQuery,useGetEmployeeTrainingExcelQuery} from "apilms/reportsApi";
+import { useGetemployeeRecordlogQuery, useGetEmployeeTrainingExcelQuery } from "apilms/reportsApi";
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const { data, error } = useGetemployeeRecordlogQuery();
   // Fetch data for Employee Training Excel Report
-  const { data: trainingData, error: trainingError, isLoading: trainingLoading } = useGetEmployeeTrainingExcelQuery();
+  const {
+    data: trainingData,
+    error: trainingError,
+    isLoading: trainingLoading,
+  } = useGetEmployeeTrainingExcelQuery();
   const route = useLocation().pathname.split("/").slice(1);
   const { user, role } = useAuth();
   const [roles, setRoles] = useState([]);
@@ -82,6 +86,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { data: rolesData, isLoading, isError } = useRequestUserGroupListQuery();
   // console.log("RolesData:::",rolesData)
   const { is_dms_user, is_lms_user, is_active } = useSelector((state) => state.userRole);
+  const group = user?.user_permissions?.group || {};
+  const groupId = group.id;
 
   const handleToggle = (event) => {
     dispatch2(
@@ -112,7 +118,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleCloseReportSubMenu = () => {
     setAnchorReportEl(null);
   };
-  
+
   const handleDownloadReport = async () => {
     if (isLoading) {
       toast.info("Generating the report, please wait...");
@@ -148,48 +154,45 @@ function DashboardNavbar({ absolute, light, isMini }) {
     }
   };
 
-
   const handleDownloadTrainingExcelReport = async () => {
     console.log("Fetching training report...");
 
     if (trainingLoading) {
-        toast.info("Generating the training report, please wait...");
-        return;
+      toast.info("Generating the training report, please wait...");
+      return;
     }
 
     if (trainingError) {
-        console.error("API Error:", trainingError);
-        toast.error("Error fetching employee training report.");
-        return;
+      console.error("API Error:", trainingError);
+      toast.error("Error fetching employee training report.");
+      return;
     }
 
     console.log("API Response:", trainingData);
 
     if (trainingData && trainingData.status && trainingData.data) {
-        const fileUrl = trainingData.data;
-        console.log("Downloading file from:", fileUrl);
+      const fileUrl = trainingData.data;
+      console.log("Downloading file from:", fileUrl);
 
-        try {
-            const response = await axios.get(fileUrl, { responseType: "blob" });
+      try {
+        const response = await axios.get(fileUrl, { responseType: "blob" });
 
-            const link = document.createElement("a");
-            const file = new Blob([response.data], { type: "application/vnd.ms-excel" });
-            link.href = URL.createObjectURL(file);
-            link.download = fileUrl.split("/").pop();
-            link.click();
+        const link = document.createElement("a");
+        const file = new Blob([response.data], { type: "application/vnd.ms-excel" });
+        link.href = URL.createObjectURL(file);
+        link.download = fileUrl.split("/").pop();
+        link.click();
 
-            toast.success("Training report downloaded successfully!");
-        } catch (err) {
-            console.error("Download Error:", err);
-            toast.error(`Failed to download training report: ${err.message}`);
-        }
+        toast.success("Training report downloaded successfully!");
+      } catch (err) {
+        console.error("Download Error:", err);
+        toast.error(`Failed to download training report: ${err.message}`);
+      }
     } else {
-        console.warn("Unexpected API Response Format:", trainingData);
-        toast.error("Failed to generate training report.");
+      console.warn("Unexpected API Response Format:", trainingData);
+      toast.error("Failed to generate training report.");
     }
-};
-
- 
+  };
 
   useEffect(() => {
     if (rolesData && rolesData.data) {
@@ -495,23 +498,30 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 </MenuItem>
 
                 {/* Report menu item with submenu */}
-                <MenuItem onClick={handleOpenReportSubMenu}>Report</MenuItem>
-                <Menu
-                  anchorEl={anchorReportEl}
-                  open={Boolean(anchorReportEl)}
-                  onClose={handleCloseReportSubMenu}
-                  MenuListProps={{
-                    "aria-labelledby": "report-menu-item",
-                  }}
-                >
-                  <MenuItem onClick={handleDownloadReport}>Employee record log Report</MenuItem>
-                  <MenuItem onClick={handleDownloadTrainingExcelReport}> Employee Training Excel Report</MenuItem>
-                </Menu>
+                {groupId === 7 && (
+                  <>
+                    <MenuItem onClick={handleOpenReportSubMenu}>Report</MenuItem>
+                    <Menu
+                      anchorEl={anchorReportEl}
+                      open={Boolean(anchorReportEl)}
+                      onClose={handleCloseReportSubMenu}
+                      MenuListProps={{
+                        "aria-labelledby": "report-menu-item",
+                      }}
+                    >
+                      <MenuItem onClick={handleDownloadReport}>Employee Record Log Report</MenuItem>
+                      <MenuItem onClick={handleDownloadTrainingExcelReport}>
+                        Employee Training Excel Report
+                      </MenuItem>
+                    </Menu>
+                  </>
+                )}
+
                 <MenuItem component={RouterLink} to="/logout">
                   Logout
                 </MenuItem>
               </Menu>
-            </MDBox>  
+            </MDBox>
           </MDBox>
         )}
       </Toolbar>

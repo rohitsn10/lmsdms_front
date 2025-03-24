@@ -11,7 +11,7 @@ import "react-toastify/dist/ReactToastify.css"; // Import toast styles
 const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
     const [reason, setReason] = useState("");
     const [approveRevise, { isLoading }] = useApproveReviseMutation();
-   console.log("roww",row)
+    const [remarks, setRemark] = useState(""); 
     useEffect(() => {
         if (row) {
             setReason(row?.revisereason || ""); 
@@ -21,10 +21,11 @@ const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
     const handleApprove = async () => {
         try {
             await approveRevise({
-                document_id: row?.id,
+                document_id: row?.id, 
                 status_id: 10,
                 request_action_id: row?.revise_request_id,
                 action_status: "approved",
+                remarks,
             }).unwrap();
             
             toast.success("Revision Approved Successfully!");
@@ -43,6 +44,7 @@ const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
                 status_id: 11,
                 request_action_id: row?.revise_request_id,
                 action_status: "rejected",
+                remarks,
             }).unwrap();
             
             toast.success("Revision Rejected Successfully!");
@@ -80,6 +82,18 @@ const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
                                 required
                             />
                         </MDBox>
+                        <MDBox sx={{ marginTop: 2 }}>
+                        <TextField
+                            fullWidth
+                            label="Remark"
+                            variant="outlined"
+                            value={remarks}
+                            onChange={(e) => setRemark(e.target.value)}
+                            multiline
+                            rows={3}
+                            placeholder="Enter your remark "
+                        />
+                    </MDBox>
                     </DialogContent>
 
                     <DialogActions>

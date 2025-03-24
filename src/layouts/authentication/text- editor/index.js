@@ -115,7 +115,7 @@ const DocumentView = () => {
     //   "against user groups:",
     //   userGroupIds
     // );
-    return requiredGroupIds.some((id) => userGroupIds.includes(id));
+    return requiredGroupIds.some((id) => userGroupIds.includes(id)); 
   };
 
   useEffect(() => {

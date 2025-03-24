@@ -97,10 +97,11 @@ function AddDocument() {
     if (!title.trim()) newErrors.title = "Title is required.";
     if (!type) newErrors.type = "Type is required.";
     if (!description.trim()) newErrors.description = "Description is required.";
-    if (!revisionMonth || revisionMonth <= 0) newErrors.revisionMonth = "Revision month must be a positive number.";
+    if (!revisionMonth || revisionMonth <= 0)
+      newErrors.revisionMonth = "Revision month must be a positive number.";
     if (!workflow) newErrors.workflow = "Workflow is required.";
     if (!template) newErrors.template = "Template is required.";
-    
+
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
       toast.error("Please fill all required fields.");
@@ -122,9 +123,18 @@ function AddDocument() {
     }
   };
   const handleRevisionMonthChange = (e) => {
-    const monthsToAdd = parseInt(e.target.value, 10);
+    const value = e.target.value;
 
-    // Allow 0 or positive numbers, but display an error for negative numbers or invalid input
+    // Allow empty input for backspacing
+    if (value === "") {
+      setRevisionMonth(""); // Let user delete input
+      setErrors((prevErrors) => ({ ...prevErrors, revisionMonth: undefined })); // Clear error
+      return;
+    }
+
+    const monthsToAdd = parseInt(value, 10);
+
+    // Allow only non-negative numbers
     if (isNaN(monthsToAdd) || monthsToAdd < 0) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -133,24 +143,22 @@ function AddDocument() {
       return;
     }
 
-    // Clear any previous error for revisionMonth
+    // Clear previous errors if valid
     setErrors((prevErrors) => ({ ...prevErrors, revisionMonth: undefined }));
 
     const currentDate = new Date();
 
     if (monthsToAdd === 0) {
-      // If the input is 0, set the revisionTime to the current date (or you can choose to leave it empty)
       setRevisionTime(currentDate.toISOString().split("T")[0]);
     } else {
-      // If it's a positive number, calculate the new revision date
       currentDate.setMonth(currentDate.getMonth() + monthsToAdd);
       setRevisionTime(currentDate.toISOString().split("T")[0]);
     }
 
-    // Set the revisionMonth state to the user input (including 0)
-    setRevisionMonth(monthsToAdd);
+    // Set the valid input
+    setRevisionMonth(value);
   };
- 
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
@@ -200,7 +208,7 @@ function AddDocument() {
         training_required: trainingRequired.toLowerCase() === "yes", // Convert to boolean
         // visible_to_users: selectedUsers, // Assuming selectedUsers is an array
         parent_document: parentDocument,
-        // parent_document: [parentDocument], 
+        // parent_document: [parentDocument],
         equipment_id: equipmentId,
         product_code: productCode,
       };
@@ -316,20 +324,16 @@ function AddDocument() {
                   }}
                   disabled={type === 1} // Disable Parent Document dropdown if Type is 1
                 >
-                 
-                  {alldocument?.map((doc) => 
-                    {
-                      if(
-                        doc.status == "Effective" ||
-                         doc.status == "Obsolete"
-                      ){
-                        return null
-                      }
-                      return(<MenuItem key={doc.id} value={doc.id}>
-                      {doc.document_title}
-                    </MenuItem>)}
-                  )}
-                 
+                  {alldocument?.map((doc) => {
+                    if (doc.status == "Effective" || doc.status == "Obsolete") {
+                      return null;
+                    }
+                    return (
+                      <MenuItem key={doc.id} value={doc.id}>
+                        {doc.document_title}
+                      </MenuItem>
+                    );
+                  })}
                 </Select>
 
                 {/* Show message when Parent Document is not required */}
@@ -399,12 +403,14 @@ function AddDocument() {
                 type="number"
                 label="Revision Month"
                 value={revisionMonth}
-                onChange={handleRevisionMonthChange} // Use the new handler
+                onChange={handleRevisionMonthChange}
                 error={Boolean(errors.revisionMonth)}
                 helperText={errors.revisionMonth}
                 fullWidth
                 inputProps={{
                   min: 0,
+                  style: { appearance: "textfield" }, // Removes number input controls
+                  onWheel: (e) => e.target.blur(), // Prevents scroll when focused
                 }}
               />
             </MDBox>
@@ -574,7 +580,6 @@ function AddDocument() {
         />
 
         {/* Toast Notifications */}
-        
       </Card>
     </BasicLayout>
   );

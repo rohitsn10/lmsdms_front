@@ -10,24 +10,23 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
+import { toast } from "react-toastify"; // Import toast notification
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
-import { useReviewerUsersQuery, useApproverUsersQuery, useDocAdminUsersQuery } from "api/auth/userApi"; // Import the hooks
+import { useReviewerUsersQuery, useApproverUsersQuery, useDocAdminUsersQuery } from "api/auth/userApi";
 
 const SelectUserDialog = ({ open, onClose, onConfirm }) => {
-  const [approver, setApprover] = useState(""); // State for Approver selection
-  const [reviewer, setReviewer] = useState([]); // State for Reviewer selection (multiple)
-  const [docAdmin, setDocAdmin] = useState(""); // State for Document Admin selection
-  const [error, setError] = useState(""); // State to handle any validation errors
+  const [approver, setApprover] = useState("");
+  const [reviewer, setReviewer] = useState([]); // Multiple selection
+  const [docAdmin, setDocAdmin] = useState("");
+  const [error, setError] = useState("");
 
-  // Use the API hooks to fetch the data
   const { data: approverData, isLoading: isLoadingApprover } = useApproverUsersQuery();
   const { data: reviewerData, isLoading: isLoadingReviewer } = useReviewerUsersQuery();
   const { data: docAdminData, isLoading: isLoadingDocAdmin } = useDocAdminUsersQuery();
 
   useEffect(() => {
-    // Reset selections when the dialog is reopened
     if (open) {
       setApprover("");
       setReviewer([]);
@@ -37,14 +36,17 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
   }, [open]);
 
   const handleConfirm = () => {
-    if (!approver || reviewer.length === 0 || !docAdmin) {
-      setError("All fields are required"); // Validation if any selection is missing
+    if (!approver || reviewer.length < 2 || !docAdmin) {
+      setError("All fields are required");
+      if (reviewer.length < 2) {
+        toast.error("Select at least 2 reviewers!");
+      }
       return;
     }
 
-    setError(""); // Clear any previous error
-    onConfirm({ approver, reviewer, docAdmin }); // Pass the selected users to the parent component
-    onClose(); // Close the dialog after confirmation
+    setError("");
+    onConfirm({ approver, reviewer, docAdmin });
+    onClose();
   };
 
   return (
@@ -57,17 +59,17 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
 
       <form onSubmit={(e) => e.preventDefault()}>
         <DialogContent>
-                  {/* Reviewer Dropdown (Multiple Selection) */}
-                  <MDBox mb={3}>
+          {/* Reviewer Dropdown (Multiple Selection) */}
+          <MDBox mb={3}>
             <FormControl fullWidth margin="dense" variant="outlined">
-              <InputLabel id="select-reviewer-label">Select Reviewer</InputLabel>
+              <InputLabel id="select-reviewer-label">Select Reviewer (Min: 2)</InputLabel>
               <Select
-                labelId="select-reviewer-label"
-                id="select-reviewer"
+                labelId="select-reviewer-label  (Min: 2)"
+                id="select-reviewer  (Min: 2)"
                 multiple
                 value={reviewer}
                 onChange={(e) => setReviewer(e.target.value)}
-                input={<OutlinedInput label="Select Reviewer" />}
+                input={<OutlinedInput label="Select Reviewer  (Min: 2)" />}
                 sx={{
                   minWidth: 200,
                   height: "3rem",
@@ -96,7 +98,7 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
               </Select>
             </FormControl>
           </MDBox>
-          
+
           {/* Approver Dropdown */}
           <MDBox mb={3}>
             <FormControl fullWidth margin="dense" variant="outlined">
@@ -127,7 +129,6 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
               </Select>
             </FormControl>
           </MDBox>
-
 
           {/* Doc Admin Dropdown */}
           <MDBox mb={3}>
@@ -171,11 +172,11 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
         <DialogActions>
           <MDButton
             onClick={() => {
-              setApprover(""); // Clear approver field
-              setReviewer([]); // Clear reviewer field (multiple)
-              setDocAdmin(""); // Clear doc admin field
-              setError(""); // Clear error messages
-              onClose(); // Close the dialog
+              setApprover("");
+              setReviewer([]);
+              setDocAdmin("");
+              setError("");
+              onClose();
             }}
             color="error"
             sx={{ marginRight: "10px" }}
@@ -188,6 +189,7 @@ const SelectUserDialog = ({ open, onClose, onConfirm }) => {
               color="submit"
               fullWidth
               onClick={handleConfirm}
+              disabled={reviewer.length < 2} // Disable button if fewer than 2 reviewers are selected
             >
               Confirm Selection
             </MDButton>

@@ -72,6 +72,9 @@ export const userApi = createApi({
                 body: { user_id: userId },
             }),
         }),
+        userIdWisewithout: builder.query({
+            query: ({ userId,  }) => `lms_module/classroom_without_assesment/${userId}`,
+        }),
     }),
 });
 
@@ -86,4 +89,5 @@ export const {
      useUserIdWiseNoOfAttemptsMutation,
      useUserIdWiseResultQuery,
      useUserIdWiseNoOfClassAttemptsMutation,
+     useUserIdWisewithoutQuery,
      } = userApi;

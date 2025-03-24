@@ -221,7 +221,7 @@ const ClassroomListing = () => {
                 //   console.log(params.row)
                 // }}
 
-                disabled={params.row.is_assesment === "Without Assessment" || params.row.document !== null}// Disable if 'is_assesment' is 'With Assessment'
+                disabled={params.row.is_assesment === "Without Assessment" || params.row.document !== null || params.row.is_all_completed}// Disable if 'is_assesment' is 'With Assessment'
               >
                 Questions
               </MDButton>
@@ -241,7 +241,7 @@ const ClassroomListing = () => {
                 variant="outlined"
                 color="secondary"
                 onClick={() => navigate("/class-quiz", { state: { classroom: params.row } })}
-                disabled={params.row.is_assesment === "Without Assessment" || params.row.document !== null} // Disable if 'is_assesment' is 'With Assessment'
+                disabled={params.row.is_assesment === "Without Assessment" || params.row.document !== null || params.row.is_all_completed} // Disable if 'is_assesment' is 'With Assessment'
               >
                 Quiz
               </MDButton>
@@ -279,6 +279,7 @@ const ClassroomListing = () => {
             variant="outlined"
             color="success"
             onClick={() => handleDownloadAttendanceSheet(params.row.document, params.row.classroom_id)}
+            disabled={!params.row.is_all_completed}
           >
             Attendance Sheet
           </MDButton>

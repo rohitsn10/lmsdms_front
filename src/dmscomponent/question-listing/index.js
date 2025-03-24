@@ -102,12 +102,12 @@ const QuestionListing = () => {
           >
             <EditIcon />
           </IconButton>
-          <IconButton
+          {/* <IconButton
             color="error"
             onClick={() => handleDeleteQuestion(params.row.id)} // Pass the question ID
           >
             <DeleteIcon />
-          </IconButton>
+          </IconButton> */}
         </MDBox>
       ),
       sortable: false,
