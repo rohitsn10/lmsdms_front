@@ -30,11 +30,11 @@ import { toast, ToastContainer } from "react-toastify";
 function EditQuestion() {
   const { state } = useLocation(); // Get the passed state from location
   const navigate = useNavigate();
-  console.log(state.id);
+  const documnetId = state.item.fullData.document;
+  console.log("++++++++++++++++++++++++++",documnetId);
   const [answers, setAnswers] = useState(() => {
     const optionsArray = state?.item?.fullData?.options?.split(",") || [];
     const correctAnswer = state?.item?.fullData?.correct_answer;
-
     return optionsArray.map((option) => ({
       text: option,
       isCorrect: option.trim() === correctAnswer.trim(), // Mark correct answer
@@ -131,7 +131,7 @@ function EditQuestion() {
       }).unwrap();
       toast.success("Question updated successfully!");
       setTimeout(() => {
-        navigate("/trainingListing");
+        navigate(`/questions/${documnetId}`);
       }, 1500);
     } catch (error) {
       toast.false("Failed to create question. Please try again.");
