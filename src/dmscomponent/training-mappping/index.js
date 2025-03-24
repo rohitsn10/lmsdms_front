@@ -393,7 +393,7 @@ const TrainingMapping = () => {
       </Box>
       
       {/* Summary */}
-      {selectedUser && (
+      {/* {selectedUser && (
         <Alert severity="info" sx={{ mt: 3 }}>
           <Typography variant="body2">
             {assignedJobRoles.length > 0 ? (
@@ -401,9 +401,9 @@ const TrainingMapping = () => {
             ) : (
               <>No job roles currently assigned to {getUserName()}</>
             )}
-          </Typography>
+          </Typography>   
         </Alert>
-      )}
+      )} */}
     </Paper>
   );
 };

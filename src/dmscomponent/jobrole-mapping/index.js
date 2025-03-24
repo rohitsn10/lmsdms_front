@@ -45,7 +45,7 @@ const JobRoleMapping = () => {
   const { data: jobRoleData, isLoading: jobRoleLoading, refetch: refetchJobRoles } = useGetJobRoleQuery();
   const [assignTrainings] = useTrainingAssignJobroleMutationMutation();
   // console.log()
-  // Fetch already assigned trainings when job role is selected
+  // Fetch already assigned trainings when job role is selected 
   const { 
     data: assignedTrainingData, 
     isLoading: assignedTrainingIsLoading,
@@ -430,17 +430,17 @@ const JobRoleMapping = () => {
       </Box>
       
       {/* Summary */}
-      {selectedJobRole && (
+      {/* {selectedJobRole && (
         <Alert severity="info" sx={{ mt: 3 }}>
           <Typography variant="body2">
             {assignedTrainings.length > 0 ? (
               <>Ready to assign {assignedTrainings.length} training{assignedTrainings.length !== 1 ? 's' : ''} to {getJobRoleName()}</>
             ) : (
               <>No trainings currently assigned to {getJobRoleName()}</>
-            )}
+            )} 
           </Typography>
         </Alert>
-      )}
+      )} */}
     </Paper>
   );
 };
