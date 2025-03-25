@@ -1,40 +1,27 @@
-import React, { useState, useEffect } from "react";
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Checkbox,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Button, 
-  Box,
-  Typography,
-  Paper,
-  Divider,
-  IconButton,
-  Chip,
-  Alert,
-  Tooltip,
-  CircularProgress,
-} from "@mui/material";
+import React, { useState, useEffect } from 'react';
+import { 
+  Paper, Typography, Divider, Card, CardHeader, CardContent, 
+  FormControl, InputLabel, Select, MenuItem, Box, 
+  List, ListItem, ListItemIcon, ListItemText, 
+  Checkbox, Button, Alert, CircularProgress, 
+  IconButton, Chip, Tooltip 
+} from '@mui/material';
 import {
   ArrowForward as ArrowForwardIcon,
   Delete as DeleteIcon,
   Save as SaveIcon,
   Info as InfoIcon,
 } from "@mui/icons-material";
-import { useFetchTrainingsQuery } from "apilms/trainingApi";
-import { useGetJobRoleQuery } from "apilms/jobRoleApi";
-import { useTrainingAssignJobroleMutationMutation, useTrainingAssignJobroleQuery } from "apilms/MappingApi";
 import { toast } from "react-toastify";
-import MDButton from "components/MDButton";
+
+// Assuming these hooks are imported from your API slice
 import { useFetchTrainingWithQuizQuery } from "apilms/trainingApi";
+import { useGetJobRoleQuery } from "apilms/jobRoleApi";
+import { 
+  useTrainingAssignJobroleMutationMutation, 
+  useTrainingAssignJobroleQuery 
+} from "apilms/MappingApi";
+import MDButton from 'components/MDButton';
 
 const JobRoleMapping = () => {
   const [selectedJobRole, setSelectedJobRole] = useState("");
@@ -42,12 +29,19 @@ const JobRoleMapping = () => {
   const [assignedTrainings, setAssignedTrainings] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: trainingData, isLoading: trainingLoading, refetch: refetchTrainings } = useFetchTrainingsQuery();
-  const { data: jobRoleData, isLoading: jobRoleLoading, refetch: refetchJobRoles } = useGetJobRoleQuery();
-  // const { data: trainingData, isLoading: trainingLoading, refetch: refetchTrainings } = useFetchTrainingWithQuizQuery();
-  const [assignTrainings] = useTrainingAssignJobroleMutationMutation();
-  // console.log()
-  // Fetch already assigned trainings when job role is selected 
+  // Fetch queries
+  const { 
+    data: trainingData, 
+    isLoading: trainingLoading, 
+    refetch: refetchTrainings 
+  } = useFetchTrainingWithQuizQuery();
+
+  const { 
+    data: jobRoleData, 
+    isLoading: jobRoleLoading, 
+    refetch: refetchJobRoles 
+  } = useGetJobRoleQuery();
+
   const { 
     data: assignedTrainingData, 
     isLoading: assignedTrainingIsLoading,
@@ -56,42 +50,30 @@ const JobRoleMapping = () => {
     skip: !selectedJobRole 
   });
 
+  const [assignTrainings] = useTrainingAssignJobroleMutationMutation();
+
+  // Initial data fetching
   useEffect(() => {
     refetchTrainings();
     refetchJobRoles();
-    if (selectedJobRole) {
-      refetchAssignedTrainings();
-    }
   }, []);
 
-    // Refetch assigned trainings whenever job role changes
-    useEffect(() => {
-      if (selectedJobRole) {
-        refetchAssignedTrainings();
-      }
-    }, [selectedJobRole]);
-
-      // After successful assignment, refetch trainings and assigned trainings
-  const handleSuccessfulUpdate = () => {
-    refetchTrainings();
+  // Refetch assigned trainings when job role changes
+  useEffect(() => {
     if (selectedJobRole) {
       refetchAssignedTrainings();
     }
-  };
+  }, [selectedJobRole]);
 
-
-  // Initialize assigned trainings when job role changes or when fetching completes
+  // Update assigned trainings based on API data
   useEffect(() => {
     if (selectedJobRole && assignedTrainingData?.documents) {
-      // Extract document_id from each assigned training
-      const existingAssignments = assignedTrainingData.documents.map(doc => doc.document_id);
+      const existingAssignments = assignedTrainingData.documents.map(doc => doc.id);
       setAssignedTrainings(existingAssignments);
     } else if (selectedJobRole && !assignedTrainingIsLoading) {
-      // Clear assignments if no data is found
       setAssignedTrainings([]);
     }
   }, [selectedJobRole, assignedTrainingData, assignedTrainingIsLoading]);
-
 
   // Reset selections when training data changes
   useEffect(() => {
@@ -100,39 +82,38 @@ const JobRoleMapping = () => {
     }
   }, [trainingData]);
 
+  // Event Handlers
   const handleJobRoleChange = (e) => {
     const newJobRole = e.target.value;
     setSelectedJobRole(newJobRole);
-    // Reset selections when job role changes
     setSelectedTrainings([]);
   };
 
   const handleAssign = () => {
-    setAssignedTrainings((prev) => [...prev, ...selectedTrainings]);
+    setAssignedTrainings(prev => [...new Set([...prev, ...selectedTrainings])]);
     setSelectedTrainings([]);
   };
 
   const handleUnassign = (trainingId) => {
-    setAssignedTrainings((prev) => prev.filter((id) => id !== trainingId));
+    setAssignedTrainings(prev => prev.filter(id => id !== trainingId));
   };
 
   const handleToggleSelect = (trainingId) => {
-    setSelectedTrainings((prev) => 
+    setSelectedTrainings(prev => 
       prev.includes(trainingId)
         ? prev.filter(id => id !== trainingId)
         : [...prev, trainingId]
     );
   };
-  
+
   const handleSelectAll = () => {
-    const availableTrainings = getAvailableTrainings();
-    const availableIds = availableTrainings.map(training => training.id || training.document_id);
+    const availableIds = getAvailableTrainings().map(training => training.id);
     
-    if (availableIds.length === selectedTrainings.length) {
-      setSelectedTrainings([]);
-    } else {
-      setSelectedTrainings(availableIds);
-    }
+    setSelectedTrainings(
+      availableIds.length === selectedTrainings.length 
+        ? [] 
+        : availableIds
+    );
   };
 
   const handleSubmit = async () => {
@@ -141,11 +122,6 @@ const JobRoleMapping = () => {
       return;
     }
     
-    // if (assignedTrainings.length === 0) {
-    //   toast.warning("Please assign at least one training");
-    //   return;
-    // }
-    
     setIsSubmitting(true);
     try {
       await assignTrainings({ 
@@ -153,8 +129,8 @@ const JobRoleMapping = () => {
         document_ids: assignedTrainings 
       });
       toast.success("Training assigned successfully!");
-      // Don't reset assigned trainings as they're now persisted
-      handleSuccessfulUpdate();
+      refetchTrainings();
+      refetchAssignedTrainings();
     } catch (err) {
       toast.error("Error assigning training");
     } finally {
@@ -162,62 +138,41 @@ const JobRoleMapping = () => {
     }
   };
 
-  // Get the job role name for display
+  // Utility Functions
   const getJobRoleName = () => {
     if (!selectedJobRole || !jobRoleData?.data) return "";
     const jobRole = jobRoleData.data.find(job => job.id === selectedJobRole);
     return jobRole?.job_role_name || "";
   };
 
-  // Filter out already assigned trainings from available list
   const getAvailableTrainings = () => {
     if (!trainingData?.document_data?.documents) return [];
     
-    return trainingData.document_data.documents.filter(training => {
-      const trainingId = training.id || training.document_id;
-      return !assignedTrainings.includes(trainingId);
-    });
+    return trainingData.document_data.documents.filter(training => 
+      !assignedTrainings.includes(training.id)
+    );
   };
 
-  // Get training objects for assigned IDs
-  // const getAssignedTrainingObjects = () => {
-  //   if (assignedTrainingData?.documents) {
-  //     return assignedTrainingData.documents;
-  //   }
-  //       if (!trainingData?.document_data?.documents) return [];
-  //   console.log("NENENE",assignedTrainings)
-  //   return assignedTrainings.map(id => {
-  //     const training = trainingData.document_data.documents.find(t => 
-  //       (t.id === id || t.document_id === id)
-  //     );
-  //     return training;
-  //   }).filter(Boolean);
-  // };
   const getAssignedTrainingObjects = () => {
     if (!trainingData?.document_data?.documents) return [];
     
-    return assignedTrainings.map(id => {
-      const training = trainingData.document_data.documents.find(t => 
-        t.id === id || t.document_id === id
-      );
-      return training;
-    }).filter(Boolean);
+    return assignedTrainings.map(id => 
+      trainingData.document_data.documents.find(t => t.id === id)
+    ).filter(Boolean);
   };
 
-  // Normalize training object structure from different data sources
-  const normalizeTraining = (training) => {
-    return {
-      id: training.id || training.document_id,
-      title: training.document_title,
-      type: training.document_type || 'Training Document',
-      status: training.document_current_status_name || null
-    };
-  };
+  const normalizeTraining = (training) => ({
+    id: training.id,
+    title: training.document_title,
+    type: training.document_type || 'SOP',
+    status: training.document_current_status_name || null,
+    version: training.version
+  });
 
   return (
     <Paper elevation={3} sx={{ maxWidth: 900, mx: "auto", my: 4, p: 3 }}>
       <Typography variant="h4" component="h1" gutterBottom align="center" color="primary">
-        Job Role   Training Mapping
+        Job Role Training Mapping
       </Typography>
       <Divider sx={{ mb: 4 }} />
       
@@ -234,16 +189,19 @@ const JobRoleMapping = () => {
         />
         <CardContent>
           <FormControl fullWidth variant="outlined">
-            <InputLabel id="job-role-label">Job Role</InputLabel>
+            <InputLabel
+             id="job-role-label">Job Role</InputLabel>
             <Select
               labelId="job-role-label"
               value={selectedJobRole}
               onChange={handleJobRoleChange}
               label="Job Role"
               disabled={jobRoleLoading}
-              sx={{
-                padding:'10px'
-              }}
+              sx={
+                {
+                  p:2
+                }
+              }
             >
               {jobRoleData?.data?.map((job) => (
                 <MenuItem key={job.id} value={job.id}>
@@ -276,7 +234,9 @@ const JobRoleMapping = () => {
                 onClick={handleSelectAll}
                 disabled={trainingLoading || getAvailableTrainings().length === 0}
               >
-                {selectedTrainings.length === getAvailableTrainings().length ? 'Deselect All' : 'Select All'}
+                {selectedTrainings.length === getAvailableTrainings().length 
+                  ? 'Deselect All' 
+                  : 'Select All'}
               </Button>
             }
           />
@@ -314,8 +274,8 @@ const JobRoleMapping = () => {
                         />
                       </ListItemIcon>
                       <ListItemText 
-                        primary={normalizedTraining.title} 
-                        // secondary={normalizedTraining.type}
+                        primary={`${normalizedTraining.title} (v${normalizedTraining.version})`} 
+                        secondary={normalizedTraining.type}
                       />
                     </ListItem>
                   );
@@ -377,26 +337,15 @@ const JobRoleMapping = () => {
                       }}
                     >
                       <ListItemText 
-                        primary={normalizedTraining.title}
-                        sx={{
-                          padding:'10px'
-                        }}
-                        secondary={
-                          <Box component="span">
-                            {/* <Typography variant="body2" component="span">
-                              {normalizedTraining.type}
-                            </Typography> */}
-                            {normalizedTraining.status && (
-                              <Chip 
-                                size="small" 
-                                label={normalizedTraining.status} 
-                                color="info" 
-                                variant="outlined"
-                                sx={{ ml: 1, height: 20 }}
-                              />
-                            )}
-                          </Box>
-                        }
+                        primary={`${normalizedTraining.title} (v${normalizedTraining.version})`}
+                        secondary={normalizedTraining.type}
+                      />
+                      <Chip 
+                        size="small" 
+                        label={normalizedTraining.status || 'No Status'} 
+                        color="info" 
+                        variant="outlined"
+                        sx={{ mr: 1 }}
                       />
                       <IconButton
                         edge="end"
@@ -419,8 +368,8 @@ const JobRoleMapping = () => {
       {/* Submit Button */}
       <Box display="flex" justifyContent="center" mt={4}>
         <MDButton
-          variant="gradient"
-          color="submit"
+          variant="contained"
+          color="primary"
           size="large"
           startIcon={<SaveIcon />}
           onClick={handleSubmit}
@@ -430,19 +379,6 @@ const JobRoleMapping = () => {
           {isSubmitting ? "Saving..." : "Save Mappings"}
         </MDButton>
       </Box>
-      
-      {/* Summary */}
-      {/* {selectedJobRole && (
-        <Alert severity="info" sx={{ mt: 3 }}>
-          <Typography variant="body2">
-            {assignedTrainings.length > 0 ? (
-              <>Ready to assign {assignedTrainings.length} training{assignedTrainings.length !== 1 ? 's' : ''} to {getJobRoleName()}</>
-            ) : (
-              <>No trainings currently assigned to {getJobRoleName()}</>
-            )} 
-          </Typography>
-        </Alert>
-      )} */}
     </Paper>
   );
 };

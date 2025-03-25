@@ -70,13 +70,13 @@ export const trainingApi = createApi({
     }),
     fetchDocumentpendingReport: builder.query({
       query: ({ documentId }) => ({
-        url: `dms_module/training_report_pending_completed/${documentId}`,
+        url: `lms_module/training_report_pending_completed/${documentId}`,
         method: "GET",
       }),
       transformResponse: (response) => response,  
     }),
     lazyFetchDocumentpendingReport: builder.query({
-      query: ({ documentId }) => `your-report-endpoint/${documentId}`
+      query: ({ documentId }) => `lms_module/training_report_pending_completed/${documentId}`
     })
   }),
 });

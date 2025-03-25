@@ -29,6 +29,8 @@ import WhiteListDialog from "./whitelist-users";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import FolderSharedOutlinedIcon from "@mui/icons-material/FolderSharedOutlined";
 import ChildDocumentsDialog from "layouts/authentication/document-listing/child-document";
+import { useFetchDocumentpendingReportQuery } from "apilms/trainingApi";
+import DownloadIcon from '@mui/icons-material/Download';
 
 const TrainingListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -47,6 +49,48 @@ const TrainingListing = () => {
   const [selectedChildDocuments, setSelectedChildDocuments] = useState([]);
   const [whiteListModalOpen, setWhiteListModalOpen] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState(null);
+
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
+  const [selectedDownloadDocId, setSelectedDownloadDocId] = useState(null);
+  const [downloadError, setDownloadError] = useState(null);
+  const { data: downloadData, error: downloadQueryError } = useFetchDocumentpendingReportQuery(
+    { documentId: selectedDownloadDocId },
+    { skip: !selectedDownloadDocId }
+  );
+
+  const handleDownloadIconClick = (docId) => {
+    setSelectedDownloadDocId(docId);
+    setDownloadModalOpen(true);
+    setDownloadError(null);
+  };
+
+  const handleDownloadConfirm = () => {
+    try {
+      if (downloadData?.status && downloadData?.data) {
+        const link = document.createElement("a");
+        link.href = downloadData.data;
+        link.setAttribute("download", `training_report_${selectedDownloadDocId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Close modal after successful download
+        handleDownloadModalClose();
+      } else {
+        setDownloadError("Unable to download report. Please try again.");
+        console.error("Download failed:", downloadQueryError);
+      }
+    } catch (error) {
+      setDownloadError("An unexpected error occurred while downloading the report.");
+      console.error("Download error:", error);
+    }
+  };
+
+  const handleDownloadModalClose = () => {
+    setDownloadModalOpen(false);
+    setSelectedDownloadDocId(null);
+    setDownloadError(null);
+  };
 
   const handleWhiteListModalOpen = (docId) => {
     setSelectedDocId(docId);
@@ -229,6 +273,27 @@ const TrainingListing = () => {
     { field: "created_date", headerName: "Created Date", flex: 1, headerAlign: "center" },
     { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
     { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" },
+    ...(groupId === 7
+      ? [
+    {
+      field: "report_download",
+      headerName: "Reports",
+      headerAlign: "center",
+      flex: 1,
+      renderCell: (params) => (
+        <MDBox display="flex" gap={1}>
+          <IconButton
+            color="success"
+            onClick={() => handleDownloadIconClick(params.row.docId)}
+          >
+            <DownloadIcon />
+          </IconButton>
+        </MDBox>
+      ),
+    },
+  ]
+  : []),
+    ,
     {
       field: "action",
       headerName: "Action",
@@ -584,6 +649,45 @@ const TrainingListing = () => {
         onClose={handleWhiteListModalClose}
         documentId={selectedDocId}
       />
+
+<Dialog
+        open={downloadModalOpen}
+        onClose={handleDownloadModalClose}
+        aria-labelledby="download-confirmation-dialog-title"
+        aria-describedby="download-confirmation-dialog-description"
+      >
+        <DialogTitle id="download-confirmation-dialog-title">
+          Confirm Download
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="download-confirmation-dialog-description">
+            Are you sure you want to download the report for this document?
+          </DialogContentText>
+          
+          {downloadError && (
+            <MDTypography 
+              variant="body2" 
+              color="error" 
+              sx={{ mt: 2 }}
+            >
+              {downloadError}
+            </MDTypography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDownloadModalClose}>
+            Cancel
+          </Button>
+          <MDButton 
+            onClick={handleDownloadConfirm}
+            color="primary"
+            variant="contained"
+            disabled={!selectedDownloadDocId}
+          >
+            Download
+          </MDButton>
+        </DialogActions>
+      </Dialog>
     </MDBox>
   );
 };
