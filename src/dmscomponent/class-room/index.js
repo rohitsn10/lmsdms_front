@@ -8,7 +8,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-import { useGetClassroomsQuery,useUpdateClassroomviewMutation } from "apilms/classRoomApi"; // Import your API hook
+import { useGetClassroomsQuery,useUpdateClassroomPreviewMutation } from "apilms/classRoomApi"; // Import your API hook
 import moment from "moment"; // For date formatting
 import { CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
@@ -29,7 +29,7 @@ const ClassroomListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [updateClassroomView] = useUpdateClassroomviewMutation();
+  const [updateClassroomView] = useUpdateClassroomPreviewMutation();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
   const [downloadClassroomId, setDownloadClassroomId] = useState(null);
