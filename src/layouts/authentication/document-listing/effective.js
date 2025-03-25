@@ -80,7 +80,11 @@ const ConditionalDialog = ({
     trainingStatus === true
       ? "Are you sure you want to release the document?"
       : "Are you sure you want to effective the document?";
-
+  const finalMsg=
+  trainingStatus === true
+  ? "All child documents must be Released before making this document released."
+  : "All child documents must be effective before making this document effective.";
+  trainingStatus ===true
   const handleConfirm = async () => {
     const status = trainingStatus === true ? 6 : 7; 
     const currentDate = new Date();
@@ -122,7 +126,7 @@ const ConditionalDialog = ({
   };
 
   // Combined check for button disabled state
-  const canSubmit = (!isParent || (isParent && allChildrenApproved)) && canReleaseFromParent;
+  const canSubmit = (!isParent || (isParent && allChildrenApproved));
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth> 
@@ -226,7 +230,8 @@ const ConditionalDialog = ({
               {isParent && !allChildrenApproved && childDocuments && Array.isArray(childDocuments) && childDocuments.length > 0 && (
                 <MDBox sx={{ mt: 2 }}>
                   <MDTypography variant="body2" color="error">
-                    All child documents must be Approved before making this document effective.
+                    {/* All child documents must be Released before making this document effective. */}
+                    {finalMsg}
                   </MDTypography>
                 </MDBox>
               )}
