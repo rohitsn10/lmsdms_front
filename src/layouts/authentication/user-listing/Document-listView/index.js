@@ -99,16 +99,16 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
     }
   }, [classAttemptsData]);
 
-  // useEffect(() => {
-  //   if (classWithoutAssessmentData?.status && classWithoutAssessmentData?.data) {
-  //     const formattedData = classWithoutAssessmentData.data.map((item, index) => ({
-  //       id: index + 1,
-  //       classroomName: item.classroom_name,
-  //       attemptDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'
-  //     }));
-  //     setClassWithoutAssessment(formattedData);
-  //   }
-  // }, [classWithoutAssessmentData]);
+  useEffect(() => {
+    if (classWithoutAssessmentData?.status && classWithoutAssessmentData?.data) {
+      const formattedData = classWithoutAssessmentData.data.map((item, index) => ({
+        id: index + 1,
+        classroomName: item.classroom_name,
+        attemptDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'
+      }));
+      setClassWithoutAssessment(formattedData);
+    }
+  }, [classWithoutAssessmentData]);
 
   const handleOpenAnswerDialog = (userId, documentId) => {
     setSelectedUser(userId);
