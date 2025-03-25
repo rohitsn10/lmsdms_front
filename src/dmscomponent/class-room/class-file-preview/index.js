@@ -12,7 +12,7 @@ const ClassFileView = () => {
   const BASE_URL = process.env.REACT_APP_APIKEY;
   
   const pdfUrl = newRowData?.files?.length > 0 
-    ? `${newRowData.files[0].upload_doc}` 
+    ? `${newRowData.files[0].upload_doc}`  
     : null;
 
   const [blobUrl, setBlobUrl] = useState(null);

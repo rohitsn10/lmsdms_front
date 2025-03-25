@@ -38,7 +38,7 @@ const SessionListing = () => {
   const { classroomId } = useParams();
   const [searchParams] = useSearchParams();
   const isPreview = searchParams.get("is_preview");
-  console.log(isPreview)
+  console.log(typeof isPreview)
   // const classroomId = classroomId;
 
   const [markSessionCompleted] = useMarkSessionCompletedMutation();
@@ -120,7 +120,7 @@ const SessionListing = () => {
         <MDButton
           variant="outlined"
           color={params.row.is_completed ? "success" : "error"}
-          disabled={!groupId === 7 || isPreview}
+          disabled={!groupId === 7 || isPreview === "false"}
           onClick={() => {
             if (groupId == 7) {
               console.log("----------")

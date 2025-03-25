@@ -8,7 +8,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-import { useGetClassroomsQuery,useUpdateClassroomPreviewMutation } from "apilms/classRoomApi"; // Import your API hook
+import { useGetClassroomsQuery, useUpdateClassroomPreviewMutation } from "apilms/classRoomApi"; // Import your API hook
 import moment from "moment"; // For date formatting
 import { CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
@@ -74,15 +74,11 @@ const ClassroomListing = () => {
   };
 
   const handleFileView = async (rowData) => {
-    
-    try {
-      await updateClassroomView(rowData.classroom_id).unwrap(); // Ensure mutation completes before navigation
-      navigate("/classroom-file-view", { state: { rowData } });
-    } catch (error) {
-      console.error("Error updating preview status:", error);
-    }
+    console.log(rowData.classroom_id);
+
+    navigate("/classroom-file-view", { state: { rowData } });
   };
-  
+
   // Open the assessment warning modal
   const handleAssessmentClick = (rowData) => {
     setSelectedClassroom(rowData);
@@ -262,30 +258,30 @@ const ClassroomListing = () => {
           },
         ]
       : []),
-      ...(groupId !== 7
-        ? [
-            {
-              field: "assessment",
-              headerName: "Assessment",
-              flex: 1,
-              headerAlign: "center",
-              renderCell: (params) => (
-                <MDButton
-                  variant="outlined"
-                  color="warning"
-                  onClick={() => handleAssessmentClick(params.row)}
-                  disabled={
-                    params.row.classroom_attempted ||
-                    !params.row.is_all_completed ||
-                    params.row.quiz_count === 0
-                  }
-                >
-                  Assessment
-                </MDButton>
-              ),
-            },
-          ]
-        : []),
+    ...(groupId !== 7
+      ? [
+          {
+            field: "assessment",
+            headerName: "Assessment",
+            flex: 1,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <MDButton
+                variant="outlined"
+                color="warning"
+                onClick={() => handleAssessmentClick(params.row)}
+                disabled={
+                  params.row.classroom_attempted ||
+                  !params.row.is_all_completed ||
+                  params.row.quiz_count === 0
+                }
+              >
+                Assessment
+              </MDButton>
+            ),
+          },
+        ]
+      : []),
     ...(groupId === 7
       ? [
           {
