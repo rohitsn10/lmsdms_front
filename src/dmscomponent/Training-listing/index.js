@@ -13,6 +13,7 @@ import moment from "moment";
 import { useFetchTrainingsQuery } from "apilms/trainingApi"; // Update this path as needed
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
+import BrowserUpdatedOutlinedIcon from "@mui/icons-material/BrowserUpdatedOutlined";
 import {
   Button,
   Dialog,
@@ -270,9 +271,6 @@ const TrainingListing = () => {
     },
     { field: "document_number", headerName: "Document No", flex: 1.5, headerAlign: "center" },
     { field: "version", headerName: "Version", flex: 0.8, headerAlign: "center" },
-    { field: "created_date", headerName: "Created Date", flex: 1, headerAlign: "center" },
-    { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
-    { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" },
     ...(groupId === 7
       ? [
     {
@@ -283,17 +281,19 @@ const TrainingListing = () => {
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
           <IconButton
-            color="success"
+            color="error"
             onClick={() => handleDownloadIconClick(params.row.docId)}
           >
-            <DownloadIcon />
+            <BrowserUpdatedOutlinedIcon />
           </IconButton>
         </MDBox>
       ),
     },
   ]
   : []),
-    ,
+    { field: "created_date", headerName: "Created Date", flex: 1, headerAlign: "center" },
+    { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
+    { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" },
     {
       field: "action",
       headerName: "Action",

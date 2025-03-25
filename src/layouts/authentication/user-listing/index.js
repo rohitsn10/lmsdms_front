@@ -118,7 +118,8 @@ const UsersListing = () => {
     (user) =>
       user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.username.toLowerCase().includes(searchTerm.toLowerCase())
+      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.depratment.toLowerCase().includes(searchTerm.toLowerCase()) 
   );
   const handleViewSOPClick = (row) => {
     if (row) {
