@@ -176,8 +176,12 @@ const DocumentListing = () => {
     handleReviseDialogClose();
   };
   const handleEffectiveClick = (row) => {
+    if (!row.is_effective) {
+      toast.warning("User needs to be assigned training before effective document.");
+      return; // Prevent opening the dialog
+    }
     setSelectedRow(row); // Set the row data
-    setOpenDialog(true); // Open the dialog
+    setOpenDialog(true); // Open the dialog only if is_effective is true
   };
   const handleCloseDialog = () => {
     setOpenDialog(false); // Close the dialog
@@ -480,7 +484,7 @@ const DocumentListing = () => {
       filterable: false,
     },
     {
-      field: "preview_download",
+      field: "preview_download", 
       headerName: "Download",
       flex: 0.4,
       headerAlign: "center",
@@ -531,25 +535,25 @@ const DocumentListing = () => {
       : []),
     ...(groupId === 5
       ? [
-          {
-            field: "effective", // New column added
-            headerName: "Effective", // Column name
-            flex: 0.4, // Adjust the flex based on your layout needs
-            headerAlign: "center", // Center-align header
-            renderCell: (params) => (
-              <MDBox display="flex" justifyContent="center">
-                <IconButton
-                  color="primary"
-                  onClick={() => handleEffectiveClick(params.row)} // Open dialog when clicked
-                  disabled={params.row.document_current_status === 7}
-                >
-                  <CheckCircleIcon /> {/* Example icon for 'Effective' */}
-                </IconButton>
-              </MDBox>
-            ),
-            sortable: false,
-            filterable: false,
-          },
+        {
+          field: "effective",
+          headerName: "Effective",
+          flex: 0.4,
+          headerAlign: "center",
+          renderCell: (params) => (
+            <MDBox display="flex" justifyContent="center">
+              <IconButton
+                color="primary"
+                onClick={() => handleEffectiveClick(params.row)}
+                disabled={params.row.document_current_status !== 6}
+              >
+                 <CheckCircleIcon />
+              </IconButton>
+            </MDBox>
+          ),
+          sortable: false,
+          filterable: false,
+        },
         ]
       : []),
   ];
