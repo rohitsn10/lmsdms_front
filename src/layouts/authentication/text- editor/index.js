@@ -79,8 +79,8 @@ const DocumentView = () => {
   const version = searchParams.get("version");
   const templateIDMain = searchParams.get("templateID");
   const is_reviewed = searchParams.get("is_reviewed");
-  // console.log("Test..",typeof version); 
-  console.log("Test2..",typeof templateIDMain); 
+  // console.log("Test..",typeof version);
+  console.log("Test2..", typeof templateIDMain);
 
   // console.log("------------------------------------------", typeof is_reviewed);
   const [isSaved, setIsSaved] = useState(false);
@@ -115,7 +115,7 @@ const DocumentView = () => {
     //   "against user groups:",
     //   userGroupIds
     // );
-    return requiredGroupIds.some((id) => userGroupIds.includes(id)); 
+    return requiredGroupIds.some((id) => userGroupIds.includes(id));
   };
 
   useEffect(() => {
@@ -132,7 +132,9 @@ const DocumentView = () => {
           const response = await fetch(
             // `http://127.0.0.1:8000/dms_module/get_editor_config?template_id=${data?.select_template}`,
             // `http://127.0.0.1:8000/dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}`,
-            `${process.env.REACT_APP_APIKEY}dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}&is_view=${false}`,
+            `${
+              process.env.REACT_APP_APIKEY
+            }dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}&is_view=${false}`,
             // http://127.0.0.1:8000/dms_module/get_editor_config?document_id=${id}&template_id=${templateIDMain}
             {
               // const response = await fetch(`http://43.204.122.158:8080/dms_module/get_editor_config?template_id=${data?.select_template}`, {
@@ -244,7 +246,7 @@ const DocumentView = () => {
                   if (document_current_status !== "6" && document_current_status !== "7") {
                     newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
                   }
-              
+
                   if (cacheUrl) {
                     const draftData = {
                       user: user?.id,
@@ -555,6 +557,15 @@ const DocumentView = () => {
                 >
                   {isLoading ? "Submitting..." : "Submit"}
                 </MDButton>
+                <MDButton
+                  variant="gradient"
+                  color="submit"
+                  // onClick={handleSaveDraft}
+                  onClick={handleDownloadFeature}
+                  disabled={isLoading}
+                >
+                  Save
+                </MDButton>
               </>
             )}
           {/* Condition 2: Show Review button when status is "For Under Review" */}
@@ -584,6 +595,15 @@ const DocumentView = () => {
                     Send Back
                   </MDButton>
                 )}
+                <MDButton
+                  variant="gradient"
+                  color="submit"
+                  // onClick={handleSaveDraft}
+                  onClick={handleDownloadFeature}
+                  disabled={isLoading}
+                >
+                  Save
+                </MDButton>
               </>
             )}
 
@@ -607,6 +627,15 @@ const DocumentView = () => {
                 >
                   Send Back
                 </MDButton>
+                <MDButton
+                  variant="gradient"
+                  color="submit"
+                  // onClick={handleSaveDraft}
+                  onClick={handleDownloadFeature}
+                  disabled={isLoading}
+                >
+                  Save
+                </MDButton>
               </>
             )}
           {/* Condition 4 */}
@@ -628,15 +657,7 @@ const DocumentView = () => {
           {/* Display success or error messages */}
           {data && <p>{data.message}</p>}
           {error && <p>Error: {error.message}</p>}
-          <MDButton
-            variant="gradient"
-            color="submit"
-            // onClick={handleSaveDraft}
-            onClick={handleDownloadFeature}
-            disabled={isLoading}
-          >
-            Save
-          </MDButton>
+
           {/* <MDButton
             variant="gradient"
             color="submit"

@@ -25,7 +25,6 @@ const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
                 status_id: 10,
                 request_action_id: row?.revise_request_id,
                 action_status: "approved",
-                remarks,
             }).unwrap();
             
             toast.success("Revision Approved Successfully!");
