@@ -60,6 +60,24 @@ export const trainingApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    fetchTrainingWithQuiz: builder.query({
+      query: () => ({
+        url: `lms_module/training_has_quiz_list`,
+        // training_wise_users?document_id=1
+        method: 'GET',
+      }),
+      transformResponse: (response) => response,
+    }),
+    fetchDocumentpendingReport: builder.query({
+      query: ({ documentId }) => ({
+        url: `dms_module/training_report_pending_completed/${documentId}`,
+        method: "GET",
+      }),
+      transformResponse: (response) => response,  
+    }),
+    lazyFetchDocumentpendingReport: builder.query({
+      query: ({ documentId }) => `your-report-endpoint/${documentId}`
+    })
   }),
 });
 
@@ -68,5 +86,8 @@ export const {
   useFetchTrainingsQuery,
   useUpdateTrainingMutation,
   useCompleteViewDocumentMutation,
-  useFetchTrainingWiseUsersQuery
+  useFetchTrainingWiseUsersQuery,
+  useFetchTrainingWithQuizQuery,
+  useFetchDocumentpendingReportQuery,
+  useLazyFetchDocumentpendingReportQuery 
 } = trainingApi;

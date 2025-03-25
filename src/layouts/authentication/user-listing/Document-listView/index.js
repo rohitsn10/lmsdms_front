@@ -6,26 +6,33 @@ import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import MDButton from "components/MDButton";
 import { DataGrid } from '@mui/x-data-grid';
-import { useUserIdWiseNoOfAttemptsMutation, useUserIdWiseNoOfClassAttemptsMutation } from 'api/auth/userApi';
+import { useUserIdWiseNoOfAttemptsMutation, useUserIdWiseNoOfClassAttemptsMutation,useUserIdWisewithoutQuery} from 'api/auth/userApi';
 import AnswerDialog from './AnswerDialog'; // Import AnswerDialog
 import { useAuth } from 'hooks/use-auth';
 
 const SOPDialog = ({ open, onClose, selectedUserid }) => {
   const [fetchAttempts, { data: attemptsData, isLoading: isAttemptsLoading, isError: isAttemptsError }] = useUserIdWiseNoOfAttemptsMutation();
+  // console.log(">>>>",attemptsData)
   const [fetchClassAttempts, { data: classAttemptsData, isLoading: isClassAttemptsLoading, isError: isClassAttemptsError }] = useUserIdWiseNoOfClassAttemptsMutation();
+  // const [fetchClassWithoutAssessment, { data: classWithoutAssessmentData }] = useUserIdWisewithoutQuery();
+  const { data: classWithoutAssessmentData, isLoading, isError } = useUserIdWisewithoutQuery({ userId: selectedUserid }, { skip: !open });
+  console.log("Class Without Assessment Data:", classWithoutAssessmentData);
+
   const [sopData, setSopData] = useState([]);
   const [classAttempts, setClassAttempts] = useState([]);
+  const [classWithoutAssessment, setClassWithoutAssessment] = useState([]);
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
   const [answerDialogOpen, setAnswerDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
-
+// console.log(">>>>>>>>>>+++++++",fetchClassWithoutAssessment)
   useEffect(() => {
     if (open && selectedUserid) {
       fetchAttempts(selectedUserid);
       fetchClassAttempts(selectedUserid);
+      // fetchClassWithoutAssessment(selectedUserid);
     }
   }, [open, selectedUserid, fetchAttempts, fetchClassAttempts]);
 
@@ -92,6 +99,17 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
     }
   }, [classAttemptsData]);
 
+  // useEffect(() => {
+  //   if (classWithoutAssessmentData?.status && classWithoutAssessmentData?.data) {
+  //     const formattedData = classWithoutAssessmentData.data.map((item, index) => ({
+  //       id: index + 1,
+  //       classroomName: item.classroom_name,
+  //       attemptDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'
+  //     }));
+  //     setClassWithoutAssessment(formattedData);
+  //   }
+  // }, [classWithoutAssessmentData]);
+
   const handleOpenAnswerDialog = (userId, documentId) => {
     setSelectedUser(userId);
     setSelectedDocument(documentId);
@@ -153,6 +171,12 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
     { field: "status", headerName: "Status", flex: 0.8, headerAlign: "center" },
     { field: "attemptDate", headerName: "Attempt Date", flex: 1, headerAlign: "center" },
   ];
+  
+  const classWithoutAssessmentColumns = [
+    { field: "id", headerName: "Sr. No.", flex: 0.5 },
+    { field: "classroomName", headerName: "Classroom Name", flex: 1.5 },
+    { field: "attemptDate", headerName: "Attempt Date", flex: 1 }
+  ];
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
@@ -171,7 +195,7 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
         >
           <CloseIcon />
         </IconButton>
-      </DialogTitle>
+      </DialogTitle> 
 
       <DialogContent>
         <MDBox p={3}>
@@ -241,6 +265,34 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
               </div>
             </>
           )}
+           {classWithoutAssessmentData && classWithoutAssessment.length > 0 && (
+            <>
+              <MDTypography variant="h5" fontWeight="medium" sx={{ mt: 5, mb: 3, textAlign: "center" }}>
+                Classroom Without Assessment
+              </MDTypography>
+              <div style={{ height: 400, width: '100%' }}>
+                <DataGrid
+                  rows={classWithoutAssessment}
+                  columns={classWithoutAssessmentColumns}
+                  pageSize={5}
+                  rowsPerPageOptions={[5, 10, 20]}
+                  disableSelectionOnClick
+                  sx={{
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                    "& .MuiDataGrid-columnHeaders": {
+                      backgroundColor: "#f5f5f5",
+                      fontWeight: "bold"
+                    },
+                    "& .MuiDataGrid-cell": {
+                      textAlign: "center"
+                    }
+                  }}
+                />
+              </div>
+            </>
+          )}
+          
         </MDBox>
       </DialogContent>
 

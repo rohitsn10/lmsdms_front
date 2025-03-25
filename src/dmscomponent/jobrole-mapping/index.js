@@ -34,6 +34,7 @@ import { useGetJobRoleQuery } from "apilms/jobRoleApi";
 import { useTrainingAssignJobroleMutationMutation, useTrainingAssignJobroleQuery } from "apilms/MappingApi";
 import { toast } from "react-toastify";
 import MDButton from "components/MDButton";
+import { useFetchTrainingWithQuizQuery } from "apilms/trainingApi";
 
 const JobRoleMapping = () => {
   const [selectedJobRole, setSelectedJobRole] = useState("");
@@ -43,6 +44,7 @@ const JobRoleMapping = () => {
 
   const { data: trainingData, isLoading: trainingLoading, refetch: refetchTrainings } = useFetchTrainingsQuery();
   const { data: jobRoleData, isLoading: jobRoleLoading, refetch: refetchJobRoles } = useGetJobRoleQuery();
+  // const { data: trainingData, isLoading: trainingLoading, refetch: refetchTrainings } = useFetchTrainingWithQuizQuery();
   const [assignTrainings] = useTrainingAssignJobroleMutationMutation();
   // console.log()
   // Fetch already assigned trainings when job role is selected 
