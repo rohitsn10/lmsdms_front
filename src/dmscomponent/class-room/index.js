@@ -67,7 +67,7 @@ const ClassroomListing = () => {
   // Handle session button click
   const handleSession = (classroom) => {
     if (classroom.classroom_id) {
-      navigate(`/session-list/${classroom.classroom_id}`);
+      navigate(`/session-list/${classroom.classroom_id}?is_preview=${classroom.is_preview}`);
     } else {
       console.log("ClassroomId not exist.");
     }

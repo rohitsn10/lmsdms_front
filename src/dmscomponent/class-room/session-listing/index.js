@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate, useLocation, useParams,useSearchParams } from "react-router-dom";
 import { useGetSessionsQuery, useMarkSessionCompletedMutation } from "apilms/classRoomApi";
 import { useUserListQuery } from "api/auth/userApi";
 import Card from "@mui/material/Card";
@@ -36,6 +36,9 @@ const SessionListing = () => {
   // const classroom = location.state?.classroom;
   // const classroomId = classroom.classroom_id;
   const { classroomId } = useParams();
+  const [searchParams] = useSearchParams();
+  const isPreview = searchParams.get("is_preview");
+  console.log(isPreview)
   // const classroomId = classroomId;
 
   const [markSessionCompleted] = useMarkSessionCompletedMutation();
@@ -108,7 +111,6 @@ const SessionListing = () => {
     { field: "venue", headerName: "Venue", flex: 1, headerAlign: "center" },
     { field: "start_date", headerName: "Date & Time", flex: 1, headerAlign: "center" },
     { field: "start_time", headerName: "Time", flex: 1, headerAlign: "center" },
-
     {
       field: "status",
       headerName: "Status",
@@ -118,7 +120,7 @@ const SessionListing = () => {
         <MDButton
           variant="outlined"
           color={params.row.is_completed ? "success" : "error"}
-          disabled={!groupId === 7}
+          disabled={!groupId === 7 || isPreview}
           onClick={() => {
             if (groupId == 7) {
               console.log("----------")
