@@ -169,11 +169,11 @@ const ConditionalDialog = ({
                   >
                     Status: {parentDocumentData[0].current_status_name}
                   </MDTypography>
-                  {!canReleaseFromParent && (
+                  {/* {!canReleaseFromParent && (
                     <MDTypography variant="body2" color="error" mt={1}>
                       Parent document must be Released or Effective before releasing this document.
                     </MDTypography>
-                  )}
+                  )} */}
                 </MDBox>
               ) : (
                 <MDTypography variant="body2">No parent document found.</MDTypography>
