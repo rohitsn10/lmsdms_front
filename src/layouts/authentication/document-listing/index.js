@@ -176,7 +176,7 @@ const DocumentListing = () => {
     handleReviseDialogClose();
   };
   const handleEffectiveClick = (row) => {
-    if (!row.is_effective) {
+    if (row.document_type === 1 && !row.is_effective) {
       toast.warning("User needs to be assigned training before effective document.");
       return; // Prevent opening the dialog
     }

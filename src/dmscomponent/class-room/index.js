@@ -199,7 +199,7 @@ const ClassroomListing = () => {
         <IconButton
           color="warning"
           onClick={() => handleFileView(params.row)}
-          disabled={params.row.files.length === 0}
+          // disabled={params.row.files.length === 0}
         >
           <SlideshowIcon />
         </IconButton>
