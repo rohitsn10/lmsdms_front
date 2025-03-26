@@ -121,7 +121,10 @@ const JobRoleMapping = () => {
       toast.warning("Please select a job role first");
       return;
     }
-    
+    if(assignedTrainings.length<1){
+      toast.warning("Please select atleast one training to assign.");
+      return
+    }
     setIsSubmitting(true);
     try {
       await assignTrainings({ 

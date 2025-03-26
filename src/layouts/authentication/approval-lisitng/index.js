@@ -210,6 +210,7 @@ const PrintApprovalListing = () => {
             headerAlign: "center",
             renderCell: (params) => {
               const status = params.row.status;
+              const statusid = params.row.status_id;
               let color = "default";
   
               if (status === "Approve") {
@@ -224,7 +225,7 @@ const PrintApprovalListing = () => {
                 <IconButton
                   color={color}
                   onClick={() => handleOpenDialog(params.row)}
-                  disabled={status === "Approve"}
+                  disabled={statusid === 9}
                 >
                   <CheckCircleIcon />
                 </IconButton>
@@ -251,7 +252,7 @@ const PrintApprovalListing = () => {
                 params.row.print_count
               )
             }
-            disabled={params.row.status !== "Approve"}
+            disabled={params.row.status_id !== 9}
           >
             <LocalPrintshopTwoToneIcon />
           </IconButton>
