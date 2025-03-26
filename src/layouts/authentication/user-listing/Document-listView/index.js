@@ -9,6 +9,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { useUserIdWiseNoOfAttemptsMutation, useUserIdWiseNoOfClassAttemptsMutation,useUserIdWisewithoutQuery} from 'api/auth/userApi';
 import AnswerDialog from './AnswerDialog'; // Import AnswerDialog
 import { useAuth } from 'hooks/use-auth';
+import moment from 'moment/moment';
 
 const SOPDialog = ({ open, onClose, selectedUserid }) => {
   const [fetchAttempts, { data: attemptsData, isLoading: isAttemptsLoading, isError: isAttemptsError }] = useUserIdWiseNoOfAttemptsMutation();
@@ -75,7 +76,7 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
         totalMarks: item.total_marks || '0',
         timeTaken: convertTime(item.total_taken_time), 
         status: item.is_pass ? 'Pass' : 'Fail',
-        attemptDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'
+        attemptDate: item.created_at ? moment(item.created_at).format("DD/MM/YYYY") : "N/A",
       }));
       setSopData(formattedData);
     }
@@ -93,7 +94,7 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
         totalMarks: item.total_marks || '0',
         timeTaken: convertTime(item.total_taken_time),
         status: item.is_pass ? 'Pass' : 'Fail',
-        attemptDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'
+        attemptDate: item.created_at ? moment(item.created_at).format("DD/MM/YYYY") : "N/A",
       }));
       setClassAttempts(formattedClassAttempts);
     }
@@ -104,7 +105,7 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
       const formattedData = classWithoutAssessmentData.data.map((item, index) => ({
         id: index + 1,
         classroomName: item.classroom_name,
-        attemptDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'
+        attemptDate: item.created_at ? moment(item.created_at).format("DD/MM/YYYY") : "N/A",
       }));
       setClassWithoutAssessment(formattedData);
     }
@@ -173,9 +174,9 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
   ];
   
   const classWithoutAssessmentColumns = [
-    { field: "id", headerName: "Sr. No.", flex: 0.5 },
-    { field: "classroomName", headerName: "Classroom Name", flex: 1.5 },
-    { field: "attemptDate", headerName: "Attempt Date", flex: 1 }
+    { field: "id", headerName: "Sr. No.", flex: 0.5,headerAlign: "center" },
+    { field: "classroomName", headerName: "Classroom Name", flex: 1.5, headerAlign: "center" },
+    { field: "attemptDate", headerName: "Attempt Date", flex: 1, headerAlign: "center"}
   ];
 
   return (

@@ -186,9 +186,9 @@ import apiService from 'services/apiService';
                   <MDButton variant="contained" color="primary" onClick={handleOpenSectionModal} sx={{ ml: 1 }}>
                       + Add Section
                   </MDButton>
-                  <MDButton variant="contained" color="secondary" onClick={()=>{}} sx={{ ml: 1 }}>
+                  {/* <MDButton variant="contained" color="secondary" onClick={()=>{}} sx={{ ml: 1 }}>
                       Publish
-                  </MDButton>
+                  </MDButton> */}
               </Box>
               </div>
           </Box>

@@ -28,6 +28,7 @@ import Visibilityicon from "@mui/icons-material/Visibility";
 import SOPDialog from "./Document-listView";
 import AssignmentLateIcon from "@mui/icons-material/AssignmentLate";
 import { Edit } from "@mui/icons-material";
+import moment from "moment/moment";
 // import { useGetTrainingCompletionCertificateQuery } from "apilms/workflowapi";
 const UsersListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -62,7 +63,7 @@ const UsersListing = () => {
         full_name: item.first_name ? `${item.first_name} ${item.last_name || ""}`.trim() : "N/A",
         email: item.email || "N/A",
         username: item.username || "N/A",
-        created_at: new Date(item.created_at).toLocaleDateString(),
+        created_at: item.created_at ? moment(item.created_at).format("DD/MM/YYYY") : "N/A",
         UserRole: item.groups_list?.map((group) => group.name).join(", ") || "N/A",
         is_department_assigned: item.is_department_assigned || false,
         is_description: item.is_description || false,
