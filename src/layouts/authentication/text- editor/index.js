@@ -244,7 +244,7 @@ const DocumentView = () => {
                   setCacheDocument(cacheUrl);
                   let newVersion = version;
                   if (document_current_status !== "6" && document_current_status !== "7") {
-                    newVersion = (parseFloat(version) + 0.1).toFixed(1); // Ensures one decimal place
+                    newVersion = (parseFloat(version) + 0.01).toFixed(2); // Ensures two decimal place
                   }
 
                   if (cacheUrl) {
