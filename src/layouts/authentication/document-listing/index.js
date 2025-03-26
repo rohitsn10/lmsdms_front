@@ -21,7 +21,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ConditionalDialog from "./effective";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import BrowserUpdatedOutlinedIcon from "@mui/icons-material/BrowserUpdatedOutlined";
-// import ReviseDialog from "./Revise";
+import RuleFolderIcon from '@mui/icons-material/RuleFolder';
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
 import FolderSharedOutlinedIcon from "@mui/icons-material/FolderSharedOutlined";
 import ChildDocumentsDialog from "./child-document";
@@ -307,7 +307,7 @@ const DocumentListing = () => {
       revision_date: revisionDate, // Dynamically calculated
     };
   });
-  
+   
   const columns = [
     {
       field: "index",
@@ -543,11 +543,11 @@ const DocumentListing = () => {
           renderCell: (params) => (
             <MDBox display="flex" justifyContent="center">
               <IconButton
-                color="primary"
+                color="success"
                 onClick={() => handleEffectiveClick(params.row)}
-                disabled={params.row.document_current_status !== 6}
+                disabled={!(params.row.document_current_status === 6 || params.row.document_current_status === 11)}
               >
-                 <CheckCircleIcon />
+                 <RuleFolderIcon />
               </IconButton>
             </MDBox>
           ),
