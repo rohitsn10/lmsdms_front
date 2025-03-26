@@ -39,12 +39,12 @@ const DocumentListing = () => {
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
-  // console.log("GRORORO",groupId)
+  console.log("GRORORO",group)
   const [searchTerm, setSearchTerm] = useState("");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { data, refetch, isLoading, isError } = useFetchDocumentsQuery();
+  const { data, refetch, isLoading, isError } = useFetchDocumentsQuery(groupId);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [userGroupIds, setUserGroupIds] = useState([]);

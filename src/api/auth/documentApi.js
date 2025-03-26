@@ -47,7 +47,7 @@ export const documentApi = createApi({
     }),
 
     fetchDocuments: builder.query({
-      query: () => "dms_module/view_document",
+      query: (groupId) => `dms_module/view_document/${groupId}`,
       transformResponse: (response) => {
         return {
           documents: response.data,
