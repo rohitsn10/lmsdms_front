@@ -19,7 +19,18 @@ import moment from "moment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ConditionalDialog from "../effective";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import {
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  Button,
+  DialogContent,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  TextField,
+} from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -34,8 +45,8 @@ const RejectedDocument = () => {
   const [endDate, setEndDate] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Fetching documents using the new API
+  const [open, setOpen] = useState(false);
+  const [selectedRemarks, setSelectedRemarks] = useState("");
   const { data, refetch, isLoading, isError } = useGetDocumentDataOfStatusIdElevenQuery({
     departmentId: selectedDepartment,
     startDate: startDate ? moment(startDate).format("DD-MM-YYYY") : "", // Format start date
@@ -62,7 +73,6 @@ const RejectedDocument = () => {
     refetch();
   }, []);
   const documents = data?.rejectdata || []; // Extract documents from the new API response
-
   const handleDialogOpen = (row) => {
     setSelectedRow(row);
     setDialogOpen(true);
@@ -83,7 +93,15 @@ const RejectedDocument = () => {
       return; // Exit if params or row is missing
     }
 
-    const { id, document_current_status, training_required, approval_status,version,select_template,is_reviewed } = params.row;
+    const {
+      id,
+      document_current_status,
+      training_required,
+      approval_status,
+      version,
+      select_template,
+      is_reviewed,
+    } = params.row;
 
     if (
       id === undefined ||
@@ -168,50 +186,68 @@ const RejectedDocument = () => {
 
   const filteredData = documents.filter(
     (doc) =>
-      doc.document_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.document_type_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())
+      doc.document_name?.toString().includes(searchTerm.toLowerCase()) ||
+      doc.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doc.remarks?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doc.created_at?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const handleOpenDialog = (remarks) => {
+    setSelectedRemarks(remarks);
+    setOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+    setSelectedRemarks("");
+  };
 
   const rows = filteredData.map((doc, index) => ({
     ...doc,
-    index,
+    id: index, // Use index as the unique ID
+    srNo: index + 1,
     created_at: moment(doc.created_at).format("DD/MM/YY"),
   }));
 
   const columns = [
     {
-      field: "index",
+      field: "srNo",
       headerName: "Sr.No.",
       flex: 0.3,
       headerAlign: "center",
-      renderCell: (params) => <span>{params.row.index + 1}</span>,
       sortable: false,
       filterable: false,
     },
     {
-      field: "document_title",
-      headerName: "Title",
-      flex: 1,
+      field: "document_name",
+      headerName: "Document",
+      flex: 0.6,
       headerAlign: "center",
     },
     {
-      field: "document_type_name",
-      headerName: "Type",
-      flex: 0.5,
+      field: "name",
+      headerName: "Name",
+      flex: 0.6,
       headerAlign: "center",
     },
     {
-      field: "document_number",
-      headerName: "Document No.",
-      flex: 0.55,
+      field: "remarks",
+      headerName: "Remarks",
+      flex: 0.8,
       headerAlign: "center",
+      renderCell: (params) => (
+        <MDButton
+          variant="contained"
+          color="success"
+          onClick={() => handleOpenDialog(params.row.remarks)}
+        >
+          View
+        </MDButton>
+      ),
     },
     {
-      field: "version",
-      headerName: "Version",
-      flex: 0.4,
+      field: "status_name",
+      headerName: "Status",
+      flex: 0.6,
       headerAlign: "center",
     },
     {
@@ -219,27 +255,6 @@ const RejectedDocument = () => {
       headerName: "Created Date",
       flex: 0.5,
       headerAlign: "center",
-    },
-    {
-      field: "current_status_name",
-      headerName: "Status",
-      flex: 0.6,
-      headerAlign: "center",
-    },
-    {
-      field: "actions",
-      headerName: "Action",
-      flex: 0.6,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <MDBox display="flex" justifyContent="center" gap={1}>
-          <IconButton color="inherit" onClick={() => handleClick(params)}>
-            <EditCalendarIcon />
-          </IconButton>
-        </MDBox>
-      ),
-      sortable: false,
-      filterable: false,
     },
   ];
 
@@ -253,7 +268,7 @@ const RejectedDocument = () => {
       <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 0 }}>
         <MDBox p={3} display="flex" alignItems="center">
           {/* Department Dropdown */}
-          <FormControl sx={{ minWidth: 180, mr: 2 }}>
+          {/* <FormControl sx={{ minWidth: 180, mr: 2 }}>
             <InputLabel>Department</InputLabel>
             <Select
               value={selectedDepartment}
@@ -271,7 +286,7 @@ const RejectedDocument = () => {
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </FormControl> */}
 
           <MDInput
             label="Search"
@@ -287,11 +302,11 @@ const RejectedDocument = () => {
             fontWeight="medium"
             sx={{ flexGrow: 1, textAlign: "center", mr: 28 }}
           >
-            Rejected Document Listing
+            Rejected Revise Document Listing
           </MDTypography>
 
           {/* Date Range Dropdown */}
-          <FormControl sx={{ minWidth: 180 }}>
+          {/* <FormControl sx={{ minWidth: 180 }}>
             <InputLabel>Date Range</InputLabel>
             <Select
               value={selectedDateRange}
@@ -312,7 +327,7 @@ const RejectedDocument = () => {
               <MenuItem value="lastYear">Last Year</MenuItem>
               <MenuItem value="custom">Custom</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
         </MDBox>
 
         {/* Selected Date Range Display */}
@@ -366,7 +381,26 @@ const RejectedDocument = () => {
           </div>
         </MDBox>
       </Card>
+      <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="lg">
+        <DialogTitle>Remarks</DialogTitle>
 
+        <DialogContent>
+          <TextField
+            fullWidth
+            multiline
+            rows={10} // Ensures 7-row space
+            value={selectedRemarks || "No Remarks Available"}
+            variant="outlined"
+            InputProps={{ readOnly: true }} // Makes it non-editable
+          />
+        </DialogContent>
+
+        <DialogActions>
+          <MDButton onClick={handleCloseDialog} variant="contained" color="error">
+            Cancel
+          </MDButton>
+        </DialogActions>
+      </Dialog>
       <ConditionalDialog
         open={dialogOpen}
         onClose={handleDialogClose}

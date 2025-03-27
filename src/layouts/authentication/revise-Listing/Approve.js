@@ -77,7 +77,7 @@ const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
                                 value={reason}
                                 InputProps={{ readOnly: true }}
                                 multiline
-                                rows={3}
+                                rows={7}
                                 required
                             />
                         </MDBox>
@@ -89,7 +89,7 @@ const ReviseApproveDialog = ({ open, onClose, onApprove, onReject, row }) => {
                             value={remarks}
                             onChange={(e) => setRemark(e.target.value)}
                             multiline
-                            rows={3}
+                            rows={5}
                             placeholder="Enter your remark "
                         />
                     </MDBox>
