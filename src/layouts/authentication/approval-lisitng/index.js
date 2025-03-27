@@ -225,7 +225,7 @@ const PrintApprovalListing = () => {
                 <IconButton
                   color={color}
                   onClick={() => handleOpenDialog(params.row)}
-                  disabled={statusid === 9}
+                  disabled={statusid == 9}
                 >
                   <CheckCircleIcon />
                 </IconButton>
@@ -252,7 +252,7 @@ const PrintApprovalListing = () => {
                 params.row.print_count
               )
             }
-            disabled={params.row.status_id !== 9}
+            disabled={params.row.status_id != 9}
           >
             <LocalPrintshopTwoToneIcon />
           </IconButton>
