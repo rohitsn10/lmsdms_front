@@ -19,6 +19,7 @@ import moment from "moment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ConditionalDialog from "../effective";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import SubjectRoundedIcon from '@mui/icons-material/SubjectRounded';
 import {
   MenuItem,
   Select,
@@ -236,11 +237,11 @@ const RejectedDocument = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <MDButton
-          variant="contained"
-          color="success"
+          variant="outlined"
+          color="warning"
           onClick={() => handleOpenDialog(params.row.remarks)}
         >
-          View
+          <SubjectRoundedIcon/>
         </MDButton>
       ),
     },
