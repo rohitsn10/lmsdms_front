@@ -75,6 +75,7 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
         obtainedMarks: item.obtain_marks || '0',
         totalMarks: item.total_marks || '0',
         timeTaken: convertTime(item.total_taken_time), 
+        document_version: item.document_version,
         status: item.is_pass ? 'Pass' : 'Fail',
         attemptDate: item.created_at ? moment(item.created_at).format("DD/MM/YYYY") : "N/A",
       }));
@@ -135,6 +136,7 @@ const SOPDialog = ({ open, onClose, selectedUserid }) => {
     },
     { field: "timeTaken", headerName: "Time Taken", flex: 1, headerAlign: "center" },
     { field: "status", headerName: "Status", flex: 0.8, headerAlign: "center" },
+    { field: "document_version", headerName: "Version", flex: 0.8, headerAlign: "center" },
     { field: "attemptDate", headerName: "Attempt Date", flex: 1, headerAlign: "center" },
     ...(groupId === 7
       ? [

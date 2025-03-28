@@ -8,25 +8,53 @@ import { usePrintConvertPdfMutation } from "api/auth/printApi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumber, document_status, print_count }) => {
+const PrintDocumentDialog = ({
+  open,
+  onClose,
+  id,
+  noOfRequestByAdmin,
+  printNumber,
+  document_status,
+  print_count,
+  issue_type,
+}) => {
   const [pdfLink, setPdfLink] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [printCount, setPrintCount] = useState(print_count);
   const [printConvertPdf] = usePrintConvertPdfMutation();
-
+  console.log(issue_type)
   useEffect(() => {
     if (open) {
       fetchPdf();
     }
   }, [open]);
-
+  const mapDocumentStatus = (status) => {
+    switch (status) {
+      case "Created":
+      case "Send Back":
+        return "DRAFT";
+      case "Under Reviewer":
+        return "UNDER REVIEW";
+      case "Under Approver":
+        return "UNDER APPROVER";
+      case "Effective":
+      case "Revise":
+        return "EFFECTIVE";
+      case "Supersede":
+        return "SUPERSEDED";
+      case "Obsolete":
+        return "OBSOLETED";
+      default:
+        return status; // Keep the original if not matched
+    }
+  };
   const fetchPdf = async () => {
     setIsLoading(true);
     try {
       const response = await printConvertPdf({
         sop_document_id: id,
         approval_numbers: printNumber,
-        document_status: document_status,
+        document_status: mapDocumentStatus(document_status), // Apply mapping function here
       }).unwrap();
 
       if (response && response.pdf_link) {
@@ -41,7 +69,6 @@ const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumbe
     }
     setIsLoading(false);
   };
-
   const handlePrint = () => {
     if (!pdfLink || printCount >= noOfRequestByAdmin) {
       toast.warning("Print limit reached or PDF not available!");
@@ -49,7 +76,7 @@ const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumbe
     }
     try {
       const printWindow = window.open(pdfLink, "_blank");
-      
+
       if (printWindow) {
         printWindow.addEventListener("load", () => {
           try {
@@ -107,7 +134,9 @@ const PrintDocumentDialog = ({ open, onClose, id, noOfRequestByAdmin, printNumbe
             <CircularProgress />
           </MDBox>
         ) : printCount >= noOfRequestByAdmin ? (
-          <MDTypography color="error">You reached the max limit which Doc Admin allows. For more prints, request again.</MDTypography>
+          <MDTypography color="error">
+            You reached the max limit which Doc Admin allows. For more prints, request again.
+          </MDTypography>
         ) : pdfLink ? (
           <MDTypography>Document is ready to print.</MDTypography>
         ) : (
@@ -141,6 +170,7 @@ PrintDocumentDialog.propTypes = {
   printNumber: PropTypes.array.isRequired,
   document_status: PropTypes.string.isRequired,
   print_count: PropTypes.number.isRequired,
+  issue_type: PropTypes.string.isRequired,
 };
 
 export default PrintDocumentDialog;
