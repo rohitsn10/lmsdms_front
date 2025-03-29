@@ -101,15 +101,17 @@ const PrintApprovalListing = () => {
       window.open(fileUrl, "_blank"); // Open the file URL in a new tab to download
     }
   };
-  const handleOpenPrintDialog = (documentId, noOfRequestByAdmin, approvalNumbers, document_status,print_count) => {
+  const handleOpenPrintDialog = (documentId, noOfRequestByAdmin, approvalNumbers, document_status,print_count,issue_type) => {
     setSelectedDocumentId(documentId); // Store the document id
     setSelectedRequest((prevRequest) => ({
       ...prevRequest,
       no_of_request_by_admin: noOfRequestByAdmin,
       approval_numbers: approvalNumbers, // Ensure approval_numbers is set
       document_status: document_status,
-      print_count : print_count
+      print_count : print_count,
+      issue_type : issue_type,
     }));
+    console.log("++++++++++++++++++++++++++++++++",selectedRequest)
     setOpenPrintDialog(true); // Open the print document dialog
   };
   
@@ -369,6 +371,7 @@ const PrintApprovalListing = () => {
           printNumber={selectedRequest?.approval_numbers}
           document_status={selectedRequest?.document_status}
           print_count = {selectedRequest?.print_count}
+          issue_type = {selectedRequest?.issue_type}
         />
       )}
     </MDBox>
