@@ -130,11 +130,53 @@ function MultiChoiceQuestionsSection() {
     setOpenConfirmModal(false);
   };
 
+  // useEffect(() => {
+  //   if (questionsData?.data?.[0]) {
+  //     console.log("Questions>>>>",questionsData)
+  //     const quizData = questionsData.data[0];
+      
+
+  //     const shuffleArray = (array) => {
+  //       let shuffled = [...array];
+  //       for (let i = shuffled.length - 1; i > 0; i--) {
+  //         const j = Math.floor(Math.random() * (i + 1));
+  //         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  //       }
+  //       return shuffled;
+  //     };
+
+  //     const shuffledQuestions = shuffleArray(quizData.questions || []);
+  
+  //     setQuestions(shuffledQuestions);
+  //     setPageCount(shuffledQuestions.length);
+  //     setCounter(quizData.quiz_time * 60);
+  
+  //     const initialCorrectAnswers = shuffledQuestions.reduce((acc, item) => {
+  //       acc[item.id] = (item.correct_answer || "").toLowerCase();
+  //       return acc;
+  //     }, {});
+  //     setCorrectAnswers(initialCorrectAnswers);
+  //     // const shuffledQuestions = shuffleArray(quizData.questions || []);
+
+  //     // setQuestions(quizData.questions || []);
+  //     // setPageCount(quizData.questions?.length || 0);
+  //     // setCounter(quizData.quiz_time * 60);
+      
+  //     // const initialCorrectAnswers = (quizData.questions || []).reduce((acc, item) => {
+  //     //   acc[item.id] = (item.correct_answer || "").toLowerCase();
+  //     //   return acc;
+  //     // }, {});
+
+  //     // setCorrectAnswers(initialCorrectAnswers);
+  //   }
+  // }, [questionsData]);
+
   useEffect(() => {
     if (questionsData?.data?.[0]) {
+      console.log("Questions>>>>",questionsData)
       const quizData = questionsData.data[0];
-
-
+      
+      // Function to shuffle array
       const shuffleArray = (array) => {
         let shuffled = [...array];
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -143,29 +185,32 @@ function MultiChoiceQuestionsSection() {
         }
         return shuffled;
       };
-      const shuffledQuestions = shuffleArray(quizData.questions || []);
-    
-      setQuestions(shuffledQuestions);
-      setPageCount(shuffledQuestions.length);
+
+      // Determine the questions to display based on quiz_type
+      let questionsToDisplay;
+      
+      if (quizData.quiz_type === "auto" && quizData.total_questions) {
+        // For 'auto' type, select random questions based on total_questions count
+        const allQuestions = quizData.questions || [];
+        // Shuffle all questions first
+        const shuffledAllQuestions = shuffleArray(allQuestions);
+        // Take only the required number of questions
+        const numQuestionsToSelect = Math.min(quizData.total_questions, shuffledAllQuestions.length);
+        questionsToDisplay = shuffledAllQuestions.slice(0, numQuestionsToSelect);
+      } else {
+        // For 'manual' type or any other case, use all questions but shuffle them
+        questionsToDisplay = shuffleArray(quizData.questions || []);
+      }
+      
+      setQuestions(questionsToDisplay);
+      setPageCount(questionsToDisplay.length);
       setCounter(quizData.quiz_time * 60);
   
-      const initialCorrectAnswers = shuffledQuestions.reduce((acc, item) => {
+      const initialCorrectAnswers = questionsToDisplay.reduce((acc, item) => {
         acc[item.id] = (item.correct_answer || "").toLowerCase();
         return acc;
       }, {});
       setCorrectAnswers(initialCorrectAnswers);
-      // const shuffledQuestions = shuffleArray(quizData.questions || []);
-
-      // setQuestions(quizData.questions || []);
-      // setPageCount(quizData.questions?.length || 0);
-      // setCounter(quizData.quiz_time * 60);
-      
-      // const initialCorrectAnswers = (quizData.questions || []).reduce((acc, item) => {
-      //   acc[item.id] = (item.correct_answer || "").toLowerCase();
-      //   return acc;
-      // }, {});
-
-      // setCorrectAnswers(initialCorrectAnswers);
     }
   }, [questionsData]);
 
