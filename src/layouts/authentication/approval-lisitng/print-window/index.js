@@ -22,7 +22,7 @@ const PrintDocumentDialog = ({
   const [isLoading, setIsLoading] = useState(false);
   const [printCount, setPrintCount] = useState(print_count);
   const [printConvertPdf] = usePrintConvertPdfMutation();
-  console.log(issue_type)
+  console.log("+++++++++++++++++++++++++++++++++++++++++++++",issue_type)
   useEffect(() => {
     if (open) {
       fetchPdf();
@@ -55,6 +55,7 @@ const PrintDocumentDialog = ({
         sop_document_id: id,
         approval_numbers: printNumber,
         document_status: mapDocumentStatus(document_status), // Apply mapping function here
+        issue_type: issue_type,
       }).unwrap();
 
       if (response && response.pdf_link) {

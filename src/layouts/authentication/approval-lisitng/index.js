@@ -251,7 +251,8 @@ const PrintApprovalListing = () => {
                 params.row.no_of_request_by_admin,
                 params.row.approval_numbers,
                 params.row.document_status,
-                params.row.print_count
+                params.row.print_count,
+                params.row.issue_type
               )
             }
             disabled={params.row.status_id != 9}

@@ -13,9 +13,10 @@ import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/m
 // Import the mutation hook
 import { usePrintDocumentMutation } from "api/auth/printApi";
 import { useGetPrintersQuery } from "api/auth/PrinterApi";
+import { useViewStatusQuery } from "api/auth/statusApi";
 
 // Example issue types (Replace with actual options)
-const issueTypes = ["CONTROLLED COPY", " DISPLAY COPY", "FOR INFORMATION ONLY" , "EXECUTION COPY"];
+const issueTypes = ["CONTROLLED COPY", " DISPLAY COPY", "FOR INFORMATION ONLY", "EXECUTION COPY"];
 
 function PrintDocument() {
   const [numberOfPrints, setNumberOfPrints] = useState(1);
@@ -23,9 +24,12 @@ function PrintDocument() {
   const [reasonForPrint, setReasonForPrint] = useState("");
   const [selectedPrinter, setSelectedPrinter] = useState(""); // New state for printer selection
   const { id } = useParams(); // Fetch sop_document_id from URL
+  const queryParams = new URLSearchParams(location.search);
+  const status = queryParams.get("status");
+  const statusId = queryParams.get("status"); 
   const navigate = useNavigate();
-
-  // console.log("Id : ", id);
+  const { data: statuses, isLoading: isLoadingStatus } = useViewStatusQuery();
+  const statusName = statuses?.find((s) => s.id === parseInt(statusId))?.status || "Unknown Status";
 
   // Initialize the mutation hook
   const [printDocument, { isLoading, isSuccess, error }] = usePrintDocumentMutation();
@@ -41,7 +45,7 @@ function PrintDocument() {
       const response = await printDocument({
         sop_document_id: id,
         no_of_print: numberOfPrints,
-        issue_type: issueType,
+        issue_type: statusId === "7" ? issueType : null,
         reason_for_print: reasonForPrint,
         printer_id: selectedPrinter, // Include selected printer
       }).unwrap(); // Unwrap the promise to handle the result directly
@@ -99,6 +103,38 @@ function PrintDocument() {
         <MDBox pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
             {/* Number of Prints */}
+
+            <MDBox mb={3}>
+              {statusId === "7" ? (
+                <FormControl fullWidth margin="dense">
+                  <InputLabel id="select-issue-type-label">Issue Type</InputLabel>
+                  <Select
+                    labelId="select-issue-type-label"
+                    id="select-issue-type"
+                    value={issueType}
+                    onChange={(e) => setIssueType(e.target.value)}
+                    input={<OutlinedInput label="Issue Type" />}
+                    sx={{
+                      minWidth: 200,
+                      height: "3rem",
+                      ".MuiSelect-select": {
+                        padding: "0.45rem",
+                      },
+                    }}
+                  >
+                    {issueTypes.map((type) => (
+                      <MenuItem key={type} value={type}>
+                        {type}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : (
+                <MDTypography variant="body2" color="error">
+                  Status <strong>{statusName}</strong> doesn&apos;t need issue type
+                </MDTypography>
+              )}
+            </MDBox>
             <MDBox mb={3}>
               <MDInput
                 type="number"
@@ -111,31 +147,8 @@ function PrintDocument() {
             </MDBox>
 
             {/* Issue Type */}
-            <MDBox mb={3}>
-              <FormControl fullWidth margin="dense">
-                <InputLabel id="select-issue-type-label">Issue Type</InputLabel>
-                <Select
-                  labelId="select-issue-type-label"
-                  id="select-issue-type"
-                  value={issueType}
-                  onChange={(e) => setIssueType(e.target.value)}
-                  input={<OutlinedInput label="Issue Type" />}
-                  sx={{
-                    minWidth: 200,
-                    height: "3rem",
-                    ".MuiSelect-select": {
-                      padding: "0.45rem",
-                    },
-                  }}
-                >
-                  {issueTypes.map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {type}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </MDBox>
+            {/* Issue Type */}
+           
 
             {/* Select Printer */}
             <MDBox mb={3}>

@@ -35,7 +35,7 @@ import { useFetchSendbackDataQuery } from "api/auth/documentApi";
 
 const DocumentView = () => {
   const { id } = useParams();
-  const { data: reviewerData, refetch: reviewerRefetch } = useFetchSendbackDataQuery(id);
+  const { data: reviewerData, refetch: reviewerRefetch } = useFetchSendbackDataQuery(id); 
   const { user, setValue } = useContext(AuthContext);
   const currentUserID = user.id;
   const sendBackRequests = reviewerData?.send_back_requests || [];
@@ -401,9 +401,9 @@ const DocumentView = () => {
   };
 
   const handlePrint = () => {
-    navigate(`/print-document/${id}`);
+    navigate(`/print-document/${id}?status=${document_current_status}`);
   };
-
+  
   const handleOpenDialog = () => {
     setDialogOpen(true);
   };
