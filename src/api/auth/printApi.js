@@ -56,12 +56,13 @@ export const printApi = createApi({
       transformResponse: (response) => response, // Handle raw response
     }),
     printConvertPdf: builder.mutation({ 
-      query: ({ sop_document_id, approval_numbers, document_status }) => ({ 
+      query: ({ sop_document_id, approval_numbers, document_status,issue_type}) => ({ 
         url: `dms_module/print_convert_pdf/${sop_document_id}`,
         method: "PUT",
         body: { 
           approval_numbers, 
-          document_status 
+          document_status,
+          issue_type, 
         },
       }),
       transformResponse: (response) => response,
