@@ -173,7 +173,7 @@ function MultiChoiceQuestionsSection() {
 
   useEffect(() => {
     if (questionsData?.data?.[0]) {
-      console.log("Questions>>>>",questionsData)
+      // console.log("Questions>>>>",questionsData)
       const quizData = questionsData.data[0];
       
       // Function to shuffle array
