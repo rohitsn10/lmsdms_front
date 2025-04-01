@@ -67,6 +67,16 @@ export const printApi = createApi({
       }),
       transformResponse: (response) => response,
     }),
+    archivedPrintConvertPdf: builder.mutation({ 
+      query: ({ sop_document_id, document_status}) => ({ 
+        url: `dms_module/archived_print_convert_pdf/${sop_document_id}`,
+        method: "PUT",
+        body: { 
+          document_status,
+        },
+      }),
+      transformResponse: (response) => response,
+    }),
     
   }),
 });
@@ -77,4 +87,5 @@ export const {
   usePrintApprovalsMutation, // New hook for print_approvals
   usePrintRequestExcelReportQuery,
   usePrintConvertPdfMutation,
+  useArchivedPrintConvertPdfMutation,
 } = printApi;

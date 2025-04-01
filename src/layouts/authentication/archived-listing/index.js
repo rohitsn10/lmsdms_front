@@ -7,6 +7,8 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import { useFetchDocumentVersionListQuery } from "api/auth/documentApi";
+import LocalPrintshopTwoToneIcon from "@mui/icons-material/LocalPrintshopTwoTone";
+import { useArchivedPrintConvertPdfMutation } from "api/auth/printApi";
 import { useNavigate } from "react-router-dom";
 const ArchivedListing = () => {
     const navigate = useNavigate();
@@ -15,11 +17,27 @@ const ArchivedListing = () => {
     const { data: versions = [], isLoading: versionsLoading } = useFetchDocumentVersionListQuery(
         selectedDocumentId || null
     );
-
+    const [convertToPdf, { isLoading: isConverting }] = useArchivedPrintConvertPdfMutation();
     const handleSearch = (event) => {
         setSearchTerm(event.target.value.toLowerCase());
     };
+    const handlePrint = async (documentId, documentStatus) => {
+        try {
+            const response = await convertToPdf({
+                sop_document_id: documentId,
+                document_status: documentStatus
+            }).unwrap();
 
+            if (response?.pdf_url) {
+                // Open the PDF in a new tab for printing
+                window.open(response.pdf_url, "_blank");
+            } else {
+                console.error("Failed to generate PDF");
+            }
+        } catch (error) {
+            console.error("Error converting document to PDF:", error);
+        }
+    };
     const columns = [
         // { field: "sr", headerName: "Sr", flex: 0.3, headerAlign: "center", valueGetter: (params) => params.rowIndex + 1 },
         {
@@ -39,17 +57,21 @@ const ArchivedListing = () => {
         { field: "document_number", headerName: "Document Number", flex: 1, headerAlign: "center" },
         { field: "version", headerName: "Version", flex: 1, headerAlign: "center" },
         { field: "document_current_status_name", headerName: "Status", flex: 1, headerAlign: "center" },
-        // {
-        //     field: "action",
-        //     headerName: "Action",
-        //     flex: 0.5,
-        //     headerAlign: "center",
-        //     renderCell: () => (
-        //         <IconButton color="primary">
-        //             <VisibilityIcon />
-        //         </IconButton>
-        //     )
-        // }
+        {
+            field: "print",
+            headerName: "Print",
+            flex: 0.5,
+            headerAlign: "center",
+            renderCell: (params) => (
+                <IconButton 
+                    color="primary" 
+                    onClick={() => handlePrint(params.row.document_id, params.row.document_current_status_name)}
+                    disabled={isConverting}
+                >
+                    <LocalPrintshopTwoToneIcon />
+                </IconButton>
+            )
+        },
         {
             field: "action",
             headerName: "Action",

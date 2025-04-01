@@ -130,7 +130,7 @@ const UserReports = () => {
     { field: "full_name", headerName: "Full Name", flex: 1, headerAlign: "center" },
     {
       field: "training_need",
-      headerName: "Employee Training Summary",
+      headerName: "EMPLOYEE TRAINING NEED IDENTIFICATION",
       flex: 1,
       headerAlign: "center",
       renderCell: (params) => (
