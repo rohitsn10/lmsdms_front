@@ -64,7 +64,7 @@ const ArchivedListing = () => {
             headerAlign: "center",
             renderCell: (params) => (
                 <IconButton 
-                    color="primary" 
+                    color="error" 
                     onClick={() => handlePrint(params.row.document_id, params.row.document_current_status_name)}
                     disabled={isConverting}
                 >
@@ -74,13 +74,13 @@ const ArchivedListing = () => {
         },
         {
             field: "action",
-            headerName: "Action",
+            headerName: "View",
             flex: 0.5,
             headerAlign: "center",
             renderCell: (params) => 
                 (
                 <IconButton
-                    color="primary"
+                    color="warning"
                     onClick={() =>
                       {  
                         console.log("Paramss",params)
@@ -106,7 +106,7 @@ const ArchivedListing = () => {
     return (
         <MDBox p={3}>
             {/* <Card sx={{ maxWidth: "90%", mx: "auto", mt: 3,ml:3 }}> */}
-            <Card sx={{ maxWidth: "80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 5 }}>
+            <Card sx={{ maxWidth: "80%",maxHeight:"80%", mx: "auto", mt: 3, marginLeft: "auto", marginRight: 5 }}>
                 <MDBox p={3}>
                 <MDBox 
                         display="flex" 
@@ -127,7 +127,7 @@ const ArchivedListing = () => {
                         </MDTypography>
                     </MDBox>
                     <MDBox display="flex" justifyContent="center">
-                        <div style={{ height: 400, width: "100%" }}>
+                        <div style={{flexGrow: 1, height: 700, width: "100%" }}>
                             <DataGrid
                                 rows={filteredRows}
                                 columns={columns}

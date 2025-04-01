@@ -628,7 +628,7 @@ const DocumentListing = () => {
           )}
         </MDBox>
         <MDBox display="flex" justifyContent="center" p={2}>
-          <div style={{ height: 500, width: "100%", overflow: "auto" }}>
+          <div style={{ height: 700, width: "100%", overflow: "auto" }}>
             <DataGrid
               rows={rows || []}
               columns={columns}
