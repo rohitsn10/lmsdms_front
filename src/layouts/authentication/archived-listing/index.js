@@ -28,9 +28,9 @@ const ArchivedListing = () => {
                 document_status: documentStatus
             }).unwrap();
 
-            if (response?.pdf_url) {
+            if (response?.pdf_link) {
                 // Open the PDF in a new tab for printing
-                window.open(response.pdf_url, "_blank");
+                window.open(response.pdf_link, "_blank");
             } else {
                 console.error("Failed to generate PDF");
             }
