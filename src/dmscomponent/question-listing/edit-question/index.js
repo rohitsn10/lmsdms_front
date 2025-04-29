@@ -31,7 +31,7 @@ function EditQuestion() {
   const { state } = useLocation(); // Get the passed state from location
   const navigate = useNavigate();
   const documnetId = state.item.fullData.document;
-  console.log("++++++++++++++++++++++++++",documnetId);
+  console.log("++++++++++++++++++++++++++", documnetId);
   const [answers, setAnswers] = useState(() => {
     const optionsArray = state?.item?.fullData?.options?.split(",") || [];
     const correctAnswer = state?.item?.fullData?.correct_answer;
@@ -230,7 +230,7 @@ function EditQuestion() {
                 label="Edit Question"
                 fullWidth
                 value={questionText}
-                onClick={handleOpenQuestionDialog}
+                onChange={(e) => setQuestionText(e.target.value)}
               />
             </MDBox>
 
@@ -249,7 +249,7 @@ function EditQuestion() {
                     ".MuiSelect-select": { padding: "0.45rem" },
                   }}
                 >
-                  <MenuItem value="Fill in the blank">Fill in the blank</MenuItem>
+                  {/* <MenuItem value="Fill in the blank">Fill in the blank</MenuItem> */}
                   <MenuItem value="MCQ">MCQ</MenuItem>
                   <MenuItem value="True/False">True/False</MenuItem>
                 </Select>
@@ -269,7 +269,6 @@ function EditQuestion() {
                   value={answers[0]?.text}
                   onChange={(e) => handleAnswerChange(0, e.target.value)}
                   fullWidth
-                 
                 />
               )}
 
@@ -291,7 +290,6 @@ function EditQuestion() {
                             onChange={() => handleCorrectAnswerChange(index)}
                           />
                         }
-                       
                       />
                       <IconButton onClick={() => handleRemoveAnswer(index)}>
                         <DeleteIcon />

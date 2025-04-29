@@ -79,7 +79,7 @@ function ClassAddQuestion() {
       setSelectedFile(null);
     }
   };
-  
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file && !file.type.startsWith("image/")) {
@@ -155,7 +155,7 @@ function ClassAddQuestion() {
       formData.append("options", options || "");
       formData.append("correct_answer", correct_answer || "");
       formData.append("marks", questionMarks);
-      
+
       // Handle image upload
       if (hasImage && selectedFile) {
         formData.append("selected_file_type", "image");
@@ -195,7 +195,7 @@ function ClassAddQuestion() {
   const handleSaveQuestion = (content) => {
     setQuestionText(content.trim()); // Trim spaces
   };
-  
+
   const handleSaveAnswer = (content) => {
     const updatedAnswers = [...answers];
     updatedAnswers[currentAnswerIndex].text = content.trim(); // Trim spaces
@@ -229,9 +229,10 @@ function ClassAddQuestion() {
                 label="Add Question"
                 fullWidth
                 value={questionText}
-                onClick={handleOpenQuestionDialog}
+                onChange={(e) => setQuestionText(e.target.value)}
               />
             </MDBox>
+
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-question-type-label">Question Type</InputLabel>
@@ -291,7 +292,6 @@ function ClassAddQuestion() {
                         type="text"
                         placeholder={`Answer ${index + 1}`}
                         value={answer.text}
-                        onClick={() => handleOpenAnswerDialog(index)}
                         onChange={(e) => handleAnswerChange(index, e.target.value)}
                         sx={{ flex: 1, marginRight: 1 }}
                       />
@@ -389,7 +389,6 @@ function ClassAddQuestion() {
         content={answers[currentAnswerIndex]?.text || ""}
         onSave={handleSaveAnswer}
       />
-    
     </BasicLayout>
   );
 }

@@ -133,21 +133,24 @@ function AddQuestion() {
 
     setOpenSignatureDialog(true);
   };
-  
+
   const handleQuestionTypeChange = (event) => {
     const newType = event.target.value;
     setQuestionType(newType);
-  
+
     // Reset answers based on question type
     if (newType === "MCQ") {
-      setAnswers([{ text: "", isCorrect: false }]); 
+      setAnswers([{ text: "", isCorrect: false }]);
     } else if (newType === "True/False") {
-      setAnswers([{ text: "True", isCorrect: false }, { text: "False", isCorrect: false }]);
+      setAnswers([
+        { text: "True", isCorrect: false },
+        { text: "False", isCorrect: false },
+      ]);
     } else if (newType === "Fill in the blank") {
-      setAnswers([{ text: "", isCorrect: true }]); 
+      setAnswers([{ text: "", isCorrect: true }]);
     }
   };
-  
+
   const handleSignatureComplete = async (password) => {
     setOpenSignatureDialog(false);
 
@@ -178,10 +181,10 @@ function AddQuestion() {
       options = "True,False";
       correct_answer = answers[0]?.text;
     }
-    
+
     formData.append("options", options ? options : "");
     formData.append("correct_answer", correct_answer ? correct_answer : "");
-    
+
     // Handle image upload
     if (hasImage && selectedFile) {
       formData.append("selected_file_type", "image");
@@ -189,7 +192,7 @@ function AddQuestion() {
     } else {
       formData.append("selected_file_type", "");
     }
-    
+
     try {
       const response = await createTrainingQuestion(formData).unwrap();
       toast.success("Question created successfully!");
@@ -202,41 +205,41 @@ function AddQuestion() {
       setOpenSignatureDialog(false);
     }
   };
-  
+
   const handleOpenQuestionDialog = () => {
     setOpenQuestionDialog(true);
   };
-  
+
   const handleCloseQuestionDialog = () => {
     setOpenQuestionDialog(false);
   };
-  
+
   const handleOpenAnswerDialog = (index) => {
     setCurrentAnswerIndex(index);
     setOpenAnswerDialog(true);
   };
-  
+
   const handleCloseAnswerDialog = () => {
     setOpenAnswerDialog(false);
   };
-  
+
   const handleSaveQuestion = (content) => {
     setQuestionText(content);
   };
-  
+
   const handleSaveAnswer = (content) => {
     const updatedAnswers = [...answers];
     updatedAnswers[currentAnswerIndex].text = content;
     setAnswers(updatedAnswers);
   };
-  
+
   const handleHasImageChange = (event) => {
     setHasImage(event.target.checked);
     if (!event.target.checked) {
       setSelectedFile(null);
     }
   };
-  
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file && !file.type.startsWith("image/")) {
@@ -273,7 +276,7 @@ function AddQuestion() {
                 label="Add Question"
                 fullWidth
                 value={questionText}
-                onClick={handleOpenQuestionDialog}
+                onChange={(e) => setQuestionText(e.target.value)}
               />
             </MDBox>
             <MDBox mb={3}>
@@ -283,7 +286,7 @@ function AddQuestion() {
                   labelId="select-question-type-label"
                   id="select-question-type"
                   value={questionType}
-                  onChange={handleQuestionTypeChange} 
+                  onChange={handleQuestionTypeChange}
                   input={<OutlinedInput label="Question Type" />}
                   sx={{
                     minWidth: 200,
@@ -325,10 +328,10 @@ function AddQuestion() {
                         type="text"
                         placeholder={`Answer ${index + 1}`}
                         value={answer.text}
-                        onClick={() => handleOpenAnswerDialog(index)}
                         onChange={(e) => handleAnswerChange(index, e.target.value)}
                         sx={{ flex: 1, marginRight: 2 }}
                       />
+
                       <FormControlLabel
                         control={
                           <Checkbox
