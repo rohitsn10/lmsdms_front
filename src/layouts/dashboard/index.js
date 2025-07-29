@@ -14,7 +14,7 @@ import DraftsIcon from "@mui/icons-material/Drafts";
 import TaskIcon from "@mui/icons-material/Task";
 import CancelPresentationTwoToneIcon from "@mui/icons-material/CancelPresentationTwoTone";
 import RateReviewTwoToneIcon from "@mui/icons-material/RateReviewTwoTone";
-import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import GetAppOutlinedIcon from "@mui/icons-material/GetAppOutlined";
 import { Link } from "react-router-dom";
@@ -26,7 +26,7 @@ import {
   useGetDocumentDataOfStatusIdFourQuery,
   useGetDocumentDataOfStatusIdnintyQuery,
 } from "api/auth/dashboardApi";
-import { useGetPrintRequestsQuery } from "api/auth/printApi"; 
+import { useGetPrintRequestsQuery } from "api/auth/printApi";
 import { useAuth } from "hooks/use-auth";
 import { useReviseRequestGetQuery } from "api/auth/reviseApi";
 
@@ -46,13 +46,16 @@ function Dashboard() {
     isLoading: loadingprint,
     error: printError,
   } = useGetPrintRequestsQuery({
-    status_id:13
+    status_id: 13,
   });
   const {
     data: retrievaldata,
     isLoading: loadingretrieval,
     error: retrievalError,
-  } = useReviseRequestGetQuery();
+  } = useReviseRequestGetQuery(undefined, {
+  refetchOnFocus: true,       // when user comes back to tab
+  refetchOnReconnect: true,   // if internet reconnects
+});
   const {
     data: approveData,
     isLoading: loadingApprove,
@@ -99,7 +102,7 @@ function Dashboard() {
     startDate: "",
     endDate: "",
   });
-  const {user}= useAuth();
+  const { user } = useAuth();
   const isDocAdmin = user?.user_permissions?.group.id;
 
   // console.log("User CCtct",isDocAdmin)
@@ -113,65 +116,65 @@ function Dashboard() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-            <Link to="/user-listing">
-              <ComplexStatisticsCard
-                color="primary"
-                icon={<PersonAddIcon />}
-                title="User"
-                count={data?.user_count || 0}
-                percentage={{
-                  color: "success",
-                  label: "Updated yesterday",
-                }}
-              />
-               </Link>
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-            <Link to="/document-listing">
-              <ComplexStatisticsCard
-                icon={<TopicIcon />}
-                color="warning"
-                title="Document"
-                count={data?.document_count || 0}
-                percentage={{
-                  color: "success",
-                  label: "Just updated",
-                }}
-              />
+              <Link to="/user-listing">
+                <ComplexStatisticsCard
+                  color="primary"
+                  icon={<PersonAddIcon />}
+                  title="User"
+                  count={data?.user_count || 0}
+                  percentage={{
+                    color: "success",
+                    label: "Updated yesterday",
+                  }}
+                />
               </Link>
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-            <Link to="/department-listing">
-              <ComplexStatisticsCard
-                color="success"
-                icon={<ApartmentIcon />}
-                title="Department"
-                count={data?.department_count || 0}
-                percentage={{
-                  color: "success",
-                  label: "Just updated",
-                }}
-              />
+              <Link to="/document-listing">
+                <ComplexStatisticsCard
+                  icon={<TopicIcon />}
+                  color="warning"
+                  title="Document"
+                  count={data?.document_count || 0}
+                  percentage={{
+                    color: "success",
+                    label: "Just updated",
+                  }}
+                />
               </Link>
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-            <Link to="/workflow-listing">
-              <ComplexStatisticsCard
-                color="dark"
-                icon={<AssignmentTurnedInIcon />}
-                title="WorkFlow"
-                count={data?.workflow_count || 0}
-                percentage={{
-                  color: "success",
-                  label: "Updated yesterday",
-                }}
-              />
+              <Link to="/department-listing">
+                <ComplexStatisticsCard
+                  color="success"
+                  icon={<ApartmentIcon />}
+                  title="Department"
+                  count={data?.department_count || 0}
+                  percentage={{
+                    color: "success",
+                    label: "Just updated",
+                  }}
+                />
+              </Link>
+            </MDBox>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <Link to="/workflow-listing">
+                <ComplexStatisticsCard
+                  color="dark"
+                  icon={<AssignmentTurnedInIcon />}
+                  title="WorkFlow"
+                  count={data?.workflow_count || 0}
+                  percentage={{
+                    color: "success",
+                    label: "Updated yesterday",
+                  }}
+                />
               </Link>
             </MDBox>
           </Grid>
@@ -255,75 +258,75 @@ function Dashboard() {
               </Link>
             </MDBox>
           </Grid>
-          {isDocAdmin == 5 &&
+          {isDocAdmin == 5 && (
             <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <Link to="/approval-listing">
-                <ComplexStatisticsCard
-                  color="dark"
-                  icon={<PendingActionsIcon />}
-                  title="Print Approval"
-                  count={printdata?.total || 0}
-                  percentage={{
-                    color: "success",
-                  }}
-                />
-              </Link> 
-            </MDBox>
-          </Grid>
-          }
+              <MDBox mb={1.5}>
+                <Link to="/approval-listing">
+                  <ComplexStatisticsCard
+                    color="dark"
+                    icon={<PendingActionsIcon />}
+                    title="Print Approval"
+                    count={printdata?.total || 0}
+                    percentage={{
+                      color: "success",
+                    }}
+                  />
+                </Link>
+              </MDBox>
+            </Grid>
+          )}
 
-          {isDocAdmin == 5 &&
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <Link to="/revise-listing">
-                <ComplexStatisticsCard
-                  color="warning"
-                  icon={<PendingActionsIcon />}
-                  title="Doc Revision Request"
-                  count={retrievaldata?.pending_revise_count || 0}
-                  percentage={{
-                    color: "success",
-                  }}
-                />
-              </Link>
-            </MDBox>
-          </Grid>
-          }
-    {isDocAdmin == 5 &&
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <Link to="/archived-listing">
-                <ComplexStatisticsCard
-                  color="error"
-                  icon={<ArchiveIcon />}
-                  title="Archived"
-                  // count={printdata?.total || 0}
-                  percentage={{
-                    color: "success",
-                  }}
-                />
-              </Link>
-            </MDBox>
-          </Grid>
-          }
-           {isDocAdmin == 5 &&
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <Link to="/retrieval-listing">
-                <ComplexStatisticsCard
-                  color="primary"
-                  icon={<GetAppOutlinedIcon />}
-                  title="Print Retrieval"
-                  // count={printdata?.total || 0}
-                  percentage={{
-                    color: "success",
-                  }}
-                />
-              </Link>
-            </MDBox>
-          </Grid>
-          }
+          {isDocAdmin == 5 && (
+            <Grid item xs={12} md={6} lg={3}>
+              <MDBox mb={1.5}>
+                <Link to="/revise-listing">
+                  <ComplexStatisticsCard
+                    color="warning"
+                    icon={<PendingActionsIcon />}
+                    title="Doc Revision Request"
+                    count={retrievaldata?.pending_revise_count || 0}
+                    percentage={{
+                      color: "success",
+                    }}
+                  />
+                </Link>
+              </MDBox>
+            </Grid>
+          )}
+          {isDocAdmin == 5 && (
+            <Grid item xs={12} md={6} lg={3}>
+              <MDBox mb={1.5}>
+                <Link to="/archived-listing">
+                  <ComplexStatisticsCard
+                    color="error"
+                    icon={<ArchiveIcon />}
+                    title="Archived"
+                    // count={printdata?.total || 0}
+                    percentage={{
+                      color: "success",
+                    }}
+                  />
+                </Link>
+              </MDBox>
+            </Grid>
+          )}
+          {isDocAdmin == 5 && (
+            <Grid item xs={12} md={6} lg={3}>
+              <MDBox mb={1.5}>
+                <Link to="/retrieval-listing">
+                  <ComplexStatisticsCard
+                    color="primary"
+                    icon={<GetAppOutlinedIcon />}
+                    title="Print Retrieval"
+                    // count={printdata?.total || 0}
+                    percentage={{
+                      color: "success",
+                    }}
+                  />
+                </Link>
+              </MDBox>
+            </Grid>
+          )}
         </Grid>
       </MDBox>
     </DashboardLayout>

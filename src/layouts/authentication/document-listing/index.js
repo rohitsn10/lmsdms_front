@@ -288,8 +288,10 @@ const DocumentListing = () => {
         doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())) &&
       doc.document_current_status !== 12
   );
-
-  const rows = filteredData.map((doc, index) => {
+ const uniqueFilteredData = filteredData?.filter((doc, index, self) => 
+  index === self.findIndex(d => d.id === doc.id)
+);
+  const rows = uniqueFilteredData?.map((doc, index) => {
     const effectiveDate = doc.effective_date ? moment(doc.effective_date) : null;
     const revisionMonths = doc.revision_month ? parseInt(doc.revision_month, 10) : null;
     
@@ -422,7 +424,8 @@ const DocumentListing = () => {
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
           {hasPermission(userPermissions, "document", "isChange") && (
-            <IconButton color="primary" onClick={() => handleEditClick(params.row)}>
+            <IconButton color="primary" onClick={() => handleEditClick(params.row)}
+            disabled={params.row.document_current_status >= 7}>
               <EditIcon />
             </IconButton>
           )}
