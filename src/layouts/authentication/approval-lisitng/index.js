@@ -111,7 +111,7 @@ const PrintApprovalListing = () => {
       print_count : print_count,
       issue_type : issue_type,
     }));
-    console.log("++++++++++++++++++++++++++++++++",selectedRequest)
+    // console.log("++++++++++++++++++++++++++++++++",selectedRequest)
     setOpenPrintDialog(true); // Open the print document dialog
   };
   

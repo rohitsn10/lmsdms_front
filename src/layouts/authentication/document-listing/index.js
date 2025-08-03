@@ -209,7 +209,7 @@ const DocumentListing = () => {
   };
   const handleViewFile = (url, new_url, params) => {
     // navigate("/PreView", { state: { templateDoc: url,new_url:new_url, templateData: params } }); // Pass the URL as state
-    navigate("/docviewer", { state: { docId: params.id, templateId: params.select_template } });
+    navigate("/docviewer", { state: { docId: params.id, templateId: params.select_template,document_current_status:params.document_current_status } });
     // console.log(params)
     // console.log(params.id,params.select_template  )
   };
@@ -288,10 +288,10 @@ const DocumentListing = () => {
         doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())) &&
       doc.document_current_status !== 12
   );
- const uniqueFilteredData = filteredData?.filter((doc, index, self) => 
-  index === self.findIndex(d => d.id === doc.id)
-);
-  const rows = uniqueFilteredData?.map((doc, index) => {
+//  const uniqueFilteredData = filteredData?.filter((doc, index, self) => 
+//   index === self.findIndex(d => d.id === doc.id)
+// );
+  const rows = filteredData?.map((doc, index) => {
     const effectiveDate = doc.effective_date ? moment(doc.effective_date) : null;
     const revisionMonths = doc.revision_month ? parseInt(doc.revision_month, 10) : null;
     
@@ -435,7 +435,8 @@ const DocumentListing = () => {
               handleViewFile(
                 params.row.selected_template_url,
                 params.row.front_file_url,
-                params.row
+                params.row,
+                params.row.current_status_name,
               );
               // console.log()
               // console.log("Params", params.row);

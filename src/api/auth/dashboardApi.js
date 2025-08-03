@@ -24,7 +24,7 @@ export const dashboardApi = createApi({
         `dms_module/document_data_of_status_id_nine?department_id=${departmentId}&start_date=${startDate}&end_date=${endDate}`,
       transformResponse: (response) => ({
         approvedata: response.data,
-        dataCountapprove: response.data_count, 
+        dataCountapprove: response.data_count,
       }),
     }),
     getDocumentDataOfStatusIdTwo: builder.query({
@@ -32,7 +32,7 @@ export const dashboardApi = createApi({
         `dms_module/document_data_of_status_id_two?department_id=${departmentId}&start_date=${startDate}&end_date=${endDate}`,
       transformResponse: (response) => ({
         saveDraftdata: response.data,
-        dataCountsavedraft: response.data_count, 
+        dataCountsavedraft: response.data_count,
       }),
     }),
     getDocumentDataOfStatusIdThree: builder.query({
@@ -40,7 +40,7 @@ export const dashboardApi = createApi({
         `dms_module/document_data_of_status_id_three?department_id=${departmentId}&start_date=${startDate}&end_date=${endDate}`,
       transformResponse: (response) => ({
         reviewdata: response.data,
-        dataCountreview: response.data_count, 
+        dataCountreview: response.data_count,
       }),
     }),
     getDocumentDataOfStatusIdEleven: builder.query({
@@ -48,7 +48,7 @@ export const dashboardApi = createApi({
         `dms_module/document_data_of_status_id_eleven?department_id=${departmentId}&start_date=${startDate}&end_date=${endDate}`,
       transformResponse: (response) => ({
         rejectdata: response.data,
-        dataCountreject: response.data_count, 
+        dataCountreject: response.data_count,
       }),
     }),
     getDocumentDataOfStatusIdFour: builder.query({
@@ -56,7 +56,7 @@ export const dashboardApi = createApi({
         `dms_module/document_data_of_status_id_four?department_id=${departmentId}&start_date=${startDate}&end_date=${endDate}`,
       transformResponse: (response) => ({
         approvedata: response.data,
-        dataCountapproved: response.data_count, 
+        dataCountapproved: response.data_count,
       }),
     }),
     getDocumentDataOfStatusIdninty: builder.query({
@@ -64,7 +64,7 @@ export const dashboardApi = createApi({
         `dms_module/document_ninty_days_data?department_id=${departmentId}&start_date=${startDate}&end_date=${endDate}`,
       transformResponse: (response) => ({
         SOPdata: response.data,
-        dataCountSOP: response.data_count, 
+        dataCountSOP: response.data_count,
       }),
     }),
     getDashboardDocument: builder.query({
@@ -75,9 +75,18 @@ export const dashboardApi = createApi({
         passedDocument: response.passed_document,
       }),
     }),
+    getPrintRejectDocumentData: builder.query({
+      query: () => `dms_module/print_reject_document_data`,
+      transformResponse: (response) => ({
+        printRejectData: response.data,
+        dataCount: response.data_count || 0,
+        status: response.status,
+        message: response.message,
+      }),
+    }),
   }),
-}); 
-
+});
+ 
 export const {
   useGetDashboardCountsQuery,
   useGetDocumentDataOfStatusIdNineQuery,
@@ -87,4 +96,5 @@ export const {
   useGetDocumentDataOfStatusIdFourQuery,
   useGetDocumentDataOfStatusIdnintyQuery,
   useGetDashboardDocumentQuery,
+  useGetPrintRejectDocumentDataQuery,
 } = dashboardApi;

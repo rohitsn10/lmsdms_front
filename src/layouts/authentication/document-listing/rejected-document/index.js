@@ -303,7 +303,7 @@ const RejectedDocument = () => {
             fontWeight="medium"
             sx={{ flexGrow: 1, textAlign: "center", mr: 28 }}
           >
-            Rejected Revise Document Listing
+            Rejected Revise Document List
           </MDTypography>
 
           {/* Date Range Dropdown */}

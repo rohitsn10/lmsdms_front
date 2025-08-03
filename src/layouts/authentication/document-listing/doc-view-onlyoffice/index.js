@@ -9,15 +9,17 @@ const DocumentPreviewComponent = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { docId, templateId } = location.state || {};
-  const [loading, setLoading] = useState(true);
+  const { docId, templateId,document_current_status } = location.state || {};
+  const [loading, setLoading] = useState(true); 
+  console.log("document iddddddddddddd",document_current_status)
   const docEditorRef = useRef(null);
   const [error, setError] = useState(null);
   const [docEditorLoaded, setDocEditorLoaded] = useState(false);
   const [editorConfig, setEditorConfig] = useState(null);
   const handlePrint = () => {
     console.log("Id passed:", docId);
-    navigate(`/print-document/${docId}`);
+    console.log("document sttatusssssssssssssssssss",document_current_status)
+    navigate(`/print-document/${docId}?status=${document_current_status}`);
   };
   useEffect(() => {
     const fetchEditorConfig = async () => {

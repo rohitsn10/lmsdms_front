@@ -23,9 +23,9 @@ function PrintDocument() {
   const [issueType, setIssueType] = useState("");
   const [reasonForPrint, setReasonForPrint] = useState("");
   const [selectedPrinter, setSelectedPrinter] = useState(""); // New state for printer selection
-  const { id } = useParams(); // Fetch sop_document_id from URL
+  const { id,status_id } = useParams(); // Fetch sop_document_id from URL
   const queryParams = new URLSearchParams(location.search);
-  const status = queryParams.get("status");
+  
   const statusId = queryParams.get("status"); 
   const navigate = useNavigate();
   const { data: statuses, isLoading: isLoadingStatus } = useViewStatusQuery();
@@ -36,8 +36,8 @@ function PrintDocument() {
 
   // Fetch printers using useGetPrintersQuery
   const { data: printersResponse, isFetching: isFetchingPrinters } = useGetPrintersQuery();
-  console.log("Printers Response:", printersResponse);
-  console.log("Printers Data:", printersResponse?.data);
+  // console.log("Printers Response:", printersResponse);
+  // console.log("Printers Data:", printersResponse?.data);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

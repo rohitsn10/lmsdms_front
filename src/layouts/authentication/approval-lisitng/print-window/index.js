@@ -22,7 +22,7 @@ const PrintDocumentDialog = ({
   const [isLoading, setIsLoading] = useState(false);
   const [printCount, setPrintCount] = useState(print_count);
   const [printConvertPdf] = usePrintConvertPdfMutation();
-  console.log("+++++++++++++++++++++++++++++++++++++++++++++",issue_type)
+  // console.log("+++++++++++++++++++++++++++++++++++++++++++++",issue_type)
   useEffect(() => {
     if (open) {
       fetchPdf();

@@ -76,12 +76,15 @@ export const userApi = createApi({
       query: ({ userId }) => `lms_module/classroom_without_assesment/${userId}`,
     }),
     updateDocumentReviewers: builder.mutation({
-  query: ({ document_id, reviewer_ids }) => ({
-    url: `dms_module/update_document_reviewers/${document_id}`,
-    method: 'PUT',
-    body: { reviewer_ids },
-  }),
-}),
+      query: ({ document_id, reviewer_ids }) => ({
+        url: `dms_module/update_document_reviewers/${document_id}`,
+        method: "PUT",
+        body: { reviewer_ids },
+      }),
+    }),
+    jobDescriptionList: builder.query({
+      query: (userId) => `lms_module/jobdescription_list/${userId}`,
+    }),
   }),
 });
 
@@ -98,4 +101,5 @@ export const {
   useUserIdWiseNoOfClassAttemptsMutation,
   useUserIdWisewithoutQuery,
   useUpdateDocumentReviewersMutation,
+  useJobDescriptionListQuery,
 } = userApi;

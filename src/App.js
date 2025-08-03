@@ -137,7 +137,7 @@ import PPTPDFPreview from "dmscomponent/induction-training/PPT-PDF-Preview/index
 import TrainingDocumentObsoleteView from "layouts/authentication/archived-listing/onlyoffice-archived.jsx";
 import ClassFileView from "dmscomponent/class-room/class-file-preview/index.js";
 import ParentTrainingDocumentView from "dmscomponent/Training-listing/onlyofficeDocViewParentView/index.js";
-
+import RejectedPrintDocument from "layouts/authentication/document-listing/print-req-rejected-doc/index.js";
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -368,6 +368,7 @@ export default function App() {
       <Route path="/archived-docviewer" element={<TrainingDocumentObsoleteView/>}/>
       <Route path="/Obsolete-data" element={<ObsoleteDataListing/>}/>
       <Route path="/due-sop-document" element={<DueSOPDocument/>}/>
+      <Route path="/rejected-print-doc-list" element={<RejectedPrintDocument/>}/>
       {/* Lms components */}
       <Route path="/add-area" element={<AddArea />} />
       <Route path="/add-departments" element={<AddDepartments />} />

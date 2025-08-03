@@ -29,6 +29,7 @@ import SOPDialog from "./Document-listView";
 import AssignmentLateIcon from "@mui/icons-material/AssignmentLate";
 import { Edit } from "@mui/icons-material";
 import moment from "moment/moment";
+import JobDescriptionListDialog from "./job-description";
 // import { useGetTrainingCompletionCertificateQuery } from "apilms/workflowapi";
 const UsersListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -80,6 +81,8 @@ const UsersListing = () => {
         groups_list: item.groups_list?.map((group) => group.id).join(", ") || "N/A",
       }))
     : [];
+  const [isJobDescriptionDialogOpen, setJobDescriptionDialogOpen] = useState(false);
+  const [jobDescriptionUserId, setJobDescriptionUserId] = useState(null);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -120,7 +123,7 @@ const UsersListing = () => {
       user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.depratment.toLowerCase().includes(searchTerm.toLowerCase()) 
+      user.depratment.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const handleViewSOPClick = (row) => {
     if (row) {
@@ -272,6 +275,23 @@ const UsersListing = () => {
         </IconButton>
       ),
     },
+    {
+      field: "view_job_description",
+      headerName: "View JD",
+      flex: 0.5,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <IconButton
+          color="primary"
+          onClick={() => {
+            setJobDescriptionUserId(params.row.id);
+            setJobDescriptionDialogOpen(true);
+          }}
+        >
+          <AssignmentIcon />
+        </IconButton>
+      ),
+    },
 
     ...(groupId === 7
       ? [
@@ -383,6 +403,12 @@ const UsersListing = () => {
         onClose={handleCloseDialog}
         selectedUserid={selectedUser ? selectedUser.id : null}
       />
+      <JobDescriptionListDialog
+  open={isJobDescriptionDialogOpen}
+  onClose={() => setJobDescriptionDialogOpen(false)}
+  userId={jobDescriptionUserId}
+/>
+
     </MDBox>
   );
 };

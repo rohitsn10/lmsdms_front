@@ -17,6 +17,7 @@ import RateReviewTwoToneIcon from "@mui/icons-material/RateReviewTwoTone";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import GetAppOutlinedIcon from "@mui/icons-material/GetAppOutlined";
+import PrintDisabledIcon from '@mui/icons-material/PrintDisabled';
 import { Link } from "react-router-dom";
 import {
   useGetDocumentDataOfStatusIdElevenQuery,
@@ -29,7 +30,7 @@ import {
 import { useGetPrintRequestsQuery } from "api/auth/printApi";
 import { useAuth } from "hooks/use-auth";
 import { useReviseRequestGetQuery } from "api/auth/reviseApi";
-
+import { useGetPrintRejectDocumentDataQuery } from "api/auth/dashboardApi";
 function Dashboard() {
   const { data, error, isLoading } = useGetDashboardCountsQuery(); // Fetch the dashboard counts
   const {
@@ -53,9 +54,9 @@ function Dashboard() {
     isLoading: loadingretrieval,
     error: retrievalError,
   } = useReviseRequestGetQuery(undefined, {
-  refetchOnFocus: true,       // when user comes back to tab
-  refetchOnReconnect: true,   // if internet reconnects
-});
+    refetchOnFocus: true, // when user comes back to tab
+    refetchOnReconnect: true, // if internet reconnects
+  });
   const {
     data: approveData,
     isLoading: loadingApprove,
@@ -83,6 +84,11 @@ function Dashboard() {
     startDate: "",
     endDate: "",
   });
+const {
+  data: rejectedPrintData,
+  isLoading: loadingRejectedPrint,
+  error: errorRejectedPrint,
+} = useGetPrintRejectDocumentDataQuery();
 
   const {
     data: savedraftData,
@@ -319,6 +325,23 @@ function Dashboard() {
                     icon={<GetAppOutlinedIcon />}
                     title="Print Retrieval"
                     // count={printdata?.total || 0}
+                    percentage={{
+                      color: "success",
+                    }}
+                  />
+                </Link>
+              </MDBox>
+            </Grid>
+          )}
+          {isDocAdmin == 5 && (
+            <Grid item xs={12} md={6} lg={3}>
+              <MDBox mb={1.5}>
+                <Link to="/rejected-print-doc-list">
+                  <ComplexStatisticsCard
+                    color="error"
+                    icon={<PrintDisabledIcon />}
+                    title="Rejected Print Request"
+                    count={rejectedPrintData?.dataCount || 0}
                     percentage={{
                       color: "success",
                     }}
