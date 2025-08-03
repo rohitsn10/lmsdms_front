@@ -50,7 +50,7 @@ const TrainingListing = () => {
   const [selectedChildDocuments, setSelectedChildDocuments] = useState([]);
   const [whiteListModalOpen, setWhiteListModalOpen] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState(null);
-
+const [maxAttemptsModalOpen, setMaxAttemptsModalOpen] = useState(false);
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [selectedDownloadDocId, setSelectedDownloadDocId] = useState(null);
   const [downloadError, setDownloadError] = useState(null);
@@ -106,6 +106,9 @@ const TrainingListing = () => {
   const handleBlacklistModalClose = () => {
     setBlacklistModalOpen(false);
   };
+  const handleMaxAttemptsModalClose = () => {
+  setMaxAttemptsModalOpen(false);
+};
 
   const handleViewChildDocuments = (row) => {
     setSelectedRowData(row);
@@ -408,42 +411,6 @@ const TrainingListing = () => {
           },
         ]
       : []),
-    // {
-    //   field: "Assessment",
-    //   headerName: "Assessment",
-    //   flex: 0.8,
-    //   headerAlign: "center",
-    //   renderCell: (params) => {
-    //     const isUserInView = params.row?.user_view?.some(view => view.user === user.id);
-
-    //     // Check if this document has a failed quiz session for the current user
-    //     const document = data?.document_data?.documents.find(doc => doc.id === params.row.id);
-    //     const userQuizSession = document?.quiz_sessions?.find(session => session.user === user.id);
-    //     const hasFailedStatus = userQuizSession?.status === "Failed";
-    //     const hasPassedStatus = userQuizSession?.status === "passed";
-    //     const hasBlackListed = document?.training_assesment_attempted == true;
-    //     // console.log(document.document_title,hasBlackListed)
-    //     return (
-    //     <MDBox display="flex" justifyContent="center">
-    //     {hasPassedStatus ? (
-    //       <IconButton disabled>
-    //         <CheckCircleIcon style={{ color: "green" }} />
-    //       </IconButton>
-    //     ) : (
-    //       <IconButton
-    //         disabled={!isUserInView} // Only enable if user is in view
-    //         color={hasFailedStatus ? "warning" : "error"}
-    //         onClick={() => handleAssessmentClick(params.row.id)}
-    //       >
-    //         {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
-    //       </IconButton>
-    //     )}
-    //   </MDBox>
-    //     );
-    //   },
-    //   sortable: false,
-    //   filterable: false,
-    // },
     {
       field: "Assessment",
       headerName: "Assessment",
@@ -460,7 +427,11 @@ const TrainingListing = () => {
         const hasFailedStatus = userQuizSession?.status === "Failed";
         const hasPassedStatus = userQuizSession?.status === "passed";
         const hasBlackListed = document?.training_assesment_attempted === true;
-
+  const attemptCount = document?.attempt_count || 0;
+  const maxAttemptsReached = attemptCount >= 3;
+const handleMaxAttemptsClick = () => {
+  setMaxAttemptsModalOpen(true);
+};
         // Handler for blacklisted user clicks
         const handleBlacklistedClick = () => {
           // Show dialog for blacklisted users
@@ -468,25 +439,30 @@ const TrainingListing = () => {
         };
 
         return (
-          <MDBox display="flex" justifyContent="center">
-            {hasPassedStatus ? (
-              <IconButton disabled>
-                <CheckCircleIcon style={{ color: "green" }} />
-              </IconButton>
-            ) : hasBlackListed ? (
-              <IconButton color="default" onClick={handleBlacklistedClick}>
-                <WarningIcon style={{ color: "gray" }} />
-              </IconButton>
-            ) : (
-              <IconButton
-                disabled={!isUserInView || params.row.quiz_count == 0} // Only enable if user is in view
-                color={hasFailedStatus ? "warning" : "error"}
-                onClick={() => handleAssessmentClick(params.row.id)}
-              >
-                {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
-              </IconButton>
-            )}
-          </MDBox>
+    <MDBox display="flex" justifyContent="center">
+      {hasPassedStatus ? (
+        <IconButton disabled>
+          <CheckCircleIcon style={{ color: "green" }} />
+        </IconButton>
+      ) : hasBlackListed ? (
+        <IconButton color="default" onClick={handleBlacklistedClick}>
+          <WarningIcon style={{ color: "gray" }} />
+        </IconButton>
+      ) : maxAttemptsReached ? (
+        // ADD THIS NEW CONDITION
+        <IconButton color="default" onClick={handleMaxAttemptsClick}>
+          <WarningIcon style={{ color: "orange" }} />
+        </IconButton>
+      ) : (
+        <IconButton
+          disabled={!isUserInView || params.row.quiz_count == 0}
+          color={hasFailedStatus ? "warning" : "error"}
+          onClick={() => handleAssessmentClick(params.row.id)}
+        >
+          {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
+        </IconButton>
+      )}
+    </MDBox>
         );
       },
       sortable: false,
@@ -638,6 +614,30 @@ const TrainingListing = () => {
           <Button onClick={handleBlacklistModalClose}>Close</Button>
         </DialogActions>
       </Dialog>
+      {/* Max Attempts Reached Modal */}
+<Dialog
+  open={maxAttemptsModalOpen}
+  onClose={handleMaxAttemptsModalClose}
+  aria-labelledby="max-attempts-dialog-title"
+  aria-describedby="max-attempts-dialog-description"
+>
+  <DialogTitle
+    id="max-attempts-dialog-title"
+    sx={{ display: "flex", alignItems: "center", color: "warning.main" }}
+  >
+    <WarningIcon color="warning" sx={{ mr: 1 }} />
+    {"Maximum Attempts Reached"}
+  </DialogTitle>
+  <DialogContent>
+    <DialogContentText id="max-attempts-dialog-description">
+      You have reached the maximum limit of 3 attempts for this assessment. 
+      No further attempts are allowed.
+    </DialogContentText>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleMaxAttemptsModalClose}>Close</Button>
+  </DialogActions>
+</Dialog>
       <ChildDocumentsDialog
         open={openChildDialog}
         onClose={() => setOpenChildDialog(false)}
