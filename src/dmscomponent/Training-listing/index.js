@@ -31,7 +31,7 @@ import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import FolderSharedOutlinedIcon from "@mui/icons-material/FolderSharedOutlined";
 import ChildDocumentsDialog from "layouts/authentication/document-listing/child-document";
 import { useFetchDocumentpendingReportQuery } from "apilms/trainingApi";
-import DownloadIcon from '@mui/icons-material/Download';
+import DownloadIcon from "@mui/icons-material/Download";
 
 const TrainingListing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,7 +50,7 @@ const TrainingListing = () => {
   const [selectedChildDocuments, setSelectedChildDocuments] = useState([]);
   const [whiteListModalOpen, setWhiteListModalOpen] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState(null);
-const [maxAttemptsModalOpen, setMaxAttemptsModalOpen] = useState(false);
+  const [maxAttemptsModalOpen, setMaxAttemptsModalOpen] = useState(false);
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [selectedDownloadDocId, setSelectedDownloadDocId] = useState(null);
   const [downloadError, setDownloadError] = useState(null);
@@ -74,7 +74,7 @@ const [maxAttemptsModalOpen, setMaxAttemptsModalOpen] = useState(false);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         // Close modal after successful download
         handleDownloadModalClose();
       } else {
@@ -107,8 +107,8 @@ const [maxAttemptsModalOpen, setMaxAttemptsModalOpen] = useState(false);
     setBlacklistModalOpen(false);
   };
   const handleMaxAttemptsModalClose = () => {
-  setMaxAttemptsModalOpen(false);
-};
+    setMaxAttemptsModalOpen(false);
+  };
 
   const handleViewChildDocuments = (row) => {
     setSelectedRowData(row);
@@ -276,24 +276,21 @@ const [maxAttemptsModalOpen, setMaxAttemptsModalOpen] = useState(false);
     { field: "version", headerName: "Version", flex: 0.8, headerAlign: "center" },
     ...(groupId === 7
       ? [
-    {
-      field: "report_download",
-      headerName: "Reports",
-      headerAlign: "center",
-      flex: 1,
-      renderCell: (params) => (
-        <MDBox display="flex" gap={1}>
-          <IconButton
-            color="error"
-            onClick={() => handleDownloadIconClick(params.row.docId)}
-          >
-            <BrowserUpdatedOutlinedIcon />
-          </IconButton>
-        </MDBox>
-      ),
-    },
-  ]
-  : []),
+          {
+            field: "report_download",
+            headerName: "Reports",
+            headerAlign: "center",
+            flex: 1,
+            renderCell: (params) => (
+              <MDBox display="flex" gap={1}>
+                <IconButton color="error" onClick={() => handleDownloadIconClick(params.row.docId)}>
+                  <BrowserUpdatedOutlinedIcon />
+                </IconButton>
+              </MDBox>
+            ),
+          },
+        ]
+      : []),
     { field: "created_date", headerName: "Created Date", flex: 1, headerAlign: "center" },
     { field: "status", headerName: "Status", flex: 1, headerAlign: "center" },
     { field: "effective_date", headerName: "Effective Date", flex: 1, headerAlign: "center" },
@@ -427,42 +424,40 @@ const [maxAttemptsModalOpen, setMaxAttemptsModalOpen] = useState(false);
         const hasFailedStatus = userQuizSession?.status === "Failed";
         const hasPassedStatus = userQuizSession?.status === "passed";
         const hasBlackListed = document?.training_assesment_attempted === true;
-  const attemptCount = document?.attempt_count || 0;
-  const maxAttemptsReached = attemptCount >= 3;
-const handleMaxAttemptsClick = () => {
-  setMaxAttemptsModalOpen(true);
-};
-        // Handler for blacklisted user clicks
+        const attemptCount = document?.attempt_count || 0;
+        const maxAttemptsReached = attemptCount >= 3;
+        const handleMaxAttemptsClick = () => {
+          setMaxAttemptsModalOpen(true);
+        };
         const handleBlacklistedClick = () => {
           // Show dialog for blacklisted users
           setBlacklistModalOpen(true);
         };
-
         return (
-    <MDBox display="flex" justifyContent="center">
-      {hasPassedStatus ? (
-        <IconButton disabled>
-          <CheckCircleIcon style={{ color: "green" }} />
-        </IconButton>
-      ) : hasBlackListed ? (
-        <IconButton color="default" onClick={handleBlacklistedClick}>
-          <WarningIcon style={{ color: "gray" }} />
-        </IconButton>
-      ) : maxAttemptsReached ? (
-        // ADD THIS NEW CONDITION
-        <IconButton color="default" onClick={handleMaxAttemptsClick}>
-          <WarningIcon style={{ color: "orange" }} />
-        </IconButton>
-      ) : (
-        <IconButton
-          disabled={!isUserInView || params.row.quiz_count == 0}
-          color={hasFailedStatus ? "warning" : "error"}
-          onClick={() => handleAssessmentClick(params.row.id)}
-        >
-          {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
-        </IconButton>
-      )}
-    </MDBox>
+          <MDBox display="flex" justifyContent="center">
+            {hasPassedStatus ? (
+              <IconButton disabled>
+                <CheckCircleIcon style={{ color: "green" }} />
+              </IconButton>
+            ) : hasBlackListed ? (
+              <IconButton color="default" onClick={handleBlacklistedClick}>
+                <WarningIcon style={{ color: "gray" }} />
+              </IconButton>
+            ) : maxAttemptsReached ? (
+              // ADD THIS NEW CONDITION
+              <IconButton color="default" onClick={handleMaxAttemptsClick}>
+                <WarningIcon style={{ color: "orange" }} />
+              </IconButton>
+            ) : (
+              <IconButton
+                disabled={!isUserInView || params.row.quiz_count == 0}
+                color={hasFailedStatus ? "warning" : "error"}
+                onClick={() => handleAssessmentClick(params.row.id)}
+              >
+                {hasFailedStatus ? <WarningIcon /> : <ChecklistIcon />}
+              </IconButton>
+            )}
+          </MDBox>
         );
       },
       sortable: false,
@@ -615,29 +610,29 @@ const handleMaxAttemptsClick = () => {
         </DialogActions>
       </Dialog>
       {/* Max Attempts Reached Modal */}
-<Dialog
-  open={maxAttemptsModalOpen}
-  onClose={handleMaxAttemptsModalClose}
-  aria-labelledby="max-attempts-dialog-title"
-  aria-describedby="max-attempts-dialog-description"
->
-  <DialogTitle
-    id="max-attempts-dialog-title"
-    sx={{ display: "flex", alignItems: "center", color: "warning.main" }}
-  >
-    <WarningIcon color="warning" sx={{ mr: 1 }} />
-    {"Maximum Attempts Reached"}
-  </DialogTitle>
-  <DialogContent>
-    <DialogContentText id="max-attempts-dialog-description">
-      You have reached the maximum limit of 3 attempts for this assessment. 
-      No further attempts are allowed.
-    </DialogContentText>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={handleMaxAttemptsModalClose}>Close</Button>
-  </DialogActions>
-</Dialog>
+      <Dialog
+        open={maxAttemptsModalOpen}
+        onClose={handleMaxAttemptsModalClose}
+        aria-labelledby="max-attempts-dialog-title"
+        aria-describedby="max-attempts-dialog-description"
+      >
+        <DialogTitle
+          id="max-attempts-dialog-title"
+          sx={{ display: "flex", alignItems: "center", color: "warning.main" }}
+        >
+          <WarningIcon color="warning" sx={{ mr: 1 }} />
+          {"Maximum Attempts Reached"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="max-attempts-dialog-description">
+            You have reached the maximum limit of 3 attempts for this assessment. No further
+            attempts are allowed.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleMaxAttemptsModalClose}>Close</Button>
+        </DialogActions>
+      </Dialog>
       <ChildDocumentsDialog
         open={openChildDialog}
         onClose={() => setOpenChildDialog(false)}
@@ -650,35 +645,27 @@ const handleMaxAttemptsClick = () => {
         documentId={selectedDocId}
       />
 
-<Dialog
+      <Dialog
         open={downloadModalOpen}
         onClose={handleDownloadModalClose}
         aria-labelledby="download-confirmation-dialog-title"
         aria-describedby="download-confirmation-dialog-description"
       >
-        <DialogTitle id="download-confirmation-dialog-title">
-          Confirm Download
-        </DialogTitle>
+        <DialogTitle id="download-confirmation-dialog-title">Confirm Download</DialogTitle>
         <DialogContent>
           <DialogContentText id="download-confirmation-dialog-description">
             Are you sure you want to download the report for this document?
           </DialogContentText>
-          
+
           {downloadError && (
-            <MDTypography 
-              variant="body2" 
-              color="error" 
-              sx={{ mt: 2 }}
-            >
+            <MDTypography variant="body2" color="error" sx={{ mt: 2 }}>
               {downloadError}
             </MDTypography>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDownloadModalClose}>
-            Cancel
-          </Button>
-          <MDButton 
+          <Button onClick={handleDownloadModalClose}>Cancel</Button>
+          <MDButton
             onClick={handleDownloadConfirm}
             color="primary"
             variant="contained"

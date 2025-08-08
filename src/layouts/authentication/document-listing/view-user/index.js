@@ -29,7 +29,7 @@ import { useAuth } from "hooks/use-auth";
 
 const ViewSelectionDialog = ({ open, onClose, documentId }) => {
   const { user } = useAuth();
-  const isAdmin = user?.user_permissions?.group?.id === 1;
+  const isAdmin = user?.user_permissions?.group?.id === 5;
 
   const { data, isLoading } = useSelectedUserGetQuery(
     { documentId },

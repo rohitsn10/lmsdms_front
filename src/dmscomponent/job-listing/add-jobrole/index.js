@@ -43,10 +43,10 @@ function AddJobRole() {
     const newErrors = {};
 
     if (!title.trim()) newErrors.title = "Job Role Title is required.";
-    if (!jobDescription.trim()) newErrors.jobDescription = "Job Description is required.";
-    if (!selectedPlant) newErrors.selectedPlant = "Plant selection is required.";
-    if (!selectedArea) newErrors.selectedArea = "Area selection is required.";
-    if (!selectedDepartment) newErrors.selectedDepartment = "Department selection is required.";
+    // if (!jobDescription.trim()) newErrors.jobDescription = "Job Description is required.";
+    // if (!selectedPlant) newErrors.selectedPlant = "Plant selection is required.";
+    // if (!selectedArea) newErrors.selectedArea = "Area selection is required.";
+    // if (!selectedDepartment) newErrors.selectedDepartment = "Department selection is required.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -141,7 +141,7 @@ function AddJobRole() {
                 fullWidth
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
-                error={!!errors.jobDescription}
+                // error={!!errors.jobDescription}
                 helperText={errors.jobDescription}
               />
             </MDBox>
@@ -154,7 +154,7 @@ function AddJobRole() {
                   value={selectedPlant}
                   onChange={(e) => setSelectedPlant(e.target.value)}
                   input={<OutlinedInput label="Plant Name" />}
-                  error={!!errors.selectedPlant}
+                  // error={!!errors.selectedPlant}
                   sx={{
                     minWidth: 200,
                     height: "3rem",
@@ -181,7 +181,7 @@ function AddJobRole() {
                   value={selectedArea}
                   onChange={(e) => setSelectedArea(e.target.value)}
                   input={<OutlinedInput label="Select Area" />}
-                  error={!!errors.selectedArea}
+                  // error={!!errors.selectedArea}
                   sx={{
                     minWidth: 200,
                     height: "3rem",
@@ -214,7 +214,7 @@ function AddJobRole() {
                   value={selectedDepartment}
                   onChange={(e) => setSelectedDepartment(e.target.value)}
                   label="Department"
-                  error={!!errors.selectedDepartment}
+                  // error={!!errors.selectedDepartment}
                   helperText={errors.selectedDepartment}
                   sx={{
                     minWidth: 200,
