@@ -84,6 +84,14 @@ export const dashboardApi = createApi({
         message: response.message,
       }),
     }),
+    getDocumentVersionCount: builder.query({
+      query: () => `dms_module/document_archived_count`, 
+      transformResponse: (response) => ({
+        status: response.status,
+        message: response.message,
+        totalCount: response.total_count,
+      }),
+    }),
   }),
 });
  
@@ -97,4 +105,5 @@ export const {
   useGetDocumentDataOfStatusIdnintyQuery,
   useGetDashboardDocumentQuery,
   useGetPrintRejectDocumentDataQuery,
+  useGetDocumentVersionCountQuery,
 } = dashboardApi;

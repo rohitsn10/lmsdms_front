@@ -26,6 +26,7 @@ import {
   useGetDocumentDataOfStatusIdTwoQuery,
   useGetDocumentDataOfStatusIdFourQuery,
   useGetDocumentDataOfStatusIdnintyQuery,
+  useGetDocumentVersionCountQuery
 } from "api/auth/dashboardApi";
 import { useGetPrintRequestsQuery } from "api/auth/printApi";
 import { useAuth } from "hooks/use-auth";
@@ -84,12 +85,15 @@ function Dashboard() {
     startDate: "",
     endDate: "",
   });
-const {
-  data: rejectedPrintData,
-  isLoading: loadingRejectedPrint,
-  error: errorRejectedPrint,
-} = useGetPrintRejectDocumentDataQuery();
-
+  const {
+    data: rejectedPrintData,
+    isLoading: loadingRejectedPrint,
+    error: errorRejectedPrint,
+  } = useGetPrintRejectDocumentDataQuery();
+  const { data: totalCount,
+     isLoading: loadingDocumentVersionCount, 
+    error: documentVersionCountError
+  } = useGetDocumentVersionCountQuery();
   const {
     data: savedraftData,
     isLoading: loadingSavedraft,
@@ -307,7 +311,7 @@ const {
                     color="error"
                     icon={<ArchiveIcon />}
                     title="Archived"
-                    // count={printdata?.total || 0}
+                    count={totalCount?.totalCount || 0}
                     percentage={{
                       color: "success",
                     }}
