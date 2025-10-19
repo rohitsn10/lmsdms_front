@@ -7,7 +7,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, OutlinedInput, Switch,FormControlLabel } from "@mui/material";
 import { useCreateUserMutation } from "api/auth/userApi";
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 import { getUserGroups } from "api/auth/auth";
@@ -23,6 +23,9 @@ function AddUser() {
   const [username, setUsername] = useState("");
   const [userRole, setUserRole] = useState([]);
   // const [department, setDepartment] = useState("");
+  const [employeeNumber, setEmployeeNumber] = useState(""); // ✅ new field
+  const [designation, setDesignation] = useState(""); // ✅ new field
+  const [isDmsUser, setIsDmsUser] = useState(false); 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userRoles, setUserRoles] = useState([]);
   const [errors, setErrors] = useState({});
@@ -50,6 +53,8 @@ function AddUser() {
     if (!firstName.trim()) newErrors.firstName = "First Name is required.";
     if (!lastName.trim()) newErrors.lastName = "Last Name is required.";
     if (!email.trim()) newErrors.email = "Email is required.";
+    if (!employeeNumber.trim()) newErrors.employeeNumber = "Employee Number is required."; // ✅
+    if (!designation.trim()) newErrors.designation = "Designation is required."; // ✅
     // if (!phone.trim()) newErrors.phone = "Phone is required.";
     if (!username.trim()) newErrors.username = "Username is required.";
     if (!userRole.length) newErrors.userRole = "User Role is required.";
@@ -82,8 +87,11 @@ function AddUser() {
       first_name: firstName,
       last_name: lastName,
       email,
+      employee_number: employeeNumber, // ✅ added
+      designation, // ✅ added
       // phone,
       username,
+      is_dms: isDmsUser,
       user_role: userRole,
       // department_id: department,
     };
@@ -107,6 +115,9 @@ function AddUser() {
     setLastName("");
     setEmail("");
     setPhone("");
+    setEmployeeNumber(""); // ✅
+    setDesignation(""); // ✅
+    setIsDmsUser(false);
     setUsername("");
     setUserRole([]);
    
@@ -190,6 +201,44 @@ function AddUser() {
                 onChange={(e) => setUsername(e.target.value)}
                 error={!!errors.username}
                 helperText={errors.username}
+              />
+            </MDBox>
+            <MDBox mb={3}>
+              <MDInput
+                type="text"
+                label="Employee Number"
+                fullWidth
+                value={employeeNumber}
+                onChange={(e) => setEmployeeNumber(e.target.value)}
+                error={!!errors.employeeNumber}
+                helperText={errors.employeeNumber}
+              />
+            </MDBox>
+
+            {/* ✅ Designation */}
+            <MDBox mb={3}>
+              <MDInput
+                type="text"
+                label="Designation"
+                fullWidth
+                value={designation}
+                onChange={(e) => setDesignation(e.target.value)}
+                error={!!errors.designation}
+                helperText={errors.designation}
+                multiline
+                rows={3}
+              />
+            </MDBox>
+            <MDBox mb={3} display="flex" alignItems="center">
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isDmsUser}
+                    onChange={(e) => setIsDmsUser(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label="DMS User"
               />
             </MDBox>
             <MDBox mb={3}>

@@ -7,7 +7,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import { FormControl, InputLabel, Select, MenuItem, OutlinedInput } from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, OutlinedInput, FormControlLabel, Switch } from "@mui/material";
 import { useUpdateUserMutation } from "api/auth/userApi";
 import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 import { getUserGroups } from "api/auth/auth";
@@ -31,8 +31,11 @@ function EditUser() {
   const [userRoles, setUserRoles] = useState([userData.groups_list]);
   const [errors, setErrors] = useState({});
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
-  console.log(userData);
+  const [designation, setDesignation] = useState(userData.designation || ""); // ✅ New
+  const [employeeNumber, setEmployeeNumber] = useState(userData.employee_number || ""); // ✅ New
+  const [isDmsUser, setIsDmsUser] = useState(userData.is_dms_user || false);
   const [updateUser] = useUpdateUserMutation();
+  console.log(userData);
   const { data: departmentsData } = useFetchDepartmentsQuery();
 
   useEffect(() => {
@@ -53,6 +56,8 @@ function EditUser() {
     if (!lastName.trim()) newErrors.lastName = "Last Name is required.";
     if (!email.trim()) newErrors.email = "Email is required.";
     if (!username.trim()) newErrors.username = "Username is required.";
+    if (!designation.trim()) newErrors.designation = "Designation is required.";
+    if (!employeeNumber.trim()) newErrors.employeeNumber = "Employee Number is required.";
     if (!userRole.length) newErrors.userRole = "User Role is required.";
 
     setErrors(newErrors);
@@ -63,7 +68,7 @@ function EditUser() {
       localStorage.setItem("userData", JSON.stringify(location.state.user));
     }
   }, [location.state?.user]);
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -87,6 +92,9 @@ function EditUser() {
       id: userData.id,
       first_name: firstName,
       last_name: lastName,
+      designation, // ✅ Added
+      employee_number: employeeNumber, // ✅ Added
+      is_dms_user: isDmsUser,
       email,
       username,
       groups: userRole,
@@ -172,6 +180,49 @@ function EditUser() {
                 helperText={errors.username}
               />
             </MDBox>
+
+            <MDBox mb={3}>
+              <MDInput
+                type="number" // 👈 only allows numbers
+                label="Employee Number"
+                fullWidth
+                value={employeeNumber}
+                onChange={(e) => setEmployeeNumber(e.target.value.replace(/\D/, ""))} // 👈 remove any non-digit
+                error={!!errors.employeeNumber}
+                helperText={errors.employeeNumber}
+                inputProps={{
+                  min: 0, // 👈 optional — prevents negative numbers
+                  step: 1, // 👈 ensures integers only
+                }}
+              />
+            </MDBox>
+
+            <MDBox mb={3}>
+              <MDInput
+                multiline
+                rows={2}
+                type="text"
+                label="Designation"
+                fullWidth
+                value={designation}
+                onChange={(e) => setDesignation(e.target.value)}
+                error={!!errors.designation}
+                helperText={errors.designation}
+              />
+            </MDBox>
+
+            <MDBox mb={3}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isDmsUser}
+                    onChange={(e) => setIsDmsUser(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label="DMS User"
+              />
+            </MDBox>
             <MDBox mb={3}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="select-role-label">User Role</InputLabel>
@@ -224,7 +275,7 @@ function EditUser() {
                 color="submit"
                 fullWidth
                 type="submit"
-                // disabled={isLoading || isSubmitting}
+              // disabled={isLoading || isSubmitting}
               >
                 Submit
               </MDButton>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useResetPasswordMutation, useOtpResetPasswordMutation } from "api/auth/userProfileApi";
+import { useNavigate } from "react-router-dom";
+import { useOtpResetPasswordMutation } from "api/auth/userProfileApi";
 import Card from "@mui/material/Card";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -11,81 +12,76 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import { toast } from "react-toastify"; // ✅ make sure react-toastify is installed and imported
 
 function ResettPassword() {
-  const [oldPassword, setOldPassword] = useState("");
+  const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [otp, setOtp] = useState(Array(6).fill(""));
   const [errorMessage, setErrorMessage] = useState("");
-  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [step, setStep] = useState(1);
 
-  const [resetPassword] = useResetPasswordMutation();
-  const [otpResetPassword] = useOtpResetPasswordMutation();
-
-  const handleOldPasswordSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await resetPassword({ oldPassword });
-      console.log("API response:", response);
-  
-      if (response.data?.status) {
-        setStep(2);
-      } else {
-        setErrorMessage(response.data?.message || "Old password is incorrect!");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage("Failed to verify old password.");
-    }
-  };
-
-  const handleOtpChange = (index, value) => {
-    const newOtp = [...otp];
-    newOtp[index] = value.slice(-1);
-    setOtp(newOtp);
-  };
+  const [resetPassword] = useOtpResetPasswordMutation();
 
   const handleClear = () => {
-    setOldPassword("");
     setNewPassword("");
     setConfirmPassword("");
-    setOtp(Array(6).fill(""));
     setErrorMessage("");
+    setSuccessMessage("");
   };
 
   const toggleVisibility = (field) => {
-    if (field === "old") setShowOldPassword((prev) => !prev);
-    else if (field === "new") setShowNewPassword((prev) => !prev);
+    if (field === "new") setShowNewPassword((prev) => !prev);
     else setShowConfirmPassword((prev) => !prev);
   };
 
-  const handleUpdatePassword = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setErrorMessage("New Password and Confirm Password do not match!");
+
+    if (!newPassword || !confirmPassword) {
+      setErrorMessage("Both fields are required.");
+      setSuccessMessage("");
       return;
     }
+
+    if (newPassword !== confirmPassword) {
+      setErrorMessage("New Password and Confirm Password do not match!");
+      setSuccessMessage("");
+      return;
+    }
+
     try {
-      const otpCode = otp.join("");
-      const response = await otpResetPassword({ otp: otpCode, password: newPassword, confirmPassword });
-      if (response.data.status) {
-        setErrorMessage("Password updated successfully!");
+      const response = await resetPassword({
+        password: newPassword,
+        confirmPassword,
+      });
+
+      if (response.data?.status === true) {
+        toast.success("Password changed successfully!", { autoClose: 2000 });
+        setSuccessMessage("Password updated successfully!");
+        setErrorMessage("");
         handleClear();
+
+        // ✅ redirect to login page after short delay
+        setTimeout(() => navigate("/login"), 2000);
       } else {
-        setErrorMessage("OTP or password is incorrect.");
+        setErrorMessage(response.data?.message || "Failed to update password.");
+        setSuccessMessage("");
+        toast.error(response.data?.message || "Failed to update password.");
       }
     } catch (error) {
-      setErrorMessage("Failed to update password.");
+      console.error("Error:", error);
+      setErrorMessage("An error occurred while updating password.");
+      setSuccessMessage("");
+      toast.error("An error occurred while updating password.");
     }
   };
 
   return (
     <BasicLayout image={bgImage} showNavbarFooter={false}>
-      <Card sx={{ width: 600, mx: "auto" }}>
+      <Card sx={{ width: 500, mx: "auto" }}>
         <MDBox
           borderRadius="lg"
           sx={{
@@ -99,7 +95,7 @@ function ResettPassword() {
           }}
         >
           <MDTypography variant="h3" fontWeight="medium" color="#344767" mt={1}>
-           Reset Password
+            Reset Password
           </MDTypography>
         </MDBox>
 
@@ -116,101 +112,62 @@ function ResettPassword() {
         </MDBox>
 
         <MDBox pb={3} px={3}>
-          {step === 1 && (
-            <MDBox component="form" role="form" onSubmit={handleOldPasswordSubmit} sx={{ padding: 3 }}>
-              {errorMessage && (
-                <MDTypography color="error" align="center" mb={2}>
-                  {errorMessage}
-                </MDTypography>
-              )}
-              <MDBox mb={3}>
-                <MDInput
-                  type={showOldPassword ? "text" : "password"}
-                  label="Old Password"
-                  fullWidth
-                  value={oldPassword}
-                  onChange={(e) => setOldPassword(e.target.value)}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => toggleVisibility("old")}>
-                          {showOldPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </MDBox>
-              <MDBox mt={2} mb={1}>
-                <MDButton variant="gradient" color="submit" fullWidth type="submit">
-                  Verify Password
-                </MDButton>
-              </MDBox>
-            </MDBox>
-          )}
+          <MDBox component="form" role="form" onSubmit={handleSubmit} sx={{ padding: 3 }}>
+            {errorMessage && (
+              <MDTypography color="error" align="center" mb={2}>
+                {errorMessage}
+              </MDTypography>
+            )}
+            {successMessage && (
+              <MDTypography color="success" align="center" mb={2}>
+                {successMessage}
+              </MDTypography>
+            )}
 
-          {step === 2 && (
-            <MDBox component="form" role="form" onSubmit={handleUpdatePassword} sx={{ padding: 3 }}>
-              {errorMessage && (
-                <MDTypography color="error" align="center" mb={2}>
-                  {errorMessage}
-                </MDTypography>
-              )}
-              <MDBox mb={3} display="flex" justifyContent="space-between">
-                {[...Array(6)].map((_, index) => (
-                  <MDInput
-                    key={index}
-                    type="text"
-                    value={otp[index]}
-                    onChange={(e) => handleOtpChange(index, e.target.value)}
-                    sx={{ width: "48px", mx: 0.5 }}
-                    inputProps={{ maxLength: 1 }}
-                  />
-                ))}
-              </MDBox>
-              <MDBox mb={3}>
-                <MDInput
-                  type={showNewPassword ? "text" : "password"}
-                  label="New Password"
-                  fullWidth
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => toggleVisibility("new")}>
-                          {showNewPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </MDBox>
-              <MDBox mb={3}>
-                <MDInput
-                  type={showConfirmPassword ? "text" : "password"}
-                  label="Confirm Password"
-                  fullWidth
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => toggleVisibility("confirm")}>
-                          {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </MDBox>
-              <MDBox mt={2} mb={1}>
-                <MDButton variant="gradient" color="submit" fullWidth type="submit">
-                 Change password
-                </MDButton>
-              </MDBox>
+            <MDBox mb={3}>
+              <MDInput
+                type={showNewPassword ? "text" : "password"}
+                label="New Password"
+                fullWidth
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => toggleVisibility("new")}>
+                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
             </MDBox>
-          )}
+
+            <MDBox mb={3}>
+              <MDInput
+                type={showConfirmPassword ? "text" : "password"}
+                label="Confirm Password"
+                fullWidth
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => toggleVisibility("confirm")}>
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </MDBox>
+
+            <MDBox mt={2} mb={1}>
+              <MDButton variant="gradient" color="submit" fullWidth type="submit">
+                Change Password
+              </MDButton>
+            </MDBox>
+          </MDBox>
         </MDBox>
       </Card>
     </BasicLayout>

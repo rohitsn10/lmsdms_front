@@ -79,61 +79,75 @@ function Login() {
   };
   
   const handleOk = async () => {
-    if (!selectedRole) return;
-  
-    const selectedRoleObj = roles.find(role => role.name === selectedRole);
-    const group_id = selectedRoleObj ? selectedRoleObj.id : null;
-  
-    if (!group_id) {
-      setError("Role selection is invalid.");
-      return;
-    }
-  
-    try {
-      const response = await login({
-        username: userId,
-        password,
-        group_id,
-      });
-  
-      if (response && response.data) {
-        const { status, data } = response.data;
-        
-        if (status === true) {
-          const { token, is_password_expired } = data;
-          const userFirstName = data.first_name || "User";
-          
-          if (is_password_expired) {
-            setError("Your password has expired. Please reset it.");
-            navigate("/reset-password"); 
-            return;
-          }
-  
-          if (token) {
-            // console.log("Login Details:",data.is_dms_user,data.is_lms_user);
-            dispatch(setUserDetails({is_dms_user: data?.is_dms_user, is_lms_user: data?.is_lms_user, is_active: true}))
-            // dispatch(setUserDetails({is_dms_user: true, is_lms_user: false, is_active: true }))
-            sessionStorage.setItem("token", token);
-            updateUser(data, token);
-            updateRole(selectedRole);
-            setFirstName(userFirstName);
-            setDialogOpen(false);
-            setError("");
-            navigate("/lms-dashboard"); 
-          } else {
-            setError("Login successful, but missing required information.");
-          }
+  if (!selectedRole) return;
+
+  const selectedRoleObj = roles.find(role => role.name === selectedRole);
+  const group_id = selectedRoleObj ? selectedRoleObj.id : null;
+
+  if (!group_id) {
+    setError("Role selection is invalid.");
+    return;
+  }
+
+  try {
+    const response = await login({
+      username: userId,
+      password,
+      group_id,
+    });
+
+    if (response && response.data) {
+      const { status, data } = response.data;
+
+      if (status === true) {
+        const { token, is_password_expired, is_reset_password } = data;
+        const userFirstName = data.first_name || "User";
+
+        // ✅ Check if password expired
+        if (is_password_expired) {
+          setError("Your password has expired. Please reset it.");
+          navigate("/resett-password");
+          return;
+        }
+
+        // ✅ Check if user needs to reset password
+        if (is_reset_password === false) {
+          setError("You must reset your password before proceeding.");
+          navigate("/resett-password");
+          return;
+        }
+
+        // ✅ Continue normal login flow
+        if (token) {
+          dispatch(
+            setUserDetails({
+              is_dms_user: data?.is_dms_user,
+              is_lms_user: data?.is_lms_user,
+              is_active: true,
+            })
+          );
+          sessionStorage.setItem("token", token);
+          updateUser(data, token);
+          updateRole(selectedRole);
+          setFirstName(userFirstName);
+          setDialogOpen(false);
+          setError("");
+          navigate("/lms-dashboard");
         } else {
-          setError("Failed to login. Please try again.");
+          setError("Login successful, but missing required information.");
         }
       } else {
         setError("Failed to login. Please try again.");
       }
-    } catch (error) {
-      console.error("Login failed:", error);
+    } else {
       setError("Failed to login. Please try again.");
     }
-  };
+  } catch (error) {
+    console.error("Login failed:", error);
+    setError("Failed to login. Please try again.");
+  }
+};
+
   
   const handleCloseDialog = () => {
     setDialogOpen(false);

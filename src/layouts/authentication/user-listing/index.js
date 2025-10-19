@@ -59,27 +59,30 @@ const UsersListing = () => {
   const [downloadTrainingCertificate] = useGetTrainingCompletionCertificateMutation();
   const formattedData = Array.isArray(data?.data)
     ? data.data.map((item, index) => ({
-        id: item.id,
-        serial_number: index + 1,
-        full_name: item.first_name ? `${item.first_name} ${item.last_name || ""}`.trim() : "N/A",
-        email: item.email || "N/A",
-        username: item.username || "N/A",
-        created_at: item.created_at ? moment(item.created_at).format("DD/MM/YYYY") : "N/A",
-        UserRole: item.groups_list?.map((group) => group.name).join(", ") || "N/A",
-        is_department_assigned: item.is_department_assigned || false,
-        is_description: item.is_description || false,
-        is_jr_approve: item.is_jr_approve || false,
-        is_induction_complete: item.is_induction_complete,
-        job_role: Array.isArray(item.job_role) ? item.job_role.join(", ") : item.job_role || "N/A",
-        departmentId: item.depratment || "N/A",
-        remark: item.remarks,
-        depratment: item.department_name || "Not Assigned",
-        is_qualification: item.is_qualification || false,
-        is_induction_certificate: item.is_induction_certificate || false,
-        first_name: item.first_name,
-        last_name: item.last_name,
-        groups_list: item.groups_list?.map((group) => group.id).join(", ") || "N/A",
-      }))
+      id: item.id,
+      serial_number: index + 1,
+      full_name: item.first_name ? `${item.first_name} ${item.last_name || ""}`.trim() : "N/A",
+      email: item.email || "N/A",
+      username: item.username || "N/A",
+      created_at: item.created_at ? moment(item.created_at).format("DD/MM/YYYY") : "N/A",
+      UserRole: item.groups_list?.map((group) => group.name).join(", ") || "N/A",
+      is_department_assigned: item.is_department_assigned || false,
+      is_description: item.is_description || false,
+      is_jr_approve: item.is_jr_approve || false,
+      is_induction_complete: item.is_induction_complete,
+      job_role: Array.isArray(item.job_role) ? item.job_role.join(", ") : item.job_role || "N/A",
+      departmentId: item.depratment || "N/A",
+      remark: item.remarks,
+      depratment: item.department_name || "Not Assigned",
+      is_qualification: item.is_qualification || false,
+      is_induction_certificate: item.is_induction_certificate || false,
+      first_name: item.first_name,
+      last_name: item.last_name,
+      groups_list: item.groups_list?.map((group) => group.id).join(", ") || "N/A",
+      designation: item.designation || "N/A",
+      is_dms_user: item.is_dms_user ?? true, // use ?? to handle undefined/null
+      employee_number: item.employee_number || "N/A",
+    }))
     : [];
   const [isJobDescriptionDialogOpen, setJobDescriptionDialogOpen] = useState(false);
   const [jobDescriptionUserId, setJobDescriptionUserId] = useState(null);
@@ -183,85 +186,85 @@ const UsersListing = () => {
 
     ...(groupId === 7
       ? [
-          {
-            field: "action",
-            headerName: "Assign Department",
-            flex: 0.7,
-            headerAlign: "center",
-            renderCell: (params) => (
-              <IconButton
-                color="success"
-                onClick={() => handleAssignDepartmentClick(params.row)}
-                // disabled={params.row.is_department_assigned} // Disable if department is assigned
-              >
-                <AssignmentIndIcon />
-              </IconButton>
-            ),
-          },
-        ]
+        {
+          field: "action",
+          headerName: "Assign Department",
+          flex: 0.7,
+          headerAlign: "center",
+          renderCell: (params) => (
+            <IconButton
+              color="success"
+              onClick={() => handleAssignDepartmentClick(params.row)}
+            // disabled={params.row.is_department_assigned} // Disable if department is assigned
+            >
+              <AssignmentIndIcon />
+            </IconButton>
+          ),
+        },
+      ]
       : []),
     ...(groupId === 7
       ? [
-          {
-            field: "action 2",
-            headerName: "JD Assign",
-            flex: 0.5,
-            headerAlign: "center",
-            renderCell: (params) => {
-              const isRemarkPresent = !!params.row.remark; // Check if 'remark' exists
-              const iconColor = isRemarkPresent ? "error" : "warning"; // Change color dynamically
-              const IconComponent = isRemarkPresent ? AssignmentLateIcon : AssignmentIcon; // Choose icon dynamically
+        {
+          field: "action 2",
+          headerName: "JD Assign",
+          flex: 0.5,
+          headerAlign: "center",
+          renderCell: (params) => {
+            const isRemarkPresent = !!params.row.remark; // Check if 'remark' exists
+            const iconColor = isRemarkPresent ? "error" : "warning"; // Change color dynamically
+            const IconComponent = isRemarkPresent ? AssignmentLateIcon : AssignmentIcon; // Choose icon dynamically
 
-              return (
-                <IconButton
-                  color={iconColor}
-                  onClick={() => handleAssignJDClick(params.row)}
-                  disabled={!params.row.is_induction_certificate}
-                >
-                  <IconComponent />
-                </IconButton>
-              );
-            },
+            return (
+              <IconButton
+                color={iconColor}
+                onClick={() => handleAssignJDClick(params.row)}
+                disabled={!params.row.is_induction_certificate}
+              >
+                <IconComponent />
+              </IconButton>
+            );
           },
-        ]
+        },
+      ]
       : []),
     ...(groupId === 6
       ? [
-          {
-            field: "action 3",
-            headerName: "JD Approve",
-            flex: 0.5,
-            headerAlign: "center",
-            renderCell: (params) => (
-              <IconButton
-                color="inherit"
-                onClick={() => handleTaskDescriptionClick(params.row)}
-                disabled={params.row.is_jr_approve} // Enable only if JD is assigned
-              >
-                <AddTaskIcon />
-              </IconButton>
-            ),
-          },
-        ]
+        {
+          field: "action 3",
+          headerName: "JD Approve",
+          flex: 0.5,
+          headerAlign: "center",
+          renderCell: (params) => (
+            <IconButton
+              color="inherit"
+              onClick={() => handleTaskDescriptionClick(params.row)}
+              disabled={params.row.is_jr_approve} // Enable only if JD is assigned
+            >
+              <AddTaskIcon />
+            </IconButton>
+          ),
+        },
+      ]
       : []),
     ...(groupId === 7
       ? [
-          {
-            field: "download_ic",
-            headerName: "Induction Certificate",
-            flex: 0.5,
-            headerAlign: "center",
-            renderCell: (params) => (
-              <IconButton
-                color="info"
-                onClick={() => handleDownloadICClick(params.row)}
-                disabled={!params.row.is_induction_complete}
-              >
-                <DownloadIcon />
-              </IconButton>
-            ),
-          },
-        ]
+        {
+          field: "download_ic",
+          headerName: "Induction Certificate",
+          flex: 0.5,
+          headerAlign: "center",
+          renderCell: (params) => (
+            <IconButton
+              color="info"
+              onClick={() => handleDownloadICClick(params.row)}
+              disabled={!params.row.is_induction_complete}
+            >
+              <DownloadIcon />
+            </IconButton>
+          ),
+        },
+      ]
       : []),
 
     {
@@ -295,22 +298,22 @@ const UsersListing = () => {
 
     ...(groupId === 7
       ? [
-          {
-            field: "download_training_certificate",
-            headerName: "Download Training Certificate",
-            flex: 0.5,
-            headerAlign: "center",
-            renderCell: (params) => (
-              <IconButton
-                color="success"
-                onClick={() => handleDownloadTrainingCertificate(params.row)}
-                disabled={!params.row.is_qualification}
-              >
-                <DownloadIcon />
-              </IconButton>
-            ),
-          },
-        ]
+        {
+          field: "download_training_certificate",
+          headerName: "Download Training Certificate",
+          flex: 0.5,
+          headerAlign: "center",
+          renderCell: (params) => (
+            <IconButton
+              color="success"
+              onClick={() => handleDownloadTrainingCertificate(params.row)}
+              disabled={!params.row.is_qualification}
+            >
+              <DownloadIcon />
+            </IconButton>
+          ),
+        },
+      ]
       : []),
   ];
 
@@ -404,10 +407,10 @@ const UsersListing = () => {
         selectedUserid={selectedUser ? selectedUser.id : null}
       />
       <JobDescriptionListDialog
-  open={isJobDescriptionDialogOpen}
-  onClose={() => setJobDescriptionDialogOpen(false)}
-  userId={jobDescriptionUserId}
-/>
+        open={isJobDescriptionDialogOpen}
+        onClose={() => setJobDescriptionDialogOpen(false)}
+        userId={jobDescriptionUserId}
+      />
 
     </MDBox>
   );

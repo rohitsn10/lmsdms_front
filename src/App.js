@@ -296,7 +296,7 @@ export default function App() {
   <CssBaseline />
   <div>
     {/* Always render Sidenav */}
-    {window.location.pathname !== "/login" && !/^\/document-view\/\d+$/.test(pathname) && window.location.pathname !== "/forgotpassword" && window.location.pathname !== "/mcq-module" &&
+    {window.location.pathname !== "/login" && !/^\/document-view\/\d+$/.test(pathname) && window.location.pathname !== "/forgotpassword" && window.location.pathname !== "/resett-password" && window.location.pathname !== "/mcq-module" &&
      window.location.pathname !== '/docviewer' && window.location.pathname  !== '/training-document-view'&& window.location.pathname !== '/parent-training-document-view' && window.location.pathname  !== '/archived-docviewer' &&   !/^\/exam-mcq-module\/\d+$/.test(pathname) &&   !/^\/mcq-module\/\d+$/.test(pathname) 
      &&(
       <Sidenav

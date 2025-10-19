@@ -337,34 +337,25 @@ function DashboardNavbar({ absolute, light, isMini }) {
               <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} />
               <Typography>LMS</Typography>
             </Stack> */}
-            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-              <Typography
-                sx={{
-                  fontSize: "17px",
-                }}
-              >
-                DMS
-              </Typography>
-              <AntSwitch
-                checked={is_active} // Switch position based on is_active
-                onChange={handleToggle}
-                inputProps={{ "aria-label": "ant design" }}
-              />
-              <Typography
-                sx={{
-                  fontSize: "17px",
-                }}
-              >
-                LMS
-              </Typography>
-            </Stack>
+            {is_dms_user && (
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                <Typography sx={{ fontSize: "17px" }}>DMS</Typography>
+                <AntSwitch
+                  checked={is_active} // Switch position based on is_active
+                  onChange={handleToggle}
+                  inputProps={{ "aria-label": "ant design" }}
+                />
+                <Typography sx={{ fontSize: "17px" }}>LMS</Typography>
+              </Stack>
+            )}
+
             <MDBox pr={1}>
               <Button
                 endIcon={<AccountCircleIcon />}
                 variant="text"
                 size="large"
                 sx={navbarIconButton}
-                // onClick={handleClickOpen}
+              // onClick={handleClickOpen}
               >
                 {role}
               </Button>
