@@ -30,11 +30,13 @@ import {
   useFetchAllDocumentsQuery,
 } from "api/auth/documentApi";
 import { useFetchWorkflowsQuery } from "api/auth/workflowApi";
+import { useFetchDepartmentsQuery } from "api/auth/departmentApi";
 
 function AddDocument() {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("");
   const [documentNumber, setDocumentNumber] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
   const [description, setDescription] = useState("");
   const [revisionMonth, setRevisionMonth] = useState("");
   const [revisionTime, setRevisionTime] = useState("");
@@ -61,10 +63,10 @@ function AddDocument() {
 
   // const { data: userdata, isLoading, error } = useDepartmentWiseReviewerQuery();
   // const users = userdata || [];
-
+  const { data: departments, isLoading, isError } = useFetchDepartmentsQuery();
   const [selectedUser, setSelectedUser] = useState("");
   const [errors, setErrors] = useState({});
-
+  console.log(">>>>",departments)
   // const validateInputs = () => {
   //   const newErrors = {};
 
@@ -101,7 +103,7 @@ function AddDocument() {
       newErrors.revisionMonth = "Revision month must be a positive number.";
     if (!workflow) newErrors.workflow = "Workflow is required.";
     if (!template) newErrors.template = "Template is required.";
-
+    if (!departmentId) newErrors.department = "Department is required.";
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
       toast.error("Please fill all required fields.");
@@ -181,6 +183,7 @@ function AddDocument() {
     setTemplate("");
     setTrainingRequired("No");
     setOperations("Create online");
+    setDepartmentId("")
     setErrors({});
   };
 
@@ -209,6 +212,7 @@ function AddDocument() {
         // visible_to_users: selectedUsers, // Assuming selectedUsers is an array
         parent_document: parentDocument,
         // parent_document: [parentDocument],
+        department_id: departmentId,
         equipment_id: equipmentId,
         product_code: productCode,
       };
@@ -385,7 +389,47 @@ function AddDocument() {
                 fullWidth
               />
             </MDBox> */}
-
+<MDBox mb={3}>
+  <FormControl fullWidth margin="dense">
+    <InputLabel id="select-department-label">Department</InputLabel>
+    <Select
+      labelId="select-department-label"
+      id="select-department"
+      value={departmentId}
+      onChange={(e) => {
+        setDepartmentId(e.target.value);
+        if (errors.departmentId) {
+          setErrors((prevErrors) => ({ ...prevErrors, departmentId: null }));
+        }
+      }}
+      input={<OutlinedInput label="Department" />}
+      sx={{
+        minWidth: 200,
+        height: "3rem",
+        ".MuiSelect-select": { padding: "0.45rem" },
+      }}
+    >
+      {isLoading ? (
+        <MenuItem disabled>Loading departments...</MenuItem>
+      ) : isError ? (
+        <MenuItem disabled>Error loading departments</MenuItem>
+      ) : Array.isArray(departments) && departments.length > 0 ? (
+        departments.map((dept) => (
+          <MenuItem key={dept.id} value={dept.id}>
+            {dept.department_name}
+          </MenuItem>
+        ))
+      ) : (
+        <MenuItem disabled>No departments available</MenuItem>
+      )}
+    </Select>
+    {errors.departmentId && (
+      <p style={{ color: "red", fontSize: "0.75rem", marginTop: "4px" }}>
+        {errors.departmentId}
+      </p>
+    )}
+  </FormControl>
+</MDBox>
             <MDBox mb={3}>
               <MDInput
                 type="text"

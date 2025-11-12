@@ -428,6 +428,7 @@ const TrainingListing = () => {
         const maxAttemptsReached = attemptCount >= 3;
         const handleMaxAttemptsClick = () => {
           setMaxAttemptsModalOpen(true);
+          // console.log("Max Attempts Reached:", attemptCount);
         };
         const handleBlacklistedClick = () => {
           // Show dialog for blacklisted users
