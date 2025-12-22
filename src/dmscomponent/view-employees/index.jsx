@@ -122,7 +122,7 @@ function ViewEmployeeStatus() {
   ? data?.data
       .map((user, index) => ({
         id: user.id,
-        empNo: `E00${index + 1}`,
+        empNo: user.employee_number,
         name: user.full_name,
         is_user_created: user.is_user_created,
         is_department_assigned: user.is_department_assigned,
