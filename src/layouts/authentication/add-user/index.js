@@ -98,13 +98,24 @@ function AddUser() {
 
     try {
       const response = await createUser(userData).unwrap();
-      toast.success("User added successfully!");
-      setTimeout(() => {
-        navigate("/user-listing");
-      }, 1500);
+
+  if (response?.status) {
+    toast.success(response.message || "User created successfully");
+
+    setTimeout(() => {
+      navigate("/user-listing");
+    }, 1500);
+  } else {
+    toast.warning(response.message || "Something went wrong");
+  }
     } catch (error) {
-      toast.error("Failed to create user. Please try again.");
-      console.error("Failed to create user:", error);
+      const backendMessage =
+    error?.data?.message ||
+    error?.error ||
+    "Server error. Please try again.";
+
+  toast.error(backendMessage);
+  console.error("Create user error:", error);
     } finally {
       setIsSubmitting(false);
     }

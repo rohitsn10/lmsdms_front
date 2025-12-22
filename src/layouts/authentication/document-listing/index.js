@@ -21,7 +21,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ConditionalDialog from "./effective";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import BrowserUpdatedOutlinedIcon from "@mui/icons-material/BrowserUpdatedOutlined";
-import RuleFolderIcon from '@mui/icons-material/RuleFolder';
+import RuleFolderIcon from "@mui/icons-material/RuleFolder";
 import ImportContactsTwoToneIcon from "@mui/icons-material/ImportContactsTwoTone";
 import FolderSharedOutlinedIcon from "@mui/icons-material/FolderSharedOutlined";
 import ChildDocumentsDialog from "./child-document";
@@ -39,7 +39,7 @@ const DocumentListing = () => {
   const { user } = useAuth();
   const group = user?.user_permissions?.group || {};
   const groupId = group.id;
-  console.log("GRORORO",group)
+  // console.log("GRORORO",group)
   const [searchTerm, setSearchTerm] = useState("");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -58,7 +58,7 @@ const DocumentListing = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openviewDialog, setOpenviewDialog] = useState(false);
   const [department, setDepartment] = useState("");
-  const [downloadUrl, setDownloadUrl] = useState(null); 
+  const [downloadUrl, setDownloadUrl] = useState(null);
   const [documentEffective, { isLoading: isEffecting, isError: isEffectError }] =
     useDocumentEffectiveMutation();
   const version = searchParams.get("version");
@@ -73,11 +73,14 @@ const DocumentListing = () => {
   useEffect(() => {
     refetch();
   }, [location.key]);
-  const { data: response, error} = useFetchDocumentExcelReportQuery({
-    department_id: department,
-  }, {
-    skip: !isReportRequested,
-  });
+  const { data: response, error } = useFetchDocumentExcelReportQuery(
+    {
+      department_id: department,
+    },
+    {
+      skip: !isReportRequested,
+    }
+  );
 
   const revisionMonth = data?.revision_month;
 
@@ -124,16 +127,14 @@ const DocumentListing = () => {
       console.error("Invalid params object:", params);
       return; // Exit if params or row is missing
     }
-    
+
     const {
-      id,
       document_current_status,
       select_template,
       training_required,
       approval_status,
       version,
       is_reviewed,
-      
     } = params.row;
     // console.log("Version", version);
     // Ensure required fields are defined
@@ -142,14 +143,14 @@ const DocumentListing = () => {
       document_current_status === undefined ||
       training_required === undefined ||
       approval_status === undefined ||
-      is_reviewed === undefined 
+      is_reviewed === undefined
     ) {
       console.error("Missing data in params.row:", params.row);
       return;
     }
     // console.log("Console.log check for ID:",params?.row?.version)
     navigate(
-      `/document-view/${id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}&is_reviewed=${is_reviewed}`
+      `/document-view/${original_id}?status=${document_current_status}&training_required=${training_required}&approvalstatus=${approval_status}&version=${version}&templateID=${select_template}&is_reviewed=${is_reviewed}`
     );
     // console.log("Navigated with:", {
     //   id,
@@ -192,7 +193,7 @@ const DocumentListing = () => {
       try {
         // Call the mutation with the document ID and status
         await documentEffective({
-          document: selectedRow.id,
+          document: selectedRow.original_id,
           status: "7", // Pass the status "7" as requested
         }).unwrap(); // unwrap to access the response directly
 
@@ -209,7 +210,13 @@ const DocumentListing = () => {
   };
   const handleViewFile = (url, new_url, params) => {
     // navigate("/PreView", { state: { templateDoc: url,new_url:new_url, templateData: params } }); // Pass the URL as state
-    navigate("/docviewer", { state: { docId: params.id, templateId: params.select_template,document_current_status:params.document_current_status } });
+    navigate("/docviewer", {
+      state: {
+        docId: params.original_id,
+        templateId: params.select_template,
+        document_current_status: params.document_current_status,
+      },
+    });
     // console.log(params)
     // console.log(params.id,params.select_template  )
   };
@@ -256,9 +263,9 @@ const DocumentListing = () => {
       fetch(downloadUrl)
         .then((res) => res.blob()) // Convert the response to a Blob
         .then((blob) => {
-          const link = document.createElement('a');
+          const link = document.createElement("a");
           link.href = URL.createObjectURL(blob);
-          link.download = 'document_report.xlsx'; // Set the desired file name
+          link.download = "document_report.xlsx"; // Set the desired file name
           document.body.appendChild(link); // Append the link to the body (required for Firefox)
           link.click();
           document.body.removeChild(link); // Clean up and remove the link
@@ -266,8 +273,8 @@ const DocumentListing = () => {
           setDownloadUrl(null); // Reset the download URL
         })
         .catch((error) => {
-          console.error('Error downloading the file:', error);
-          toast.error('Failed to download the report.');
+          console.error("Error downloading the file:", error);
+          toast.error("Failed to download the report.");
           setIsReportRequested(false); // Reset request flag on error
         });
     }
@@ -288,35 +295,37 @@ const DocumentListing = () => {
         doc.created_at.toLowerCase().includes(searchTerm.toLowerCase())) &&
       doc.document_current_status !== 12
   );
-//  const uniqueFilteredData = filteredData?.filter((doc, index, self) => 
-//   index === self.findIndex(d => d.id === doc.id)
-// );
+  //  const uniqueFilteredData = filteredData?.filter((doc, index, self) =>
+  //   index === self.findIndex(d => d.id === doc.id)
+  // );
   const rows = filteredData?.map((doc, index) => {
     const effectiveDate = doc.effective_date ? moment(doc.effective_date) : null;
     const revisionMonths = doc.revision_month ? parseInt(doc.revision_month, 10) : null;
-    
+
     // Calculate revision_date only if effective_date exists and revision_month is valid
     let revisionDate = "N/A";
     if (effectiveDate && revisionMonths) {
-      revisionDate = moment(effectiveDate).add(revisionMonths, 'months').format("DD/MM/YY");
+      revisionDate = moment(effectiveDate).add(revisionMonths, "months").format("DD/MM/YY");
     }
-  
+
     return {
       ...doc,
-      index,
+      original_id: doc.id, // ✅ keep backend id
+      id: `${doc.id}-${index}`, // ✅ UNIQUE id for DataGrid
+      srNo: index + 1, // ✅ correct Sr.No
       created_at: doc.created_at ? moment(doc.created_at).format("DD/MM/YY") : "N/A",
       effective_date: doc.effective_date ? moment(doc.effective_date).format("DD/MM/YY") : "N/A", // Keep as received from API
       revision_date: revisionDate, // Dynamically calculated
     };
   });
-   
+
   const columns = [
     {
       field: "index",
       headerName: "Sr.No.",
       flex: 0.3,
       headerAlign: "center",
-      renderCell: (params) => <span>{params.row.index + 1}</span>,
+      renderCell: (params) => <span>{params.row.srNo}</span>,
       sortable: false,
       filterable: false,
     },
@@ -365,7 +374,7 @@ const DocumentListing = () => {
       headerName: "Version",
       flex: 0.4,
       headerAlign: "center",
-    }, 
+    },
     {
       field: "created_at",
       headerName: "Created Date",
@@ -380,12 +389,16 @@ const DocumentListing = () => {
       renderCell: (params) => {
         // Check for the specific condition: is_done is true and current_status_name is "Under Reviewer"
         // console.log("Print params:::",params);
-        if (( groupId ==3 &&( params.row.is_done === false || params.row.is_done === null)  && params.row.document_current_status == 8)) {
-          return <span>Under Reviewer</span>
+        if (
+          groupId == 3 &&
+          (params.row.is_done === false || params.row.is_done === null) &&
+          params.row.document_current_status == 8
+        ) {
+          return <span>Under Reviewer</span>;
         }
         // Otherwise, display the original current_status_name
         return <span>{params.row.current_status_name}</span>;
-      }
+      },
     },
     {
       field: "view_Users",
@@ -424,8 +437,11 @@ const DocumentListing = () => {
       renderCell: (params) => (
         <MDBox display="flex" gap={1}>
           {hasPermission(userPermissions, "document", "isChange") && (
-            <IconButton color="primary" onClick={() => handleEditClick(params.row)}
-            disabled={params.row.document_current_status >= 7}>
+            <IconButton
+              color="primary"
+              onClick={() => handleEditClick(params.row)}
+              disabled={params.row.document_current_status >= 7}
+            >
               <EditIcon />
             </IconButton>
           )}
@@ -436,7 +452,7 @@ const DocumentListing = () => {
                 params.row.selected_template_url,
                 params.row.front_file_url,
                 params.row,
-                params.row.current_status_name,
+                params.row.current_status_name
               );
               // console.log()
               // console.log("Params", params.row);
@@ -459,7 +475,8 @@ const DocumentListing = () => {
               params.row.current_status_name !== "Release" &&
               !(
                 (groupId === 3 && params.row.current_status_name == "Under Approver") ||
-                params.row.document_current_status === 7 || params.row.document_current_status === 9
+                params.row.document_current_status === 7 ||
+                params.row.document_current_status === 9
               ) && ( // Hide if status is "Approve"
                 <IconButton color="inherit" onClick={() => handleClick(params)}>
                   <EditCalendarIcon />
@@ -488,7 +505,7 @@ const DocumentListing = () => {
       filterable: false,
     },
     {
-      field: "preview_download", 
+      field: "preview_download",
       headerName: "Download",
       flex: 0.4,
       headerAlign: "center",
@@ -499,7 +516,7 @@ const DocumentListing = () => {
             onClick={() => {
               navigate("/PDFPreview", {
                 state: {
-                  documentId: params.row.id,
+                  documentId: params.row.original_id,
                 },
               });
             }}
@@ -539,25 +556,30 @@ const DocumentListing = () => {
       : []),
     ...(groupId === 5
       ? [
-        {
-          field: "effective",
-          headerName: "Effective",
-          flex: 0.4,
-          headerAlign: "center",
-          renderCell: (params) => (
-            <MDBox display="flex" justifyContent="center">
-              <IconButton
-                color="success"
-                onClick={() => handleEffectiveClick(params.row)}
-                disabled={!(params.row.document_current_status === 6 || params.row.document_current_status === 11)}
-              >
-                 <RuleFolderIcon />
-              </IconButton>
-            </MDBox>
-          ),
-          sortable: false,
-          filterable: false,
-        },
+          {
+            field: "effective",
+            headerName: "Effective",
+            flex: 0.4,
+            headerAlign: "center",
+            renderCell: (params) => (
+              <MDBox display="flex" justifyContent="center">
+                <IconButton
+                  color="success"
+                  onClick={() => handleEffectiveClick(params.row)}
+                  disabled={
+                    !(
+                      params.row.document_current_status === 6 ||
+                      params.row.document_current_status === 11
+                    )
+                  }
+                >
+                  <RuleFolderIcon />
+                </IconButton>
+              </MDBox>
+            ),
+            sortable: false,
+            filterable: false,
+          },
         ]
       : []),
   ];
@@ -589,7 +611,6 @@ const DocumentListing = () => {
                   sx={{
                     minWidth: 200,
                     height: "2.50rem",
-                    
                   }}
                 >
                   {isDepartmentsLoading ? (
@@ -615,7 +636,12 @@ const DocumentListing = () => {
             </MDButton>
           )}
           {groupId === 5 && (
-            <MDButton variant="gradient" color="submit" onClick={handleDownloadReport} sx={{ ml: 2 }}>
+            <MDButton
+              variant="gradient"
+              color="submit"
+              onClick={handleDownloadReport}
+              sx={{ ml: 2 }}
+            >
               Generate Excel
             </MDButton>
           )}
@@ -664,7 +690,7 @@ const DocumentListing = () => {
         onClose={handleDialogClose}
         onConfirm={() => console.log("Confirmed for row:", selectedRow)}
         trainingStatus={selectedRow?.training_required || "false"}
-        documentId={selectedRow?.id || ""}
+        documentId={selectedRow?.original_id  || ""}
         revisionMonth={selectedRow?.revision_month}
         isParent={selectedRow?.is_parent}
         parentId={selectedRow?.parent_document}
@@ -672,14 +698,14 @@ const DocumentListing = () => {
       <ChildDocumentsDialog
         open={openChildDialog}
         onClose={() => setOpenChildDialog(false)}
-        documentId={selectedRow?.id || ""}
+        documentId={selectedRow?.original_id  || ""}
       />
       <ObsoleteDialog
         open={ObsoletedialogOpen}
         onClose={handleObsoleteClose}
         onConfirm={handleObsoleteConfirm}
         documentTitle={selectedRow?.document_title || "Unknown Document"} // Pass document_title here
-        documentId={selectedRow?.id || ""}
+        documentId={selectedRow?.original_id  || ""}
         selectedRow={selectedRow}
       />
       <EffectiveDialog
@@ -691,7 +717,7 @@ const DocumentListing = () => {
       <ViewSelectionDialog
         open={openviewDialog}
         onClose={() => setOpenviewDialog(false)}
-        documentId={selectedRow?.id || ""}
+        documentId={selectedRow?.original_id  || ""}
       />
       {/* <ReviseDialog
   open={isReviseDialogOpen}
@@ -703,7 +729,7 @@ const DocumentListing = () => {
     </MDBox>
   );
 };
- 
+
 DocumentListing.propTypes = {
   userPermissions: PropTypes.arrayOf(
     PropTypes.shape({

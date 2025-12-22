@@ -46,7 +46,7 @@ function AddJobRole() {
     // if (!jobDescription.trim()) newErrors.jobDescription = "Job Description is required.";
     // if (!selectedPlant) newErrors.selectedPlant = "Plant selection is required.";
     // if (!selectedArea) newErrors.selectedArea = "Area selection is required.";
-    // if (!selectedDepartment) newErrors.selectedDepartment = "Department selection is required.";
+    if (!selectedDepartment) newErrors.selectedDepartment = "Department selection is required.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -87,6 +87,9 @@ function AddJobRole() {
     setTitle("");
     setJobDescription("");
     setErrors({});
+    setSelectedDepartment("");
+    setSelectedPlant("");
+    setSelectedArea("");
   };
 
   return (
