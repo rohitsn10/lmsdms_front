@@ -151,14 +151,15 @@ import {
   MenuItem,
 } from "@mui/material";
 import MDButton from "components/MDButton";
+
 import {
   useCreateJobDescriptionMutation,
   useGetJobDescriptionListQuery,
   useSaveDescriptionMutation,
-  useGetJobRolesQuery,
+  
 } from "apilms/jobRoleApi";
 import { toast } from "react-toastify";
-
+const { data, isLoading, error } = useGetJobRoleQuery();
 const JobDescriptionDialog = ({ open, onClose, userId, remark }) => {
   const [jobDescription, setJobDescription] = useState("");
   const [jobRoleId, setJobRoleId] = useState("");
