@@ -1,24 +1,13 @@
-name: Deploy LMSDMS Frontend
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Deploy to Ubuntu VM
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22
-          script: |
-            cd /home/itadmin/lmsdms_frontend
-            git pull origin main
-            sudo systemctl restart gunicorn
-            sudo systemctl restart nginx
+- name: Deploy LMSDMS Frontend
+  uses: appleboy/ssh-action@v1.0.0
+  with:
+    host: ${{ secrets.SERVER_HOST }}
+    username: ${{ secrets.SERVER_USER }}
+    key: ${{ secrets.SERVER_SSH_KEY }}
+    port: 22
+    script: |
+      set -e
+      cd /home/itadmin/lmsdms_frontend
+      git pull origin main
+      npm install
+      npm run build
