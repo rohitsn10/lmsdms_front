@@ -44,10 +44,10 @@ export const jobroleApi = createApi({
       transformResponse: (response) => response, // Handle raw response
     }),
     createJobDescription: builder.mutation({
-      query: ({ user_id, employee_job_description }) => ({
+      query: ({ user_id, employee_job_description,job_role_id }) => ({
         url: "lms_module/jobdescriptioncreate",
         method: "POST",
-        body: { user_id, employee_job_description },
+        body: { user_id, employee_job_description,job_role_id },
       }),
       transformResponse: (response) => response, // Handle raw response
     }),

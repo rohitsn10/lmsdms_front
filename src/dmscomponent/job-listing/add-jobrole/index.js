@@ -58,31 +58,42 @@ function AddJobRole() {
     setOpenSignatureDialog(true);
   };
   const handleSignatureComplete = async (password) => {
-    setOpenSignatureDialog(false);
+  setOpenSignatureDialog(false);
 
-    if (!password) {
-      toast.error("E-Signature is required to proceed.");
-      return;
-    }
+  if (!password) {
+    toast.error("E-Signature is required to proceed.");
+    return;
+  }
 
-    try {
-      await createJobRole({
-        job_role_name: title.trim(),
-        job_role_description: jobDescription.trim(),
-        plant: selectedPlant,
-        area: selectedArea,
-        department: selectedDepartment,
-      }).unwrap();
+  try {
+    const response = await createJobRole({
+      job_role_name: title.trim(),
+      job_role_description: jobDescription.trim(),
+      plant: selectedPlant,
+      area: selectedArea,
+      department: selectedDepartment,
+    }).unwrap();
 
-      toast.success("Job Role added successfully!");
-      setTimeout(() => {
-        navigate("/jobrole-listing");
-      }, 1500);
-    } catch (error) {
-      console.error("Error submitting job role:", error);
-      toast.error("Failed to add job role. Please try again.");
-    }
-  };
+    // backend success message
+    toast.success(response?.message || "Job Role added successfully!");
+
+    setTimeout(() => {
+      navigate("/jobrole-listing");
+    }, 1500);
+
+  } catch (error) {
+    console.error("Error submitting job role:", error);
+
+    // 🔥 THIS is the important part
+    const backendMessage =
+      error?.data?.message ||
+      error?.error ||
+      "Failed to add job role. Please try again.";
+
+    toast.error(backendMessage);
+  }
+};
+
   const handleClear = () => {
     setTitle("");
     setJobDescription("");
@@ -217,7 +228,7 @@ function AddJobRole() {
                   value={selectedDepartment}
                   onChange={(e) => setSelectedDepartment(e.target.value)}
                   label="Department"
-                  // error={!!errors.selectedDepartment}
+                  error={!!errors.selectedDepartment}
                   helperText={errors.selectedDepartment}
                   sx={{
                     minWidth: 200,
